@@ -11,6 +11,8 @@ namespace ImpossibleLab.Core
         public const string RainLab = "RainLab";
         public const string ObstacleCourse = "ObstacleCourse";
         public const string FlightDeck = "FlightDeck";
+        /// <summary>4週目の組み立て式の実験（実験計画で決まる。画面・保存の対応は6週目）。</summary>
+        public const string ScenarioLab = "ScenarioLab";
         public static bool IsValid(string e) => e == RainLab || e == ObstacleCourse || e == FlightDeck;
         public static string ForCategory(string category) =>
             category == "carrier" ? ObstacleCourse : category == "mobility" ? FlightDeck : RainLab;

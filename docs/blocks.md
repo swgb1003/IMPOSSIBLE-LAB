@@ -5,7 +5,7 @@
 
 > どれも**ゲーム・教育向けの簡易モデル**で、現実の性能や安全性の予測ではない。
 > 乱数を使わない計算で、同じ入力なら同じ結果になる。
-> **実験場（シナリオ・環境モジュール）への組み込みは4週目**。それまでは、カタログに登録してあるが AI には渡していない（`ExposeToAi = false`、`proxy/catalog.json` は変わらない）。
+> 4週目に実験計画（シナリオ・環境モジュール・計測項目）とつないだ（`docs/experiments.md` 4章）。AI にはまだ渡していない（`ExposeToAi = false`、5週目に対応）。
 
 ## 0. 共通
 
@@ -136,14 +136,14 @@
 | lightNoticeNightLx | 夜に光に気づく照度 | 1×10⁻⁵ lx（10⁻⁶〜10⁻⁴） | 推定 |
 | lightNoticeDayLx | 昼に光に気づく照度 | 1×10⁻³ lx（10⁻⁴〜10⁻²） | 推定 |
 
-## 10. 4週目でつなぐもの
+## 10. 実験場とのつながり（4週目に実装、`docs/experiments.md` 4章）
 
 | ブロック | シナリオ | 環境モジュール | 計測項目 |
 |---|---|---|---|
-| illuminate | stand / walk_route | darkness | 足元の照度 |
+| illuminate | stand（walk_route は未対応） | darkness | 足元の照度・照度の最小 |
 | heat / cool | sit_still | temperature | 温度変化・到達時間 |
-| sun_shade | stand / walk_route | sunlight | 日陰率 |
+| sun_shade | stand | sunlight | 日陰率・体が受ける日射 |
 | impact_cushion | drop_test | drop | 最大減速度（G） |
-| grip / lift_load | lift_task | payload | 落とした回数・持ち上げ時間・電力 |
-| detect | stand / walk_route | targets・obstacles | 検知率・検知までの時間 |
+| grip / lift_load | lift_task | payload・shelf | 落とした回数・持ち上げ時間・電力 |
+| detect | stand | targets・obstacles | 検知率（動く対象の「検知までの時間」は未対応） |
 | alert | stand | darkness | 通知の届く距離 |

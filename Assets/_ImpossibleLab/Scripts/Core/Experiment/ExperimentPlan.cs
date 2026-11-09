@@ -199,11 +199,14 @@ namespace ImpossibleLab.Core
             if (p.Metrics.Count > ExperimentCatalog.MaxMetrics) errors.Add($"計測項目は{ExperimentCatalog.MaxMetrics}個までです");
             if (p.Criteria.Count > ExperimentCatalog.MaxCriteria) errors.Add($"合格条件は{ExperimentCatalog.MaxCriteria}個までです");
             var seen = new HashSet<string>();
+            var scenario = ExperimentCatalog.Scenario(p.Scenario);
             foreach (var m in p.Modules)
             {
                 var info = ExperimentCatalog.Module(m.Type);
                 if (info == null) { errors.Add($"未対応の環境モジュール: {Short(m.Type)}"); continue; }
                 if (!seen.Add(m.Type)) errors.Add($"環境モジュールが重複しています: {m.Type}");
+                if (scenario != null && !scenario.AllowedModules.Contains(m.Type))
+                    errors.Add($"{info.LabelJa}（{m.Type}）はシナリオ {p.Scenario} では使えません（使用可能: {string.Join(", ", scenario.AllowedModules)}）");
                 foreach (var kv in m.Params)
                 {
                     var pi = info.Param(kv.Key);
@@ -211,6 +214,9 @@ namespace ImpossibleLab.Core
                     else if (kv.Value < pi.Min || kv.Value > pi.Max) errors.Add($"{info.LabelJa}の{pi.LabelJa}が範囲外です（{pi.Min}〜{pi.Max}）");
                 }
             }
+            // 雨の実験（RainSimulator）は、この版では風以外のモジュールと組み合わせない
+            if (p.Has("rain") && p.Modules.Any(m => m.Type != "rain" && m.Type != "wind"))
+                errors.Add("雨（rain）は、この版では風（wind）以外の環境モジュールと組み合わせられません");
             var metricSet = new HashSet<string>();
             foreach (var key in p.Metrics)
             {

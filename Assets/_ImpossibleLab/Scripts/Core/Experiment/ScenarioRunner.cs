@@ -26,13 +26,24 @@ namespace ImpossibleLab.Core
         public Vector3 Device;
         public float DeviceYaw;
         public bool CollidedNow;
+        /// <summary>再生用の追加の値（温度・衝撃など、シナリオごとに意味が違う）。</summary>
+        public float Aux;
+        /// <summary>動いている機能ブロックの消費電力の合計（REALITY の「機能の消費電力」）。</summary>
+        public float BlockPowerW;
 
-        /// <summary>実験計画にない計測を除くため、結果に入れる前に通す。</summary>
+        /// <summary>
+        /// 計測を結果に入れる。実験計画にない計測、シナリオ・環境モジュール・モードの条件を満たさない計測は入れない
+        /// （計画の検証と同じ条件。機能の有無は各モデルが判断する）。
+        /// </summary>
         public void AddMetric(string key, float value)
         {
-            if (Plan.Metrics.Count > 0 && !Plan.Metrics.Contains(key)) return;
             var info = ExperimentCatalog.Metric(key);
             if (info == null) throw new ArgumentException("未登録の計測項目: " + key);
+            if (Plan.Metrics.Count > 0 && !Plan.Metrics.Contains(key)) return;
+            if (info.Scenarios.Length > 0 && Array.IndexOf(info.Scenarios, Plan.Scenario) < 0) return;
+            foreach (var need in info.Modules) if (!Plan.Has(need)) return;
+            if (info.RealityOnly && !Reality) return;
+            if (float.IsNaN(value) || float.IsInfinity(value)) throw new ArgumentException("計測値が不正です: " + key);
             Result.Metrics.Add(info.Make(value));
         }
     }
@@ -75,8 +86,8 @@ namespace ImpossibleLab.Core
             if (errors.Count > 0) throw new ArgumentException("実験計画が不正です: " + string.Join(" / ", errors.Take(3)));
             var run = new CourseRun { Result = result };
             var ctx = new SimContext { Dna = dna, Plan = plan, Result = result, Run = run, Reality = plan.Mode == LabModes.Reality };
-            var scenario = CreateScenario(plan.Scenario);
-            var models = CreateModels(plan.Scenario, dna);
+            var scenario = CreateScenario(plan);
+            var models = CreateModels(plan, dna);
             scenario.Begin(ctx);
             foreach (var m in models) m.Begin(ctx);
             float nextFrame = 0f;
@@ -89,34 +100,93 @@ namespace ImpossibleLab.Core
                 foreach (var m in models) m.AfterTick(ctx);
                 if (ctx.T >= nextFrame || ctx.CollidedNow)
                 {
-                    run.Frames.Add(new CourseFrame { Time = ctx.T, Device = ctx.Device, YawDeg = ctx.DeviceYaw, Leader = new Vector3(ctx.Leader.x, 0f, ctx.Leader.y), Collision = ctx.CollidedNow });
+                    run.Frames.Add(new CourseFrame { Time = ctx.T, Device = ctx.Device, YawDeg = ctx.DeviceYaw, Leader = new Vector3(ctx.Leader.x, 0f, ctx.Leader.y), Collision = ctx.CollidedNow, Aux = ctx.Aux });
                     if (ctx.T >= nextFrame) nextFrame += FrameInterval;
                 }
                 foreach (var m in models) m.AfterFrame(ctx);
             }
             foreach (var m in models) m.End(ctx);
+            if (ExperimentCatalog.Scenario(plan.Scenario)?.JudgedByCriteria == true) Judge(ctx, models.Count);
             return run;
         }
 
-        static IScenario CreateScenario(string id)
+        /// <summary>
+        /// 4週目のシナリオ（stand・sit_still・drop_test・lift_task）を実行する入口。保存・画面の対応は6週目。
+        /// </summary>
+        public static CourseRun RunPlan(InventionDna dna, ExperimentPlan plan, string experimentId = null, string startTime = null)
         {
-            switch (id)
+            var result = new RainExperimentResult
+            {
+                ExperimentId = experimentId ?? "exp-" + plan.Seed, InventionId = dna.Id, Revision = dna.Revision,
+                Environment = LabEnvironments.ScenarioLab, StartTime = startTime ?? "",
+                Config = new RainExperimentConfig { Mode = plan.Mode, Seed = plan.Seed, DurationSec = plan.DurationSec },
+            };
+            return Run(dna, plan, result);
+        }
+
+        static IScenario CreateScenario(ExperimentPlan plan)
+        {
+            switch (plan.Scenario)
             {
                 case ExperimentCatalog.WalkRoute: return new WalkRouteScenario();
                 case ExperimentCatalog.FlyToTarget: return new FlyToTargetScenario();
-                default: throw new ArgumentException("このシナリオは ScenarioRunner ではまだ実行できません: " + id + "（stand は RainSimulator）");
+                case ExperimentCatalog.SitStill: return new SitStillScenario();
+                case ExperimentCatalog.DropTest: return new DropTestScenario();
+                case ExperimentCatalog.LiftTask: return new LiftTaskScenario();
+                case ExperimentCatalog.Stand:
+                    if (plan.Has("rain")) throw new ArgumentException("雨のある stand は RainSimulator で実行してください");
+                    return new StandScenario();
+                default: throw new ArgumentException("このシナリオは ScenarioRunner では実行できません: " + plan.Scenario);
             }
         }
 
         /// <summary>
-        /// 発明品の動きを決めるモデル。2週目の時点ではシナリオごとに1つ（4週目に取り付け位置と機能ブロックから組み立てる形にする）。
+        /// 発明品の動きを決めるモデル。既存の運搬・移動はシナリオごとに1つ、4週目のシナリオは発明にある機能ブロックから組み立てる。
         /// </summary>
-        static List<IBlockModel> CreateModels(string scenario, InventionDna dna)
+        static List<IBlockModel> CreateModels(ExperimentPlan plan, InventionDna dna)
         {
             var list = new List<IBlockModel>();
-            if (scenario == ExperimentCatalog.WalkRoute) list.Add(new GroundFollowerModel());
-            else if (scenario == ExperimentCatalog.FlyToTarget) list.Add(new FlightModel());
+            bool Has(string b) => dna.FindBehavior(b) != null;
+            switch (plan.Scenario)
+            {
+                case ExperimentCatalog.WalkRoute: list.Add(new GroundFollowerModel()); break;
+                case ExperimentCatalog.FlyToTarget: list.Add(new FlightModel()); break;
+                case ExperimentCatalog.Stand:
+                    if (Has("illuminate")) list.Add(new IlluminateBlock());
+                    if (plan.Has("sunlight")) list.Add(new SunShadeBlock());
+                    if (Has("detect")) list.Add(new DetectBlock());
+                    if (Has("alert")) list.Add(new AlertBlock());
+                    break;
+                case ExperimentCatalog.SitStill: if (Has("heat") || Has("cool")) list.Add(new ThermalBlock()); break;
+                case ExperimentCatalog.DropTest: list.Add(new CushionBlock()); break;
+                case ExperimentCatalog.LiftTask: if (Has("lift_load") || Has("grip")) list.Add(new LiftBlock()); break;
+            }
             return list;
+        }
+
+        /// <summary>
+        /// 合否：実験計画の合格条件（なければ ExperimentCatalog.DefaultCriteria のうち測れたもの）をすべて満たすこと。
+        /// 測れなかった条件があれば不合格（理由を「制限」に出す）。
+        /// </summary>
+        static void Judge(SimContext ctx, int modelCount)
+        {
+            var r = ctx.Result;
+            if (ctx.Reality && ctx.BlockPowerW > 0f) ctx.AddMetric("blockPowerW", ctx.BlockPowerW);
+            if (modelCount == 0) r.Limits.Add("このシナリオで働く機能がこの発明にない");
+            var criteria = ctx.Plan.Criteria.Count > 0 ? ctx.Plan.Criteria : ExperimentCatalog.DefaultCriteria.Where(c => r.Metric(c.Metric) != null).ToList();
+            bool ok = criteria.Count > 0;
+            var texts = new List<string>();
+            foreach (var c in criteria)
+            {
+                var info = ExperimentCatalog.Metric(c.Metric);
+                string target = $"{info.LabelJa}{(c.Op == ">=" ? "≥" : "≤")}{c.Value.ToString(info.Format, System.Globalization.CultureInfo.InvariantCulture)}{info.Unit.Trim()}";
+                texts.Add(target);
+                var m = r.Metric(c.Metric);
+                if (m == null) { ok = false; r.Limits.Add($"合格条件「{target}」を測れなかった"); continue; }
+                if (!c.Check(m.Value)) { ok = false; r.Limits.Add($"合格条件を満たさない：{info.LabelJa} {m.Value.ToString(info.Format, System.Globalization.CultureInfo.InvariantCulture)}{info.Unit}（{target}{(string.IsNullOrEmpty(c.Reason) ? "" : "、" + c.Reason)}）"); }
+            }
+            r.Passed = ok;
+            r.Criteria = texts.Count > 0 ? string.Join("・", texts) : "合格条件なし（測れる計測項目がない）";
         }
     }
 

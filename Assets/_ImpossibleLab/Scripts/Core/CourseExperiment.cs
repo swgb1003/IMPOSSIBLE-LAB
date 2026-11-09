@@ -13,6 +13,8 @@ namespace ImpossibleLab.Core
         public float YawDeg;
         public Vector3 Leader;
         public bool Collision;
+        /// <summary>シナリオごとの追加の値（sit_still：温度 °C、drop_test：衝撃 G、lift_task：落としたら 1）。</summary>
+        public float Aux;
     }
 
     /// <summary>実験場の配置（可視化と計算で同じものを使う）。</summary>
@@ -22,6 +24,8 @@ namespace ImpossibleLab.Core
         public readonly List<Vector3> Obstacles = new List<Vector3>(); // x, z, 半径
         public Vector2 Start, Goal;
         public float CruiseHeight;
+        /// <summary>検知対象（x, z）。stand + targets。</summary>
+        public readonly List<Vector2> Targets = new List<Vector2>();
     }
 
     /// <summary>計算済みの実験（結果＋再生用の軌跡）。</summary>
