@@ -42,6 +42,7 @@ namespace ImpossibleLab.Core
             if (Plan.Metrics.Count > 0 && !Plan.Metrics.Contains(key)) return;
             if (info.Scenarios.Length > 0 && Array.IndexOf(info.Scenarios, Plan.Scenario) < 0) return;
             foreach (var need in info.Modules) if (!Plan.Has(need)) return;
+            if (Plan.Scenario == ExperimentCatalog.Stand) foreach (var need in info.StandModules) if (!Plan.Has(need)) return;
             if (info.RealityOnly && !Reality) return;
             if (float.IsNaN(value) || float.IsInfinity(value)) throw new ArgumentException("計測値が不正です: " + key);
             Result.Metrics.Add(info.Make(value));
@@ -85,6 +86,7 @@ namespace ImpossibleLab.Core
             ExperimentPlanJson.Validate(plan, null, errors); // 機能が足りない場合は失敗にせず、結果の「制限」に理由を出す
             if (errors.Count > 0) throw new ArgumentException("実験計画が不正です: " + string.Join(" / ", errors.Take(3)));
             var run = new CourseRun { Result = result };
+            result.Scenario = plan.Scenario;
             var ctx = new SimContext { Dna = dna, Plan = plan, Result = result, Run = run, Reality = plan.Mode == LabModes.Reality };
             var scenario = CreateScenario(plan);
             var models = CreateModels(plan, dna);

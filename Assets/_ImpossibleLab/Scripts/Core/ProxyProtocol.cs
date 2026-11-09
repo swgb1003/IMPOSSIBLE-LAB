@@ -20,7 +20,9 @@ namespace ImpossibleLab.Core
                 var lr = new JObject { ["mode"] = c.Mode, ["environment"] = last.Environment };
                 foreach (var m in last.Metrics) lr[m.Key] = m.Value;
                 if (last.Environment == LabEnvironments.ObstacleCourse) { lr["obstacleCount"] = c.ObstacleCount; lr["payloadKg"] = c.PayloadKg; }
-                else { lr["targetDistance"] = c.TargetDistance; lr["windSpeed"] = c.WindSpeed; lr["windDirectionDeg"] = c.WindDirectionDeg; }
+                else if (last.Environment == LabEnvironments.FlightDeck) { lr["targetDistance"] = c.TargetDistance; lr["windSpeed"] = c.WindSpeed; lr["windDirectionDeg"] = c.WindDirectionDeg; }
+                if (!string.IsNullOrEmpty(last.Scenario)) lr["scenario"] = last.Scenario;
+                if (last.Passed.HasValue) lr["passed"] = last.Passed.Value;
                 o["lastResult"] = lr;
             }
             else if (last != null)
@@ -57,12 +59,41 @@ namespace ImpossibleLab.Core
             var report = DnaJson.Parse(dna.ToString());
             if (!report.IsValid)
                 return new DesignOutcome { Status = DesignStatus.Failed, Report = report, Source = "ai", Message = "AIの設計が検証に通りませんでした：" + report.Summary };
-            return new DesignOutcome
+            var outcome = new DesignOutcome
             {
                 Status = DesignStatus.Success, Dna = report.Dna, Report = report, Source = "ai",
                 Message = "AI（Claude）が設計しました" + (report.Warnings.Count > 0 ? $"（範囲外の値 {report.Warnings.Count} 件を補正）" : ""),
                 DesignPoints = Strings(o["designPoints"], 4),
             };
+            ParsePlans(o["plans"], report.Dna, outcome.Plans, outcome.PlanErrors);
+            return outcome;
+        }
+
+        public const int MaxPlans = 3;
+
+        /// <summary>
+        /// AI の実験計画案（{ title, aim, plan }）を、アプリの検証（ExperimentPlanJson）に通す。通らないものは理由だけ残す。
+        /// </summary>
+        public static void ParsePlans(JToken t, InventionDna dna, List<ProposedPlan> plans, List<string> errors)
+        {
+            if (!(t is JArray arr)) return;
+            int i = 0;
+            foreach (var item in arr.Take(MaxPlans))
+            {
+                i++;
+                if (!(item is JObject po) || !(po["plan"] is JObject plan)) { errors.Add($"案{i}：形式が不正です"); continue; }
+                string title = Clip(po.Value<string>("title"), 40);
+                var r = ExperimentPlanJson.Parse(plan.ToString(Newtonsoft.Json.Formatting.None), dna);
+                if (!r.IsValid) { errors.Add($"案{i}（{title}）：{r.Summary}"); continue; }
+                plans.Add(new ProposedPlan { Title = title.Length > 0 ? title : $"実験案{i}", Aim = Clip(po.Value<string>("aim"), 120), Plan = r.Plan });
+            }
+        }
+
+        public static string PlanRequestJson(InventionDna current, string wish = null)
+        {
+            var o = new JObject { ["dna"] = DnaJson.ToJObject(current) };
+            if (!string.IsNullOrWhiteSpace(wish)) o["wish"] = wish.Trim();
+            return o.ToString(Newtonsoft.Json.Formatting.None);
         }
 
         public static RevisionOutcome ParseRevision(long httpStatus, string body, string transportError)
@@ -87,7 +118,7 @@ namespace ImpossibleLab.Core
         // 接続・混雑・鍵の問題だけをオフライン切替の対象にする。AIの出力が不正・拒否された場合はエラーとして見せる
         static readonly HashSet<string> ConnectivityCodes = new HashSet<string>
         {
-            "no_api_key", "upstream_timeout", "upstream_unreachable", "upstream_rate_limited", "rate_limited", "upstream_auth", "upstream_error", "internal",
+            "no_api_key", "upstream_billing", "upstream_timeout", "upstream_unreachable", "upstream_rate_limited", "rate_limited", "upstream_auth", "upstream_error", "internal",
         };
 
         public static bool IsConnectivityProblem(long httpStatus, string code) =>

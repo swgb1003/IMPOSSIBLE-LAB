@@ -165,6 +165,8 @@ namespace ImpossibleLab.Core
         public string InventionId;
         public int Revision;
         public string Environment = "RainLab";
+        /// <summary>実験計画のシナリオ（ScenarioRunner で実行したとき）。</summary>
+        public string Scenario = "";
         public RainExperimentConfig Config;
         public string StartTime;
         public int DropsTotal;

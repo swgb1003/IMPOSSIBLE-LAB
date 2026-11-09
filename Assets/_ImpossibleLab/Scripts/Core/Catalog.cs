@@ -92,24 +92,24 @@ namespace ImpossibleLab.Core
             new PartTypeInfo { Type = "body", LabelJa = "本体", MinScale = 0.03f, MaxScale = 1.0f },
             new PartTypeInfo { Type = "wheel", LabelJa = "車輪", MinScale = 0.03f, MaxScale = 0.6f, DefaultMaterial = "rubber" },
             new PartTypeInfo { Type = "container", LabelJa = "格納部", MinScale = 0.05f, MaxScale = 1.0f, DefaultShape = "box" },
-            new PartTypeInfo { Type = "sensor", LabelJa = "センサー", MinScale = 0.02f, MaxScale = 0.3f, DefaultShape = "sphere" },
+            new PartTypeInfo { Type = "sensor", LabelJa = "センサー", MinScale = 0.005f, MaxScale = 0.3f, DefaultShape = "sphere" },
             new PartTypeInfo { Type = "arm", LabelJa = "アーム", MinScale = 0.02f, MaxScale = 1.0f, DefaultShape = "capsule", DefaultMaterial = "aluminum" },
             new PartTypeInfo { Type = "canopy", LabelJa = "キャノピー（覆い）", MinScale = 0.02f, MaxScale = 3.0f, DefaultMaterial = "fabric" },
             new PartTypeInfo { Type = "thruster", LabelJa = "推進ユニット", MinScale = 0.03f, MaxScale = 0.5f, DefaultMaterial = "aluminum" },
             new PartTypeInfo { Type = "stabilizer", LabelJa = "姿勢安定ユニット", MinScale = 0.02f, MaxScale = 0.5f, DefaultShape = "box" },
             new PartTypeInfo { Type = "connector", LabelJa = "接続部", MinScale = 0.01f, MaxScale = 1.0f, DefaultMaterial = "aluminum" },
-            // DNA v2 で追加（docs/GENERAL_INVENTION_DESIGN.md 3章）
-            new PartTypeInfo { Type = "frame", LabelJa = "骨組み", MinScale = 0.01f, MaxScale = 1.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
-            new PartTypeInfo { Type = "panel", LabelJa = "板", MinScale = 0.005f, MaxScale = 1.5f, DefaultShape = "box" },
+            // DNA v2 で追加（docs/GENERAL_INVENTION_DESIGN.md 3章）。薄い部品・背の高い骨組みの範囲は AI 評価1回目（2026-11-09）の結果で広げた
+            new PartTypeInfo { Type = "frame", LabelJa = "骨組み", MinScale = 0.005f, MaxScale = 2.2f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "panel", LabelJa = "板", MinScale = 0.003f, MaxScale = 2.0f, DefaultShape = "box" },
             new PartTypeInfo { Type = "light", LabelJa = "発光部", MinScale = 0.01f, MaxScale = 0.3f },
-            new PartTypeInfo { Type = "heater", LabelJa = "加熱部", MinScale = 0.02f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
-            new PartTypeInfo { Type = "cooler", LabelJa = "冷却部", MinScale = 0.02f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "heater", LabelJa = "加熱部", MinScale = 0.003f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "cooler", LabelJa = "冷却部", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
             new PartTypeInfo { Type = "motor", LabelJa = "駆動部（関節）", MinScale = 0.02f, MaxScale = 0.3f, DefaultMaterial = "steel" },
             new PartTypeInfo { Type = "gripper", LabelJa = "つかみ具", MinScale = 0.02f, MaxScale = 0.4f, DefaultShape = "box" },
-            new PartTypeInfo { Type = "cushion", LabelJa = "緩衝材", MinScale = 0.01f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "foam" },
-            new PartTypeInfo { Type = "battery", LabelJa = "電池", MinScale = 0.02f, MaxScale = 0.4f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "cushion", LabelJa = "緩衝材", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "foam" },
+            new PartTypeInfo { Type = "battery", LabelJa = "電池", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box" },
             new PartTypeInfo { Type = "solar", LabelJa = "太陽電池", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "glass" },
-            new PartTypeInfo { Type = "speaker", LabelJa = "音を出す部品", MinScale = 0.02f, MaxScale = 0.3f },
+            new PartTypeInfo { Type = "speaker", LabelJa = "音を出す部品", MinScale = 0.005f, MaxScale = 0.3f },
             new PartTypeInfo { Type = "strap", LabelJa = "ベルト・取り付け具", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "fabric" },
         };
 
@@ -185,39 +185,39 @@ namespace ImpossibleLab.Core
                 P("skirtLength", "側面カバーの長さ", "m", 0f, 0.6f, 0f) } },
 
             // ---- 機能ブロック 第1弾（3週目）。計算式は Core/Blocks/BlockModels.cs・docs/blocks.md。実験場への組み込みは4週目 ----
-            new BehaviorInfo { Type = "illuminate", LabelJa = "照明", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "illuminate", LabelJa = "照明", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "light" }, ModelJa = "光度 I = lm ÷ (2π(1−cos(θ/2)))、床の照度 E = I cosα ÷ d²", Parameters = new[] {
                 P("lumens", "明るさ（光束）", "lm", 10f, 2000f, 150f, "0"),
                 P("beamAngleDeg", "光の広がり", "°", 10f, 160f, 60f, "0"),
                 P("tiltDeg", "下向きの角度", "°", 0f, 90f, 45f, "0") } },
-            new BehaviorInfo { Type = "heat", LabelJa = "加温", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "heat", LabelJa = "加温", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "heater" }, ModelJa = "集中定数の熱モデル C dT/dt = 電力×効率 − G(T − 外気温)", Parameters = new[] {
                 P("powerW", "加熱の電力", "W", 1f, 100f, 10f, "0") } },
-            new BehaviorInfo { Type = "cool", LabelJa = "冷却", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "cool", LabelJa = "冷却", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "cooler" }, ModelJa = "集中定数の熱モデル C dT/dt = −電力×成績係数 − G(T − 外気温)", Parameters = new[] {
                 P("powerW", "冷却の電力", "W", 1f, 100f, 10f, "0") } },
-            new BehaviorInfo { Type = "sun_shade", LabelJa = "日よけ", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "sun_shade", LabelJa = "日よけ", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "canopy", "panel" }, ModelJa = "平行光線と人型モデル（円柱）の影の判定（雨の実験と同じ方式）", Parameters = new[] {
                 P("radius", "日よけの半径", "m", 0.2f, 1.5f, 0.6f),
                 P("opacity", "遮光率", "", 0.1f, 1f, 0.9f) } },
-            new BehaviorInfo { Type = "impact_cushion", LabelJa = "衝撃吸収", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "impact_cushion", LabelJa = "衝撃吸収", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "cushion" }, ModelJa = "ばね・ダンパーの落下モデル（厚みを使い切ると硬くなる）", Parameters = new[] {
                 P("thicknessM", "緩衝材の厚み", "m", 0.005f, 0.2f, 0.03f, "0.000"),
                 P("stiffness", "緩衝材の硬さ", "N/m", 500f, 200000f, 20000f, "0") } },
-            new BehaviorInfo { Type = "grip", LabelJa = "つかむ", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "grip", LabelJa = "つかむ", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "gripper", "arm" }, ModelJa = "2面ではさむ：2μF ≥ m(g + 揺れの加速度)", Parameters = new[] {
                 P("gripForceN", "つかむ力", "N", 1f, 200f, 30f, "0"),
                 P("openingM", "開き幅", "m", 0.02f, 0.6f, 0.2f) } },
-            new BehaviorInfo { Type = "lift_load", LabelJa = "持ち上げ", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "lift_load", LabelJa = "持ち上げ", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "arm", "motor" }, ModelJa = "一定の速さで持ち上げる：電力 = m g v ÷ 効率", Parameters = new[] {
                 P("maxLoadKg", "持ち上げられる重さ", "kg", 0.5f, 30f, 5f, "0.0"),
                 P("liftHeightM", "持ち上げられる高さ", "m", 0.1f, 2f, 0.8f),
                 P("speed", "持ち上げる速さ", "m/s", 0.05f, 1f, 0.2f) } },
-            new BehaviorInfo { Type = "detect", LabelJa = "検知", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "detect", LabelJa = "検知", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "sensor" }, ModelJa = "距離・視野角・障害物による遮りの幾何判定", Parameters = new[] {
                 P("rangeM", "検知距離", "m", 0.5f, 30f, 5f, "0.0"),
                 P("fovDeg", "視野角", "°", 10f, 360f, 90f, "0") } },
-            new BehaviorInfo { Type = "alert", LabelJa = "通知", RequiresTargetPart = true, ExposeToAi = false,
+            new BehaviorInfo { Type = "alert", LabelJa = "通知", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "light", "speaker" }, ModelJa = "音：距離の逆二乗で弱まる、光：点の光が気づく照度に届く距離", Parameters = new[] {
                 P("loudnessDb", "音の大きさ（1 m）", "dB", 0f, 110f, 80f, "0"),
                 P("lightLumens", "光の明るさ", "lm", 0f, 500f, 50f, "0"),
@@ -271,7 +271,28 @@ namespace ImpossibleLab.Core
                 {
                     ["key"] = p.Key, ["labelJa"] = p.LabelJa, ["unit"] = p.Unit ?? "", ["min"] = p.Min, ["max"] = p.Max, ["default"] = p.Default,
                 })),
+                ["modelJa"] = b.ModelJa ?? "",
             }));
+            Newtonsoft.Json.Linq.JArray Named(IEnumerable<NamedOption> xs) => new Newtonsoft.Json.Linq.JArray(xs.Select(x => new Newtonsoft.Json.Linq.JObject { ["id"] = x.Id, ["labelJa"] = x.LabelJa }));
+            Newtonsoft.Json.Linq.JArray Strs(IEnumerable<string> xs) => new Newtonsoft.Json.Linq.JArray(xs);
+            var experiments = new Newtonsoft.Json.Linq.JObject
+            {
+                ["scenarios"] = new Newtonsoft.Json.Linq.JArray(ExperimentCatalog.Scenarios.Select(x => new Newtonsoft.Json.Linq.JObject
+                {
+                    ["id"] = x.Id, ["labelJa"] = x.LabelJa, ["description"] = x.Description, ["allowedModules"] = Strs(x.AllowedModules),
+                })),
+                ["modules"] = new Newtonsoft.Json.Linq.JArray(ExperimentCatalog.Modules.Select(m => new Newtonsoft.Json.Linq.JObject
+                {
+                    ["id"] = m.Id, ["labelJa"] = m.LabelJa,
+                    ["params"] = new Newtonsoft.Json.Linq.JArray(m.Params.Select(p => new Newtonsoft.Json.Linq.JObject
+                    { ["key"] = p.Key, ["labelJa"] = p.LabelJa, ["unit"] = p.Unit ?? "", ["min"] = p.Min, ["max"] = p.Max, ["default"] = p.Default })),
+                })),
+                ["metrics"] = new Newtonsoft.Json.Linq.JArray(ExperimentCatalog.Metrics.Select(m => new Newtonsoft.Json.Linq.JObject
+                {
+                    ["key"] = m.Key, ["labelJa"] = m.LabelJa, ["unit"] = (m.Unit ?? "").Trim(), ["lowerIsBetter"] = m.LowerIsBetter, ["realityOnly"] = m.RealityOnly,
+                    ["scenarios"] = Strs(m.Scenarios), ["anyBlocks"] = Strs(m.AnyBlocks), ["modules"] = Strs(m.Modules), ["standModules"] = Strs(m.StandModules), ["min"] = m.Min, ["max"] = m.Max,
+                })),
+            };
             var cats = new Newtonsoft.Json.Linq.JArray(Categories.Select(c => new Newtonsoft.Json.Linq.JObject
             {
                 ["id"] = c.Id, ["labelJa"] = c.LabelJa, ["experimentAvailable"] = c.ExperimentAvailable,
@@ -279,13 +300,22 @@ namespace ImpossibleLab.Core
             var root = new Newtonsoft.Json.Linq.JObject
             {
                 ["generatedBy"] = "ImpossibleLab.Core.LabCatalog.ToProxyJson (Unity で再生成すること。手で編集しない)",
+                ["schemaVersion"] = InventionDna.CurrentSchemaVersion,
                 ["partTypes"] = parts, ["behaviors"] = behaviors, ["categories"] = cats,
+                ["tags"] = Named(Tags), ["mounts"] = Named(Mounts), ["shapes"] = Named(Shapes),
+                ["materials"] = new Newtonsoft.Json.Linq.JArray(Materials.Select(m => new Newtonsoft.Json.Linq.JObject { ["id"] = m.Id, ["labelJa"] = m.LabelJa, ["densityKgM3"] = m.DensityKgM3 })),
+                ["functionStatuses"] = Strs(FunctionStatuses),
+                ["experiments"] = experiments,
                 ["appearances"] = new Newtonsoft.Json.Linq.JArray(Appearances.Select(a => new Newtonsoft.Json.Linq.JObject { ["id"] = a.Id, ["labelJa"] = a.LabelJa })),
                 ["limits"] = new Newtonsoft.Json.Linq.JObject
                 {
                     ["maxParts"] = InventionConstraints.HardMaxParts, ["maxBehaviors"] = MaxBehaviors,
                     ["positionLimitXZ"] = PositionLimitXZ, ["positionMinY"] = PositionMinY, ["positionMaxY"] = PositionMaxY,
                     ["maxNameLength"] = MaxNameLength, ["maxPurposeLength"] = MaxPurposeLength, ["maxRequestLength"] = RequestRules.MaxRequestLength,
+                    ["maxTags"] = MaxTags, ["maxFunctionNeeds"] = MaxFunctionNeeds, ["maxNeedLength"] = MaxNeedLength, ["maxNoteLength"] = MaxNoteLength,
+                    ["maxPlans"] = ProxyProtocol.MaxPlans, ["maxModules"] = ExperimentCatalog.MaxModules, ["maxMetrics"] = ExperimentCatalog.MaxMetrics,
+                    ["maxCriteria"] = ExperimentCatalog.MaxCriteria, ["maxReasonLength"] = ExperimentCatalog.MaxReasonLength,
+                    ["minDurationSec"] = RainExperimentConfig.MinDuration, ["maxDurationSec"] = RainExperimentConfig.MaxDuration,
                 },
             };
             return root.ToString(Newtonsoft.Json.Formatting.Indented);

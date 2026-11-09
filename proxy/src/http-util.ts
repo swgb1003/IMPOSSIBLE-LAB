@@ -18,22 +18,30 @@ export function checkRequestText(v: unknown, maxLength: number): string {
   return t;
 }
 
-/** 実験結果は既知の数値項目だけを Claude に渡す。 */
-export function pickExperiment(v: unknown): Record<string, number | string> | null {
+const LEGACY_FIELDS = ["coverageRatio", "wetnessScore", "headHits", "upperHits", "lowerHits", "baselineHits", "deviceHits",
+  "driftM", "rainIntensity", "windSpeed", "windDirectionDeg", "runtimeMinutes",
+  // 運搬（ObstacleCourse）
+  "collisionCount", "arrivalDelay", "followError", "averageFollowDistance", "maxGap", "energyWh", "obstacleCount", "payloadKg",
+  // 移動（FlightDeck）
+  "completionTime", "stabilityScore", "maxDeviation", "landingError", "maxAltitude", "requiredPowerKW", "availableFlightSec", "targetDistance"];
+const ENVIRONMENTS = ["RainLab", "ObstacleCourse", "FlightDeck", "ScenarioLab"];
+
+/**
+ * 実験結果は既知の項目だけを Claude に渡す。数値は従来の項目と実験カタログの計測項目（metricKeys）、
+ * 文字列はモード・実験場・シナリオ（scenarioIds にあるもの）だけ。
+ */
+export function pickExperiment(v: unknown, metricKeys: string[] = [], scenarioIds: string[] = []): Record<string, number | string | boolean> | null {
   if (typeof v !== "object" || v === null) return null;
   const src = v as Record<string, unknown>;
-  const out: Record<string, number | string> = {};
-  for (const k of ["coverageRatio", "wetnessScore", "headHits", "upperHits", "lowerHits", "baselineHits", "deviceHits",
-    "driftM", "rainIntensity", "windSpeed", "windDirectionDeg", "runtimeMinutes",
-    // 運搬（ObstacleCourse）
-    "collisionCount", "arrivalDelay", "followError", "averageFollowDistance", "maxGap", "energyWh", "obstacleCount", "payloadKg",
-    // 移動（FlightDeck）
-    "completionTime", "stabilityScore", "maxDeviation", "landingError", "maxAltitude", "requiredPowerKW", "availableFlightSec", "targetDistance"]) {
+  const out: Record<string, number | string | boolean> = {};
+  for (const k of new Set([...LEGACY_FIELDS, ...metricKeys])) {
     const x = src[k];
     if (typeof x === "number" && Number.isFinite(x)) out[k] = Math.round(x * 1000) / 1000;
   }
   if (src.mode === "dream" || src.mode === "reality") out.mode = src.mode;
-  if (src.environment === "RainLab" || src.environment === "ObstacleCourse" || src.environment === "FlightDeck") out.environment = src.environment;
+  if (typeof src.environment === "string" && ENVIRONMENTS.includes(src.environment)) out.environment = src.environment;
+  if (typeof src.scenario === "string" && scenarioIds.includes(src.scenario)) out.scenario = src.scenario;
+  if (typeof src.passed === "boolean") out.passed = src.passed;
   return Object.keys(out).length ? out : null;
 }
 

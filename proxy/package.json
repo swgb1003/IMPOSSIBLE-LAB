@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.ts",
     "test": "node --test test/*.test.ts",
-    "typecheck": "tsc -p ."
+    "typecheck": "tsc -p .",
+    "eval": "node eval/run-eval.ts"
   },
   "engines": {
     "node": ">=22.18"

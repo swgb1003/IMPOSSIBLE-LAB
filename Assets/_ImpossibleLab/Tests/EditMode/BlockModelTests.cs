@@ -232,13 +232,13 @@ namespace ImpossibleLab.Tests
         }
 
         // ---------------- カタログと係数 ----------------
-        [Test] public void Catalog_NewBlocksAreRegisteredButNotYetExposedToAi()
+        [Test] public void Catalog_NewBlocksAreRegisteredAndExposedToAi()
         {
             foreach (var type in NewBlocks)
             {
                 var info = LabCatalog.Behavior(type);
                 Assert.IsNotNull(info, type);
-                Assert.IsFalse(info.ExposeToAi, type + "：実験場ができるまで AI には渡さない");
+                Assert.IsTrue(info.ExposeToAi, type + "：5週目から AI に渡す");
                 Assert.IsNotEmpty(info.ModelJa, type);
                 Assert.IsNotEmpty(info.AllowedTargetTypes, type);
                 foreach (var t in info.AllowedTargetTypes) Assert.IsNotNull(LabCatalog.Part(t), $"{type} → {t}");
@@ -250,8 +250,13 @@ namespace ImpossibleLab.Tests
             }
             var proxy = Newtonsoft.Json.Linq.JObject.Parse(LabCatalog.ToProxyJson());
             var exported = proxy["behaviors"].Select(b => (string)b["type"]).ToList();
-            foreach (var type in NewBlocks) CollectionAssert.DoesNotContain(exported, type);
-            Assert.AreEqual(8, exported.Count, "AI に渡す機能は今の 8 種のまま");
+            foreach (var type in NewBlocks) CollectionAssert.Contains(exported, type);
+            Assert.AreEqual(LabCatalog.Behaviors.Length, exported.Count);
+            // 5週目：実験カタログ・タグ・取り付け位置も渡す
+            Assert.AreEqual(ExperimentCatalog.Metrics.Length, proxy["experiments"]["metrics"].Count());
+            Assert.AreEqual(ExperimentCatalog.Scenarios.Length, proxy["experiments"]["scenarios"].Count());
+            Assert.AreEqual(LabCatalog.Mounts.Length, proxy["mounts"].Count());
+            Assert.AreEqual(LabCatalog.Tags.Length, proxy["tags"].Count());
         }
 
         [Test] public void Coefficients_HaveRangeStatusAndSource()

@@ -37,6 +37,17 @@ namespace ImpossibleLab.Core
         public string Source = "offline";
         public List<string> DesignPoints = new List<string>();
         public List<string> Suggestions = new List<string>();
+        /// <summary>AI が設計と一緒に提案した実験計画（アプリで検証を通ったものだけ）。</summary>
+        public List<ProposedPlan> Plans = new List<ProposedPlan>();
+        /// <summary>検証に通らなかった実験計画の理由（黙って捨てない）。</summary>
+        public List<string> PlanErrors = new List<string>();
+    }
+
+    /// <summary>AI が提案した実験計画1案。</summary>
+    public sealed class ProposedPlan
+    {
+        public string Title = "", Aim = "";
+        public ExperimentPlan Plan;
     }
 
     public sealed class RevisionOutcome

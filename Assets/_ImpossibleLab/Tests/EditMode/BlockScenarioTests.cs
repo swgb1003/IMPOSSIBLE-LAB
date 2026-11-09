@@ -294,6 +294,7 @@ namespace ImpossibleLab.Tests
         [TestCase("\"mode\": \"reality\"", "\"mode\": \"dream\"", "REALITY")]
         [TestCase("\"footIlluminance\", \"alertRange\"", "\"footIlluminance\", \"peakImpactG\"", "シナリオ stand では測れません")]
         [TestCase("\"value\": 10", "\"value\": 200000", "範囲外")]
+        [TestCase("\"blockPowerW\" ]", "\"energyWh\" ]", "stand で測るには環境モジュール rain が必要")]
         public void PlanJson_RejectsInvalidNewScenarioPlans(string from, string to, string expect)
         {
             string json = NightPlan.Replace(from, to);

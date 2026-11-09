@@ -11,10 +11,12 @@ namespace ImpossibleLab.Core
         public const string AddPart = "add_part";
         public const string RemovePart = "remove_part";
         public const string UpdateParameter = "update_parameter";
-        public static bool IsValid(string op) => op == AddPart || op == RemovePart || op == UpdateParameter;
+        public const string AddBehavior = "add_behavior";
+        public const string RemoveBehavior = "remove_behavior";
+        public static bool IsValid(string op) => op == AddPart || op == RemovePart || op == UpdateParameter || op == AddBehavior || op == RemoveBehavior;
     }
 
-    /// <summary>改良の変更操作（仕様6.2）。add_part / remove_part / update_parameter のみ。</summary>
+    /// <summary>改良の変更操作（仕様6.2、5週目に機能の追加・削除を追加）。</summary>
     public sealed class RevisionOperation
     {
         public string Op;
@@ -23,6 +25,9 @@ namespace ImpossibleLab.Core
         public float Value;
         public string PartId;
         public PartSpec Part;
+        /// <summary>add_behavior：対象部品（空なら使える部品を自動で選ぶ）と、パラメータ（指定のないものは既定値）。</summary>
+        public string TargetPart;
+        public Dictionary<string, float> Parameters = new Dictionary<string, float>();
     }
 
     public sealed class RevisionProposal
@@ -69,6 +74,8 @@ namespace ImpossibleLab.Core
                     case RevisionOps.UpdateParameter: ApplyUpdate(next, op, result); break;
                     case RevisionOps.AddPart: ApplyAdd(next, op, result); break;
                     case RevisionOps.RemovePart: ApplyRemove(next, op, result); break;
+                    case RevisionOps.AddBehavior: ApplyAddBehavior(next, op, result); break;
+                    case RevisionOps.RemoveBehavior: ApplyRemoveBehavior(next, op, result); break;
                     default: result.Errors.Add($"未対応の変更操作: {op.Op}"); break;
                 }
             }
@@ -123,6 +130,56 @@ namespace ImpossibleLab.Core
             r.Changes.Add(new ChangeLine { Label = "部品削除", Before = $"{LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）", After = "—" });
         }
 
+        static void ApplyAddBehavior(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            var info = LabCatalog.Behavior(op.BehaviorType ?? "");
+            if (info == null) { r.Errors.Add($"未対応の機能: {op.BehaviorType}"); return; }
+            if (dna.FindBehavior(info.Type) != null) { r.Errors.Add($"機能 {info.LabelJa} はすでにあります"); return; }
+            if (dna.Behaviors.Count >= LabCatalog.MaxBehaviors) { r.Errors.Add($"機能の数が上限 {LabCatalog.MaxBehaviors} です"); return; }
+            string target = null;
+            if (info.RequiresTargetPart)
+            {
+                var part = !string.IsNullOrEmpty(op.TargetPart) ? dna.FindPart(op.TargetPart) : dna.Parts.FirstOrDefault(p => info.AllowedTargetTypes.Contains(p.Type));
+                if (part == null) { r.Errors.Add($"{info.LabelJa} には {string.Join("/", info.AllowedTargetTypes)} 部品が必要です（先に部品を追加してください）"); return; }
+                if (!info.AllowedTargetTypes.Contains(part.Type)) { r.Errors.Add($"{info.LabelJa} は {part.Type} 部品に付けられません"); return; }
+                target = part.Id;
+            }
+            foreach (var k in op.Parameters.Keys) if (info.Param(k) == null) { r.Errors.Add($"{info.Type} に未対応のパラメータ: {k}"); return; }
+            var b = new BehaviorSpec { Type = info.Type, TargetPart = target };
+            foreach (var pinfo in info.Parameters)
+            {
+                float v = pinfo.Default;
+                if (op.Parameters.TryGetValue(pinfo.Key, out var given))
+                {
+                    if (float.IsNaN(given) || float.IsInfinity(given)) { r.Errors.Add("不正な数値です"); return; }
+                    v = Mathf.Clamp(given, pinfo.Min, pinfo.Max);
+                    if (!Mathf.Approximately(v, given)) r.Warnings.Add($"{pinfo.LabelJa} は許可範囲 {LabCatalog.FormatValue(pinfo, pinfo.Min)}〜{LabCatalog.FormatValue(pinfo, pinfo.Max)} に制限しました");
+                }
+                b.Parameters[pinfo.Key] = v;
+            }
+            dna.Behaviors.Add(b);
+            r.Changes.Add(new ChangeLine { Label = "機能追加", Before = "—", After = info.LabelJa + (target != null ? $"（{target}）" : "") });
+        }
+
+        static void ApplyRemoveBehavior(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            var b = dna.FindBehavior(op.BehaviorType ?? "");
+            if (b == null) { r.Errors.Add($"削除する機能がありません: {op.BehaviorType}"); return; }
+            var info = LabCatalog.Behavior(b.Type);
+            dna.Behaviors.Remove(b);
+            // 機能対応表からも外す。検証の手段がなくなった要望は「検証できない」にして理由を残す
+            foreach (var n in dna.FunctionMap)
+            {
+                if (!n.Blocks.Remove(b.Type)) continue;
+                if (n.Blocks.Count == 0 && n.Status != "unverifiable")
+                {
+                    n.Status = "unverifiable";
+                    n.Note = $"改良で機能「{info?.LabelJa ?? b.Type}」を外したため検証しない";
+                }
+            }
+            r.Changes.Add(new ChangeLine { Label = "機能削除", Before = info?.LabelJa ?? b.Type, After = "—" });
+        }
+
         /// <summary>AIプロキシが返す改良提案JSONを検証して読み込む（データとしてのみ扱う）。</summary>
         public static bool TryParseProposal(string json, out RevisionProposal proposal, out string error)
         {
@@ -142,6 +199,18 @@ namespace ImpossibleLab.Core
                 op.BehaviorType = jo.Value<string>("behavior");
                 op.Parameter = jo.Value<string>("parameter");
                 op.PartId = jo.Value<string>("partId");
+                if (op.Op == RevisionOps.AddBehavior || op.Op == RevisionOps.RemoveBehavior)
+                {
+                    if (string.IsNullOrEmpty(op.BehaviorType)) { error = "behavior がありません"; return false; }
+                    op.TargetPart = jo.Value<string>("targetPart");
+                    if (jo["parameters"] is JObject pars)
+                        foreach (var pp in pars.Properties().Take(8))
+                        {
+                            if (pp.Value.Type != JTokenType.Float && pp.Value.Type != JTokenType.Integer) { error = "parameters の値は数値です"; return false; }
+                            op.Parameters[Truncate(pp.Name, 32)] = (float)pp.Value.Value<double>();
+                        }
+                    else if (jo["parameters"] != null && jo["parameters"].Type != JTokenType.Null) { error = "parameters はオブジェクトです"; return false; }
+                }
                 var val = jo["value"];
                 if (op.Op == RevisionOps.UpdateParameter)
                 {

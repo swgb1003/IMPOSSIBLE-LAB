@@ -29,9 +29,16 @@ adb reverse tcp:8787 tcp:8787   # Quest を USB 接続した状態で。Quest �
 
 | メソッド | パス | 入力 | 出力 |
 |---|---|---|---|
-| GET | `/health` | — | `{ok, model, apiKey, categories}` |
-| POST | `/v1/design` | `{request}`（200文字以内） | `{status:"ok", dna, designPoints}` / `{status:"unsupported", message, suggestions}` |
-| POST | `/v1/revise` | `{dna, instruction, lastResult?}` | `{status:"ok", proposal}` / `{status:"unsupported", message}` |
+| GET | `/health` | — | `{ok, model, effort, apiKey, schemaVersion, behaviors}` |
+| POST | `/v1/design` | `{request}`（200文字以内） | `{status:"ok", dna(v2), designPoints, plans, fixes, usage}` / `{status:"unsupported", message, suggestions}` |
+| POST | `/v1/plan` | `{dna, wish?}` | `{status:"ok", plans, usage}` / `{status:"unsupported", message}` |
+| POST | `/v1/revise` | `{dna, instruction, lastResult?}` | `{status:"ok", proposal, usage}` / `{status:"unsupported", message}` |
+
+- `dna` は発明DNA v2（タグ・取り付け位置・形・素材・機能対応表）。`plans` は実験計画 1〜3 案（`{title, aim, plan}`、plan はアプリの ExperimentPlan と同じ形）。どちらもアプリ側の検証器を必ず通す。
+- `fixes`：プロキシで直した小さな食い違い（機能対応表に設計に無い機能が書かれていた、など）。評価で数える。
+- `usage`：トークン数・所要時間・料金の目安（`src/cost.ts`、claude-opus-5-5 の公開価格。請求額そのものではない）。
+- 改良の操作は `update_parameter` / `add_part` / `remove_part` / `add_behavior` / `remove_behavior`（最大6）。
+- カタログ（部品・機能・実験カタログ）は Unity の `ProjectSetup.ExportProxyCatalog` で `catalog.json` に書き出す。手で編集しない。
 
 エラーは `{status:"error", code, message}`（400/401/413/415/422/429/502/503/504）。
 
@@ -60,3 +67,16 @@ Quest の `persistentDataPath/proxy.json`（`/sdcard/Android/data/jp.impossiblel
 npm test          # API を呼ばない単体テスト（スキーマ・変換・入力検証）
 npm run typecheck # TypeScript 型チェック
 ```
+
+## AI 評価セット（料金がかかる）
+
+`eval/requests.json`：日常の困りごと 40 件（設計してほしい 38 件・断ってほしい 2 件、指示の書き換えを含む）。
+
+```bash
+npm start                                   # 別ターミナル（10分40回の制限に注意：ILAB_RATE_PER_10MIN=100 npm start）
+npm run eval                                # 全件 → eval/results/design-<日時>.jsonl
+node eval/run-eval.ts --only r01,r15        # 一部だけ
+```
+
+集計は Unity の `IMPOSSIBLE LAB/5. AI評価セットを集計`（`AiEvalReport.Run`、API は呼ばない）。最新の結果を、アプリと同じ検証器で数えて
+`docs/eval/<同じ名前>.md`（①設計が通る割合 ②実験計画が通る割合 ③「検証できない」の割合 ④時間・費用）と、人の5段階評価を記入する `-rating.csv` を作る。

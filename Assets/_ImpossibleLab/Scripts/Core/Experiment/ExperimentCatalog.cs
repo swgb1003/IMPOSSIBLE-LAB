@@ -37,6 +37,8 @@ namespace ImpossibleLab.Core
         public string[] AnyBlocks = new string[0];
         /// <summary>すべて必要な環境モジュール。</summary>
         public string[] Modules = new string[0];
+        /// <summary>stand で測るときだけ追加で必要な環境モジュール（例：消費エネルギーは雨の実験でだけ出す）。</summary>
+        public string[] StandModules = new string[0];
         /// <summary>合格条件に使える値の範囲。</summary>
         public float Min, Max;
 
@@ -99,7 +101,7 @@ namespace ImpossibleLab.Core
             new MetricInfo { Key = "followError", LabelJa = "追従距離の誤差", Unit = " m", Scenarios = new[] { WalkRoute }, AnyBlocks = new[] { "follow_user" }, Min = 0, Max = 20 },
             new MetricInfo { Key = "averageFollowDistance", LabelJa = "平均追従距離", Unit = " m", Primary = false, Scenarios = new[] { WalkRoute }, AnyBlocks = new[] { "follow_user" }, Min = 0, Max = 50 },
             new MetricInfo { Key = "maxGap", LabelJa = "最大の離れ", Unit = " m", Primary = false, Scenarios = new[] { WalkRoute }, AnyBlocks = new[] { "follow_user" }, Min = 0, Max = 50 },
-            new MetricInfo { Key = "energyWh", LabelJa = "消費エネルギー", Unit = " Wh", RealityOnly = true, Scenarios = new[] { Stand, WalkRoute }, Min = 0, Max = 10000 },
+            new MetricInfo { Key = "energyWh", LabelJa = "消費エネルギー", Unit = " Wh", RealityOnly = true, Scenarios = new[] { Stand, WalkRoute }, StandModules = Rain, Min = 0, Max = 10000 },
             // 移動（fly_to_target）
             new MetricInfo { Key = "requiredPowerKW", LabelJa = "必要電力", Unit = " kW", Format = "0", Primary = false, RealityOnly = true, Scenarios = new[] { FlyToTarget }, AnyBlocks = new[] { "hover" }, Min = 0, Max = 100000 },
             new MetricInfo { Key = "availableFlightSec", LabelJa = "電池で飛べる時間", Unit = " 秒", Format = "0.0", LowerIsBetter = false, Primary = false, RealityOnly = true, Scenarios = new[] { FlyToTarget }, AnyBlocks = new[] { "hover" }, Min = 0, Max = 100000 },

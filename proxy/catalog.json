@@ -1,5 +1,6 @@
 {
   "generatedBy": "ImpossibleLab.Core.LabCatalog.ToProxyJson (Unity で再生成すること。手で編集しない)",
+  "schemaVersion": 2,
   "partTypes": [
     {
       "type": "body",
@@ -22,7 +23,7 @@
     {
       "type": "sensor",
       "labelJa": "センサー",
-      "minScale": 0.02,
+      "minScale": 0.005,
       "maxScale": 0.3
     },
     {
@@ -58,14 +59,14 @@
     {
       "type": "frame",
       "labelJa": "骨組み",
-      "minScale": 0.01,
-      "maxScale": 1.5
+      "minScale": 0.005,
+      "maxScale": 2.2
     },
     {
       "type": "panel",
       "labelJa": "板",
-      "minScale": 0.005,
-      "maxScale": 1.5
+      "minScale": 0.003,
+      "maxScale": 2.0
     },
     {
       "type": "light",
@@ -76,13 +77,13 @@
     {
       "type": "heater",
       "labelJa": "加熱部",
-      "minScale": 0.02,
+      "minScale": 0.003,
       "maxScale": 0.5
     },
     {
       "type": "cooler",
       "labelJa": "冷却部",
-      "minScale": 0.02,
+      "minScale": 0.005,
       "maxScale": 0.5
     },
     {
@@ -100,14 +101,14 @@
     {
       "type": "cushion",
       "labelJa": "緩衝材",
-      "minScale": 0.01,
+      "minScale": 0.005,
       "maxScale": 1.0
     },
     {
       "type": "battery",
       "labelJa": "電池",
-      "minScale": 0.02,
-      "maxScale": 0.4
+      "minScale": 0.005,
+      "maxScale": 0.5
     },
     {
       "type": "solar",
@@ -118,7 +119,7 @@
     {
       "type": "speaker",
       "labelJa": "音を出す部品",
-      "minScale": 0.02,
+      "minScale": 0.005,
       "maxScale": 0.3
     },
     {
@@ -151,7 +152,8 @@
           "max": 3.0,
           "default": 1.2
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "avoid_obstacle",
@@ -167,7 +169,8 @@
           "max": 5.0,
           "default": 1.5
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "carry_load",
@@ -183,7 +186,8 @@
           "max": 30.0,
           "default": 5.0
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "hover",
@@ -207,7 +211,8 @@
           "max": 3.0,
           "default": 2.0
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "move_forward",
@@ -231,7 +236,8 @@
           "max": 3.0,
           "default": 1.5
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "stabilize",
@@ -250,7 +256,8 @@
           "max": 1.0,
           "default": 0.3
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "follow_head",
@@ -269,7 +276,8 @@
           "max": 0.8,
           "default": 0.35
         }
-      ]
+      ],
+      "modelJa": ""
     },
     {
       "type": "rain_shield",
@@ -303,7 +311,263 @@
           "max": 0.6,
           "default": 0.0
         }
-      ]
+      ],
+      "modelJa": ""
+    },
+    {
+      "type": "illuminate",
+      "labelJa": "照明",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "light"
+      ],
+      "parameters": [
+        {
+          "key": "lumens",
+          "labelJa": "明るさ（光束）",
+          "unit": "lm",
+          "min": 10.0,
+          "max": 2000.0,
+          "default": 150.0
+        },
+        {
+          "key": "beamAngleDeg",
+          "labelJa": "光の広がり",
+          "unit": "°",
+          "min": 10.0,
+          "max": 160.0,
+          "default": 60.0
+        },
+        {
+          "key": "tiltDeg",
+          "labelJa": "下向きの角度",
+          "unit": "°",
+          "min": 0.0,
+          "max": 90.0,
+          "default": 45.0
+        }
+      ],
+      "modelJa": "光度 I = lm ÷ (2π(1−cos(θ/2)))、床の照度 E = I cosα ÷ d²"
+    },
+    {
+      "type": "heat",
+      "labelJa": "加温",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "heater"
+      ],
+      "parameters": [
+        {
+          "key": "powerW",
+          "labelJa": "加熱の電力",
+          "unit": "W",
+          "min": 1.0,
+          "max": 100.0,
+          "default": 10.0
+        }
+      ],
+      "modelJa": "集中定数の熱モデル C dT/dt = 電力×効率 − G(T − 外気温)"
+    },
+    {
+      "type": "cool",
+      "labelJa": "冷却",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "cooler"
+      ],
+      "parameters": [
+        {
+          "key": "powerW",
+          "labelJa": "冷却の電力",
+          "unit": "W",
+          "min": 1.0,
+          "max": 100.0,
+          "default": 10.0
+        }
+      ],
+      "modelJa": "集中定数の熱モデル C dT/dt = −電力×成績係数 − G(T − 外気温)"
+    },
+    {
+      "type": "sun_shade",
+      "labelJa": "日よけ",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "canopy",
+        "panel"
+      ],
+      "parameters": [
+        {
+          "key": "radius",
+          "labelJa": "日よけの半径",
+          "unit": "m",
+          "min": 0.2,
+          "max": 1.5,
+          "default": 0.6
+        },
+        {
+          "key": "opacity",
+          "labelJa": "遮光率",
+          "unit": "",
+          "min": 0.1,
+          "max": 1.0,
+          "default": 0.9
+        }
+      ],
+      "modelJa": "平行光線と人型モデル（円柱）の影の判定（雨の実験と同じ方式）"
+    },
+    {
+      "type": "impact_cushion",
+      "labelJa": "衝撃吸収",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "cushion"
+      ],
+      "parameters": [
+        {
+          "key": "thicknessM",
+          "labelJa": "緩衝材の厚み",
+          "unit": "m",
+          "min": 0.005,
+          "max": 0.2,
+          "default": 0.03
+        },
+        {
+          "key": "stiffness",
+          "labelJa": "緩衝材の硬さ",
+          "unit": "N/m",
+          "min": 500.0,
+          "max": 200000.0,
+          "default": 20000.0
+        }
+      ],
+      "modelJa": "ばね・ダンパーの落下モデル（厚みを使い切ると硬くなる）"
+    },
+    {
+      "type": "grip",
+      "labelJa": "つかむ",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "gripper",
+        "arm"
+      ],
+      "parameters": [
+        {
+          "key": "gripForceN",
+          "labelJa": "つかむ力",
+          "unit": "N",
+          "min": 1.0,
+          "max": 200.0,
+          "default": 30.0
+        },
+        {
+          "key": "openingM",
+          "labelJa": "開き幅",
+          "unit": "m",
+          "min": 0.02,
+          "max": 0.6,
+          "default": 0.2
+        }
+      ],
+      "modelJa": "2面ではさむ：2μF ≥ m(g + 揺れの加速度)"
+    },
+    {
+      "type": "lift_load",
+      "labelJa": "持ち上げ",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "arm",
+        "motor"
+      ],
+      "parameters": [
+        {
+          "key": "maxLoadKg",
+          "labelJa": "持ち上げられる重さ",
+          "unit": "kg",
+          "min": 0.5,
+          "max": 30.0,
+          "default": 5.0
+        },
+        {
+          "key": "liftHeightM",
+          "labelJa": "持ち上げられる高さ",
+          "unit": "m",
+          "min": 0.1,
+          "max": 2.0,
+          "default": 0.8
+        },
+        {
+          "key": "speed",
+          "labelJa": "持ち上げる速さ",
+          "unit": "m/s",
+          "min": 0.05,
+          "max": 1.0,
+          "default": 0.2
+        }
+      ],
+      "modelJa": "一定の速さで持ち上げる：電力 = m g v ÷ 効率"
+    },
+    {
+      "type": "detect",
+      "labelJa": "検知",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "sensor"
+      ],
+      "parameters": [
+        {
+          "key": "rangeM",
+          "labelJa": "検知距離",
+          "unit": "m",
+          "min": 0.5,
+          "max": 30.0,
+          "default": 5.0
+        },
+        {
+          "key": "fovDeg",
+          "labelJa": "視野角",
+          "unit": "°",
+          "min": 10.0,
+          "max": 360.0,
+          "default": 90.0
+        }
+      ],
+      "modelJa": "距離・視野角・障害物による遮りの幾何判定"
+    },
+    {
+      "type": "alert",
+      "labelJa": "通知",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "light",
+        "speaker"
+      ],
+      "parameters": [
+        {
+          "key": "loudnessDb",
+          "labelJa": "音の大きさ（1 m）",
+          "unit": "dB",
+          "min": 0.0,
+          "max": 110.0,
+          "default": 80.0
+        },
+        {
+          "key": "lightLumens",
+          "labelJa": "光の明るさ",
+          "unit": "lm",
+          "min": 0.0,
+          "max": 500.0,
+          "default": 50.0
+        },
+        {
+          "key": "flashHz",
+          "labelJa": "点滅の速さ",
+          "unit": "Hz",
+          "min": 0.0,
+          "max": 10.0,
+          "default": 2.0
+        }
+      ],
+      "modelJa": "音：距離の逆二乗で弱まる、光：点の光が気づく照度に届く距離"
     }
   ],
   "categories": [
@@ -323,6 +587,926 @@
       "experimentAvailable": true
     }
   ],
+  "tags": [
+    {
+      "id": "protection",
+      "labelJa": "防護"
+    },
+    {
+      "id": "carrier",
+      "labelJa": "運搬"
+    },
+    {
+      "id": "mobility",
+      "labelJa": "移動"
+    },
+    {
+      "id": "lighting",
+      "labelJa": "照明"
+    },
+    {
+      "id": "thermal",
+      "labelJa": "温度"
+    },
+    {
+      "id": "safety",
+      "labelJa": "安全"
+    },
+    {
+      "id": "assist",
+      "labelJa": "身体補助"
+    },
+    {
+      "id": "sensing",
+      "labelJa": "検知・通知"
+    },
+    {
+      "id": "daily",
+      "labelJa": "生活"
+    },
+    {
+      "id": "outdoor",
+      "labelJa": "屋外"
+    }
+  ],
+  "mounts": [
+    {
+      "id": "head",
+      "labelJa": "頭"
+    },
+    {
+      "id": "back",
+      "labelJa": "背中"
+    },
+    {
+      "id": "waist",
+      "labelJa": "腰"
+    },
+    {
+      "id": "wrist",
+      "labelJa": "手首"
+    },
+    {
+      "id": "hand",
+      "labelJa": "手"
+    },
+    {
+      "id": "foot",
+      "labelJa": "足"
+    },
+    {
+      "id": "ground",
+      "labelJa": "床（自走）"
+    },
+    {
+      "id": "air",
+      "labelJa": "空中"
+    },
+    {
+      "id": "fixed",
+      "labelJa": "設置"
+    }
+  ],
+  "shapes": [
+    {
+      "id": "box",
+      "labelJa": "箱"
+    },
+    {
+      "id": "cylinder",
+      "labelJa": "円柱"
+    },
+    {
+      "id": "sphere",
+      "labelJa": "球"
+    },
+    {
+      "id": "capsule",
+      "labelJa": "カプセル"
+    }
+  ],
+  "materials": [
+    {
+      "id": "plastic",
+      "labelJa": "樹脂",
+      "densityKgM3": 1050.0
+    },
+    {
+      "id": "aluminum",
+      "labelJa": "アルミ",
+      "densityKgM3": 2700.0
+    },
+    {
+      "id": "steel",
+      "labelJa": "鉄",
+      "densityKgM3": 7850.0
+    },
+    {
+      "id": "fabric",
+      "labelJa": "布",
+      "densityKgM3": 400.0
+    },
+    {
+      "id": "foam",
+      "labelJa": "発泡材",
+      "densityKgM3": 30.0
+    },
+    {
+      "id": "rubber",
+      "labelJa": "ゴム",
+      "densityKgM3": 1100.0
+    },
+    {
+      "id": "glass",
+      "labelJa": "ガラス",
+      "densityKgM3": 2500.0
+    }
+  ],
+  "functionStatuses": [
+    "simulated",
+    "simplified",
+    "unverifiable"
+  ],
+  "experiments": {
+    "scenarios": [
+      {
+        "id": "stand",
+        "labelJa": "その場に立つ",
+        "description": "人型モデルが立ち、装置が頭上などで働く",
+        "allowedModules": [
+          "rain",
+          "wind",
+          "darkness",
+          "sunlight",
+          "targets",
+          "obstacles"
+        ]
+      },
+      {
+        "id": "walk_route",
+        "labelJa": "ルートを歩く",
+        "description": "人型モデル（案内役）が決まったルートを歩き、装置がついていく",
+        "allowedModules": [
+          "obstacles",
+          "payload"
+        ]
+      },
+      {
+        "id": "fly_to_target",
+        "labelJa": "目標まで飛ぶ",
+        "description": "人型モデルが装置で目標地点まで飛ぶ（観察モード）",
+        "allowedModules": [
+          "target",
+          "wind"
+        ]
+      },
+      {
+        "id": "sit_still",
+        "labelJa": "座って過ごす",
+        "description": "人型モデルが座って過ごし、装置が温める・冷やす（時間は早送りで再生）",
+        "allowedModules": [
+          "temperature"
+        ]
+      },
+      {
+        "id": "drop_test",
+        "labelJa": "落とす",
+        "description": "発明品（または守る物）を落とし、床に当たるときの衝撃を測る",
+        "allowedModules": [
+          "drop"
+        ]
+      },
+      {
+        "id": "lift_task",
+        "labelJa": "持ち上げて置く",
+        "description": "荷物を棚の高さまで持ち上げる（装置の持ち上げ機構、またはつかみ具で人が持ち上げる）",
+        "allowedModules": [
+          "payload",
+          "shelf"
+        ]
+      }
+    ],
+    "modules": [
+      {
+        "id": "rain",
+        "labelJa": "雨",
+        "params": [
+          {
+            "key": "intensity",
+            "labelJa": "雨量",
+            "unit": "mm/h",
+            "min": 5.0,
+            "max": 80.0,
+            "default": 20.0
+          }
+        ]
+      },
+      {
+        "id": "wind",
+        "labelJa": "風",
+        "params": [
+          {
+            "key": "speed",
+            "labelJa": "風速",
+            "unit": "m/s",
+            "min": 0.0,
+            "max": 15.0,
+            "default": 3.0
+          },
+          {
+            "key": "directionDeg",
+            "labelJa": "風向",
+            "unit": "°",
+            "min": 0.0,
+            "max": 359.9,
+            "default": 90.0
+          }
+        ]
+      },
+      {
+        "id": "obstacles",
+        "labelJa": "障害物",
+        "params": [
+          {
+            "key": "count",
+            "labelJa": "障害物の数",
+            "unit": "個",
+            "min": 0.0,
+            "max": 10.0,
+            "default": 4.0
+          }
+        ]
+      },
+      {
+        "id": "payload",
+        "labelJa": "積荷",
+        "params": [
+          {
+            "key": "kg",
+            "labelJa": "積荷の重さ",
+            "unit": "kg",
+            "min": 0.0,
+            "max": 30.0,
+            "default": 5.0
+          },
+          {
+            "key": "sizeM",
+            "labelJa": "積荷の大きさ（幅）",
+            "unit": "m",
+            "min": 0.05,
+            "max": 0.8,
+            "default": 0.3
+          }
+        ]
+      },
+      {
+        "id": "target",
+        "labelJa": "目標地点",
+        "params": [
+          {
+            "key": "distanceM",
+            "labelJa": "目標までの距離",
+            "unit": "m",
+            "min": 4.0,
+            "max": 10.0,
+            "default": 7.0
+          }
+        ]
+      },
+      {
+        "id": "darkness",
+        "labelJa": "暗さ",
+        "params": [
+          {
+            "key": "lux",
+            "labelJa": "周りの明るさ",
+            "unit": "lx",
+            "min": 0.0,
+            "max": 1000.0,
+            "default": 2.0
+          }
+        ]
+      },
+      {
+        "id": "temperature",
+        "labelJa": "気温",
+        "params": [
+          {
+            "key": "ambientC",
+            "labelJa": "気温",
+            "unit": "°C",
+            "min": -20.0,
+            "max": 45.0,
+            "default": 5.0
+          },
+          {
+            "key": "targetDeltaC",
+            "labelJa": "目標の温度変化",
+            "unit": "°C",
+            "min": 1.0,
+            "max": 20.0,
+            "default": 5.0
+          },
+          {
+            "key": "minutes",
+            "labelJa": "過ごす時間",
+            "unit": "分",
+            "min": 1.0,
+            "max": 60.0,
+            "default": 15.0
+          }
+        ]
+      },
+      {
+        "id": "sunlight",
+        "labelJa": "日差し",
+        "params": [
+          {
+            "key": "elevationDeg",
+            "labelJa": "太陽の高さ",
+            "unit": "°",
+            "min": 5.0,
+            "max": 90.0,
+            "default": 60.0
+          },
+          {
+            "key": "azimuthDeg",
+            "labelJa": "太陽の方位",
+            "unit": "°",
+            "min": 0.0,
+            "max": 359.9,
+            "default": 180.0
+          },
+          {
+            "key": "irradiance",
+            "labelJa": "日射の強さ",
+            "unit": "W/m²",
+            "min": 100.0,
+            "max": 1100.0,
+            "default": 800.0
+          }
+        ]
+      },
+      {
+        "id": "drop",
+        "labelJa": "落下",
+        "params": [
+          {
+            "key": "heightM",
+            "labelJa": "落とす高さ",
+            "unit": "m",
+            "min": 0.2,
+            "max": 3.0,
+            "default": 1.0
+          },
+          {
+            "key": "massKg",
+            "labelJa": "落とす物の重さ",
+            "unit": "kg",
+            "min": 0.1,
+            "max": 5.0,
+            "default": 0.5
+          }
+        ]
+      },
+      {
+        "id": "targets",
+        "labelJa": "検知対象",
+        "params": [
+          {
+            "key": "count",
+            "labelJa": "対象の数",
+            "unit": "個",
+            "min": 1.0,
+            "max": 12.0,
+            "default": 6.0
+          }
+        ]
+      },
+      {
+        "id": "shelf",
+        "labelJa": "棚",
+        "params": [
+          {
+            "key": "heightM",
+            "labelJa": "棚の高さ",
+            "unit": "m",
+            "min": 0.2,
+            "max": 2.0,
+            "default": 0.8
+          }
+        ]
+      }
+    ],
+    "metrics": [
+      {
+        "key": "wetnessScore",
+        "labelJa": "被濡れスコア",
+        "unit": "粒/秒",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "rain_shield"
+        ],
+        "modules": [
+          "rain"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1000.0
+      },
+      {
+        "key": "coverageRatio",
+        "labelJa": "防護率",
+        "unit": "",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "rain_shield"
+        ],
+        "modules": [
+          "rain"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1.0
+      },
+      {
+        "key": "collisionCount",
+        "labelJa": "衝突回数",
+        "unit": "回",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "walk_route"
+        ],
+        "anyBlocks": [
+          "follow_user"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100.0
+      },
+      {
+        "key": "arrivalDelay",
+        "labelJa": "到着の遅れ",
+        "unit": "秒",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "walk_route"
+        ],
+        "anyBlocks": [
+          "follow_user"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 60.0
+      },
+      {
+        "key": "followError",
+        "labelJa": "追従距離の誤差",
+        "unit": "m",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "walk_route"
+        ],
+        "anyBlocks": [
+          "follow_user"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 20.0
+      },
+      {
+        "key": "averageFollowDistance",
+        "labelJa": "平均追従距離",
+        "unit": "m",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "walk_route"
+        ],
+        "anyBlocks": [
+          "follow_user"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 50.0
+      },
+      {
+        "key": "maxGap",
+        "labelJa": "最大の離れ",
+        "unit": "m",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "walk_route"
+        ],
+        "anyBlocks": [
+          "follow_user"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 50.0
+      },
+      {
+        "key": "energyWh",
+        "labelJa": "消費エネルギー",
+        "unit": "Wh",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "stand",
+          "walk_route"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [
+          "rain"
+        ],
+        "min": 0.0,
+        "max": 10000.0
+      },
+      {
+        "key": "requiredPowerKW",
+        "labelJa": "必要電力",
+        "unit": "kW",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [
+          "hover"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "availableFlightSec",
+        "labelJa": "電池で飛べる時間",
+        "unit": "秒",
+        "lowerIsBetter": false,
+        "realityOnly": true,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [
+          "hover"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "completionTime",
+        "labelJa": "所要時間",
+        "unit": "秒",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 60.0
+      },
+      {
+        "key": "stabilityScore",
+        "labelJa": "安定度（100点満点）",
+        "unit": "点",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100.0
+      },
+      {
+        "key": "maxDeviation",
+        "labelJa": "横の最大の揺れ",
+        "unit": "m",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 20.0
+      },
+      {
+        "key": "landingError",
+        "labelJa": "着地点のずれ",
+        "unit": "m",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 50.0
+      },
+      {
+        "key": "maxAltitude",
+        "labelJa": "最高高度",
+        "unit": "m",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "fly_to_target"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 10.0
+      },
+      {
+        "key": "footIlluminance",
+        "labelJa": "足元の照度",
+        "unit": "lx",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "illuminate"
+        ],
+        "modules": [
+          "darkness"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "illuminanceMin",
+        "labelJa": "照度の最小",
+        "unit": "lx",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "illuminate"
+        ],
+        "modules": [
+          "darkness"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "shadeRatio",
+        "labelJa": "日陰率",
+        "unit": "",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "sun_shade"
+        ],
+        "modules": [
+          "sunlight"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1.0
+      },
+      {
+        "key": "sunExposureW",
+        "labelJa": "体が受ける日射",
+        "unit": "W",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [],
+        "modules": [
+          "sunlight"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 10000.0
+      },
+      {
+        "key": "detectionRate",
+        "labelJa": "検知率",
+        "unit": "",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "detect"
+        ],
+        "modules": [
+          "targets"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1.0
+      },
+      {
+        "key": "alertRange",
+        "labelJa": "通知の届く距離",
+        "unit": "m",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "stand"
+        ],
+        "anyBlocks": [
+          "alert"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 5000.0
+      },
+      {
+        "key": "temperatureGain",
+        "labelJa": "狙った向きの温度変化",
+        "unit": "°C",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "sit_still"
+        ],
+        "anyBlocks": [
+          "heat",
+          "cool"
+        ],
+        "modules": [
+          "temperature"
+        ],
+        "standModules": [],
+        "min": -50.0,
+        "max": 50.0
+      },
+      {
+        "key": "timeToTarget",
+        "labelJa": "目標の温度に届くまで",
+        "unit": "分",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "sit_still"
+        ],
+        "anyBlocks": [
+          "heat",
+          "cool"
+        ],
+        "modules": [
+          "temperature"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 999.0
+      },
+      {
+        "key": "peakImpactG",
+        "labelJa": "最大の衝撃",
+        "unit": "G",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "drop_test"
+        ],
+        "anyBlocks": [],
+        "modules": [
+          "drop"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "cushionCompression",
+        "labelJa": "緩衝材のつぶれ",
+        "unit": "m",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "drop_test"
+        ],
+        "anyBlocks": [
+          "impact_cushion"
+        ],
+        "modules": [
+          "drop"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 10.0
+      },
+      {
+        "key": "dropCount",
+        "labelJa": "落とした回数",
+        "unit": "回",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "lift_task"
+        ],
+        "anyBlocks": [
+          "grip",
+          "lift_load"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100.0
+      },
+      {
+        "key": "liftTime",
+        "labelJa": "持ち上げ時間",
+        "unit": "秒",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "lift_task"
+        ],
+        "anyBlocks": [
+          "grip",
+          "lift_load"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 60.0
+      },
+      {
+        "key": "liftPowerW",
+        "labelJa": "持ち上げの電力",
+        "unit": "W",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "lift_task"
+        ],
+        "anyBlocks": [
+          "lift_load"
+        ],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "blockPowerW",
+        "labelJa": "機能の消費電力",
+        "unit": "W",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "stand",
+          "sit_still",
+          "lift_task"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      }
+    ]
+  },
   "appearances": [
     {
       "id": "lab_white",
@@ -353,6 +1537,17 @@
     "positionMaxY": 3.0,
     "maxNameLength": 40,
     "maxPurposeLength": 200,
-    "maxRequestLength": 200
+    "maxRequestLength": 200,
+    "maxTags": 3,
+    "maxFunctionNeeds": 8,
+    "maxNeedLength": 60,
+    "maxNoteLength": 120,
+    "maxPlans": 3,
+    "maxModules": 6,
+    "maxMetrics": 8,
+    "maxCriteria": 4,
+    "maxReasonLength": 80,
+    "minDurationSec": 2.0,
+    "maxDurationSec": 60.0
   }
 }
