@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using ImpossibleLab.Core;
 using NUnit.Framework;
@@ -247,7 +248,7 @@ namespace ImpossibleLab.Tests
         {
             var o = Newtonsoft.Json.Linq.JObject.Parse(LabCatalog.ToProxyJson());
             Assert.AreEqual(LabCatalog.PartTypes.Length, ((Newtonsoft.Json.Linq.JArray)o["partTypes"]).Count);
-            Assert.AreEqual(LabCatalog.Behaviors.Length, ((Newtonsoft.Json.Linq.JArray)o["behaviors"]).Count);
+            Assert.AreEqual(LabCatalog.AiBehaviors.Count(), ((Newtonsoft.Json.Linq.JArray)o["behaviors"]).Count);
             Assert.AreEqual(RequestRules.MaxRequestLength, (int)o["limits"]["maxRequestLength"]);
         }
 

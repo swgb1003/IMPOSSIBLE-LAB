@@ -50,6 +50,10 @@ namespace ImpossibleLab.Core
         public bool RequiresTargetPart;
         public string[] AllowedTargetTypes = new string[0];
         public ParameterInfo[] Parameters;
+        /// <summary>AI設計プロキシのカタログ（proxy/catalog.json）に載せるか。実験場がまだないブロックは載せない（5週目に AI 側を対応）。</summary>
+        public bool ExposeToAi = true;
+        /// <summary>簡易モデルの説明（式の要約。詳しくは docs/blocks.md）。</summary>
+        public string ModelJa = "";
         public ParameterInfo Param(string key) => Parameters.FirstOrDefault(p => p.Key == key);
     }
 
@@ -179,6 +183,45 @@ namespace ImpossibleLab.Core
                 P("radius", "防護半径", "m", 0.2f, 1.5f, 0.6f, "0.00", 0.9f, "大型化で重量と風荷重が増すため（仮定）"),
                 P("effectiveness", "遮水効率", "", 0.1f, 1f, 0.9f, "0.00", 0.95f, "縁からの跳ね返り・漏れを仮定"),
                 P("skirtLength", "側面カバーの長さ", "m", 0f, 0.6f, 0f) } },
+
+            // ---- 機能ブロック 第1弾（3週目）。計算式は Core/Blocks/BlockModels.cs・docs/blocks.md。実験場への組み込みは4週目 ----
+            new BehaviorInfo { Type = "illuminate", LabelJa = "照明", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "light" }, ModelJa = "光度 I = lm ÷ (2π(1−cos(θ/2)))、床の照度 E = I cosα ÷ d²", Parameters = new[] {
+                P("lumens", "明るさ（光束）", "lm", 10f, 2000f, 150f, "0"),
+                P("beamAngleDeg", "光の広がり", "°", 10f, 160f, 60f, "0"),
+                P("tiltDeg", "下向きの角度", "°", 0f, 90f, 45f, "0") } },
+            new BehaviorInfo { Type = "heat", LabelJa = "加温", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "heater" }, ModelJa = "集中定数の熱モデル C dT/dt = 電力×効率 − G(T − 外気温)", Parameters = new[] {
+                P("powerW", "加熱の電力", "W", 1f, 100f, 10f, "0") } },
+            new BehaviorInfo { Type = "cool", LabelJa = "冷却", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "cooler" }, ModelJa = "集中定数の熱モデル C dT/dt = −電力×成績係数 − G(T − 外気温)", Parameters = new[] {
+                P("powerW", "冷却の電力", "W", 1f, 100f, 10f, "0") } },
+            new BehaviorInfo { Type = "sun_shade", LabelJa = "日よけ", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "canopy", "panel" }, ModelJa = "平行光線と人型モデル（円柱）の影の判定（雨の実験と同じ方式）", Parameters = new[] {
+                P("radius", "日よけの半径", "m", 0.2f, 1.5f, 0.6f),
+                P("opacity", "遮光率", "", 0.1f, 1f, 0.9f) } },
+            new BehaviorInfo { Type = "impact_cushion", LabelJa = "衝撃吸収", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "cushion" }, ModelJa = "ばね・ダンパーの落下モデル（厚みを使い切ると硬くなる）", Parameters = new[] {
+                P("thicknessM", "緩衝材の厚み", "m", 0.005f, 0.2f, 0.03f, "0.000"),
+                P("stiffness", "緩衝材の硬さ", "N/m", 500f, 200000f, 20000f, "0") } },
+            new BehaviorInfo { Type = "grip", LabelJa = "つかむ", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "gripper", "arm" }, ModelJa = "2面ではさむ：2μF ≥ m(g + 揺れの加速度)", Parameters = new[] {
+                P("gripForceN", "つかむ力", "N", 1f, 200f, 30f, "0"),
+                P("openingM", "開き幅", "m", 0.02f, 0.6f, 0.2f) } },
+            new BehaviorInfo { Type = "lift_load", LabelJa = "持ち上げ", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "arm", "motor" }, ModelJa = "一定の速さで持ち上げる：電力 = m g v ÷ 効率", Parameters = new[] {
+                P("maxLoadKg", "持ち上げられる重さ", "kg", 0.5f, 30f, 5f, "0.0"),
+                P("liftHeightM", "持ち上げられる高さ", "m", 0.1f, 2f, 0.8f),
+                P("speed", "持ち上げる速さ", "m/s", 0.05f, 1f, 0.2f) } },
+            new BehaviorInfo { Type = "detect", LabelJa = "検知", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "sensor" }, ModelJa = "距離・視野角・障害物による遮りの幾何判定", Parameters = new[] {
+                P("rangeM", "検知距離", "m", 0.5f, 30f, 5f, "0.0"),
+                P("fovDeg", "視野角", "°", 10f, 360f, 90f, "0") } },
+            new BehaviorInfo { Type = "alert", LabelJa = "通知", RequiresTargetPart = true, ExposeToAi = false,
+                AllowedTargetTypes = new[] { "light", "speaker" }, ModelJa = "音：距離の逆二乗で弱まる、光：点の光が気づく照度に届く距離", Parameters = new[] {
+                P("loudnessDb", "音の大きさ（1 m）", "dB", 0f, 110f, 80f, "0"),
+                P("lightLumens", "光の明るさ", "lm", 0f, 500f, 50f, "0"),
+                P("flashHz", "点滅の速さ", "Hz", 0f, 10f, 2f, "0.0") } },
         };
 
         public static readonly CategoryInfo[] Categories =
@@ -210,6 +253,8 @@ namespace ImpossibleLab.Core
 
         public static IEnumerable<string> PartTypeIds => PartTypes.Select(p => p.Type);
         public static IEnumerable<string> BehaviorTypeIds => Behaviors.Select(b => b.Type);
+        /// <summary>AI設計プロキシに渡す機能（ExposeToAi）。</summary>
+        public static IEnumerable<BehaviorInfo> AiBehaviors => Behaviors.Where(b => b.ExposeToAi);
 
         /// <summary>AI設計プロキシ用に書き出すカタログ（proxy/catalog.json）。部品・機能の唯一の出典はこのクラス。</summary>
         public static string ToProxyJson()
@@ -218,7 +263,7 @@ namespace ImpossibleLab.Core
             {
                 ["type"] = p.Type, ["labelJa"] = p.LabelJa, ["minScale"] = p.MinScale, ["maxScale"] = p.MaxScale,
             }));
-            var behaviors = new Newtonsoft.Json.Linq.JArray(Behaviors.Select(b => new Newtonsoft.Json.Linq.JObject
+            var behaviors = new Newtonsoft.Json.Linq.JArray(AiBehaviors.Select(b => new Newtonsoft.Json.Linq.JObject
             {
                 ["type"] = b.Type, ["labelJa"] = b.LabelJa, ["requiresTargetPart"] = b.RequiresTargetPart,
                 ["allowedTargetTypes"] = new Newtonsoft.Json.Linq.JArray(b.AllowedTargetTypes),
