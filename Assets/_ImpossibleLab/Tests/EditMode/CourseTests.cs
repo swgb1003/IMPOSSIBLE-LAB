@@ -152,6 +152,34 @@ namespace ImpossibleLab.Tests
             Assert.IsTrue(q.Notes.Any(n => n.Contains("障害物の回避")), "運搬ロボットで使える改良を案内する");
         }
 
+        /// <summary>実際の Claude API の応答（2026-11-09 記録）：検証を通り、実験でき、改良依頼の入力を作れること。</summary>
+        [Test] public void RecordedAiDesigns_AreValidAndTestable()
+        {
+            foreach (var (cat, key) in new[] { ("carrier", "collisionCount"), ("mobility", "stabilityScore") })
+            {
+                string path = Path.Combine(Application.dataPath, $"_ImpossibleLab/Tests/EditMode/Fixtures/ai_design_{cat}.json");
+                var o = ProxyProtocol.ParseDesign(200, File.ReadAllText(path), null);
+                Assert.AreEqual(DesignStatus.Success, o.Status, o.Message);
+                Assert.AreEqual(cat, o.Dna.Category);
+                var cfg = Cfg(LabEnvironments.ForCategory(cat));
+                var dream = CourseSimulator.Run(o.Dna, cfg).Result;
+                var real = CourseSimulator.Run(o.Dna, Cfg(LabEnvironments.ForCategory(cat), LabModes.Reality)).Result;
+                Log(dream); Log(real);
+                Assert.IsNotNull(dream.Metric(key));
+                Assert.IsTrue(dream.Metrics.All(m => !float.IsNaN(m.Value) && !float.IsInfinity(m.Value)));
+                // 記録した改良応答（「もっと速く」）を適用し、同じ条件で再実験する
+                string rpath = Path.Combine(Application.dataPath, $"_ImpossibleLab/Tests/EditMode/Fixtures/ai_revise_{cat}.json");
+                var rev = ProxyProtocol.ParseRevision(200, File.ReadAllText(rpath), null);
+                Assert.AreEqual(DesignStatus.Success, rev.Status, rev.Message);
+                var applied = RevisionEngine.Apply(o.Dna, rev.Proposal);
+                Assert.IsTrue(applied.Success, string.Join(" / ", applied.Errors));
+                var after = CourseSimulator.Run(applied.NewDna, cfg).Result;
+                Log(after);
+                string timeKey = cat == "carrier" ? "arrivalDelay" : "completionTime";
+                Assert.LessOrEqual(after.Metric(timeKey).Value, dream.Metric(timeKey).Value + 1e-3f, "速くする改良で時間が延びない");
+            }
+        }
+
         [Test] public void Appearance_ValidatesAndRoundTrips()
         {
             var dna = Load("carrier_robot");

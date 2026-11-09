@@ -32,6 +32,8 @@ ${cats}
 
 Appearance presets (colors only, no effect on performance): ${looks || "lab_white"}
 
+Part shapes: body, canopy, thruster and wheel are cylinders, so their scale is [diameter, height, diameter]. A wheel is turned on its side by the app, so for a wheel give [diameter, tire width, diameter] (for example [0.2, 0.06, 0.2]). sensor is a sphere, container and stabilizer are boxes, arm is a capsule.
+
 Limits: at most ${L.maxParts} parts and ${L.maxBehaviors} behaviors. Positions are local to the body center (y up, +z forward), x/z within ±${L.positionLimitXZ} m, y within ${L.positionMinY}..${L.positionMaxY} m. Part ids: lowercase letters, digits, "-" or "_", unique. Each behavior appears at most once.`;
 }
 
