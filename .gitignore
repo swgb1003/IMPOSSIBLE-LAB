@@ -1,0 +1,24 @@
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+*.csproj
+*.sln
+*.slnx
+.vs/
+.idea/
+# フォントファイルは再配布しない（仕様21.2）。各自のライセンス済みNoto Sans JPを配置する
+/Assets/_ImpossibleLab/Art/Fonts/*.ttf
+/Assets/_ImpossibleLab/Art/Fonts/*.ttf.meta
+# 開発用シークレット
+.env
+proxy/.env
+proxy/node_modules/
+
+# Unity一時ファイル・テスト結果
+/.utmp/
+/test-results.xml

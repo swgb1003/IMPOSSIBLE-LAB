@@ -1,0 +1,23 @@
+{
+  "name": "impossible-lab-proxy",
+  "private": true,
+  "version": "0.1.0",
+  "description": "IMPOSSIBLE LAB AI design proxy (keeps the Anthropic API key on the server)",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc -p ."
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3"
+  }
+}

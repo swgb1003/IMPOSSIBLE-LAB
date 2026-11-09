@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "inv-handsfree-rain",
+  "name": "ハンズフリー雨よけ装置",
+  "category": "protection",
+  "purpose": "両手がふさがっていても、傘を持たずに頭上の雨を防ぐ",
+  "mode": "dream",
+  "parts": [
+    { "id": "core", "type": "body", "position": [0, -0.06, 0], "scale": [0.22, 0.08, 0.22] },
+    { "id": "shield", "type": "canopy", "position": [0, 0, 0], "scale": [1.2, 0.03, 1.2] },
+    { "id": "eye", "type": "sensor", "position": [0, -0.11, 0.09], "scale": [0.05, 0.03, 0.05] },
+    { "id": "gyro", "type": "stabilizer", "position": [0, -0.12, -0.08], "scale": [0.08, 0.04, 0.08] }
+  ],
+  "behaviors": [
+    { "type": "follow_head", "targetPart": "core", "parameters": { "heightOffset": 0.35 } },
+    { "type": "rain_shield", "targetPart": "shield", "parameters": { "radius": 0.6, "effectiveness": 0.9, "skirtLength": 0 } },
+    { "type": "stabilize", "targetPart": "gyro", "parameters": { "stabilizationStrength": 0.3 } }
+  ],
+  "constraints": { "maxParts": 12, "maxSpeed": 3.0 },
+  "revision": 1,
+  "parentRevision": null
+}
