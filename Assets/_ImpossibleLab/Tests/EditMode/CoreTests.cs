@@ -74,13 +74,13 @@ namespace ImpossibleLab.Tests
         [Test] public void TooManyParts_IsRejected()
         {
             var parts = new List<string>();
-            for (int i = 0; i < 13; i++) parts.Add($"{{\"id\":\"p{i}\",\"type\":\"body\",\"position\":[0,0,0],\"scale\":[0.1,0.1,0.1]}}");
+            for (int i = 0; i < 25; i++) parts.Add($"{{\"id\":\"p{i}\",\"type\":\"body\",\"position\":[0,0,0],\"scale\":[0.1,0.1,0.1]}}");
             string json = "{\"schemaVersion\":1,\"id\":\"x\",\"name\":\"x\",\"category\":\"protection\",\"purpose\":\"x\",\"parts\":[" + string.Join(",", parts) + "],\"behaviors\":[]}";
             Assert.IsFalse(DnaJson.Parse(json).IsValid);
         }
 
         [Test] public void WrongSchemaVersion_IsRejected() =>
-            Assert.IsFalse(DnaJson.Parse(SampleJson.Replace("\"schemaVersion\": 1", "\"schemaVersion\": 2")).IsValid);
+            Assert.IsFalse(DnaJson.Parse(SampleJson.Replace("\"schemaVersion\": 1", "\"schemaVersion\": 3")).IsValid);
 
         // ---------- 雨実験（AT-03） ----------
         static RainExperimentConfig Cfg(string mode = LabModes.Dream, float rain = 20, float wind = 3) =>

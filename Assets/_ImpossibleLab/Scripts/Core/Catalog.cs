@@ -10,6 +10,23 @@ namespace ImpossibleLab.Core
         public string LabelJa;
         public float MinScale;
         public float MaxScale;
+        /// <summary>形の指定がないときの形（DNA v1 の見た目と同じになるよう決めてある）。</summary>
+        public string DefaultShape = "cylinder";
+        public string DefaultMaterial = "plastic";
+    }
+
+    /// <summary>名前つきの選択肢（タグ・取り付け位置・形）。</summary>
+    public sealed class NamedOption
+    {
+        public string Id, LabelJa;
+        public NamedOption(string id, string label) { Id = id; LabelJa = label; }
+    }
+
+    /// <summary>素材（REALITY の質量計算に使う密度）。値は代表値で、出典は要確認（docs/GENERAL_INVENTION_DESIGN.md 5.5）。</summary>
+    public sealed class MaterialInfo
+    {
+        public string Id, LabelJa;
+        public float DensityKgM3;
     }
 
     public sealed class ParameterInfo
@@ -62,21 +79,79 @@ namespace ImpossibleLab.Core
         public const float PositionMaxY = 3f;
         public const int MaxBehaviors = 8;
         public const int MaxIdLength = 48;
+        public const int MaxTags = 3, MaxFunctionNeeds = 8, MaxNeedLength = 60, MaxNoteLength = 120;
         public const int MaxNameLength = 40;
         public const int MaxPurposeLength = 200;
 
         public static readonly PartTypeInfo[] PartTypes =
         {
             new PartTypeInfo { Type = "body", LabelJa = "本体", MinScale = 0.03f, MaxScale = 1.0f },
-            new PartTypeInfo { Type = "wheel", LabelJa = "車輪", MinScale = 0.03f, MaxScale = 0.6f },
-            new PartTypeInfo { Type = "container", LabelJa = "格納部", MinScale = 0.05f, MaxScale = 1.0f },
-            new PartTypeInfo { Type = "sensor", LabelJa = "センサー", MinScale = 0.02f, MaxScale = 0.3f },
-            new PartTypeInfo { Type = "arm", LabelJa = "アーム", MinScale = 0.02f, MaxScale = 1.0f },
-            new PartTypeInfo { Type = "canopy", LabelJa = "キャノピー（覆い）", MinScale = 0.02f, MaxScale = 3.0f },
-            new PartTypeInfo { Type = "thruster", LabelJa = "推進ユニット", MinScale = 0.03f, MaxScale = 0.5f },
-            new PartTypeInfo { Type = "stabilizer", LabelJa = "姿勢安定ユニット", MinScale = 0.02f, MaxScale = 0.5f },
-            new PartTypeInfo { Type = "connector", LabelJa = "接続部", MinScale = 0.01f, MaxScale = 1.0f },
+            new PartTypeInfo { Type = "wheel", LabelJa = "車輪", MinScale = 0.03f, MaxScale = 0.6f, DefaultMaterial = "rubber" },
+            new PartTypeInfo { Type = "container", LabelJa = "格納部", MinScale = 0.05f, MaxScale = 1.0f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "sensor", LabelJa = "センサー", MinScale = 0.02f, MaxScale = 0.3f, DefaultShape = "sphere" },
+            new PartTypeInfo { Type = "arm", LabelJa = "アーム", MinScale = 0.02f, MaxScale = 1.0f, DefaultShape = "capsule", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "canopy", LabelJa = "キャノピー（覆い）", MinScale = 0.02f, MaxScale = 3.0f, DefaultMaterial = "fabric" },
+            new PartTypeInfo { Type = "thruster", LabelJa = "推進ユニット", MinScale = 0.03f, MaxScale = 0.5f, DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "stabilizer", LabelJa = "姿勢安定ユニット", MinScale = 0.02f, MaxScale = 0.5f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "connector", LabelJa = "接続部", MinScale = 0.01f, MaxScale = 1.0f, DefaultMaterial = "aluminum" },
+            // DNA v2 で追加（docs/GENERAL_INVENTION_DESIGN.md 3章）
+            new PartTypeInfo { Type = "frame", LabelJa = "骨組み", MinScale = 0.01f, MaxScale = 1.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "panel", LabelJa = "板", MinScale = 0.005f, MaxScale = 1.5f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "light", LabelJa = "発光部", MinScale = 0.01f, MaxScale = 0.3f },
+            new PartTypeInfo { Type = "heater", LabelJa = "加熱部", MinScale = 0.02f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "cooler", LabelJa = "冷却部", MinScale = 0.02f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "motor", LabelJa = "駆動部（関節）", MinScale = 0.02f, MaxScale = 0.3f, DefaultMaterial = "steel" },
+            new PartTypeInfo { Type = "gripper", LabelJa = "つかみ具", MinScale = 0.02f, MaxScale = 0.4f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "cushion", LabelJa = "緩衝材", MinScale = 0.01f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "foam" },
+            new PartTypeInfo { Type = "battery", LabelJa = "電池", MinScale = 0.02f, MaxScale = 0.4f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "solar", LabelJa = "太陽電池", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "glass" },
+            new PartTypeInfo { Type = "speaker", LabelJa = "音を出す部品", MinScale = 0.02f, MaxScale = 0.3f },
+            new PartTypeInfo { Type = "strap", LabelJa = "ベルト・取り付け具", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "fabric" },
         };
+
+        /// <summary>部品の形。Unity の標準プリミティブのみ（円錐・輪は専用メッシュが必要なため初版では扱わない）。</summary>
+        public static readonly NamedOption[] Shapes =
+        {
+            new NamedOption("box", "箱"), new NamedOption("cylinder", "円柱"), new NamedOption("sphere", "球"), new NamedOption("capsule", "カプセル"),
+        };
+
+        public static readonly MaterialInfo[] Materials =
+        {
+            new MaterialInfo { Id = "plastic", LabelJa = "樹脂", DensityKgM3 = 1050f },
+            new MaterialInfo { Id = "aluminum", LabelJa = "アルミ", DensityKgM3 = 2700f },
+            new MaterialInfo { Id = "steel", LabelJa = "鉄", DensityKgM3 = 7850f },
+            new MaterialInfo { Id = "fabric", LabelJa = "布", DensityKgM3 = 400f },
+            new MaterialInfo { Id = "foam", LabelJa = "発泡材", DensityKgM3 = 30f },
+            new MaterialInfo { Id = "rubber", LabelJa = "ゴム", DensityKgM3 = 1100f },
+            new MaterialInfo { Id = "glass", LabelJa = "ガラス", DensityKgM3 = 2500f },
+        };
+
+        /// <summary>分類用のタグ（実験場とは結び付けない）。最初の3つは DNA v1 のカテゴリと同じ。</summary>
+        public static readonly NamedOption[] Tags =
+        {
+            new NamedOption("protection", "防護"), new NamedOption("carrier", "運搬"), new NamedOption("mobility", "移動"),
+            new NamedOption("lighting", "照明"), new NamedOption("thermal", "温度"), new NamedOption("safety", "安全"),
+            new NamedOption("assist", "身体補助"), new NamedOption("sensing", "検知・通知"), new NamedOption("daily", "生活"),
+            new NamedOption("outdoor", "屋外"),
+        };
+
+        /// <summary>取り付け位置（人型モデルのどこに付くか、または自走・飛行・設置）。</summary>
+        public static readonly NamedOption[] Mounts =
+        {
+            new NamedOption("head", "頭"), new NamedOption("back", "背中"), new NamedOption("waist", "腰"),
+            new NamedOption("wrist", "手首"), new NamedOption("hand", "手"), new NamedOption("foot", "足"),
+            new NamedOption("ground", "床（自走）"), new NamedOption("air", "空中"), new NamedOption("fixed", "設置"),
+        };
+
+        /// <summary>タグを日本語で「防護・安全」のようにつなぐ。</summary>
+        public static string TagsJa(IEnumerable<string> tags) => string.Join("・", tags.Select(t => Tag(t)?.LabelJa ?? t));
+
+        public static NamedOption Shape(string id) => Shapes.FirstOrDefault(x => x.Id == id);
+        public static MaterialInfo Material(string id) => Materials.FirstOrDefault(x => x.Id == id);
+        public static NamedOption Tag(string id) => Tags.FirstOrDefault(x => x.Id == id);
+        public static NamedOption Mount(string id) => Mounts.FirstOrDefault(x => x.Id == id);
+        public static readonly string[] FunctionStatuses = { "simulated", "simplified", "unverifiable" };
+        public static string FunctionStatusJa(string s) => s == "simulated" ? "検証する" : s == "simplified" ? "単純化して検証" : "検証できない";
 
         public static readonly BehaviorInfo[] Behaviors =
         {

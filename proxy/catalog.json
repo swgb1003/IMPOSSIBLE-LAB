@@ -54,6 +54,78 @@
       "labelJa": "接続部",
       "minScale": 0.01,
       "maxScale": 1.0
+    },
+    {
+      "type": "frame",
+      "labelJa": "骨組み",
+      "minScale": 0.01,
+      "maxScale": 1.5
+    },
+    {
+      "type": "panel",
+      "labelJa": "板",
+      "minScale": 0.005,
+      "maxScale": 1.5
+    },
+    {
+      "type": "light",
+      "labelJa": "発光部",
+      "minScale": 0.01,
+      "maxScale": 0.3
+    },
+    {
+      "type": "heater",
+      "labelJa": "加熱部",
+      "minScale": 0.02,
+      "maxScale": 0.5
+    },
+    {
+      "type": "cooler",
+      "labelJa": "冷却部",
+      "minScale": 0.02,
+      "maxScale": 0.5
+    },
+    {
+      "type": "motor",
+      "labelJa": "駆動部（関節）",
+      "minScale": 0.02,
+      "maxScale": 0.3
+    },
+    {
+      "type": "gripper",
+      "labelJa": "つかみ具",
+      "minScale": 0.02,
+      "maxScale": 0.4
+    },
+    {
+      "type": "cushion",
+      "labelJa": "緩衝材",
+      "minScale": 0.01,
+      "maxScale": 1.0
+    },
+    {
+      "type": "battery",
+      "labelJa": "電池",
+      "minScale": 0.02,
+      "maxScale": 0.4
+    },
+    {
+      "type": "solar",
+      "labelJa": "太陽電池",
+      "minScale": 0.005,
+      "maxScale": 1.0
+    },
+    {
+      "type": "speaker",
+      "labelJa": "音を出す部品",
+      "minScale": 0.02,
+      "maxScale": 0.3
+    },
+    {
+      "type": "strap",
+      "labelJa": "ベルト・取り付け具",
+      "minScale": 0.005,
+      "maxScale": 1.0
     }
   ],
   "behaviors": [
@@ -274,7 +346,7 @@
     }
   ],
   "limits": {
-    "maxParts": 12,
+    "maxParts": 24,
     "maxBehaviors": 8,
     "positionLimitXZ": 2.0,
     "positionMinY": -1.0,

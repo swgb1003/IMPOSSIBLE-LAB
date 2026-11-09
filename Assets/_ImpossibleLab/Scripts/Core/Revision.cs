@@ -151,7 +151,7 @@ namespace ImpossibleLab.Core
                 if (op.Op == RevisionOps.AddPart)
                 {
                     // 部品は DNA のスキーマ検証器で検証する
-                    var wrapper = new JObject { ["schemaVersion"] = 1, ["id"] = "tmp", ["name"] = "tmp", ["category"] = "protection", ["purpose"] = "tmp",
+                    var wrapper = new JObject { ["schemaVersion"] = 2, ["id"] = "tmp", ["name"] = "tmp", ["tags"] = new JArray("daily"), ["mount"] = "fixed", ["purpose"] = "tmp",
                         ["parts"] = new JArray(jo["part"]), ["behaviors"] = new JArray() };
                     var rep = DnaJson.Parse(wrapper.ToString());
                     if (!rep.IsValid) { error = "追加部品が不正: " + rep.Summary; return false; }

@@ -90,22 +90,30 @@ namespace ImpossibleLab
 
         GameObject CreatePrimitive(PartSpec part, InventionDna dna)
         {
-            PrimitiveType type;
-            Material mat = _assets.RobotWhite;
-            Vector3 scale = part.Scale;
-            Quaternion rot = Quaternion.identity;
+            // 素材（見た目）は部品タイプで決め、形は DNA の shape（未指定なら部品タイプの既定の形）で決める
+            Material mat;
             switch (part.Type)
             {
-                case "canopy": type = PrimitiveType.Cylinder; mat = _assets.Canopy; scale.y *= 0.5f; break;
-                case "body": type = PrimitiveType.Cylinder; scale.y *= 0.5f; break;
-                case "wheel": type = PrimitiveType.Cylinder; rot = Quaternion.Euler(0, 0, 90); scale.y *= 0.5f; mat = _assets.DarkMetal; break;
-                case "sensor": type = PrimitiveType.Sphere; mat = _assets.AccentBlue; break;
-                case "stabilizer": type = PrimitiveType.Cube; mat = _assets.AccentOrange; break;
-                case "thruster": type = PrimitiveType.Cylinder; scale.y *= 0.5f; mat = _assets.DarkMetal; break;
-                case "arm": type = PrimitiveType.Capsule; scale.y *= 0.5f; mat = _assets.MatteMetal; break;
-                case "container": type = PrimitiveType.Cube; mat = _assets.MatteMetal; break;
-                default: type = PrimitiveType.Cylinder; scale.y *= 0.5f; mat = _assets.MatteMetal; break;
+                case "canopy": mat = _assets.Canopy; break;
+                case "wheel": case "thruster": case "motor": case "battery": case "speaker": case "strap": mat = _assets.DarkMetal; break;
+                case "sensor": case "light": case "cooler": mat = _assets.AccentBlue; break;
+                case "stabilizer": case "heater": mat = _assets.AccentOrange; break;
+                case "arm": case "container": case "frame": case "gripper": case "connector": mat = _assets.MatteMetal; break;
+                case "solar": mat = _assets.Glass; break;
+                default: mat = _assets.RobotWhite; break; // body, panel, cushion
             }
+            Vector3 scale = part.Scale;
+            Quaternion rot = Quaternion.identity;
+            PrimitiveType type;
+            switch (part.ShapeOrDefault)
+            {
+                case "box": type = PrimitiveType.Cube; break;
+                case "sphere": type = PrimitiveType.Sphere; break;
+                case "capsule": type = PrimitiveType.Capsule; scale.y *= 0.5f; break; // Unity のカプセル・円柱は高さ2
+                default: type = PrimitiveType.Cylinder; scale.y *= 0.5f; break;
+            }
+            // 車輪の円柱は横倒し（scale は [直径, 幅, 直径]）
+            if (part.Type == "wheel" && type == PrimitiveType.Cylinder) rot = Quaternion.Euler(0, 0, 90);
             var go = GameObject.CreatePrimitive(type);
             go.name = $"Part_{part.Id}_{part.Type}";
             Object.Destroy(go.GetComponent<Collider>());
@@ -115,8 +123,9 @@ namespace ImpossibleLab
             rend.sharedMaterial = mat;
             // 外観プリセット：本体系は本体色、センサー・安定ユニットはアクセント色（マテリアルは共有のまま色だけ変える）
             var look = LabCatalog.Appearance(dna.Appearance) ?? LabCatalog.Appearance(LabCatalog.DefaultAppearance);
-            int? rgb = part.Type == "body" || part.Type == "container" || part.Type == "arm" || part.Type == "connector" ? look.BodyRgb
-                : part.Type == "sensor" || part.Type == "stabilizer" ? look.AccentRgb : (int?)null;
+            int? rgb = part.Type == "body" || part.Type == "container" || part.Type == "arm" || part.Type == "connector"
+                    || part.Type == "frame" || part.Type == "panel" || part.Type == "gripper" ? look.BodyRgb
+                : part.Type == "sensor" || part.Type == "stabilizer" || part.Type == "light" ? look.AccentRgb : (int?)null;
             if (rgb.HasValue)
             {
                 var mpb = new MaterialPropertyBlock();

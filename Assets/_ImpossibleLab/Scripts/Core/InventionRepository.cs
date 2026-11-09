@@ -20,6 +20,8 @@ namespace ImpossibleLab.Core
     public sealed class GalleryEntry
     {
         public string Id, Name, Category, UpdatedAt;
+        /// <summary>分類タグの日本語（例：防護・安全）。</summary>
+        public string TagsJa = "";
         public int Revision;
         public bool Tested;
     }
@@ -119,7 +121,7 @@ namespace ImpossibleLab.Core
                 if (inv == null) continue;
                 list.Add(new GalleryEntry
                 {
-                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category,
+                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags),
                     Revision = inv.Current.Revision, UpdatedAt = inv.UpdatedAt, Tested = inv.Tested,
                 });
             }

@@ -373,7 +373,7 @@ namespace ImpossibleLab
             var c1 = UiKit.Column("Info", cols, LabTheme.Space1); UiKit.Size(c1, flexW: 1);
             Para(c1, $"<b><color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>{dna.Name}</color></b>", LabTheme.FontHeading, h: 42);
             Para(c1, "目的：" + dna.Purpose, LabTheme.FontBody, h: 70);
-            Para(c1, "カテゴリ：" + (LabCatalog.Category(dna.Category)?.LabelJa ?? dna.Category) + "　｜　部品 " + dna.Parts.Count + " / 上限 " + dna.Constraints.MaxParts, LabTheme.FontBody, h: 36);
+            Para(c1, $"分類：{LabCatalog.TagsJa(dna.Tags)}　｜　取り付け：{LabCatalog.Mount(dna.Mount)?.LabelJa ?? dna.Mount}　｜　部品 {dna.Parts.Count} / 上限 {dna.Constraints.MaxParts}", LabTheme.FontBody, h: 36);
             var rep = App.LastOutcome?.Report;
             Para(c1, "検証：" + (rep != null ? rep.Summary : "—") + (App.LastOutcome != null ? "\n" + App.LastOutcome.Message : ""), LabTheme.FontSmall, LabTheme.AccentLight, 64);
             var c2 = UiKit.Column("Behaviors", cols, LabTheme.Space1); UiKit.Size(c2, flexW: 1);
@@ -971,7 +971,7 @@ namespace ImpossibleLab
             var card = UiKit.Panel("Card_" + e.Id, parent, LabTheme.BgPanel);
             UiKit.VList(card, 6, LabTheme.Space2);
             Para(card, $"<b><color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>{e.Name}</color></b>", LabTheme.FontBody, h: 36);
-            Para(card, $"{LabCatalog.Category(e.Category)?.LabelJa ?? e.Category} ／ Rev.{e.Revision} ／ 更新 {e.UpdatedAt}", LabTheme.FontSmall, h: 30);
+            Para(card, $"{e.TagsJa} ／ Rev.{e.Revision} ／ 更新 {e.UpdatedAt}", LabTheme.FontSmall, h: 30);
             Para(card, e.Tested ? "✓ 実験済み" : "未実験", LabTheme.FontSmall, e.Tested ? LabTheme.AccentLight : LabTheme.TextSecondary, 30);
             var row = UiKit.Row("Btns", card, LabTheme.Space1, 60);
             string id = e.Id;

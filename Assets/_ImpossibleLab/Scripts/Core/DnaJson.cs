@@ -28,9 +28,13 @@ namespace ImpossibleLab.Core
     {
         public const int MaxJsonLength = 32 * 1024;
         static readonly Regex IdPattern = new Regex("^[a-z0-9][a-z0-9_-]{0,47}$");
-        static readonly HashSet<string> RootFields = new HashSet<string>
+        static readonly HashSet<string> RootFieldsV1 = new HashSet<string>
         { "schemaVersion", "id", "name", "category", "purpose", "mode", "appearance", "parts", "behaviors", "constraints", "revision", "parentRevision" };
-        static readonly HashSet<string> PartFields = new HashSet<string> { "id", "type", "position", "scale" };
+        static readonly HashSet<string> RootFieldsV2 = new HashSet<string>
+        { "schemaVersion", "id", "name", "purpose", "tags", "mount", "appearance", "mode", "parts", "behaviors", "functionMap", "constraints", "revision", "parentRevision" };
+        static readonly HashSet<string> PartFieldsV1 = new HashSet<string> { "id", "type", "position", "scale" };
+        static readonly HashSet<string> PartFieldsV2 = new HashSet<string> { "id", "type", "shape", "material", "position", "scale" };
+        static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "status", "note" };
         static readonly HashSet<string> BehaviorFields = new HashSet<string> { "type", "targetPart", "parameters" };
         static readonly HashSet<string> ConstraintFields = new HashSet<string> { "maxParts", "maxSpeed" };
 
@@ -61,20 +65,30 @@ namespace ImpossibleLab.Core
 
         static ValidationReport Validate(JObject root, ValidationReport r)
         {
-            RejectUnknown(root, RootFields, "ルート", r);
             var dna = new InventionDna();
-
             var sv = Int(root, "schemaVersion", r, required: true);
-            if (sv.HasValue && sv.Value != InventionDna.CurrentSchemaVersion)
-                r.Errors.Add($"schemaVersion {sv.Value} は非対応です（対応: {InventionDna.CurrentSchemaVersion}）");
+            if (sv.HasValue && sv.Value != 1 && sv.Value != 2)
+            { r.Errors.Add($"schemaVersion {sv.Value} は非対応です（対応: 1, 2）"); return r; }
+            int version = sv ?? InventionDna.CurrentSchemaVersion;
+            RejectUnknown(root, version == 1 ? RootFieldsV1 : RootFieldsV2, "ルート", r);
 
             dna.Id = Str(root, "id", r, true, LabCatalog.MaxIdLength) ?? "";
             if (dna.Id.Length > 0 && !IsSafeId(dna.Id)) r.Errors.Add("id は英小文字・数字・-・_ のみ使用できます");
             dna.Name = Str(root, "name", r, true, LabCatalog.MaxNameLength) ?? "";
             dna.Purpose = Str(root, "purpose", r, true, LabCatalog.MaxPurposeLength) ?? "";
-            dna.Category = Str(root, "category", r, true, 32) ?? "";
-            if (dna.Category.Length > 0 && LabCatalog.Category(dna.Category) == null)
-                r.Errors.Add($"未対応のカテゴリ: {dna.Category}");
+            if (version == 1)
+            {
+                string cat = Str(root, "category", r, true, 32) ?? "";
+                if (cat.Length > 0 && LabCatalog.Category(cat) == null) r.Errors.Add($"未対応のカテゴリ: {cat}");
+                else dna.Category = cat;
+            }
+            else
+            {
+                ParseTags(root, dna, r);
+                var mount = Str(root, "mount", r, true, 16);
+                if (mount != null && LabCatalog.Mount(mount) == null) r.Errors.Add($"未対応の取り付け位置: {mount}（使用可能: {string.Join(", ", LabCatalog.Mounts.Select(m => m.Id))}）");
+                else if (mount != null) dna.Mount = mount;
+            }
             var mode = Str(root, "mode", r, false, 16);
             if (mode != null && !LabModes.IsValid(mode)) r.Errors.Add($"未対応のモード: {mode}");
             dna.Mode = mode != null && LabModes.IsValid(mode) ? mode : LabModes.Dream;
@@ -104,13 +118,72 @@ namespace ImpossibleLab.Core
                 else r.Errors.Add("constraints はオブジェクトです");
             }
 
-            ParseParts(root, dna, r);
+            ParseParts(root, dna, r, version);
             ParseBehaviors(root, dna, r);
+            if (version == 1) dna.Mount = InferMount(dna);
+            else ParseFunctionMap(root, dna, r);
+            dna.SchemaVersion = InventionDna.CurrentSchemaVersion; // v1 は読み込み時に v2 へ変換する
             if (r.Errors.Count == 0) r.Dna = dna;
             return r;
         }
 
-        static void ParseParts(JObject root, InventionDna dna, ValidationReport r)
+        /// <summary>v1 には取り付け位置がないため、機能から推定する（docs/GENERAL_INVENTION_DESIGN.md 2章）。</summary>
+        public static string InferMount(InventionDna dna)
+        {
+            if (dna.FindBehavior("follow_head") != null) return "head";
+            if (dna.FindBehavior("follow_user") != null) return "ground";
+            if (dna.FindBehavior("hover") != null) return dna.Category == "mobility" ? "foot" : "air";
+            return "fixed";
+        }
+
+        static void ParseTags(JObject root, InventionDna dna, ValidationReport r)
+        {
+            if (!root.TryGetValue("tags", out var t) || !(t is JArray arr)) { r.Errors.Add("tags（分類タグの配列）がありません"); return; }
+            if (arr.Count == 0 || arr.Count > LabCatalog.MaxTags) { r.Errors.Add($"tags は1〜{LabCatalog.MaxTags}個です"); return; }
+            foreach (var item in arr)
+            {
+                if (item.Type != JTokenType.String) { r.Errors.Add("tags は文字列の配列です"); return; }
+                string tag = item.Value<string>();
+                if (LabCatalog.Tag(tag) == null) { r.Errors.Add($"未対応のタグ: {Shorten(tag)}（使用可能: {string.Join(", ", LabCatalog.Tags.Select(x => x.Id))}）"); continue; }
+                if (dna.Tags.Contains(tag)) { r.Errors.Add($"タグが重複しています: {tag}"); continue; }
+                dna.Tags.Add(tag);
+            }
+        }
+
+        static void ParseFunctionMap(JObject root, InventionDna dna, ValidationReport r)
+        {
+            if (!root.TryGetValue("functionMap", out var t) || t.Type == JTokenType.Null) return;
+            if (!(t is JArray arr)) { r.Errors.Add("functionMap は配列です"); return; }
+            if (arr.Count > LabCatalog.MaxFunctionNeeds) { r.Errors.Add($"functionMap は{LabCatalog.MaxFunctionNeeds}件までです"); return; }
+            for (int i = 0; i < arr.Count; i++)
+            {
+                string at = $"functionMap[{i}]";
+                if (!(arr[i] is JObject o)) { r.Errors.Add(at + " がオブジェクトではありません"); continue; }
+                RejectUnknown(o, NeedFields, at, r);
+                var n = new FunctionNeed
+                {
+                    Need = Str(o, "need", r, true, LabCatalog.MaxNeedLength, at) ?? "",
+                    Status = Str(o, "status", r, true, 16, at) ?? "",
+                    Note = Str(o, "note", r, false, LabCatalog.MaxNoteLength, at) ?? "",
+                };
+                if (n.Status.Length > 0 && !LabCatalog.FunctionStatuses.Contains(n.Status)) r.Errors.Add($"{at}.status が不正です: {Shorten(n.Status)}");
+                if (o.TryGetValue("blocks", out var bt) && bt.Type != JTokenType.Null)
+                {
+                    if (!(bt is JArray blocks) || blocks.Count > LabCatalog.MaxBehaviors) { r.Errors.Add($"{at}.blocks は{LabCatalog.MaxBehaviors}件までの配列です"); continue; }
+                    foreach (var b in blocks)
+                    {
+                        string type = b.Type == JTokenType.String ? b.Value<string>() : null;
+                        if (type == null || dna.FindBehavior(type) == null) { r.Errors.Add($"{at}.blocks にこの発明に無い機能があります: {Shorten(type ?? b.ToString())}"); continue; }
+                        if (!n.Blocks.Contains(type)) n.Blocks.Add(type);
+                    }
+                }
+                if (n.Status == "unverifiable" && n.Note.Length == 0) r.Errors.Add($"{at}：検証できない要望には理由（note）が必要です");
+                if ((n.Status == "simulated" || n.Status == "simplified") && n.Blocks.Count == 0) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）が必要です");
+                dna.FunctionMap.Add(n);
+            }
+        }
+
+        static void ParseParts(JObject root, InventionDna dna, ValidationReport r, int version)
         {
             if (!root.TryGetValue("parts", out var pt) || !(pt is JArray parts)) { r.Errors.Add("parts（部品配列）がありません"); return; }
             if (parts.Count == 0) { r.Errors.Add("部品が1つもありません"); return; }
@@ -120,7 +193,7 @@ namespace ImpossibleLab.Core
             {
                 string at = $"parts[{i}]";
                 if (!(parts[i] is JObject po)) { r.Errors.Add(at + " がオブジェクトではありません"); continue; }
-                RejectUnknown(po, PartFields, at, r);
+                RejectUnknown(po, version == 1 ? PartFieldsV1 : PartFieldsV2, at, r);
                 var p = new PartSpec();
                 p.Id = Str(po, "id", r, true, LabCatalog.MaxIdLength, at) ?? "";
                 if (p.Id.Length > 0 && !IsSafeId(p.Id)) r.Errors.Add($"{at}.id が不正です");
@@ -128,6 +201,15 @@ namespace ImpossibleLab.Core
                 p.Type = Str(po, "type", r, true, 32, at) ?? "";
                 var info = LabCatalog.Part(p.Type);
                 if (p.Type.Length > 0 && info == null) r.Errors.Add($"未対応の部品タイプ: {p.Type}（使用可能: {string.Join(", ", LabCatalog.PartTypeIds)}）");
+                if (version >= 2)
+                {
+                    var shape = Str(po, "shape", r, false, 16, at);
+                    if (shape != null && LabCatalog.Shape(shape) == null) r.Errors.Add($"{at}.shape が未対応です: {shape}（使用可能: {string.Join(", ", LabCatalog.Shapes.Select(x => x.Id))}）");
+                    else if (shape != null) p.Shape = shape;
+                    var mat = Str(po, "material", r, false, 16, at);
+                    if (mat != null && LabCatalog.Material(mat) == null) r.Errors.Add($"{at}.material が未対応です: {mat}（使用可能: {string.Join(", ", LabCatalog.Materials.Select(x => x.Id))}）");
+                    else if (mat != null) p.Material = mat;
+                }
                 var pos = Vec(po, "position", r, at, true);
                 if (pos.HasValue)
                 {
@@ -211,7 +293,18 @@ namespace ImpossibleLab.Core
         {
             var parts = new JArray();
             foreach (var p in dna.Parts)
-                parts.Add(new JObject { ["id"] = p.Id, ["type"] = p.Type, ["position"] = V(p.Position), ["scale"] = V(p.Scale) });
+                parts.Add(new JObject
+                {
+                    ["id"] = p.Id, ["type"] = p.Type, ["shape"] = p.ShapeOrDefault, ["material"] = p.MaterialOrDefault,
+                    ["position"] = V(p.Position), ["scale"] = V(p.Scale),
+                });
+            var needs = new JArray();
+            foreach (var n in dna.FunctionMap)
+            {
+                var no = new JObject { ["need"] = n.Need, ["blocks"] = new JArray(n.Blocks), ["status"] = n.Status };
+                if (!string.IsNullOrEmpty(n.Note)) no["note"] = n.Note;
+                needs.Add(no);
+            }
             var behaviors = new JArray();
             foreach (var b in dna.Behaviors)
             {
@@ -224,9 +317,10 @@ namespace ImpossibleLab.Core
             }
             return new JObject
             {
-                ["schemaVersion"] = dna.SchemaVersion, ["id"] = dna.Id, ["name"] = dna.Name, ["category"] = dna.Category,
-                ["purpose"] = dna.Purpose, ["mode"] = dna.Mode, ["appearance"] = dna.Appearance ?? LabCatalog.DefaultAppearance,
-                ["parts"] = parts, ["behaviors"] = behaviors,
+                ["schemaVersion"] = InventionDna.CurrentSchemaVersion, ["id"] = dna.Id, ["name"] = dna.Name,
+                ["purpose"] = dna.Purpose, ["tags"] = new JArray(dna.Tags), ["mount"] = dna.Mount ?? "fixed",
+                ["appearance"] = dna.Appearance ?? LabCatalog.DefaultAppearance, ["mode"] = dna.Mode,
+                ["parts"] = parts, ["behaviors"] = behaviors, ["functionMap"] = needs,
                 ["constraints"] = new JObject { ["maxParts"] = dna.Constraints.MaxParts, ["maxSpeed"] = Round(dna.Constraints.MaxSpeed) },
                 ["revision"] = dna.Revision,
                 ["parentRevision"] = dna.ParentRevision.HasValue ? new JValue(dna.ParentRevision.Value) : JValue.CreateNull(),
