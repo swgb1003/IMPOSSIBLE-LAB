@@ -12,15 +12,15 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const catalog = loadCatalog(path.join(here, "..", "catalog.json"));
 const schemas = buildSchemas(catalog);
 
-test("catalog: only protection is designable in this build", () => {
-  assert.deepEqual(supportedCategories(catalog).map((c) => c.id), ["protection"]);
+test("catalog: protection, carrier and mobility are designable", () => {
+  assert.deepEqual(supportedCategories(catalog).map((c) => c.id), ["protection", "carrier", "mobility"]);
 });
 
 test("design output converts to app DNA with safe ids", () => {
   const out = schemas.design.parse({
     status: "ok", message: "", suggestions: [],
     design: {
-      name: "ハンズフリー雨よけ", category: "protection", purpose: "両手がふさがっていても雨を防ぐ",
+      name: "ハンズフリー雨よけ", category: "protection", appearance: "safety_orange", purpose: "両手がふさがっていても雨を防ぐ",
       parts: [
         { id: "Core Body", type: "body", position: [0, -0.06, 0], scale: [0.22, 0.08, 0.22] },
         { id: "shield", type: "canopy", position: [0, 0, 0], scale: [1.2, 0.03, 1.2] },
@@ -38,14 +38,22 @@ test("design output converts to app DNA with safe ids", () => {
   assert.equal((dna.behaviors[0] as { targetPart: string }).targetPart, "core-body");
   assert.deepEqual((dna.behaviors[1] as { parameters: Record<string, number> }).parameters, { radius: 0.6, effectiveness: 0.9 });
   assert.equal(dna.schemaVersion, 1);
+  assert.equal(dna.appearance, "safety_orange");
   assert.equal(dna.parentRevision, null);
 });
 
 test("schema rejects part types outside the catalog", () => {
   assert.throws(() => schemas.design.parse({
     status: "ok", message: "", suggestions: [],
-    design: { name: "x", category: "protection", purpose: "x", designPoints: [],
+    design: { name: "x", category: "protection", appearance: "lab_white", purpose: "x", designPoints: [],
       parts: [{ id: "a", type: "laser_cannon", position: [0, 0, 0], scale: [1, 1, 1] }], behaviors: [] },
+  }));
+});
+
+test("schema rejects appearance presets outside the catalog", () => {
+  assert.throws(() => schemas.design.parse({
+    status: "ok", message: "", suggestions: [],
+    design: { name: "x", category: "protection", appearance: "rainbow_neon", purpose: "x", designPoints: [], parts: [], behaviors: [] },
   }));
 });
 
@@ -91,6 +99,12 @@ test("request text is checked before calling the API", () => {
 test("only known numeric experiment fields are forwarded", () => {
   const e = pickExperiment({ coverageRatio: 0.41234, windSpeed: 4, mode: "dream", note: "ignore me", headHits: Infinity });
   assert.deepEqual(e, { coverageRatio: 0.412, windSpeed: 4, mode: "dream" });
+});
+
+test("course experiment fields and environment are forwarded", () => {
+  const e = pickExperiment({ environment: "FlightDeck", stabilityScore: 46.4, requiredPowerKW: 146.21, landingError: 0.2234, secret: 1, environment2: "x" });
+  assert.deepEqual(e, { stabilityScore: 46.4, requiredPowerKW: 146.21, landingError: 0.223, environment: "FlightDeck" });
+  assert.equal(pickExperiment({ environment: "Moon" }), null);
 });
 
 test("rate limiter", () => {

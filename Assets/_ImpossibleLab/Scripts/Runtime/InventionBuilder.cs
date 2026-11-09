@@ -52,6 +52,13 @@ namespace ImpossibleLab
                     case "follow_head": behavior = root.AddComponent<FollowHeadBehavior>(); break;
                     case "rain_shield": behavior = root.AddComponent<RainShieldBehavior>(); break;
                     case "stabilize": behavior = root.AddComponent<StabilizeBehavior>(); break;
+                    case "follow_user": behavior = root.AddComponent<FollowUserBehavior>(); break;
+                    case "hover": behavior = root.AddComponent<HoverBehavior>(); break;
+                    case "avoid_obstacle":
+                    case "carry_load":
+                    case "move_forward":
+                        // 発明台での試用では見た目の変化なし。性能は実験場（CourseSimulator）で計測する
+                        behavior = root.AddComponent<PassiveBehavior>(); ((PassiveBehavior)behavior).Type = b.Type; break;
                     default: result.Warnings.Add($"機能 {b.Type} はこの版では見た目のみ（動作モジュール未実装）"); break;
                 }
                 if (behavior == null) continue;
@@ -63,9 +70,20 @@ namespace ImpossibleLab
             var bounds = new Bounds(Vector3.zero, Vector3.zero);
             foreach (var r in root.GetComponentsInChildren<Renderer>()) bounds.Encapsulate(root.transform.InverseTransformPoint(r.bounds.center));
             var col = root.AddComponent<BoxCollider>();
-            float rad = Mathf.Max(0.25f, report.Dna.GetParameter("rain_shield", "radius", 0.3f));
-            col.center = new Vector3(0, -0.05f, 0);
-            col.size = new Vector3(rad * 2f, 0.25f, rad * 2f);
+            if (report.Dna.FindBehavior("rain_shield") != null)
+            {
+                float rad = Mathf.Max(0.25f, report.Dna.GetParameter("rain_shield", "radius", 0.3f));
+                col.center = new Vector3(0, -0.05f, 0);
+                col.size = new Vector3(rad * 2f, 0.25f, rad * 2f);
+            }
+            else
+            {
+                // 部品の位置・大きさから掴む範囲を決める（最小 0.25 m 角）
+                var pb = new Bounds(report.Dna.Parts[0].Position, report.Dna.Parts[0].Scale);
+                foreach (var part in report.Dna.Parts) pb.Encapsulate(new Bounds(part.Position, part.Scale));
+                col.center = pb.center;
+                col.size = Vector3.Max(pb.size, Vector3.one * 0.25f);
+            }
             result.View = view;
             return result;
         }
@@ -93,9 +111,22 @@ namespace ImpossibleLab
             Object.Destroy(go.GetComponent<Collider>());
             go.transform.localRotation = rot;
             go.transform.localScale = scale;
-            go.GetComponent<Renderer>().sharedMaterial = mat;
+            var rend = go.GetComponent<Renderer>();
+            rend.sharedMaterial = mat;
+            // 外観プリセット：本体系は本体色、センサー・安定ユニットはアクセント色（マテリアルは共有のまま色だけ変える）
+            var look = LabCatalog.Appearance(dna.Appearance) ?? LabCatalog.Appearance(LabCatalog.DefaultAppearance);
+            int? rgb = part.Type == "body" || part.Type == "container" || part.Type == "arm" || part.Type == "connector" ? look.BodyRgb
+                : part.Type == "sensor" || part.Type == "stabilizer" ? look.AccentRgb : (int?)null;
+            if (rgb.HasValue)
+            {
+                var mpb = new MaterialPropertyBlock();
+                mpb.SetColor("_BaseColor", RgbColor(rgb.Value));
+                rend.SetPropertyBlock(mpb);
+            }
             return go;
         }
+
+        static Color RgbColor(int rgb) => new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f);
 
         public void Clear(InventionView view)
         {
@@ -239,5 +270,83 @@ namespace ImpossibleLab
         {
             if (_active && _gyro != null) _gyro.Rotate(0f, (90f + 360f * Strength) * Time.deltaTime, 0f, Space.Self);
         }
+    }
+
+    /// <summary>follow_user：起動すると床の上を移動してユーザーの後ろについてくる（試用。計測は CourseSimulator）。</summary>
+    public sealed class FollowUserBehavior : MonoBehaviour, IInventionBehavior
+    {
+        public string BehaviorType => "follow_user";
+        public float Speed, FollowDistance;
+        public Transform Target;
+        public float FloorY;
+        bool _active;
+
+        public void Configure(BehaviorSpec spec, InventionView view)
+        {
+            Speed = Mathf.Min(spec.Parameters["speed"], view.Dna.Constraints.MaxSpeed);
+            FollowDistance = spec.Parameters["followDistance"];
+        }
+
+        public void Activate() { _active = true; }
+        public void Deactivate() { _active = false; }
+
+        void Update()
+        {
+            if (!_active || Target == null) return;
+            var p = transform.position;
+            var goal = new Vector3(Target.position.x, FloorY, Target.position.z);
+            var flat = goal - new Vector3(p.x, FloorY, p.z);
+            float d = flat.magnitude;
+            var np = new Vector3(p.x, Mathf.MoveTowards(p.y, FloorY, 1.5f * Time.deltaTime), p.z);
+            if (d > FollowDistance + 0.05f)
+            {
+                var step = flat / d * Mathf.Min(Speed * Time.deltaTime, d - FollowDistance);
+                np += step;
+            }
+            transform.position = np;
+            if (d > 0.05f)
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(flat.x, 0f, flat.z)), 1f - Mathf.Exp(-5f * Time.deltaTime));
+        }
+    }
+
+    /// <summary>hover：起動するとその場で浮き上がり、ゆっくり上下する（試用。飛行の計測は CourseSimulator）。</summary>
+    public sealed class HoverBehavior : MonoBehaviour, IInventionBehavior
+    {
+        public string BehaviorType => "hover";
+        public float Lift, MaxHeight;
+        float _stab, _base;
+        bool _active;
+
+        public void Configure(BehaviorSpec spec, InventionView view)
+        {
+            Lift = spec.Parameters["lift"];
+            MaxHeight = spec.Parameters["maxHeight"];
+            _stab = view.Dna.GetParameter("stabilize", "stabilizationStrength", 0f);
+        }
+
+        public void Activate() { _active = true; _base = transform.position.y; }
+        public void Deactivate() { _active = false; }
+
+        void Update()
+        {
+            if (!_active) return;
+            // 発明台の上なので高さは控えめ（最大 0.4 m）。揚力が弱いと低く、安定化が弱いと揺れる（見た目のみ）
+            float h = Lift < 0.15f ? 0.02f : Mathf.Min(0.4f, MaxHeight * 0.3f) * Mathf.Lerp(0.5f, 1f, Lift);
+            float wobble = (1f - _stab) * 0.03f;
+            var p = transform.position;
+            float y = _base + h + Mathf.Sin(Time.time * 2f) * 0.02f;
+            transform.position = new Vector3(p.x, Mathf.Lerp(p.y, y, 1f - Mathf.Exp(-3f * Time.deltaTime)), p.z);
+            transform.localRotation = Quaternion.Euler(Mathf.Sin(Time.time * 2.7f) * wobble * 100f, transform.localEulerAngles.y, Mathf.Cos(Time.time * 2.1f) * wobble * 100f);
+        }
+    }
+
+    /// <summary>試用時に見た目の変化がない機能（avoid_obstacle・carry_load・move_forward）。性能は実験場で計測する。</summary>
+    public sealed class PassiveBehavior : MonoBehaviour, IInventionBehavior
+    {
+        public string Type;
+        public string BehaviorType => Type;
+        public void Configure(BehaviorSpec spec, InventionView view) { }
+        public void Activate() { }
+        public void Deactivate() { }
     }
 }

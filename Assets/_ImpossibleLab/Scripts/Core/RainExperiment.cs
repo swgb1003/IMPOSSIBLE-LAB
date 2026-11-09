@@ -5,38 +5,80 @@ using UnityEngine;
 
 namespace ImpossibleLab.Core
 {
-    /// <summary>実験条件（設定スナップショットとして結果に保存）。</summary>
+    /// <summary>実験場（仕様9.1）。</summary>
+    public static class LabEnvironments
+    {
+        public const string RainLab = "RainLab";
+        public const string ObstacleCourse = "ObstacleCourse";
+        public const string FlightDeck = "FlightDeck";
+        public static bool IsValid(string e) => e == RainLab || e == ObstacleCourse || e == FlightDeck;
+        public static string ForCategory(string category) =>
+            category == "carrier" ? ObstacleCourse : category == "mobility" ? FlightDeck : RainLab;
+        public static string LabelJa(string e) =>
+            e == ObstacleCourse ? "ObstacleCourse（障害物コース）" : e == FlightDeck ? "FlightDeck（飛行デッキ）" : "RainLab（雨・風）";
+    }
+
+    /// <summary>実験条件（設定スナップショットとして結果に保存）。環境ごとに使う項目が異なる。</summary>
     public sealed class RainExperimentConfig
     {
         public string Mode = LabModes.Dream;
-        /// <summary>雨量 mm/h（5〜80）。</summary>
+        public string Environment = LabEnvironments.RainLab;
+        /// <summary>雨量 mm/h（5〜80）。RainLab のみ。</summary>
         public float RainIntensity = 20f;
-        /// <summary>風速 m/s（0〜15）。</summary>
+        /// <summary>風速 m/s（0〜15）。RainLab・FlightDeck。</summary>
         public float WindSpeed = 3f;
         /// <summary>風が吹いていく方向（度、0=+Z前方、90=+X右）。</summary>
         public float WindDirectionDeg = 90f;
+        /// <summary>障害物の数（0〜10）。ObstacleCourse のみ。</summary>
+        public int ObstacleCount = 4;
+        /// <summary>積荷の重さ kg（0〜30）。ObstacleCourse のみ。</summary>
+        public float PayloadKg = 5f;
+        /// <summary>目標地点までの距離 m（4〜10）。FlightDeck のみ。</summary>
+        public float TargetDistance = 7f;
         public int Seed = 1234;
         public float DurationSec = 10f;
 
         public const float MinIntensity = 5f, MaxIntensity = 80f, MaxWind = 15f, MinDuration = 2f, MaxDuration = 60f;
+        public const int MaxObstacles = 10;
+        public const float MaxPayload = 30f, MinTargetDistance = 4f, MaxTargetDistance = 10f, MaxFlightWind = 10f;
 
         public RainExperimentConfig Clamped() => new RainExperimentConfig
         {
             Mode = LabModes.IsValid(Mode) ? Mode : LabModes.Dream,
+            Environment = LabEnvironments.IsValid(Environment) ? Environment : LabEnvironments.RainLab,
             RainIntensity = Mathf.Clamp(RainIntensity, MinIntensity, MaxIntensity),
-            WindSpeed = Mathf.Clamp(WindSpeed, 0f, MaxWind),
+            WindSpeed = Mathf.Clamp(WindSpeed, 0f, Environment == LabEnvironments.FlightDeck ? MaxFlightWind : MaxWind),
             WindDirectionDeg = Mathf.Repeat(WindDirectionDeg, 360f),
+            ObstacleCount = Mathf.Clamp(ObstacleCount, 0, MaxObstacles),
+            PayloadKg = Mathf.Clamp(PayloadKg, 0f, MaxPayload),
+            TargetDistance = Mathf.Clamp(TargetDistance, MinTargetDistance, MaxTargetDistance),
             Seed = Seed,
             DurationSec = Mathf.Clamp(DurationSec, MinDuration, MaxDuration),
         };
 
-        public bool SameConditions(RainExperimentConfig o) => o != null && Mode == o.Mode && Seed == o.Seed &&
-            Mathf.Approximately(RainIntensity, o.RainIntensity) && Mathf.Approximately(WindSpeed, o.WindSpeed) &&
-            Mathf.Approximately(WindDirectionDeg, o.WindDirectionDeg) && Mathf.Approximately(DurationSec, o.DurationSec);
+        public RainExperimentConfig Copy() => (RainExperimentConfig)MemberwiseClone();
 
-        public string Describe() => string.Format(CultureInfo.InvariantCulture,
-            "{0} / 雨量 {1:0} mm/h / 風速 {2:0.0} m/s / 風向 {3:0}° / {4:0} 秒 / シード {5}",
-            LabModes.Label(Mode), RainIntensity, WindSpeed, WindDirectionDeg, DurationSec, Seed);
+        /// <summary>モード以外の条件が同じか。</summary>
+        public bool SameExceptMode(RainExperimentConfig o) => o != null && Environment == o.Environment && Seed == o.Seed &&
+            Mathf.Approximately(DurationSec, o.DurationSec) &&
+            (Environment == LabEnvironments.ObstacleCourse
+                ? ObstacleCount == o.ObstacleCount && Mathf.Approximately(PayloadKg, o.PayloadKg)
+                : Environment == LabEnvironments.FlightDeck
+                    ? Mathf.Approximately(WindSpeed, o.WindSpeed) && Mathf.Approximately(WindDirectionDeg, o.WindDirectionDeg) && Mathf.Approximately(TargetDistance, o.TargetDistance)
+                    : Mathf.Approximately(RainIntensity, o.RainIntensity) && Mathf.Approximately(WindSpeed, o.WindSpeed) && Mathf.Approximately(WindDirectionDeg, o.WindDirectionDeg));
+
+        public bool SameConditions(RainExperimentConfig o) => o != null && Mode == o.Mode && SameExceptMode(o);
+
+        public string Describe()
+        {
+            var ci = CultureInfo.InvariantCulture;
+            if (Environment == LabEnvironments.ObstacleCourse)
+                return string.Format(ci, "{0} / 障害物 {1} 個 / 積荷 {2:0} kg / シード {3}", LabModes.Label(Mode), ObstacleCount, PayloadKg, Seed);
+            if (Environment == LabEnvironments.FlightDeck)
+                return string.Format(ci, "{0} / 距離 {1:0} m / 風速 {2:0.0} m/s / 風向 {3:0}° / シード {4}", LabModes.Label(Mode), TargetDistance, WindSpeed, WindDirectionDeg, Seed);
+            return string.Format(ci, "{0} / 雨量 {1:0} mm/h / 風速 {2:0.0} m/s / 風向 {3:0}° / {4:0} 秒 / シード {5}",
+                LabModes.Label(Mode), RainIntensity, WindSpeed, WindDirectionDeg, DurationSec, Seed);
+        }
     }
 
     /// <summary>モードごとに適用した実効パラメータと前提（仕様8章）。</summary>
@@ -139,8 +181,27 @@ namespace ImpossibleLab.Core
         public float DriftM;
         public List<string> Assumptions = new List<string>();
         public List<string> Limits = new List<string>();
-        public bool Success => CoverageRatio >= SuccessCoverage;
+        /// <summary>RainLab 以外の実験の指標（表示順）。</summary>
+        public List<ExperimentMetric> Metrics = new List<ExperimentMetric>();
+        /// <summary>RainLab 以外の合否（RainLab は防護率で判定）。</summary>
+        public bool? Passed;
+        /// <summary>RainLab 以外の判定の説明（例：「衝突0回・到着の遅れ3秒以内」）。</summary>
+        public string Criteria = "";
+        public bool IsRain => Environment == LabEnvironments.RainLab;
+        public bool Success => Passed ?? CoverageRatio >= SuccessCoverage;
         public const float SuccessCoverage = 0.8f;
+        public ExperimentMetric Metric(string key) => Metrics.Find(m => m.Key == key);
+    }
+
+    /// <summary>実験の指標1件（計算式はコードと docs/experiments.md に明記）。</summary>
+    public sealed class ExperimentMetric
+    {
+        public string Key, LabelJa, Unit = "", Format = "0.00";
+        public float Value;
+        public bool LowerIsBetter;
+        /// <summary>比較・改善案の対象にするか（参考値は false）。</summary>
+        public bool Primary = true;
+        public string Display => Value.ToString(Format, CultureInfo.InvariantCulture) + Unit;
     }
 
     /// <summary>
@@ -344,6 +405,17 @@ namespace ImpossibleLab.Core
         {
             var list = new List<MetricComparison>();
             if (before == null || after == null) return list;
+            if (!before.IsRain || !after.IsRain)
+            {
+                if (before.Environment != after.Environment) return list;
+                foreach (var a in after.Metrics)
+                {
+                    var b = before.Metric(a.Key);
+                    if (b == null || !a.Primary) continue;
+                    list.Add(Row(a.LabelJa, b.Value, a.Value, a.Format, a.LowerIsBetter, a.Unit));
+                }
+                return list;
+            }
             list.Add(Row("被濡れスコア（雨粒/秒）", before.WetnessScore, after.WetnessScore, "0.0", lowerIsBetter: true));
             list.Add(Row("防護率", before.CoverageRatio * 100f, after.CoverageRatio * 100f, "0.0", lowerIsBetter: false, unit: "%"));
             list.Add(Row("頭部への命中", before.HeadHits, after.HeadHits, "0", true));
@@ -356,14 +428,10 @@ namespace ImpossibleLab.Core
 
         static MetricComparison Row(string label, float b, float a, string fmt, bool lowerIsBetter, string unit = "")
         {
-            string verdict = Mathf.Abs(a - b) < 1e-4f ? "変化なし" : ((a < b) == lowerIsBetter ? "改善" : "悪化");
-            return new MetricComparison
-            {
-                Label = label,
-                Before = b.ToString(fmt, CultureInfo.InvariantCulture) + unit,
-                After = a.ToString(fmt, CultureInfo.InvariantCulture) + unit,
-                Verdict = verdict,
-            };
+            string bs = b.ToString(fmt, CultureInfo.InvariantCulture), as_ = a.ToString(fmt, CultureInfo.InvariantCulture);
+            // 表示桁で同じなら「変化なし」（0.08→0.12 秒が「0.1→0.1 悪化」と見えないように）
+            string verdict = bs == as_ || Mathf.Abs(a - b) < 1e-4f ? "変化なし" : ((a < b) == lowerIsBetter ? "改善" : "悪化");
+            return new MetricComparison { Label = label, Before = bs + unit, After = as_ + unit, Verdict = verdict };
         }
     }
 }

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "inv-flying-shoes",
+  "name": "空飛ぶ靴",
+  "category": "mobility",
+  "purpose": "靴の底の推進ユニットで浮き上がり、短い距離を飛んで移動する",
+  "mode": "dream",
+  "parts": [
+    { "id": "shoe-l", "type": "body", "position": [-0.12, 0.05, 0], "scale": [0.11, 0.08, 0.28] },
+    { "id": "shoe-r", "type": "body", "position": [0.12, 0.05, 0], "scale": [0.11, 0.08, 0.28] },
+    { "id": "jet-l", "type": "thruster", "position": [-0.12, -0.02, 0.02], "scale": [0.12, 0.05, 0.12] },
+    { "id": "jet-r", "type": "thruster", "position": [0.12, -0.02, 0.02], "scale": [0.12, 0.05, 0.12] },
+    { "id": "gyro", "type": "stabilizer", "position": [0, 0.06, -0.12], "scale": [0.06, 0.04, 0.06] }
+  ],
+  "behaviors": [
+    { "type": "hover", "parameters": { "lift": 0.5, "maxHeight": 1.0 } },
+    { "type": "move_forward", "parameters": { "thrust": 0.4, "speedLimit": 1.2 } },
+    { "type": "stabilize", "targetPart": "gyro", "parameters": { "stabilizationStrength": 0.2 } }
+  ],
+  "constraints": { "maxParts": 12, "maxSpeed": 3.0 },
+  "revision": 1,
+  "parentRevision": null
+}

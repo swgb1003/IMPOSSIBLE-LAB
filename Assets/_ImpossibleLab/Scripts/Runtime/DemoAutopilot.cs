@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Text;
 using ImpossibleLab.Core;
 using UnityEngine;
@@ -89,12 +90,12 @@ namespace ImpossibleLab
         }
 
         /// <summary>メイン・左右パネルの全要素（文字の実際の描画範囲を含む）がパネルの枠内に収まっているかを確かめる。</summary>
-        void CheckFits(string screen)
+        void CheckFits(string screen, Canvas only = null)
         {
             Canvas.ForceUpdateCanvases();
             var bad = new System.Collections.Generic.List<string>();
             var corners = new Vector3[4];
-            foreach (var canvas in _app.ConsoleRoot.GetComponentsInChildren<Canvas>(false))
+            foreach (var canvas in only != null ? new[] { only } : _app.ConsoleRoot.GetComponentsInChildren<Canvas>(false))
             {
                 if (!canvas.isRootCanvas || canvas.GetComponentInChildren<UnityEngine.UI.Graphic>() == null) continue;
                 var root = (RectTransform)canvas.transform;
@@ -175,7 +176,7 @@ namespace ImpossibleLab
             _app.SubmitRequest();
             Check(_app.InputWarning != null && _app.Sm.State == LabState.Drafting, "empty input warns: " + _app.InputWarning);
             // 未対応の発明 → エラー画面と代替案
-            _app.SetRequestText("空を飛べる靴を作って");
+            _app.SetRequestText("時間を止める時計を作って");
             _app.SubmitRequest();
             yield return WaitState(LabState.Error);
             yield return Shot("S02_error_unsupported");
@@ -296,6 +297,103 @@ namespace ImpossibleLab
             _app.LoadFromGallery(_app.Current.Current.Id);
             yield return WaitState(LabState.Editing);
             yield return Shot("S03_loaded_from_gallery");
+
+            // 手元メニュー：表示・収まり・効果音の切り替え
+            var hm = _app.GetComponent<HandMenu>();
+            Check(hm != null && hm.Canvas != null, "hand menu created (Left Controller found)");
+            if (hm != null && hm.Canvas != null)
+            {
+                var eye = new Vector3(0, 1.6f, -3.3f);
+                var at = eye + new Vector3(0.12f, -0.25f, 0.45f);
+                hm.PoseOverride = new Pose(at, Quaternion.LookRotation(at - eye));
+                hm.ForceVisible = true;
+                yield return null; yield return null;
+                Check(hm.Shown, "hand menu shows");
+                yield return Shot("hand_menu");
+                CheckFits("hand_menu", hm.Canvas);
+                bool soundBefore = _app.Fx.SoundOn;
+                var soundBtn = hm.Canvas.GetComponentsInChildren<UnityEngine.UI.Button>().FirstOrDefault(b => b.GetComponentInChildren<TMPro.TMP_Text>().text.Contains("効果音"));
+                soundBtn?.onClick.Invoke();
+                Check(soundBtn != null && _app.Fx.SoundOn != soundBefore, "hand menu toggles sound");
+                _app.Fx.SoundOn = soundBefore;
+                hm.ForceVisible = false; hm.PoseOverride = null;
+                yield return null;
+            }
+
+            // 運搬ロボット（障害物コース）・空飛ぶ靴（飛行デッキ）：生成 → 試用 → 実験 → 改良 → 再実験 → REALITY → 保存
+            foreach (var (req, cat, fix, key) in new[] {
+                ("自動でついてくる運搬ロボットを作って", "carrier", "障害物をよけて", "collisionCount"),
+                ("空を飛べる靴を作って", "mobility", "風で揺れないようにして", "stabilityScore") })
+            {
+                _app.NewInvention();
+                _app.SetRequestText(req);
+                float w0 = 0;
+                while (_app.Sm.State == LabState.Drafting && w0 < 10f) { _app.SubmitRequest(); w0 += Time.unscaledDeltaTime; yield return null; }
+                yield return WaitState(LabState.AwaitingApproval);
+                Check(_app.Preview != null && _app.Preview.Category == cat, $"{cat}: offline design generated");
+                yield return Shot($"S02_preview_{cat}");
+                _app.ApprovePreview();
+                yield return WaitState(LabState.Editing);
+                yield return Shot($"S03_edit_{cat}");
+                if (cat == "carrier")
+                {
+                    int rev = _app.Current.Current.Revision;
+                    _app.StepAppearance(+1);
+                    yield return null;
+                    Check(_app.Current.Current.Appearance == "safety_orange" && _app.Current.Current.Revision == rev, "appearance preset changes without a new revision");
+                    yield return Shot("S03_appearance_carrier");
+                }
+                _app.ToggleDevice();
+                yield return new WaitForSeconds(1.5f);
+                Check(_app.DeviceRunning, $"{cat}: device activates in workshop");
+                yield return Shot($"S03_trial_{cat}");
+                _app.ToggleDevice();
+                _app.GoToTestSetup();
+                yield return WaitState(LabState.ConfiguringTest);
+                Check(_app.TestConfig.Environment == LabEnvironments.ForCategory(cat), $"{cat}: environment = {_app.TestConfig.Environment}");
+                if (cat == "mobility") { _app.TestConfig.WindDirectionDeg = 0f; _app.TestConfig.WindSpeed = 4f; }
+                _app.Notify();
+                yield return null;
+                yield return Shot($"S04_setup_{cat}");
+                _app.StartExperiment();
+                yield return WaitState(LabState.RunningTest);
+                yield return new WaitForSeconds(3f);
+                yield return Shot($"S05_running_{cat}", rainLab: true);
+                yield return WaitState(LabState.ReviewingResult, 60f);
+                var c1 = _app.LastResult;
+                Check(c1 != null && !c1.IsRain && c1.Metrics.Count > 0, $"{cat}: result has metrics");
+                float before = c1?.Metric(key)?.Value ?? 0f;
+                Log($"RESULT {cat} rev{c1?.Revision} {c1?.Config.Mode} passed={c1?.Passed} {string.Join(" ", c1?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])}");
+                yield return Shot($"S05_result_{cat}_rev1", rainLab: true);
+                _app.ImproveAndRetest();
+                yield return WaitState(LabState.Editing);
+                _app.PickRevision(fix);
+                _app.RequestRevision();
+                float tw = 0; while (_app.PendingRevision == null && tw < 5f) { tw += Time.unscaledDeltaTime; yield return null; }
+                Check(_app.PendingRevision != null && _app.PendingRevision.Success, $"{cat}: revision proposal ({fix})");
+                _app.ApproveRevision();
+                _app.GoToTestSetup();
+                yield return WaitState(LabState.ConfiguringTest);
+                _app.StartExperiment();
+                yield return WaitState(LabState.ReviewingResult, 60f);
+                var c2 = _app.LastResult;
+                float after = c2?.Metric(key)?.Value ?? 0f;
+                Log($"RESULT {cat} rev{c2?.Revision} {c2?.Config.Mode} passed={c2?.Passed} {string.Join(" ", c2?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])}");
+                Check(_app.BaselineResult != null, $"{cat}: compared with previous revision");
+                Check(cat == "carrier" ? after < before : after > before, $"{cat}: {key} improved {before:0.##} -> {after:0.##}");
+                yield return Shot($"S05_result_{cat}_compare", rainLab: true);
+                _app.RerunOtherMode();
+                yield return WaitState(LabState.ReviewingResult, 60f);
+                var c3 = _app.LastResult;
+                Log($"RESULT {cat} rev{c3?.Revision} {c3?.Config.Mode} passed={c3?.Passed} {string.Join(" ", c3?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])} | {string.Join(" / ", c3?.Limits ?? new System.Collections.Generic.List<string>())}");
+                Check(c3 != null && c3.Config.Mode == LabModes.Reality, $"{cat}: REALITY run");
+                if (cat == "mobility") Check(c3 != null && c3.Limits.Any(l => l.Contains("電池切れ")), "mobility: REALITY shows power limit");
+                yield return Shot($"S05_result_{cat}_reality", rainLab: true);
+                _app.Save();
+                yield return WaitState(LabState.Saved, 20f);
+                var saved = _app.Repo.Load(_app.Current.Current.Id, out var serr);
+                Check(saved != null && saved.Experiments.Count >= 3 && saved.Experiments.All(e => e.Environment == LabEnvironments.ForCategory(cat)), $"{cat}: saved with experiments {serr}");
+            }
 
             // 記録したAI応答（部品5・機能5・パラメータ9）でも、全項目がパネル内に収まる
             string fixture = Path.Combine(Application.dataPath, "_ImpossibleLab/Tests/EditMode/Fixtures/ai_design_response.json");

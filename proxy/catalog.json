@@ -243,12 +243,34 @@
     {
       "id": "carrier",
       "labelJa": "運搬",
-      "experimentAvailable": false
+      "experimentAvailable": true
     },
     {
       "id": "mobility",
       "labelJa": "移動",
-      "experimentAvailable": false
+      "experimentAvailable": true
+    }
+  ],
+  "appearances": [
+    {
+      "id": "lab_white",
+      "labelJa": "研究所ホワイト"
+    },
+    {
+      "id": "safety_orange",
+      "labelJa": "セーフティオレンジ"
+    },
+    {
+      "id": "night_navy",
+      "labelJa": "ナイトネイビー"
+    },
+    {
+      "id": "field_green",
+      "labelJa": "フィールドグリーン"
+    },
+    {
+      "id": "graphite",
+      "labelJa": "グラファイト"
     }
   ],
   "limits": {

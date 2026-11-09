@@ -7,10 +7,13 @@ export interface BehaviorInfo {
   type: string; labelJa: string; requiresTargetPart: boolean; allowedTargetTypes: string[]; parameters: ParameterInfo[];
 }
 export interface CategoryInfo { id: string; labelJa: string; experimentAvailable: boolean }
+export interface AppearanceInfo { id: string; labelJa: string }
 export interface Catalog {
   partTypes: PartTypeInfo[];
   behaviors: BehaviorInfo[];
   categories: CategoryInfo[];
+  /** 外観プリセット（色の組み合わせ）。古い catalog.json には無い。 */
+  appearances?: AppearanceInfo[];
   limits: {
     maxParts: number; maxBehaviors: number; positionLimitXZ: number; positionMinY: number; positionMaxY: number;
     maxNameLength: number; maxPurposeLength: number; maxRequestLength: number;

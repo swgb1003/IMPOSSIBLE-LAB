@@ -156,7 +156,11 @@ namespace ImpossibleLab.Core
                 ["experimentId"] = r.ExperimentId, ["inventionId"] = r.InventionId, ["revision"] = r.Revision,
                 ["mode"] = c.Mode, ["environment"] = r.Environment, ["seed"] = c.Seed, ["startTime"] = r.StartTime,
                 ["durationSec"] = c.DurationSec,
-                ["conditions"] = new JObject { ["rainIntensity"] = c.RainIntensity, ["windSpeed"] = c.WindSpeed, ["windDirectionDeg"] = c.WindDirectionDeg },
+                ["conditions"] = new JObject
+                {
+                    ["rainIntensity"] = c.RainIntensity, ["windSpeed"] = c.WindSpeed, ["windDirectionDeg"] = c.WindDirectionDeg,
+                    ["obstacleCount"] = c.ObstacleCount, ["payloadKg"] = c.PayloadKg, ["targetDistance"] = c.TargetDistance,
+                },
                 ["metrics"] = new JObject
                 {
                     ["wetnessScore"] = Math.Round(r.WetnessScore, 3), ["coverageRatio"] = Math.Round(r.CoverageRatio, 4),
@@ -168,9 +172,19 @@ namespace ImpossibleLab.Core
                     ["powerW"] = Opt(r.PowerW, 2), ["powerWLow"] = Opt(r.PowerWMin, 2), ["powerWHigh"] = Opt(r.PowerWMax, 2),
                     ["massKg"] = Opt(r.MassKg, 3), ["windForceN"] = Opt(r.WindForceN, 3), ["canHoldPosition"] = r.CanHoldPosition,
                 },
+                ["items"] = new JArray(r.Metrics.Select(x => new JObject
+                {
+                    ["key"] = x.Key, ["labelJa"] = x.LabelJa, ["value"] = Math.Round(x.Value, 4), ["unit"] = x.Unit,
+                    ["format"] = x.Format, ["lowerIsBetter"] = x.LowerIsBetter, ["primary"] = x.Primary,
+                })),
+                ["passed"] = r.Passed.HasValue ? new JValue(r.Passed.Value) : JValue.CreateNull(),
+                ["criteria"] = r.Criteria ?? "",
                 ["notes"] = new JArray(r.Limits.Concat(r.Assumptions).Take(10)),
+                ["limitCount"] = r.Limits.Count,
             };
         }
+
+        static string Trunc(string s, int max) => string.IsNullOrEmpty(s) ? "" : s.Length > max ? s.Substring(0, max) : s;
 
         static JToken Opt(float? v, int digits) => v.HasValue ? new JValue(Math.Round(v.Value, digits)) : JValue.CreateNull();
 
@@ -180,14 +194,20 @@ namespace ImpossibleLab.Core
             {
                 var cond = (JObject)o["conditions"];
                 var m = (JObject)o["metrics"];
+                string env = o.Value<string>("environment") ?? LabEnvironments.RainLab;
                 var cfg = new RainExperimentConfig
                 {
                     Mode = o.Value<string>("mode"), Seed = o.Value<int>("seed"), DurationSec = o.Value<float>("durationSec"),
+                    Environment = env,
                     RainIntensity = cond.Value<float>("rainIntensity"), WindSpeed = cond.Value<float>("windSpeed"),
                     WindDirectionDeg = cond.Value<float>("windDirectionDeg"),
+                    ObstacleCount = cond.Value<int?>("obstacleCount") ?? 4, PayloadKg = cond.Value<float?>("payloadKg") ?? 5f,
+                    TargetDistance = cond.Value<float?>("targetDistance") ?? 7f,
                 }.Clamped();
-                return new RainExperimentResult
+                if (!LabEnvironments.IsValid(env)) return null;
+                var res = new RainExperimentResult
                 {
+                    Environment = env,
                     ExperimentId = o.Value<string>("experimentId"), InventionId = o.Value<string>("inventionId"),
                     Revision = o.Value<int>("revision"), Config = cfg, StartTime = o.Value<string>("startTime"),
                     WetnessScore = m.Value<float>("wetnessScore"), CoverageRatio = m.Value<float>("coverageRatio"),
@@ -200,7 +220,26 @@ namespace ImpossibleLab.Core
                     PowerWMin = m.Value<float?>("powerWLow"), PowerWMax = m.Value<float?>("powerWHigh"),
                     MassKg = m.Value<float?>("massKg"), WindForceN = m.Value<float?>("windForceN"),
                     CanHoldPosition = m.Value<bool?>("canHoldPosition") ?? true,
+                    Passed = o.Value<bool?>("passed"), Criteria = o.Value<string>("criteria") ?? "",
                 };
+                if (o["items"] is JArray items)
+                    foreach (var it in items.OfType<JObject>())
+                    {
+                        string key = it.Value<string>("key"), fmt = it.Value<string>("format") ?? "0.00";
+                        if (string.IsNullOrEmpty(key) || key.Length > 40 || fmt.Length > 8 || fmt.Trim('0', '.').Length > 0) continue; // 書式は 0 と . のみ許可
+                        float v = it.Value<float>("value");
+                        if (float.IsNaN(v) || float.IsInfinity(v)) continue;
+                        res.Metrics.Add(new ExperimentMetric
+                        {
+                            Key = key, LabelJa = Trunc(it.Value<string>("labelJa"), 40), Value = v, Unit = Trunc(it.Value<string>("unit"), 8),
+                            Format = fmt, LowerIsBetter = it.Value<bool?>("lowerIsBetter") ?? true, Primary = it.Value<bool?>("primary") ?? true,
+                        });
+                    }
+                // notes の先頭 limitCount 件が「制限」（改善案の判定に使う）。前提は読み込み時に表示しない
+                int limits = o.Value<int?>("limitCount") ?? 0;
+                if (o["notes"] is JArray notes)
+                    foreach (var n in notes.Take(limits)) { var t = n.Value<string>(); if (!string.IsNullOrEmpty(t)) res.Limits.Add(Trunc(t, 160)); }
+                return res;
             }
             catch (Exception) { return null; }
         }

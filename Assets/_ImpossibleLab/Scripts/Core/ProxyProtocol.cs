@@ -14,7 +14,16 @@ namespace ImpossibleLab.Core
         public static string ReviseRequestJson(InventionDna current, RainExperimentResult last, string instruction)
         {
             var o = new JObject { ["dna"] = DnaJson.ToJObject(current), ["instruction"] = instruction.Trim() };
-            if (last != null)
+            if (last != null && !last.IsRain)
+            {
+                var c = last.Config;
+                var lr = new JObject { ["mode"] = c.Mode, ["environment"] = last.Environment };
+                foreach (var m in last.Metrics) lr[m.Key] = m.Value;
+                if (last.Environment == LabEnvironments.ObstacleCourse) { lr["obstacleCount"] = c.ObstacleCount; lr["payloadKg"] = c.PayloadKg; }
+                else { lr["targetDistance"] = c.TargetDistance; lr["windSpeed"] = c.WindSpeed; lr["windDirectionDeg"] = c.WindDirectionDeg; }
+                o["lastResult"] = lr;
+            }
+            else if (last != null)
             {
                 var c = last.Config;
                 o["lastResult"] = new JObject

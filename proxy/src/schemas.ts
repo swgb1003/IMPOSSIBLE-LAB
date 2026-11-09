@@ -12,6 +12,7 @@ export function buildSchemas(c: Catalog) {
   const partType = enumOf(c.partTypes.map((p) => p.type));
   const behaviorType = enumOf(c.behaviors.map((b) => b.type));
   const category = enumOf(c.categories.map((x) => x.id));
+  const appearance = enumOf((c.appearances ?? [{ id: "lab_white", labelJa: "" }]).map((x) => x.id));
   const param = z.object({ name: z.string(), value: z.number() });
   const part = z.object({
     id: z.string(),
@@ -33,6 +34,7 @@ export function buildSchemas(c: Catalog) {
       .object({
         name: z.string(),
         category,
+        appearance: appearance.describe("color preset id; does not change performance"),
         purpose: z.string(),
         parts: z.array(part),
         behaviors: z.array(behavior),
@@ -103,6 +105,7 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     category: d.category,
     purpose: clip(d.purpose, c.limits.maxPurposeLength) || "（目的未記入）",
     mode: "dream",
+    appearance: d.appearance,
     parts,
     behaviors,
     constraints: { maxParts: c.limits.maxParts, maxSpeed: 3.0 },

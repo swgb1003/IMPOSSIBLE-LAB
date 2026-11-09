@@ -100,7 +100,7 @@ namespace ImpossibleLab
             var s = App.Sm.State;
             string screen = s == LabState.Idle || s == LabState.Drafting ? "S01" : s.ToString();
             var sb = new StringBuilder(screen);
-            sb.Append('|').Append(App.InputWarning).Append('|').Append(App.Current?.Current.Revision).Append('|').Append(App.Current?.Current.Id)
+            sb.Append('|').Append(App.InputWarning).Append('|').Append(App.Current?.Current.Revision).Append('|').Append(App.Current?.Current.Id).Append(App.Current?.Current.Appearance)
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
@@ -288,13 +288,13 @@ namespace ImpossibleLab
             UiKit.Size(_requestInput, flexW: 1, h: 76);
             UiKit.Button(row, "送信 ▶", App.SubmitRequest, ButtonStyle.Primary, 200, 76);
             if (App.InputWarning != null) Para(_body, "⚠ " + App.InputWarning, LabTheme.FontBody, LabTheme.AccentWarning, 36);
-            else Para(_body, "Quest単体で文字入力しにくい場合は、下の例を選ぶだけで進められます。音声入力はこの版では未対応です。", LabTheme.FontSmall, h: 32);
+            else Para(_body, "文字入力しにくい場合は下の例を選ぶだけで進められます。声で入れたいときは、Questキーボードのマイクボタンを試してください（実機で確認中）。", LabTheme.FontSmall, h: 32);
 
             UiKit.Heading(_body, "クイック発明（例から選ぶ → 入力欄に反映）", LabTheme.FontHeading);
             var cards = UiKit.Row("Cards", _body, LabTheme.Space2, 150);
             QuickCard(cards, "手を使わない傘", "ハンズフリー雨具 ・ 実験できます", LabAppText.RainRequest, true);
-            QuickCard(cards, "空を飛べる靴", "この版では設計未対応", "空を飛べる靴を作って", false);
-            QuickCard(cards, "自動でついてくる運搬ロボット", "この版では設計未対応", "自動でついてくる運搬ロボットを作って", false);
+            QuickCard(cards, "空を飛べる靴", "移動 ・ 飛行デッキで実験できます", "空を飛べる靴を作って", true);
+            QuickCard(cards, "自動でついてくる運搬ロボット", "運搬 ・ 障害物コースで実験できます", "自動でついてくる運搬ロボットを作って", true);
 
             var actions = UiKit.Row("Actions", _body, LabTheme.Space2, 64);
             UiKit.Button(actions, "保存済みの発明（ギャラリー）", App.OpenGallery, ButtonStyle.Secondary, 440);
@@ -460,7 +460,7 @@ namespace ImpossibleLab
             var right = UiKit.Column("Revise", cols, LabTheme.Space1); UiKit.Size(right, flexW: 1);
             UiKit.Heading(right, "AIに改良を依頼", 26);
             var inRow = UiKit.Row("RevInput", right, LabTheme.Space1, 64);
-            _revisionInput = UiKit.Input(inRow, "例：防ぐ範囲を広げて", RequestRules.MaxRequestLength, s => App.RevisionText = s);
+            _revisionInput = UiKit.Input(inRow, "例：" + OfflineRevisionRules.SuggestedRequestsFor(dna.Category).First(), RequestRules.MaxRequestLength, s => App.RevisionText = s);
             _revisionInput.SetTextWithoutNotify(App.RevisionText);
             UiKit.Size(_revisionInput, flexW: 1, h: 64);
             UiKit.Button(inRow, "依頼", App.RequestRevision, ButtonStyle.Primary, 120, 64);
@@ -468,7 +468,7 @@ namespace ImpossibleLab
             var grid = chips.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
             grid.cellSize = new Vector2(298, 52); grid.spacing = new Vector2(8, 8);
             UiKit.Size(chips, h: 112);
-            foreach (var sug in OfflineRevisionRules.SuggestedRequests)
+            foreach (var sug in OfflineRevisionRules.SuggestedRequestsFor(dna.Category))
             {
                 var text = sug;
                 UiKit.Button(chips, text, () => { App.PickRevision(text); if (_revisionInput != null) _revisionInput.SetTextWithoutNotify(text); }, ButtonStyle.Secondary, -1, 52, LabTheme.FontSmall);
@@ -497,20 +497,43 @@ namespace ImpossibleLab
 
             SideHeading(_leftBody, "DESIGN STUDIO", "部品一覧（掴む：グリップ／起動：掴んでトリガー）");
             CappedLines(_leftBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}  <size=80%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>{part.Id} ／ {part.Scale.x:0.00}×{part.Scale.y:0.00}×{part.Scale.z:0.00} m</color></size>", LabTheme.FontBody, LabTheme.TextPrimary, 40f)).ToList(), 6);
-            Para(_leftBody, "外観プリセットはこの版では未対応（機能優先）", LabTheme.FontSmall, h: 34);
+            var lookRow = UiKit.Row("Appearance", _leftBody, LabTheme.Space1, 52);
+            var lookLabel = UiKit.Text(lookRow, "外観", LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft); UiKit.Size(lookLabel, w: 70);
+            UiKit.Button(lookRow, "◀", () => App.StepAppearance(-1), ButtonStyle.Secondary, 56, 48);
+            var lookName = UiKit.Text(lookRow, LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, LabTheme.FontSmall, LabTheme.AccentLight, bold: true, align: TextAlignmentOptions.Center); UiKit.Size(lookName, flexW: 1);
+            UiKit.Button(lookRow, "▶", () => App.StepAppearance(+1), ButtonStyle.Secondary, 56, 48);
 
             SideHeading(_rightBody, "HISTORY", "改良履歴（元に戻す対象）");
             var hist = App.Current.History.AsEnumerable().Reverse().Take(5).ToList();
             Para(_rightBody, $"● 現在 Rev.{dna.Revision}", LabTheme.FontBody, LabTheme.AccentLight, 36);
-            foreach (var h in hist) Para(_rightBody, $"○ Rev.{h.Revision}　防護半径 {h.GetParameter("rain_shield", "radius", 0):0.00} m／側面 {h.GetParameter("rain_shield", "skirtLength", 0):0.00} m", LabTheme.FontSmall, h: 34);
+            foreach (var h in hist) Para(_rightBody, $"○ Rev.{h.Revision}　{KeySummary(h)}", LabTheme.FontSmall, h: 34);
             if (hist.Count == 0) Para(_rightBody, "まだ改良履歴はありません", LabTheme.FontSmall, h: 34);
             var last = App.Current.Experiments.LastOrDefault();
             if (last != null)
             {
                 UiKit.Heading(_rightBody, "直近の実験", 26);
-                Para(_rightBody, $"Rev.{last.Revision}　{LabModes.Label(last.Config.Mode)}\n被濡れ {last.WetnessScore:0.0} 粒/秒　防護率 {last.CoverageRatio * 100f:0.0}%", LabTheme.FontSmall, LabTheme.TextPrimary, 70);
+                Para(_rightBody, $"Rev.{last.Revision}　{LabModes.Label(last.Config.Mode)}　{(last.Success ? "✓ 成功" : "! 要改良")}\n{ResultSummary(last)}", LabTheme.FontSmall, LabTheme.TextPrimary, 70);
             }
         }
+
+        /// <summary>改良履歴の1行に出す主なパラメータ（カテゴリ別）。</summary>
+        static string KeySummary(InventionDna d)
+        {
+            string F(string b, string p, string label)
+            {
+                var info = LabCatalog.Behavior(b)?.Param(p);
+                return info == null || d.FindBehavior(b) == null ? null : label + " " + LabCatalog.FormatValue(info, d.GetParameter(b, p, info.Default));
+            }
+            var items = d.Category == "carrier" ? new[] { F("follow_user", "speed", "速度"), F("avoid_obstacle", "detectionRange", "検知"), F("carry_load", "capacity", "積載") }
+                : d.Category == "mobility" ? new[] { F("hover", "lift", "揚力"), F("move_forward", "thrust", "推力"), F("stabilize", "stabilizationStrength", "安定") }
+                : new[] { F("rain_shield", "radius", "防護半径"), F("rain_shield", "skirtLength", "側面") };
+            return string.Join("／", items.Where(x => x != null));
+        }
+
+        /// <summary>結果の要約（主な指標2つ）。</summary>
+        static string ResultSummary(RainExperimentResult r) => r.IsRain
+            ? $"被濡れ {r.WetnessScore:0.0} 粒/秒　防護率 {r.CoverageRatio * 100f:0.0}%"
+            : string.Join("　", r.Metrics.Where(m => m.Primary).Take(2).Select(m => $"{m.LabelJa} {m.Display}"));
 
         void ParamRow(Transform parent, BehaviorInfo b, ParameterInfo p, float value)
         {
@@ -531,7 +554,8 @@ namespace ImpossibleLab
         {
             var cfg = App.TestConfig;
             if (cfg.Mode == LabModes.Reality && App.CoefficientPage >= 0 && RealityModel.Default != null) { BuildCoefficientTable(); return; }
-            Title("実験環境設定", "実験場：EXPERIMENT GATE → RainLab");
+            bool rain = cfg.Environment == LabEnvironments.RainLab;
+            Title("実験環境設定", "実験場：EXPERIMENT GATE → " + LabEnvironments.LabelJa(cfg.Environment));
             // REALITY の注意書きは見出しと同じ行に置く（別の行にするとフッターがパネルからはみ出す）
             var modeHead = UiKit.Row("ModeHead", _body, LabTheme.Space2, 36);
             var mh = UiKit.Heading(modeHead, "実験モードの選択", 26);
@@ -543,19 +567,40 @@ namespace ImpossibleLab
             }
             var modes = UiKit.Row("Modes", _body, LabTheme.Space2, 92);
             ModeCard(modes, LabModes.Dream, "DREAM MODE（自由実験）", "空想の物理で、制限なく試せる");
-            ModeCard(modes, LabModes.Reality, "REALITY MODE（現実準拠）", "簡易モデルで重量・風・電力の制約を確認");
+            ModeCard(modes, LabModes.Reality, "REALITY MODE（現実準拠）", rain ? "簡易モデルで重量・風・電力の制約を確認" : cfg.Environment == LabEnvironments.FlightDeck ? "人を浮かせる電力と電池の制約を確認" : "速度上限・加速・積荷・電力の制約を確認");
 
             UiKit.Heading(_body, "環境条件の設定", 26);
             var envRow = UiKit.Row("Env", _body, LabTheme.Space1, 56);
-            UiKit.Button(envRow, "RainLab（雨・風）✓ 選択中", null, ButtonStyle.Selected, -1, 56, LabTheme.FontSmall);
-            var ob = UiKit.Button(envRow, "ObstacleCourse（運搬向け・選択不可）", null, ButtonStyle.Ghost, -1, 56, LabTheme.FontSmall); UiKit.SetInteractable(ob, false);
-            var fd = UiKit.Button(envRow, "FlightDeck（移動向け・選択不可）", null, ButtonStyle.Ghost, -1, 56, LabTheme.FontSmall); UiKit.SetInteractable(fd, false);
+            foreach (var env in new[] { LabEnvironments.RainLab, LabEnvironments.ObstacleCourse, LabEnvironments.FlightDeck })
+            {
+                bool sel = env == cfg.Environment;
+                var eb = UiKit.Button(envRow, LabEnvironments.LabelJa(env) + (sel ? " ✓" : ""), null, sel ? ButtonStyle.Selected : ButtonStyle.Ghost, -1, 56, LabTheme.FontSmall);
+                if (!sel) UiKit.SetInteractable(eb, false);
+            }
             var cond = UiKit.Row("Cond", _body, LabTheme.Space2, 64);
-            Stepper(cond, "雨量", $"{cfg.RainIntensity:0} mm/h", "rain");
-            Stepper(cond, "風速", $"{cfg.WindSpeed:0.0} m/s", "wind");
-            Stepper(cond, "風向", DirJa(cfg.WindDirectionDeg), "dir");
+            string seedNote;
+            if (cfg.Environment == LabEnvironments.ObstacleCourse)
+            {
+                Stepper(cond, "障害物", $"{cfg.ObstacleCount} 個", "obstacles");
+                Stepper(cond, "積荷", $"{cfg.PayloadKg:0} kg", "payload");
+                seedNote = "同じシード＝同じ障害物の配置";
+            }
+            else if (cfg.Environment == LabEnvironments.FlightDeck)
+            {
+                Stepper(cond, "距離", $"{cfg.TargetDistance:0} m", "distance");
+                Stepper(cond, "風速", $"{cfg.WindSpeed:0.0} m/s", "flightwind");
+                Stepper(cond, "風向", DirJa(cfg.WindDirectionDeg), "dir");
+                seedNote = "同じシード＝同じ突風";
+            }
+            else
+            {
+                Stepper(cond, "雨量", $"{cfg.RainIntensity:0} mm/h", "rain");
+                Stepper(cond, "風速", $"{cfg.WindSpeed:0.0} m/s", "wind");
+                Stepper(cond, "風向", DirJa(cfg.WindDirectionDeg), "dir");
+                seedNote = "同じシード＝同じ雨粒の並び";
+            }
             var misc = UiKit.Row("Misc", _body, LabTheme.Space2, 56);
-            var dur = UiKit.Text(misc, $"実験時間 {cfg.DurationSec:0} 秒（固定）　｜　乱数シード {cfg.Seed}（同じシード＝同じ雨粒の並び）", LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft);
+            var dur = UiKit.Text(misc, (rain ? $"実験時間 {cfg.DurationSec:0} 秒（固定）　｜　" : "") + $"乱数シード {cfg.Seed}（{seedNote}）", LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft);
             UiKit.Size(dur, flexW: 1);
             if (cfg.Mode == LabModes.Reality) UiKit.Button(misc, "前提係数と出典", App.ShowCoefficients, ButtonStyle.Secondary, 240, 52, LabTheme.FontSmall);
             UiKit.Button(misc, "シード変更", App.NewSeed, ButtonStyle.Ghost, 200, 52, LabTheme.FontSmall);
@@ -565,6 +610,7 @@ namespace ImpossibleLab
             var sp2 = UiKit.Rect("Sp2", a); UiKit.Size(sp2, flexW: 1);
             UiKit.Button(a, "実験開始 ▶", App.StartExperiment, ButtonStyle.Primary, 360, 68);
 
+            if (!rain) { CourseSidePanels(cfg); return; }
             SideHeading(_leftBody, "MODEL", "このモードの前提");
             var e = ModeRules.Evaluate(App.Current.Current, cfg.Clamped());
             foreach (var s in e.Assumptions) Para(_leftBody, "・" + s, LabTheme.FontSmall, LabTheme.TextPrimary, 66);
@@ -580,6 +626,30 @@ namespace ImpossibleLab
                 Para(_rightBody, $"稼働時間 約 {n.RuntimeMinutes:0} 分（{lo.RuntimeMinutes:0}〜{hi.RuntimeMinutes:0} 分）", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
                 Para(_rightBody, $"総重量 約 {n.MassKg:0.00} kg ／ 風荷重 {n.WindForceN:0.0} N ／ 傾き {n.TiltDeg:0}°", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
             }
+        }
+
+        /// <summary>障害物コース・飛行デッキの実験設定の側面：計算の前提と、実行前に分かる制限（同じ計算を先に実行して表示）。</summary>
+        void CourseSidePanels(RainExperimentConfig cfg)
+        {
+            var preview = CourseSimulator.Run(App.Current.Current, cfg).Result;
+            SideHeading(_leftBody, "MODEL", "このモードの前提");
+            CappedLines(_leftBody, preview.Assumptions.Select(a => ("・" + a, LabTheme.FontSmall, LabTheme.TextPrimary, 92f)).ToList(), 5);
+            SideHeading(_rightBody, "LIMITS", "適用される制限");
+            var limits = preview.Limits.Where(l => !l.Contains("秒で電池切れ")).ToList();
+            if (limits.Count == 0) Para(_rightBody, cfg.Mode == LabModes.Dream ? "DREAM MODE では電力・速度の制限を適用しません" : "現在の設計で事前に分かる制限はありません", LabTheme.FontBody, LabTheme.TextPrimary);
+            foreach (var l in limits.Take(3)) Para(_rightBody, "⚠ " + l, LabTheme.FontSmall, LabTheme.AccentWarning, 70);
+            if (cfg.Environment == LabEnvironments.FlightDeck && cfg.Mode == LabModes.Reality)
+            {
+                var fp = CourseSimulator.EstimateFlightPower(App.Current.Current);
+                if (fp.HasValue)
+                {
+                    UiKit.Divider(_rightBody);
+                    Para(_rightBody, "<b>推定値（中央値）</b>", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+                    Para(_rightBody, $"人を浮かせる必要電力 約 {fp.Value.RequiredKW:0} kW", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+                    Para(_rightBody, $"靴の電池で浮いていられる時間 約 {fp.Value.AvailableSec:0.0} 秒", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+                }
+            }
+            Para(_rightBody, "合格条件：" + preview.Criteria, LabTheme.FontSmall, LabTheme.AccentLight, 64);
         }
 
         // REALITY 前提係数の一覧（値・幅・確度・出典）。ページ送りで表示する
@@ -650,7 +720,7 @@ namespace ImpossibleLab
             var cfg = App.TestConfig.Clamped();
             if (App.Sm.State == LabState.RunningTest)
             {
-                Title("実験中 — RainLab", LabModes.Label(cfg.Mode) + "（" + LabModes.Caption(cfg.Mode) + "）");
+                Title("実験中 — " + LabEnvironments.LabelJa(cfg.Environment), LabModes.Label(cfg.Mode) + "（" + LabModes.Caption(cfg.Mode) + "）");
                 Para(_body, cfg.Describe(), LabTheme.FontSmall, h: 32);
                 _liveText = UiKit.Text(_body, "", LabTheme.FontHeading, LabTheme.TextPrimary);
                 UiKit.Size(_liveText, flexH: 1);
@@ -663,6 +733,7 @@ namespace ImpossibleLab
             }
             var r = App.LastResult;
             if (r == null) return;
+            if (!r.IsRain) { BuildCourseResult(r, cfg); return; }
             bool ok = r.Success;
             Title("実験結果", $"Rev.{r.Revision} ／ {r.Config.Describe()}");
             var verdictRow = UiKit.Row("Verdict", _body, LabTheme.Space2, 60);
@@ -713,11 +784,55 @@ namespace ImpossibleLab
             BuildBridgePanel();
         }
 
-        void Metric(Transform parent, string label, string value)
+        /// <summary>障害物コース・飛行デッキの結果（指標は CourseSimulator が計算した値のみ）。</summary>
+        void BuildCourseResult(RainExperimentResult r, RainExperimentConfig cfg)
+        {
+            bool ok = r.Success;
+            Title("実験結果", $"Rev.{r.Revision} ／ {r.Config.Describe()}");
+            var verdictRow = UiKit.Row("Verdict", _body, LabTheme.Space2, 60);
+            var vb = UiKit.Badge(verdictRow, ok ? "✓ 成功" : "! 要改良", ok ? LabTheme.AccentLight : LabTheme.AccentWarning, LabTheme.BgDeep, 220);
+            UiKit.Size(vb.transform.parent.GetComponent<RectTransform>(), h: 56);
+            var crit = UiKit.Text(verdictRow, "合格条件：" + r.Criteria, LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.MidlineLeft);
+            UiKit.Size(crit, flexW: 1);
+
+            var cols = UiKit.Row("Cols", _body, LabTheme.Space3); UiKit.Size(cols, flexH: 1);
+            var c1 = UiKit.Column("Metrics", cols, 4); UiKit.Size(c1, flexW: 1);
+            UiKit.Heading(c1, "計測値（Unityシミュレーションの実測）", 24);
+            foreach (var m in r.Metrics.Take(7)) Metric(c1, (m.Primary ? "" : "参考：") + m.LabelJa, m.Display, 200);
+
+            var c2 = UiKit.Column("Compare", cols, 4); UiKit.Size(c2, flexW: 1);
+            UiKit.Heading(c2, "同一条件での比較", 24);
+            if (App.BaselineResult != null)
+            {
+                Para(c2, $"Rev.{App.BaselineResult.Revision}（改良前） → Rev.{r.Revision}（今回）", LabTheme.FontSmall, h: 30);
+                foreach (var m in ExperimentComparer.Compare(App.BaselineResult, r).Take(4)) CompareRow(c2, m);
+            }
+            else if (App.OtherModeResult != null)
+            {
+                var dream = App.OtherModeResult.Config.Mode == LabModes.Dream ? App.OtherModeResult : r;
+                var real = dream == r ? App.OtherModeResult : r;
+                Para(c2, "DREAM → REALITY（同じ版・同じ条件。計算式が異なります）", LabTheme.FontSmall, h: 30);
+                foreach (var m in ExperimentComparer.Compare(dream, real).Take(4)) CompareRow(c2, m);
+            }
+            else Para(c2, "比較対象なし：同じ条件の別の版、または別モードの結果がまだありません。改良して再実験するか、モードを切り替えてください。", LabTheme.FontSmall, h: 100);
+            UiKit.Heading(c2, "改善案（計測値からの規則）", 24);
+            foreach (var h in App.ImprovementHints(r).Take(3)) Para(c2, "・" + h, LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+
+            var a2 = UiKit.Row("Actions", _body, LabTheme.Space1, 68);
+            UiKit.Button(a2, "同じ条件で再実験", App.RerunSameConditions, ButtonStyle.Secondary, 280);
+            UiKit.Button(a2, cfg.Mode == LabModes.Dream ? "REALITYで比較" : "DREAMで比較", App.RerunOtherMode, ButtonStyle.Secondary, 260);
+            UiKit.Button(a2, "保存して終了", App.Save, ButtonStyle.Ghost, 240);
+            var sp = UiKit.Rect("Sp", a2); UiKit.Size(sp, flexW: 1);
+            UiKit.Button(a2, "改良して再実験 ▶", App.ImproveAndRetest, ButtonStyle.Primary, 340, 68);
+            BuildMethodPanel(r.Config, r);
+            BuildBridgePanel();
+        }
+
+        void Metric(Transform parent, string label, string value, float valueWidth = 400)
         {
             var row = UiKit.Row("M", parent, LabTheme.Space1, 40);
             var l = UiKit.Text(row, label, LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft); UiKit.Size(l, flexW: 1);
-            var v = UiKit.Text(row, value, LabTheme.FontSmall, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.MidlineRight); UiKit.Size(v, w: 400);
+            var v = UiKit.Text(row, value, LabTheme.FontSmall, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.MidlineRight); UiKit.Size(v, w: valueWidth);
         }
 
         void CompareRow(Transform parent, MetricComparison m)
@@ -733,15 +848,47 @@ namespace ImpossibleLab
         void BuildMethodPanel(RainExperimentConfig cfg, RainExperimentResult r = null)
         {
             SideHeading(_leftBody, "METHOD", "前提・測定方法・限界");
-            Para(_leftBody, "・雨粒を直線として、キャノピー（円板＋側面カバー）と判定用円筒（半径0.22m・高さ1.75m）との衝突を計算", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
-            Para(_leftBody, "・被濡れスコア＝身体に当たった雨粒数÷実験秒数\n・防護率＝1−装置あり命中÷装置なし命中", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
-            Para(_leftBody, "・流体解析ではありません。シード固定で再現可能", LabTheme.FontSmall, h: 34);
+            if (cfg.Environment == LabEnvironments.ObstacleCourse)
+            {
+                Para(_leftBody, "・案内役が決まったルートを歩き、ロボットは追従速度・追従距離・検知距離に従って動く（0.02秒刻みの計算）", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_leftBody, "・衝突回数＝障害物の円柱に接触した回数\n・到着の遅れ＝案内役の到着から、ロボットが追従距離まで近づくまでの秒数", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_leftBody, "・ゲーム的な運動モデル。シード固定で再現可能", LabTheme.FontSmall, h: 34);
+            }
+            else if (cfg.Environment == LabEnvironments.FlightDeck)
+            {
+                Para(_leftBody, "・人型モデルが靴で離陸し、目標地点まで飛んで着地する（0.02秒刻みの計算）。横風と突風で横に揺れる", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_leftBody, "・安定度＝100×(1−横揺れのRMS÷0.4 m)\n・着地点のずれ＝目標地点の中心からの距離", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_leftBody, "・観察モード（視点は動かない）。シード固定で再現可能", LabTheme.FontSmall, h: 34);
+            }
+            else
+            {
+                Para(_leftBody, "・雨粒を直線として、キャノピー（円板＋側面カバー）と判定用円筒（半径0.22m・高さ1.75m）との衝突を計算", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_leftBody, "・被濡れスコア＝身体に当たった雨粒数÷実験秒数\n・防護率＝1−装置あり命中÷装置なし命中", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_leftBody, "・流体解析ではありません。シード固定で再現可能", LabTheme.FontSmall, h: 34);
+            }
             if (r != null) foreach (var s in r.Limits.Take(2)) Para(_leftBody, "⚠ " + s, LabTheme.FontSmall, LabTheme.AccentWarning, 64);
         }
 
         void BuildBridgePanel()
         {
             SideHeading(_rightBody, "REALITY LAB", "現実化の課題（推定・要調査を含む）");
+            string cat = App.Current?.Current.Category;
+            if (cat == "carrier")
+            {
+                Para(_rightBody, "<b>現実の目的</b>：買い物・介護・配送などで重い荷物を持たずに移動する", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
+                Para(_rightBody, "<b>近い既知技術</b>：追従型の運搬ロボット・配送ロボット（具体例・性能は要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
+                Para(_rightBody, "<b>未解決の課題</b>：人混みや段差での安全、持ち主の見失い、歩道走行のルール（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_rightBody, "この表示は工学的な実現性・安全性を保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 34);
+                return;
+            }
+            if (cat == "mobility")
+            {
+                Para(_rightBody, "<b>現実の目的</b>：短い距離を、段差や混雑を越えて移動する", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
+                Para(_rightBody, "<b>最大の課題</b>：人を浮かせる電力。REALITY の推定では数十〜数百 kW が必要で、靴に載る電池では数秒しか浮けない", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
+                Para(_rightBody, "<b>ほかの課題</b>：噴流・騒音・転落の安全、法規制（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
+                Para(_rightBody, "この表示は工学的な実現性・安全性を保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 34);
+                return;
+            }
             Para(_rightBody, "<b>現実の目的</b>：両手がふさがった状態での雨対策", LabTheme.FontSmall, LabTheme.TextPrimary, 34);
             Para(_rightBody, "<b>近い既知技術</b>：ドローン・頭上追従カメラ等（具体例は要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
             Para(_rightBody, "<b>未解決の課題</b>：バッテリー持続、プロペラの安全性、騒音、強風時の制御、法規制（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
@@ -753,6 +900,25 @@ namespace ImpossibleLab
 
         void UpdateLive()
         {
+            if (App.TestConfig.Environment != LabEnvironments.RainLab)
+            {
+                var c = App.Course;
+                if (c == null || c.Run == null || _liveText == null) return;
+                var f = c.CurrentFrame;
+                string body = string.Format(CultureInfo.InvariantCulture, "経過 {0:0.0} / {1:0.0} 秒", c.Elapsed, c.Run.Duration);
+                if (f.HasValue && c.Run.Result.Environment == LabEnvironments.ObstacleCourse)
+                {
+                    float gap = new Vector2(f.Value.Leader.x - f.Value.Device.x, f.Value.Leader.z - f.Value.Device.z).magnitude;
+                    body += string.Format(CultureInfo.InvariantCulture, "\n案内役との距離 {0:0.00} m\n衝突 <color=#{2}>{1}</color> 回", gap, c.CollisionsSoFar, LabTheme.ToHex(LabTheme.AccentWarning));
+                }
+                else if (f.HasValue)
+                {
+                    float dev = f.Value.Device.z - c.Run.Layout.Start.y;
+                    body += string.Format(CultureInfo.InvariantCulture, "\n高度 {0:0.00} m　横の揺れ {1:+0.00;-0.00;0.00} m\n目標まで {2:0.0} m", f.Value.Device.y, dev, Mathf.Abs(c.Run.Layout.Goal.x - f.Value.Device.x));
+                }
+                _liveText.text = body;
+                return;
+            }
             var sim = App.RainLab != null ? App.RainLab.Simulator : null;
             if (sim == null || _liveText == null) return;
             var r = sim.Result;

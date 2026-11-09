@@ -480,6 +480,34 @@ namespace ImpossibleLab.Tests
             Assert.IsTrue(sm.Transition(LabState.Drafting));
         }
 
+        // ---------- フレーム時間の集計（実機の72fps確認用） ----------
+        [Test] public void FrameStats_SteadyFrames_MeetTarget()
+        {
+            var s = new FrameStats();
+            for (int i = 0; i < 720; i++) s.Add(1f / 72f);
+            var r = s.Summarize(72f);
+            Assert.AreEqual(72f, r.AvgFps, 0.1f);
+            Assert.AreEqual(0f, r.SlowPercent);
+            Assert.AreEqual(1000f / 72f, r.P95Ms, 0.01f);
+            Assert.IsTrue(r.MeetsTarget);
+        }
+
+        [Test] public void FrameStats_DroppedFrames_AreCounted()
+        {
+            var s = new FrameStats();
+            for (int i = 0; i < 90; i++) s.Add(1f / 72f);
+            for (int i = 0; i < 10; i++) s.Add(2f / 72f);   // 1フレーム落ち（約27.8ms）が10%
+            s.Add(float.NaN); s.Add(-1f); s.Add(0f);         // 不正値は無視
+            var r = s.Summarize(72f);
+            Assert.AreEqual(100, r.Frames);
+            Assert.AreEqual(10f, r.SlowPercent, 0.001f);
+            Assert.AreEqual(2000f / 72f, r.WorstMs, 0.01f);
+            Assert.IsFalse(r.MeetsTarget);
+            s.Reset();
+            Assert.AreEqual(0, s.Summarize(72f).Frames);
+            Assert.IsFalse(s.Summarize(72f).MeetsTarget);
+        }
+
         sealed class SyncProgress<T> : System.IProgress<T>
         {
             readonly System.Action<T> _a;

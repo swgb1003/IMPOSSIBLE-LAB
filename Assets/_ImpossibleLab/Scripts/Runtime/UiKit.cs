@@ -12,6 +12,8 @@ namespace ImpossibleLab
     public static class UiKit
     {
         public const float MetersPerPixel = 0.001f;
+        /// <summary>どのボタンでも押されたときに呼ばれる（効果音用）。</summary>
+        public static event System.Action Clicked;
 
         public static Canvas CreateCanvas(string name, Transform parent, Vector2 sizePx, Camera eventCamera)
         {
@@ -151,6 +153,7 @@ namespace ImpossibleLab
             Stretch(t.rectTransform, pad, pad, 2, 2);
             t.textWrappingMode = TextWrappingModes.Normal;
             if (onClick != null) btn.onClick.AddListener(onClick);
+            btn.onClick.AddListener(() => Clicked?.Invoke());
             Size(btn, width, height);
             if (width < 0) Size(btn, flexW: 1);
             return btn;

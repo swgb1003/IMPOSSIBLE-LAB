@@ -44,6 +44,16 @@ namespace ImpossibleLab.Core
         public bool ExperimentAvailable;
     }
 
+    /// <summary>
+    /// 外観プリセット（色の組み合わせ）。性能には影響しない。3D外観の生成AIの代わりに、AIまたは利用者が
+    /// この一覧から選ぶ（任意の形・テクスチャは生成しない）。色は sRGB の 0xRRGGBB。
+    /// </summary>
+    public sealed class AppearancePreset
+    {
+        public string Id, LabelJa;
+        public int BodyRgb, AccentRgb;
+    }
+
     /// <summary>LLMにもこの一覧を渡し、出力はこの範囲に制限する。</summary>
     public static class LabCatalog
     {
@@ -99,9 +109,20 @@ namespace ImpossibleLab.Core
         public static readonly CategoryInfo[] Categories =
         {
             new CategoryInfo { Id = "protection", LabelJa = "防護", ExperimentAvailable = true },
-            new CategoryInfo { Id = "carrier", LabelJa = "運搬", ExperimentAvailable = false },
-            new CategoryInfo { Id = "mobility", LabelJa = "移動", ExperimentAvailable = false },
+            new CategoryInfo { Id = "carrier", LabelJa = "運搬", ExperimentAvailable = true },
+            new CategoryInfo { Id = "mobility", LabelJa = "移動", ExperimentAvailable = true },
         };
+
+        public const string DefaultAppearance = "lab_white";
+        public static readonly AppearancePreset[] Appearances =
+        {
+            new AppearancePreset { Id = "lab_white", LabelJa = "研究所ホワイト", BodyRgb = 0xE8EDF1, AccentRgb = 0x0EA5E9 },
+            new AppearancePreset { Id = "safety_orange", LabelJa = "セーフティオレンジ", BodyRgb = 0xE8862A, AccentRgb = 0x1E293B },
+            new AppearancePreset { Id = "night_navy", LabelJa = "ナイトネイビー", BodyRgb = 0x2B3A55, AccentRgb = 0x38BDF8 },
+            new AppearancePreset { Id = "field_green", LabelJa = "フィールドグリーン", BodyRgb = 0x4E7A5A, AccentRgb = 0xF8FAFC },
+            new AppearancePreset { Id = "graphite", LabelJa = "グラファイト", BodyRgb = 0x4A4F57, AccentRgb = 0xF59E0B },
+        };
+        public static AppearancePreset Appearance(string id) => Appearances.FirstOrDefault(a => a.Id == id);
 
         static ParameterInfo P(string key, string label, string unit, float min, float max, float def,
             string format = "0.00", float? realityMax = null, string realityReason = null) =>
@@ -139,6 +160,7 @@ namespace ImpossibleLab.Core
             {
                 ["generatedBy"] = "ImpossibleLab.Core.LabCatalog.ToProxyJson (Unity で再生成すること。手で編集しない)",
                 ["partTypes"] = parts, ["behaviors"] = behaviors, ["categories"] = cats,
+                ["appearances"] = new Newtonsoft.Json.Linq.JArray(Appearances.Select(a => new Newtonsoft.Json.Linq.JObject { ["id"] = a.Id, ["labelJa"] = a.LabelJa })),
                 ["limits"] = new Newtonsoft.Json.Linq.JObject
                 {
                     ["maxParts"] = InventionConstraints.HardMaxParts, ["maxBehaviors"] = MaxBehaviors,

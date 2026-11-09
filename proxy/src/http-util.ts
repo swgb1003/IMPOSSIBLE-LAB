@@ -24,11 +24,16 @@ export function pickExperiment(v: unknown): Record<string, number | string> | nu
   const src = v as Record<string, unknown>;
   const out: Record<string, number | string> = {};
   for (const k of ["coverageRatio", "wetnessScore", "headHits", "upperHits", "lowerHits", "baselineHits", "deviceHits",
-    "driftM", "rainIntensity", "windSpeed", "windDirectionDeg", "runtimeMinutes"]) {
+    "driftM", "rainIntensity", "windSpeed", "windDirectionDeg", "runtimeMinutes",
+    // 運搬（ObstacleCourse）
+    "collisionCount", "arrivalDelay", "followError", "averageFollowDistance", "maxGap", "energyWh", "obstacleCount", "payloadKg",
+    // 移動（FlightDeck）
+    "completionTime", "stabilityScore", "maxDeviation", "landingError", "maxAltitude", "requiredPowerKW", "availableFlightSec", "targetDistance"]) {
     const x = src[k];
     if (typeof x === "number" && Number.isFinite(x)) out[k] = Math.round(x * 1000) / 1000;
   }
   if (src.mode === "dream" || src.mode === "reality") out.mode = src.mode;
+  if (src.environment === "RainLab" || src.environment === "ObstacleCourse" || src.environment === "FlightDeck") out.environment = src.environment;
   return Object.keys(out).length ? out : null;
 }
 

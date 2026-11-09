@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "inv-follow-carrier",
+  "name": "追従運搬ロボット",
+  "category": "carrier",
+  "purpose": "重い荷物を載せて、持ち主の後ろを自動でついてくる",
+  "mode": "dream",
+  "parts": [
+    { "id": "chassis", "type": "body", "position": [0, 0.22, 0], "scale": [0.5, 0.16, 0.62] },
+    { "id": "cargo", "type": "container", "position": [0, 0.42, -0.04], "scale": [0.44, 0.24, 0.48] },
+    { "id": "wheel-fl", "type": "wheel", "position": [-0.29, 0.1, 0.2], "scale": [0.2, 0.06, 0.2] },
+    { "id": "wheel-fr", "type": "wheel", "position": [0.29, 0.1, 0.2], "scale": [0.2, 0.06, 0.2] },
+    { "id": "wheel-rl", "type": "wheel", "position": [-0.29, 0.1, -0.2], "scale": [0.2, 0.06, 0.2] },
+    { "id": "wheel-rr", "type": "wheel", "position": [0.29, 0.1, -0.2], "scale": [0.2, 0.06, 0.2] },
+    { "id": "eye", "type": "sensor", "position": [0, 0.36, 0.32], "scale": [0.08, 0.06, 0.08] }
+  ],
+  "behaviors": [
+    { "type": "follow_user", "parameters": { "speed": 1.0, "followDistance": 1.2 } },
+    { "type": "avoid_obstacle", "parameters": { "detectionRange": 0.2 } },
+    { "type": "carry_load", "parameters": { "capacity": 10 } }
+  ],
+  "constraints": { "maxParts": 12, "maxSpeed": 3.0 },
+  "revision": 1,
+  "parentRevision": null
+}

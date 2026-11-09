@@ -29,7 +29,7 @@ namespace ImpossibleLab.Core
         public const int MaxJsonLength = 32 * 1024;
         static readonly Regex IdPattern = new Regex("^[a-z0-9][a-z0-9_-]{0,47}$");
         static readonly HashSet<string> RootFields = new HashSet<string>
-        { "schemaVersion", "id", "name", "category", "purpose", "mode", "parts", "behaviors", "constraints", "revision", "parentRevision" };
+        { "schemaVersion", "id", "name", "category", "purpose", "mode", "appearance", "parts", "behaviors", "constraints", "revision", "parentRevision" };
         static readonly HashSet<string> PartFields = new HashSet<string> { "id", "type", "position", "scale" };
         static readonly HashSet<string> BehaviorFields = new HashSet<string> { "type", "targetPart", "parameters" };
         static readonly HashSet<string> ConstraintFields = new HashSet<string> { "maxParts", "maxSpeed" };
@@ -78,6 +78,9 @@ namespace ImpossibleLab.Core
             var mode = Str(root, "mode", r, false, 16);
             if (mode != null && !LabModes.IsValid(mode)) r.Errors.Add($"未対応のモード: {mode}");
             dna.Mode = mode != null && LabModes.IsValid(mode) ? mode : LabModes.Dream;
+            var look = Str(root, "appearance", r, false, 32);
+            if (look != null && LabCatalog.Appearance(look) == null) r.Errors.Add($"未対応の外観: {look}");
+            dna.Appearance = look != null && LabCatalog.Appearance(look) != null ? look : LabCatalog.DefaultAppearance;
 
             var rev = Int(root, "revision", r, required: false);
             dna.Revision = rev.HasValue ? rev.Value : 1;
@@ -222,7 +225,8 @@ namespace ImpossibleLab.Core
             return new JObject
             {
                 ["schemaVersion"] = dna.SchemaVersion, ["id"] = dna.Id, ["name"] = dna.Name, ["category"] = dna.Category,
-                ["purpose"] = dna.Purpose, ["mode"] = dna.Mode, ["parts"] = parts, ["behaviors"] = behaviors,
+                ["purpose"] = dna.Purpose, ["mode"] = dna.Mode, ["appearance"] = dna.Appearance ?? LabCatalog.DefaultAppearance,
+                ["parts"] = parts, ["behaviors"] = behaviors,
                 ["constraints"] = new JObject { ["maxParts"] = dna.Constraints.MaxParts, ["maxSpeed"] = Round(dna.Constraints.MaxSpeed) },
                 ["revision"] = dna.Revision,
                 ["parentRevision"] = dna.ParentRevision.HasValue ? new JValue(dna.ParentRevision.Value) : JValue.CreateNull(),

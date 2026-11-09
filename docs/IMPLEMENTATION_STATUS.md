@@ -76,16 +76,27 @@ Assets/_ImpossibleLab/
 - 接続：開発中は USB の `adb reverse tcp:8787 tcp:8787` で Quest → PC。HTTP は開発ビルドのみ許可（`insecureHttpOption = DevelopmentOnly`）。
 - 自動検証（`-ilabVerify`）は常にオフライン設計で実行（結果を決定的に保つため）。
 
+### T8 SHOULD 項目（余力の実装, 2026-11-09） — 実装済み（Editor で検証、Quest 実機は未確認）
+- **運搬：追従運搬ロボット**（ObstacleCourse）・**移動：空飛ぶ靴**（FlightDeck、観察モード）を追加。サンプル設計図・オフライン改良ルール（カテゴリ別）・実験・比較・REALITY・保存まで雨具と同じ流れで通る。計算式と仮定は `docs/experiments.md`。
+- 実験の仕組みを一般化：実験条件に環境（RainLab／ObstacleCourse／FlightDeck）と各環境の条件、結果に汎用の指標リストと合否を追加。旧保存データ（雨具）はそのまま読める。
+- 発明台での試用：運搬ロボットは床に降りて利用者の後ろをついてくる、靴はその場で浮く（`FollowUserBehavior`・`HoverBehavior`）。
+- AIプロキシ：カタログ・プロンプト・実験指標の受け渡しを3カテゴリ対応に更新（`proxy/test` 12/12）。**実APIでの運搬・移動の設計は未実施**。
+- 演出と効果音（`LabFx`）：生成開始・完成・組み立て（部品が順に現れる＋走査する輪）・実験開始（地面に広がる輪）・結果・保存・エラー・ボタン・衝突の効果音。音はコードで生成（素材ファイルなし）。イベント時のみ（仕様 21.1）。
+- 手元メニュー（`HandMenu`）：左コントローラーを顔の前に持ってくると表示。パネルを正面へ・高さ・座位/立位・効果音・実験停止。**実機での出る条件（距離・向き）の調整は未実施**。
+- 外観プリセット（5種、色のみ・性能に影響なし）：S03 の左パネルで切り替え、AI も選べる。仕様 SHOULD の「生成3D外観」の代わり（外部の3D生成サービスは使わない）。
+- 音声入力：アプリ側の実装はなし。Quest システムキーボードのマイク入力で代用できる見込み（**実機で未確認**）。音声読み上げ（TTS）は未実装。
+- 見送り：ライトベイク・オブジェクトプール化（実機の fps 計測結果を見てから判断）。
+
 ## 3. テスト結果（2026-11-04 実施）
 
 | テスト | 方法 | 結果 |
 |---|---|---|
-| EditMode 単体テスト | `unity test . --mode EditMode` | **41/41 合格**（2026-11-09 再実行、REALITY係数更新後） |
-| プロキシ単体テスト | `cd proxy && npm test` / `npm run typecheck` | **10/10 合格**（2026-11-09）（Claude API は呼ばない） |
+| EditMode 単体テスト | `unity test . --mode EditMode` | **54/54 合格**（2026-11-09、運搬・移動・外観の11件を追加） |
+| プロキシ単体テスト | `cd proxy && npm test` / `npm run typecheck` | **12/12 合格**（2026-11-09、3カテゴリ・外観・実験指標の受け渡し）（Claude API は呼ばない） |
 | プロキシ起動確認（APIキーなし） | `npm start` + curl | `/health` 200、キー未設定で 503 `no_api_key`、空の指示 400、JSON以外 415 |
 | 実APIでの設計・改良（PCから） | プロキシ + curl | **成功**：設計 200（8〜16秒、部品5・機能4）、改良 200（約6秒、パラメータ変更3件）。記録した応答で EditMode テスト（DNA検証→実験→改良適用）合格 |
 | Questからの AI 設計 | adb reverse 経由（2026-11-08） | **成功**：クイック発明「手を使わない傘」→ `POST /v1/design` 200（9.7秒）→ 実験1回 → 保存（`ai-*.json`）。2回目（キーボード入力の指示）：設計 200（8.1秒）・改良 `POST /v1/revise` 200（6.1秒）。改良案は「承認して適用」を押さなかったため保存データは Rev.1 のまま |
-| Play Mode 自動通し検証 | `Unity.exe -batchmode -projectPath . -executeMethod ImpossibleLab.EditorTools.VerifyRunner.Run -ilabVerify` | **69 チェック合格 / 失敗0 / 例外0**（2026-11-09、REALITY係数表3ページすべての収まりチェックを追加）、画面を `Logs/verify/` に出力 |
+| Play Mode 自動通し検証 | `Unity.exe -batchmode -projectPath . -executeMethod ImpossibleLab.EditorTools.VerifyRunner.Run -ilabVerify` | **131 チェック合格 / 失敗0 / 例外0**（2026-11-09、運搬・移動の通し〔生成→試用→実験→改良→再実験→REALITY→保存〕、手元メニュー、外観切替を追加）、画面44枚を `Logs/verify/` に出力 |
 | 計測例（雨量30mm/h・風速4m/s・シード2026・10秒） | 同上 | Rev.1 DREAM：被濡れ 30.8粒/秒・防護率40.9% → Rev.3（側面カバー0.25m＋半径0.8m）DREAM：17.5粒/秒・66.4% → Rev.3 REALITY（物理モデル）：33.9粒/秒・34.9%・1.306Wh（消費電力 約470W、稼働 約6分〔2〜16分〕）・流され0.42m（2026-11-04 の旧係数。新係数では Rev.3 が約377W・約8.5分〔2.7〜19分〕：`docs/reality_model.md` 5章） |
 | Quest APK ビルド | `QuestBuild.BuildDevelopment` | **ビルド成功**（`Builds/Android/ImpossibleLab-dev.apk`, 約63MB, 所要16分）。**実機へのインストール・起動は未実施** |
 
@@ -112,6 +123,9 @@ Assets/_ImpossibleLab/
 - AI改良で、構造化出力の空の操作（partId が空の remove_part など）が混ざり「削除対象の部品がありません」で改良全体が止まった（Quest実機）。プロキシで中身のない操作だけを取り除き、プロンプトでも禁止（`proxy/test` 10/10 合格）。**Quest 3S 実機で再確認（2026-11-08）**：AI改良 200（5.2秒）→ 承認前の保存は止まる → 承認後に保存し Rev.2（改良履歴 Rev.1）で保存された。
 - 音声入力、運搬ロボット・空飛ぶ靴（未対応と明示）、外観プリセット、ライトベイク、オブジェクトプール化、専用ハンドメニューは未実装。
 - REALITY 係数17件（2026-11-09 に出典調査）：標準値1・文献値8・設計上の仮定3・推定・要調査2（使用可能割合、制御電力）・調整用仮定3。NASA の実測論文と DJI 公式仕様などで更新し、市販ドローン1機種で飛行時間の当てはめも確認（`docs/reality_model.md` 5〜6章）。抗力係数の原典ページ、指導教員による確認は未実施。
+- フレームレート計測（2026-11-09）：`PerfMonitor` が10秒ごとに平均fps・p95・1フレーム以上落ちた割合・画面の状態を `[ILAB] perf` として ilab_log.txt に記録（起動3秒と一時停止の前後は除外）。Editor で動作を確認。**Quest 実機での計測は未実施**（手順：`docs/DEVICE_TEST_CHECKLIST.md`）。
+- 描画設定の点検（2026-11-09、静的確認のみ）：Single Pass Instanced、MSAA 4x、HDR・深度/不透明テクスチャ・ソフトシャドウ無効、影はカスケード1・距離15m、SRP Batcher 有効で Quest 向けとして妥当。URP レンダラーの Intermediate Texture が「Always」で余分な描画コピーが起きうる、Foveated Rendering が無効 — どちらも実機の計測結果を見てから変更を判断する。
+- 開発用 APK を再ビルド（2026-11-09、約101MB。以前の約63MBから増加、原因は未調査）。
 - `Logs/verify/` のスクリーンショットはEditorの検証用カメラ（FOV62°）で撮影したもので、VRの見え方とは異なる。
 
 ## 5. 再現手順

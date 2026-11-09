@@ -27,6 +27,10 @@ namespace ImpossibleLab
         public GameObject Hologram;
         public Transform GateDoorLeft, GateDoorRight;
         [Header("Test Zone")] public RainLabController RainLab;
+        /// <summary>ObstacleCourse / FlightDeck（RainLab と同じ実験場に実行時に組み立てる）。</summary>
+        [NonSerialized] public CourseLabController Course;
+        [NonSerialized] public LabFx Fx;
+        public bool ExperimentRunning => (RainLab != null && RainLab.Running) || (Course != null && Course.Running);
         [Header("XR")] public XROrigin Origin;
         public ScreenFader Fader;
         public Transform ConsoleRoot;
@@ -84,6 +88,11 @@ namespace ImpossibleLab
             _builder = new InventionBuilder(Assets);
             var samples = new Dictionary<string, string>();
             if (Assets != null && Assets.RainSample != null) samples["protection"] = Assets.RainSample.text;
+            foreach (var (cat, file) in new[] { ("carrier", "carrier_robot"), ("mobility", "flying_shoes") })
+            {
+                var ta = Resources.Load<TextAsset>("ImpossibleLabSamples/" + file);
+                if (ta != null) samples[cat] = ta.text; else Debug.LogWarning("[ILAB] sample missing: " + file);
+            }
             // 段階表示は実処理に紐づける。オフライン処理は一瞬で終わるため、各段階を読める最小時間だけ表示する。
             OfflineDesign = new OfflineDesignService(samples, stageDelayMs: 450);
             Proxy = ProxyConfig.Load(Application.persistentDataPath);
@@ -94,7 +103,18 @@ namespace ImpossibleLab
             Repo = new InventionRepository(Application.persistentDataPath);
             Sm.Changed += (a, b) => Notify();
             ResetStages();
-            if (RainLab != null) RainLab.Completed += OnExperimentCompleted;
+            if (RainLab != null)
+            {
+                RainLab.Completed += OnExperimentCompleted;
+                Course = RainLab.gameObject.AddComponent<CourseLabController>();
+                Course.Init(Assets, RainLab);
+                Course.Completed += OnExperimentCompleted;
+            }
+            if (GetComponent<PerfMonitor>() == null) gameObject.AddComponent<PerfMonitor>();
+            Fx = gameObject.AddComponent<LabFx>();
+            Fx.Init(this);
+            if (Course != null) Course.Collided += Fx.Bump;
+            gameObject.AddComponent<HandMenu>().Init(this);
         }
 
         void Start()
@@ -282,10 +302,13 @@ namespace ImpossibleLab
             {
                 View.SetVisiblePartCount(0);
                 _ringPulse = 1f;
-                for (int i = 1; i <= View.Parts.Count; i++)
+                var parts = View.Parts.Values.ToList();
+                Fx.BuildScan(DisplayPoint, 0.45f * parts.Count + 0.3f, Assets != null ? Assets.Canopy : null);
+                for (int i = 1; i <= parts.Count; i++)
                 {
                     yield return new WaitForSeconds(0.45f);
                     View.SetVisiblePartCount(i);
+                    Fx.PartPlaced(parts[i - 1]);
                     PulseArms(i);
                 }
                 yield return new WaitForSeconds(0.3f);
@@ -338,9 +361,12 @@ namespace ImpossibleLab
             bool on = !View.Active;
             var follow = View.Get<FollowHeadBehavior>();
             if (follow != null) { follow.Target = on ? Origin.Camera.transform : null; follow.TargetHeadTop = 0.1f; }
+            var followUser = View.Get<FollowUserBehavior>();
+            if (followUser != null) { followUser.Target = on ? Origin.Camera.transform : null; followUser.FloorY = WorkshopPlayerSpot != null ? WorkshopPlayerSpot.position.y : 0f; }
             View.SetActive(on);
             if (!on) View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayPoint.rotation);
-            ShowToast(on ? "起動しました：頭上に追従します（試用）" : "停止して発明台に戻しました");
+            string what = follow != null ? "頭上に追従します" : followUser != null ? "床に降りて、あなたの後ろをついてきます" : View.Get<HoverBehavior>() != null ? "その場で浮き上がります" : "動作します";
+            ShowToast(on ? $"起動しました：{what}（試用）" : "停止して発明台に戻しました");
         }
 
         public void StepParameter(string behavior, string param, int direction)
@@ -409,6 +435,18 @@ namespace ImpossibleLab
             Notify();
         }
 
+        /// <summary>外観プリセットを切り替える（性能に影響しないため改良の版は増やさない）。</summary>
+        public void StepAppearance(int dir)
+        {
+            if (Current == null || Sm.State != LabState.Editing || RevisionBusy) return;
+            var list = LabCatalog.Appearances;
+            int i = Array.FindIndex(list, a => a.Id == Current.Current.Appearance);
+            var next = list[((i < 0 ? 0 : i) + dir + list.Length) % list.Length];
+            Current.Current.Appearance = next.Id;
+            RebuildView(Current.Current);
+            ShowToast($"外観：{next.LabelJa}（性能には影響しません）");
+        }
+
         public bool CanUndo => Current != null && Current.History.Count > 0 && Sm.State == LabState.Editing;
 
         public void Undo()
@@ -430,6 +468,7 @@ namespace ImpossibleLab
             { ShowToast("この発明カテゴリの実験場はこの版では未対応です"); return; }
             if (DeviceRunning) ToggleDevice();
             CoefficientPage = -1;
+            TestConfig.Environment = LabEnvironments.ForCategory(Current.Current.Category);
             Sm.Transition(LabState.ConfiguringTest);
         }
 
@@ -442,6 +481,10 @@ namespace ImpossibleLab
                 case "rain": TestConfig.RainIntensity = Mathf.Clamp(TestConfig.RainIntensity + 5f * dir, RainExperimentConfig.MinIntensity, RainExperimentConfig.MaxIntensity); break;
                 case "wind": TestConfig.WindSpeed = Mathf.Clamp(TestConfig.WindSpeed + 1f * dir, 0f, RainExperimentConfig.MaxWind); break;
                 case "dir": TestConfig.WindDirectionDeg = Mathf.Repeat(TestConfig.WindDirectionDeg + 45f * dir, 360f); break;
+                case "flightwind": TestConfig.WindSpeed = Mathf.Clamp(TestConfig.WindSpeed + 1f * dir, 0f, RainExperimentConfig.MaxFlightWind); break;
+                case "obstacles": TestConfig.ObstacleCount = Mathf.Clamp(TestConfig.ObstacleCount + dir, 0, RainExperimentConfig.MaxObstacles); break;
+                case "payload": TestConfig.PayloadKg = Mathf.Clamp(TestConfig.PayloadKg + 5f * dir, 0f, RainExperimentConfig.MaxPayload); break;
+                case "distance": TestConfig.TargetDistance = Mathf.Clamp(TestConfig.TargetDistance + 1f * dir, RainExperimentConfig.MinTargetDistance, RainExperimentConfig.MaxTargetDistance); break;
             }
             Notify();
         }
@@ -481,7 +524,18 @@ namespace ImpossibleLab
         void BeginRun(InventionDna dna, RainExperimentConfig cfg)
         {
             if (!Sm.Transition(LabState.RunningTest)) return;
-            var sim = new RainSimulator(dna, cfg, "exp-" + DateTime.Now.ToString("yyyyMMddHHmmss"), LabClock.NowIso());
+            string expId = "exp-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            if (cfg.Environment != LabEnvironments.RainLab)
+            {
+                LastResult = null;
+                var run = CourseSimulator.Run(dna, cfg, expId, LabClock.NowIso());
+                Course.Begin(run, View);
+                Fx.StartPulse(RainLab.transform.position, Assets != null ? Assets.Canopy : null);
+                Debug.Log($"[ILAB] course run env={cfg.Environment} mode={cfg.Mode} frames={run.Frames.Count} dur={run.Duration:F1}s passed={run.Result.Passed}");
+                Notify();
+                return;
+            }
+            var sim = new RainSimulator(dna, cfg, expId, LabClock.NowIso());
             // 発明品を判定用マネキンの頭上へ（REALITY は風で流された位置）
             View.SetActive(false);
             var follow = View.Get<FollowHeadBehavior>();
@@ -491,6 +545,7 @@ namespace ImpossibleLab
             View.SetActive(true);
             LastResult = null;
             RainLab.Begin(sim, cfg);
+            Fx.StartPulse(RainLab.transform.position, Assets != null ? Assets.Canopy : null);
             Notify();
         }
 
@@ -498,6 +553,7 @@ namespace ImpossibleLab
         {
             if (Sm.State != LabState.RunningTest) return;
             RainLab.Abort();
+            if (Course != null) Course.Abort();
             ResetDeviceInRainLab();
             Sm.Transition(LabState.Cancelled);
             Sm.Transition(LabState.ConfiguringTest);
@@ -506,9 +562,10 @@ namespace ImpossibleLab
 
         void OnExperimentCompleted(RainExperimentResult r)
         {
+            if (Sm.State != LabState.RunningTest) return;
             LastResult = r;
             Current.Experiments.Add(r);
-            OtherModeResult = Current.Experiments.LastOrDefault(e => e != r && e.Revision == r.Revision && e.Config.Mode != r.Config.Mode && SameExceptMode(e.Config, r.Config));
+            OtherModeResult = Current.Experiments.LastOrDefault(e => e != r && e.Revision == r.Revision && e.Config.Mode != r.Config.Mode && e.Config.SameExceptMode(r.Config));
             try { Repo.Save(Current); LastSavedPath = Repo.DirectoryPath; }
             catch (Exception e) { Debug.LogWarning("[ImpossibleLab] auto save failed: " + e.Message); ShowToast("実験記録の自動保存に失敗しました"); }
             Sm.Transition(LabState.ReviewingResult);
@@ -517,9 +574,6 @@ namespace ImpossibleLab
         RainExperimentResult FindComparable(RainExperimentConfig cfg, int revision, bool sameRevision) =>
             Current.Experiments.LastOrDefault(e => cfg.SameConditions(e.Config) && (sameRevision ? e.Revision == revision : e.Revision != revision));
 
-        static bool SameExceptMode(RainExperimentConfig a, RainExperimentConfig b) =>
-            a.Seed == b.Seed && Mathf.Approximately(a.RainIntensity, b.RainIntensity) && Mathf.Approximately(a.WindSpeed, b.WindSpeed) &&
-            Mathf.Approximately(a.WindDirectionDeg, b.WindDirectionDeg) && Mathf.Approximately(a.DurationSec, b.DurationSec);
 
         public void RerunSameConditions() { if (Sm.State == LabState.ReviewingResult) StartExperiment(); }
 
@@ -539,6 +593,7 @@ namespace ImpossibleLab
 
         void ResetDeviceInRainLab()
         {
+            if (Course != null) Course.Cleanup();
             if (View == null) return;
             View.SetActive(false);
             View.ExtraOffset = Vector3.zero;
@@ -551,6 +606,7 @@ namespace ImpossibleLab
         {
             var hints = new List<string>();
             if (r == null) return hints;
+            if (!r.IsRain) return CourseSimulator.Hints(r);
             int total = Mathf.Max(1, r.DeviceHits);
             if (r.HeadHits > total * 0.3f) hints.Add("頭部に雨が当たっています →「防ぐ範囲を広げて」");
             if (r.LowerHits + r.UpperHits > total * 0.5f && r.Config.WindSpeed > 1f) hints.Add("横からの雨が多い →「横からの雨も防いで」");
@@ -691,6 +747,7 @@ namespace ImpossibleLab
             if (Fader != null) yield return Fader.FadeTo(1f);
             var spot = toRainLab ? RainLab.PlayerSpot : WorkshopPlayerSpot;
             TeleportRig(spot);
+            if (!toRainLab && Course != null) Course.Cleanup();
             if (!toRainLab && View != null)
             {
                 View.SetActive(false);

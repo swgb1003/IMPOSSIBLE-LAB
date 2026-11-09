@@ -14,6 +14,8 @@ namespace ImpossibleLab.Core
         public string Category = "";
         public string Purpose = "";
         public string Mode = LabModes.Dream;
+        /// <summary>外観プリセットID（LabCatalog.Appearances）。性能には影響しない。</summary>
+        public string Appearance = LabCatalog.DefaultAppearance;
         public List<PartSpec> Parts = new List<PartSpec>();
         public List<BehaviorSpec> Behaviors = new List<BehaviorSpec>();
         public InventionConstraints Constraints = new InventionConstraints();
