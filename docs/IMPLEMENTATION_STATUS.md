@@ -80,13 +80,13 @@ Assets/_ImpossibleLab/
 
 | テスト | 方法 | 結果 |
 |---|---|---|
-| EditMode 単体テスト | `unity test . --mode EditMode` | **41/41 合格**（REALITYモデル6件、AIプロキシ通信7件を追加） |
-| プロキシ単体テスト | `cd proxy && npm test` / `npm run typecheck` | **9/9 合格**、型エラー0（Claude API は呼ばない） |
+| EditMode 単体テスト | `unity test . --mode EditMode` | **41/41 合格**（2026-11-09 再実行、REALITY係数更新後） |
+| プロキシ単体テスト | `cd proxy && npm test` / `npm run typecheck` | **10/10 合格**（2026-11-09）（Claude API は呼ばない） |
 | プロキシ起動確認（APIキーなし） | `npm start` + curl | `/health` 200、キー未設定で 503 `no_api_key`、空の指示 400、JSON以外 415 |
 | 実APIでの設計・改良（PCから） | プロキシ + curl | **成功**：設計 200（8〜16秒、部品5・機能4）、改良 200（約6秒、パラメータ変更3件）。記録した応答で EditMode テスト（DNA検証→実験→改良適用）合格 |
 | Questからの AI 設計 | adb reverse 経由（2026-11-08） | **成功**：クイック発明「手を使わない傘」→ `POST /v1/design` 200（9.7秒）→ 実験1回 → 保存（`ai-*.json`）。2回目（キーボード入力の指示）：設計 200（8.1秒）・改良 `POST /v1/revise` 200（6.1秒）。改良案は「承認して適用」を押さなかったため保存データは Rev.1 のまま |
-| Play Mode 自動通し検証 | `Unity.exe -batchmode -projectPath . -executeMethod ImpossibleLab.EditorTools.VerifyRunner.Run -ilabVerify` | **68 チェック合格 / 失敗0 / 例外0**（2026-11-08、パネル内収まりチェック・記録AI応答の画面を含む）、画面21枚を `Logs/verify/` に出力 |
-| 計測例（雨量30mm/h・風速4m/s・シード2026・10秒） | 同上 | Rev.1 DREAM：被濡れ 30.8粒/秒・防護率40.9% → Rev.3（側面カバー0.25m＋半径0.8m）DREAM：17.5粒/秒・66.4% → Rev.3 REALITY（物理モデル）：33.9粒/秒・34.9%・1.306Wh（消費電力 約470W、稼働 約6分〔2〜16分〕）・流され0.42m |
+| Play Mode 自動通し検証 | `Unity.exe -batchmode -projectPath . -executeMethod ImpossibleLab.EditorTools.VerifyRunner.Run -ilabVerify` | **69 チェック合格 / 失敗0 / 例外0**（2026-11-09、REALITY係数表3ページすべての収まりチェックを追加）、画面を `Logs/verify/` に出力 |
+| 計測例（雨量30mm/h・風速4m/s・シード2026・10秒） | 同上 | Rev.1 DREAM：被濡れ 30.8粒/秒・防護率40.9% → Rev.3（側面カバー0.25m＋半径0.8m）DREAM：17.5粒/秒・66.4% → Rev.3 REALITY（物理モデル）：33.9粒/秒・34.9%・1.306Wh（消費電力 約470W、稼働 約6分〔2〜16分〕）・流され0.42m（2026-11-04 の旧係数。新係数では Rev.3 が約377W・約8.5分〔2.7〜19分〕：`docs/reality_model.md` 5章） |
 | Quest APK ビルド | `QuestBuild.BuildDevelopment` | **ビルド成功**（`Builds/Android/ImpossibleLab-dev.apk`, 約63MB, 所要16分）。**実機へのインストール・起動は未実施** |
 
 ### 受け入れテスト（仕様25章）の状況
@@ -111,7 +111,7 @@ Assets/_ImpossibleLab/
 - 承認待ちの改良案がある状態で保存しようとすると、保存せずに「未適用の改良案があります…」と表示する（実機で利用者が承認を押し忘れたため・2026-11-08）。Editor 検証で確認。
 - AI改良で、構造化出力の空の操作（partId が空の remove_part など）が混ざり「削除対象の部品がありません」で改良全体が止まった（Quest実機）。プロキシで中身のない操作だけを取り除き、プロンプトでも禁止（`proxy/test` 10/10 合格）。**Quest 3S 実機で再確認（2026-11-08）**：AI改良 200（5.2秒）→ 承認前の保存は止まる → 承認後に保存し Rev.2（改良履歴 Rev.1）で保存された。
 - 音声入力、運搬ロボット・空飛ぶ靴（未対応と明示）、外観プリセット、ライトベイク、オブジェクトプール化、専用ハンドメニューは未実装。
-- REALITY 係数17件のうち11件が「推定・要調査」、3件が「調整用仮定」（`docs/reality_model.md` 6章の確認作業が未了）。
+- REALITY 係数17件（2026-11-09 に出典調査）：標準値1・文献値8・設計上の仮定3・推定・要調査2（使用可能割合、制御電力）・調整用仮定3。NASA の実測論文と DJI 公式仕様などで更新し、市販ドローン1機種で飛行時間の当てはめも確認（`docs/reality_model.md` 5〜6章）。抗力係数の原典ページ、指導教員による確認は未実施。
 - `Logs/verify/` のスクリーンショットはEditorの検証用カメラ（FOV62°）で撮影したもので、VRの見え方とは異なる。
 
 ## 5. 再現手順

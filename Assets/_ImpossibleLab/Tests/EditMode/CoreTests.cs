@@ -234,7 +234,7 @@ namespace ImpossibleLab.Tests
             Assert.IsNotNull(RealityModel.Parse(json, out var ok), ok);
             Assert.IsNull(RealityModel.Parse(json.Replace("\"id\": \"airDensity\"", "\"id\": \"airDensityX\""), out var e1));
             StringAssert.Contains("airDensity", e1);
-            Assert.IsNull(RealityModel.Parse(json.Replace("\"value\": 0.8, \"min\": 0.7, \"max\": 0.85", "\"value\": 0.8, \"min\": 0.7, \"max\": 1.5"), out var e2));
+            Assert.IsNull(RealityModel.Parse(json.Replace("\"value\": 0.72, \"min\": 0.6, \"max\": 0.78", "\"value\": 0.72, \"min\": 0.6, \"max\": 1.5"), out var e2));
             Assert.IsNotNull(e2);
             Assert.IsNull(RealityModel.Parse(json.Replace("\"value\": 1.225, \"min\": 1.16", "\"value\": 1.0, \"min\": 1.16"), out var e3));
             Assert.IsNotNull(e3);

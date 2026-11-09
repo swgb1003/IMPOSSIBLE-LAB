@@ -266,8 +266,11 @@ namespace ImpossibleLab
             _app.ShowCoefficients();
             Check(_app.CoefficientPage == 0 && _app.CoefficientPageCount >= 2, "coefficient table opens");
             yield return Shot("S04_coefficients_p1", rainLab: true);
-            _app.StepCoefficientPage(+1);
-            yield return Shot("S04_coefficients_p2", rainLab: true);
+            for (int p = 2; p <= _app.CoefficientPageCount; p++)
+            {
+                _app.StepCoefficientPage(+1);
+                yield return Shot("S04_coefficients_p" + p, rainLab: true);
+            }
             _app.HideCoefficients();
             _app.BackToEditing();
             yield return WaitState(LabState.Editing, 20f);

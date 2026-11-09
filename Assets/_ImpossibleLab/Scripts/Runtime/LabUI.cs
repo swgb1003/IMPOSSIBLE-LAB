@@ -598,7 +598,8 @@ namespace ImpossibleLab
                 var l = UiKit.Text(row, $"<b>{c.LabelJa}</b>　{c.FormatValue(c.Value)}　<color=#{sub}>（{range}）</color>\n<size=82%><color=#{sub}>{c.Source}</color></size>",
                     LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.MidlineLeft);
                 UiKit.Size(l, flexW: 1);
-                Color badge = c.Status == "standard" ? LabTheme.AccentLight : c.Status == "tuning" ? LabTheme.TextSecondary : LabTheme.AccentWarning;
+                Color badge = c.Status == "standard" ? LabTheme.AccentLight
+                    : c.Status == "tuning" || c.Status == "design" ? LabTheme.TextSecondary : LabTheme.AccentWarning;
                 UiKit.Badge(row, model.StatusLabel(c.Status), badge, LabTheme.BgDeep, 250);
             }
             var sp = UiKit.Rect("Sp", _body); UiKit.Size(sp, flexH: 1);
@@ -616,7 +617,7 @@ namespace ImpossibleLab
             Para(_leftBody, "・稼働時間 = 電池容量 ÷ 消費電力", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
             Para(_leftBody, "風の中で誘導電力が下がる効果は無視しており、電力は多めに見積もっています。", LabTheme.FontSmall, h: 60);
             SideHeading(_rightBody, "STATUS", "確度の内訳");
-            foreach (var st in new[] { "standard", "literature", "estimate", "tuning" })
+            foreach (var st in new[] { "standard", "literature", "design", "estimate", "tuning" })
                 Para(_rightBody, $"・{model.StatusLabel(st)}：{model.CountStatus(st)} 件", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
             Para(_rightBody, "「要調査」「要確認」の値は、文献や市販品の公開仕様で確かめてから確定します。詳細は docs/reality_model.md。", LabTheme.FontSmall, LabTheme.AccentWarning, 90);
         }
