@@ -294,13 +294,15 @@ namespace ImpossibleLab
             var loaded = repo.Load(_app.Current.Current.Id, out var err);
             Check(loaded != null && DnaJson.ToJson(loaded.Current) == DnaJson.ToJson(_app.Current.Current), "saved DNA restores identically " + err);
             Check(loaded != null && loaded.Experiments.Count >= 3, "experiment records persisted");
-            _app.LoadFromGallery(_app.Current.Current.Id);
+            string rainId = _app.Current.Current.Id;
+            _app.LoadFromGallery(rainId);
             yield return WaitState(LabState.Editing);
             yield return Shot("S03_loaded_from_gallery");
 
             // 手元メニュー：表示・収まり・効果音の切り替え
             var hm = _app.GetComponent<HandMenu>();
-            Check(hm != null && hm.Canvas != null, "hand menu created (Left Controller found)");
+            if (!LabApp.HandMenuEnabled) Check(hm == null, "hand menu disabled (not created)");
+            else Check(hm != null && hm.Canvas != null, "hand menu created (Left Controller found)");
             if (hm != null && hm.Canvas != null)
             {
                 var eye = new Vector3(0, 1.6f, -3.3f);
@@ -399,6 +401,16 @@ namespace ImpossibleLab
                 var saved = _app.Repo.Load(_app.Current.Current.Id, out var serr);
                 Check(saved != null && saved.Experiments.Count >= 3 && saved.Experiments.All(e => e.Environment == LabEnvironments.ForCategory(cat)), $"{cat}: saved with experiments {serr}");
             }
+
+            // 移動の実験のあとに雨具へ戻ると、風が雨の初期値（90°・3 m/s）に戻る（Quest 実機で 4 m/s が引き継がれた不具合）
+            _app.LoadFromGallery(rainId);
+            yield return WaitState(LabState.Editing);
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            Check(_app.TestConfig.Environment == LabEnvironments.RainLab && Mathf.Approximately(_app.TestConfig.WindSpeed, 3f) && Mathf.Approximately(_app.TestConfig.WindDirectionDeg, 90f),
+                $"rain after mobility: wind reset (speed={_app.TestConfig.WindSpeed:0.0} dir={_app.TestConfig.WindDirectionDeg:0})");
+            _app.BackToEditing();
+            yield return WaitState(LabState.Editing);
 
             // 記録したAI応答（部品5・機能5・パラメータ9）でも、全項目がパネル内に収まる
             string fixture = Path.Combine(Application.dataPath, "_ImpossibleLab/Tests/EditMode/Fixtures/ai_design_response.json");

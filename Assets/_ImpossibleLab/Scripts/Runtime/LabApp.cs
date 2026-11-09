@@ -114,8 +114,14 @@ namespace ImpossibleLab
             Fx = gameObject.AddComponent<LabFx>();
             Fx.Init(this);
             if (Course != null) Course.Collided += Fx.Bump;
-            gameObject.AddComponent<HandMenu>().Init(this);
+            if (HandMenuEnabled) gameObject.AddComponent<HandMenu>().Init(this);
         }
+
+        /// <summary>
+        /// 左手の手元メニュー（仕様外の追加機能）。Quest 実機でボタンが効かず、中身はほかの操作で代わりがあるため止めている（2026-11-09）。
+        /// 戻すときは true にする（実機でのボタン操作の確認が必要）。
+        /// </summary>
+        public static bool HandMenuEnabled = false;
 
         void Start()
         {
@@ -474,9 +480,10 @@ namespace ImpossibleLab
             string env = LabEnvironments.ForCategory(Current.Current.Category);
             if (env != TestConfig.Environment)
             {
-                // 実験場が変わったら風向を初期値に戻す。移動（FlightDeck）は横風（0°・4 m/s）、雨（RainLab）は 90°
+                // 実験場が変わったら風を初期値に戻す。移動（FlightDeck）は横風（0°・4 m/s）、ほかは設定の初期値（90°・3 m/s）
+                var defaults = new RainExperimentConfig();
                 if (env == LabEnvironments.FlightDeck) { TestConfig.WindDirectionDeg = 0f; TestConfig.WindSpeed = FlightDefaultWind; }
-                else if (TestConfig.Environment == LabEnvironments.FlightDeck) TestConfig.WindDirectionDeg = 90f;
+                else if (TestConfig.Environment == LabEnvironments.FlightDeck) { TestConfig.WindDirectionDeg = defaults.WindDirectionDeg; TestConfig.WindSpeed = defaults.WindSpeed; }
             }
             TestConfig.Environment = env;
             Sm.Transition(LabState.ConfiguringTest);
