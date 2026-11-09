@@ -353,7 +353,8 @@ namespace ImpossibleLab
                 Check(_app.TestConfig.Environment == LabEnvironments.ForCategory(cat), $"{cat}: environment = {_app.TestConfig.Environment}");
                 if (cat == "mobility")
                 {
-                    Check(Mathf.Approximately(_app.TestConfig.WindDirectionDeg, 0f), $"mobility: default wind is crosswind (dir={_app.TestConfig.WindDirectionDeg:0})");
+                    Check(Mathf.Approximately(_app.TestConfig.WindDirectionDeg, 0f) && Mathf.Approximately(_app.TestConfig.WindSpeed, 4f),
+                        $"mobility: default wind is crosswind 4 m/s (dir={_app.TestConfig.WindDirectionDeg:0} speed={_app.TestConfig.WindSpeed:0.0})");
                     _app.TestConfig.WindDirectionDeg = 0f; _app.TestConfig.WindSpeed = 4f;
                 }
                 _app.Notify();

@@ -461,6 +461,9 @@ namespace ImpossibleLab
         }
 
         // ================= S04 実験設定 =================
+        /// <summary>移動の実験の風速の初期値。改良前（安定度 46 点）が不合格、改良後が合格になる強さ。</summary>
+        public const float FlightDefaultWind = 4f;
+
         public void GoToTestSetup()
         {
             if (Current == null) return;
@@ -471,8 +474,8 @@ namespace ImpossibleLab
             string env = LabEnvironments.ForCategory(Current.Current.Category);
             if (env != TestConfig.Environment)
             {
-                // 実験場が変わったら風向を初期値に戻す。移動（FlightDeck）は横風（0°）、雨（RainLab）は 90°
-                if (env == LabEnvironments.FlightDeck) TestConfig.WindDirectionDeg = 0f;
+                // 実験場が変わったら風向を初期値に戻す。移動（FlightDeck）は横風（0°・4 m/s）、雨（RainLab）は 90°
+                if (env == LabEnvironments.FlightDeck) { TestConfig.WindDirectionDeg = 0f; TestConfig.WindSpeed = FlightDefaultWind; }
                 else if (TestConfig.Environment == LabEnvironments.FlightDeck) TestConfig.WindDirectionDeg = 90f;
             }
             TestConfig.Environment = env;
