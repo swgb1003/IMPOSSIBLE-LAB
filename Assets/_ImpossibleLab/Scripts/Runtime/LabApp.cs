@@ -525,7 +525,10 @@ namespace ImpossibleLab
         {
             if (!Sm.Transition(LabState.RunningTest)) return;
             string expId = "exp-" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            if (cfg.Environment != LabEnvironments.RainLab)
+            // 実験はすべて「実験計画」として扱う（画面の設定 → 計画 → 実行）
+            var plan = ExperimentPlan.FromConfig(cfg);
+            Debug.Log($"[ILAB] experiment plan scenario={plan.Scenario} modules={string.Join(",", plan.Modules.Select(m => m.Type))} mode={plan.Mode} seed={plan.Seed}");
+            if (plan.Scenario != ExperimentCatalog.Stand)
             {
                 LastResult = null;
                 var run = CourseSimulator.Run(dna, cfg, expId, LabClock.NowIso());
@@ -535,7 +538,7 @@ namespace ImpossibleLab
                 Notify();
                 return;
             }
-            var sim = new RainSimulator(dna, cfg, expId, LabClock.NowIso());
+            var sim = new RainSimulator(dna, plan.ToConfig(), expId, LabClock.NowIso());
             // 発明品を判定用マネキンの頭上へ（REALITY は風で流された位置）
             View.SetActive(false);
             var follow = View.Get<FollowHeadBehavior>();

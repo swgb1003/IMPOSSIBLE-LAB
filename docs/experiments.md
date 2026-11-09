@@ -3,6 +3,9 @@
 更新：2026-11-09 ／ 実装：`Assets/_ImpossibleLab/Scripts/Core/CourseExperiment.cs`（`CourseSimulator`）
 RainLab（雨具）は `docs/reality_model.md` と `RainExperiment.cs` を参照。
 
+> 2週目から、実験はすべて**実験計画**（`Core/Experiment/ExperimentPlan.cs`）として表し、`ScenarioRunner` が実行する。
+> 運搬は `WalkRouteScenario`＋`GroundFollowerModel`、移動は `FlyToTargetScenario`＋`FlightModel`（計算式は下記のまま）。
+
 > どちらも**ゲーム的な運動モデル**で、現実の走行・飛行性能や安全性の予測ではない（仕様 7.2 の注意、8章）。
 > 0.02 秒刻みの固定時間ステップ・シード固定の乱数で計算し、同じ条件なら同じ結果になる。
 > 画面の動きは、計算した軌跡（0.05 秒ごと）をそのまま再生している（見た目と計測が一致する）。
