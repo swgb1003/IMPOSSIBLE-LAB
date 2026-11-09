@@ -468,7 +468,14 @@ namespace ImpossibleLab
             { ShowToast("この発明カテゴリの実験場はこの版では未対応です"); return; }
             if (DeviceRunning) ToggleDevice();
             CoefficientPage = -1;
-            TestConfig.Environment = LabEnvironments.ForCategory(Current.Current.Category);
+            string env = LabEnvironments.ForCategory(Current.Current.Category);
+            if (env != TestConfig.Environment)
+            {
+                // 実験場が変わったら風向を初期値に戻す。移動（FlightDeck）は横風（0°）、雨（RainLab）は 90°
+                if (env == LabEnvironments.FlightDeck) TestConfig.WindDirectionDeg = 0f;
+                else if (TestConfig.Environment == LabEnvironments.FlightDeck) TestConfig.WindDirectionDeg = 90f;
+            }
+            TestConfig.Environment = env;
             Sm.Transition(LabState.ConfiguringTest);
         }
 

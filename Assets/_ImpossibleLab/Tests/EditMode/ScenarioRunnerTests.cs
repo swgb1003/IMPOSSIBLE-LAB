@@ -76,7 +76,9 @@ namespace ImpossibleLab.Tests
             foreach (var (name, dna) in variants)
                 foreach (int seed in new[] { 1, 7, 2026 })
                     foreach (float wind in new[] { 0f, 4f, 10f })
-                        foreach (float dir in new[] { 0f, 90f, 225f })
+                        // 進行方向の風の打ち消し（Quest 実機で見つかった、追い風で着地できない不具合の修正）以降は、
+                        // 横風だけ（風向 0°）で旧計算と一致を確かめる。追い風・向かい風は FlightLandsInAlongWind で確かめる
+                        foreach (float dir in new[] { 0f })
                             foreach (float dist in new[] { 4f, 10f })
                                 foreach (var mode in new[] { LabModes.Dream, LabModes.Reality })
                                 {
@@ -85,6 +87,26 @@ namespace ImpossibleLab.Tests
                                     runs++;
                                 }
             TestContext.WriteLine($"flight: {runs} runs identical");
+        }
+
+        [Test] public void FlightLandsInAlongWind()
+        {
+            // 風向 90° = 追い風、270° = 向かい風。以前は追い風で目標の手前に浮いたまま着地できなかった（Quest 実機 2026-11-09）
+            var dna = Load("flying_shoes");
+            foreach (float wind in new[] { 3f, 5f })
+                foreach (float dir in new[] { 90f, 270f, 45f })
+                    foreach (int seed in new[] { 1234, 7, 2026 })
+                    {
+                        var cfg = new RainExperimentConfig { Environment = LabEnvironments.FlightDeck, Seed = seed, WindSpeed = wind, WindDirectionDeg = dir, TargetDistance = 7 };
+                        var r = CourseSimulator.Run(dna, cfg).Result;
+                        string tag = $"wind={wind} dir={dir} seed={seed}";
+                        Assert.Less(r.Metric("completionTime").Value, CourseSimulator.FlightTimeout, tag);
+                        Assert.LessOrEqual(r.Metric("landingError").Value, CourseSimulator.LandingTolerance, tag);
+                    }
+            // 推進がなければ打ち消せない（流されるまま）
+            var noMove = dna.Clone(); noMove.Behaviors.RemoveAll(b => b.Type == "move_forward");
+            var nm = CourseSimulator.Run(noMove, new RainExperimentConfig { Environment = LabEnvironments.FlightDeck, Seed = 1, WindSpeed = 3, WindDirectionDeg = 90, TargetDistance = 7 }).Result;
+            Assert.IsFalse(nm.Passed);
         }
 
         [Test] public void FromConfig_ProducesValidPlans()

@@ -351,7 +351,11 @@ namespace ImpossibleLab
                 _app.GoToTestSetup();
                 yield return WaitState(LabState.ConfiguringTest);
                 Check(_app.TestConfig.Environment == LabEnvironments.ForCategory(cat), $"{cat}: environment = {_app.TestConfig.Environment}");
-                if (cat == "mobility") { _app.TestConfig.WindDirectionDeg = 0f; _app.TestConfig.WindSpeed = 4f; }
+                if (cat == "mobility")
+                {
+                    Check(Mathf.Approximately(_app.TestConfig.WindDirectionDeg, 0f), $"mobility: default wind is crosswind (dir={_app.TestConfig.WindDirectionDeg:0})");
+                    _app.TestConfig.WindDirectionDeg = 0f; _app.TestConfig.WindSpeed = 4f;
+                }
                 _app.Notify();
                 yield return null;
                 yield return Shot($"S04_setup_{cat}");

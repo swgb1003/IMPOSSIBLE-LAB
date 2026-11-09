@@ -390,12 +390,16 @@ namespace ImpossibleLab.Core
             float dx = L.Goal.x - x;
             if (powered)
             {
-                bool nearGoal = Mathf.Abs(dx) < 0.15f && Mathf.Abs(vx) < 0.2f;
+                // 進行方向の風で流される分（drift）。推進があれば打ち消して、対地速度で目標へ向かい・止まる
+                float drift = y > 0.02f ? 0.15f * windAlong * gust : 0f;
+                float comp = canMove ? drift : 0f;
+                bool nearGoal = Mathf.Abs(dx) < 0.15f && Mathf.Abs(vx + comp) < 0.2f;
                 if (!nearGoal) { y = Mathf.MoveTowards(y, L.CruiseHeight, climb * Dt); airborne |= y > 0.05f; }
                 else y = Mathf.MoveTowards(y, 0f, descend * Dt);
                 float targetVx = canMove && y > 0.5f * L.CruiseHeight && !nearGoal
                     ? Mathf.Sign(dx) * Mathf.Min(vmax, Mathf.Sqrt(2f * accel * Mathf.Abs(dx))) : 0f;
-                vx = Mathf.MoveTowards(vx, targetVx, accel * Dt);
+                float command = canMove ? Mathf.Clamp(targetVx - comp, -vmax, vmax) : targetVx;
+                vx = Mathf.MoveTowards(vx, command, accel * Dt);
             }
             else
             {
