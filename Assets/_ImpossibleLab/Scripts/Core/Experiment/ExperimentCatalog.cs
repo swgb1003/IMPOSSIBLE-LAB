@@ -10,12 +10,19 @@ namespace ImpossibleLab.Core
         public string[] AllowedModules = new string[0];
         /// <summary>合否を実験計画の合格条件で決める（4週目以降のシナリオ）。既存の3デモはモデルが決める。</summary>
         public bool JudgedByCriteria;
+        /// <summary>画面で外せない環境モジュール（シナリオの計算に必要）。</summary>
+        public string[] RequiredModules = new string[0];
     }
 
     public sealed class ModuleParam
     {
         public string Key, LabelJa, Unit = "";
         public float Min, Max, Default;
+        /// <summary>画面の −／＋ で変える幅（0 なら範囲の 1/20 をきりのよい値に丸める）。</summary>
+        public float Step;
+        /// <summary>段階で選ぶ値（明るさのように桁が変わるもの）。指定があれば Step より優先。</summary>
+        public float[] Levels;
+        public bool Integer;
     }
 
     /// <summary>環境モジュール（雨・風・障害物など）。</summary>
@@ -61,31 +68,31 @@ namespace ImpossibleLab.Core
             new ScenarioInfo { Id = Stand, LabelJa = "その場に立つ", Description = "人型モデルが立ち、装置が頭上などで働く",
                 AllowedModules = new[] { "rain", "wind", "darkness", "sunlight", "targets", "obstacles" }, JudgedByCriteria = true },
             new ScenarioInfo { Id = WalkRoute, LabelJa = "ルートを歩く", Description = "人型モデル（案内役）が決まったルートを歩き、装置がついていく",
-                AllowedModules = new[] { "obstacles", "payload" } },
+                AllowedModules = new[] { "obstacles", "payload" }, RequiredModules = new[] { "obstacles", "payload" } },
             new ScenarioInfo { Id = FlyToTarget, LabelJa = "目標まで飛ぶ", Description = "人型モデルが装置で目標地点まで飛ぶ（観察モード）",
-                AllowedModules = new[] { "target", "wind" } },
+                AllowedModules = new[] { "target", "wind" }, RequiredModules = new[] { "target" } },
             new ScenarioInfo { Id = SitStill, LabelJa = "座って過ごす", Description = "人型モデルが座って過ごし、装置が温める・冷やす（時間は早送りで再生）",
-                AllowedModules = new[] { "temperature" }, JudgedByCriteria = true },
+                AllowedModules = new[] { "temperature" }, RequiredModules = new[] { "temperature" }, JudgedByCriteria = true },
             new ScenarioInfo { Id = DropTest, LabelJa = "落とす", Description = "発明品（または守る物）を落とし、床に当たるときの衝撃を測る",
-                AllowedModules = new[] { "drop" }, JudgedByCriteria = true },
+                AllowedModules = new[] { "drop" }, RequiredModules = new[] { "drop" }, JudgedByCriteria = true },
             new ScenarioInfo { Id = LiftTask, LabelJa = "持ち上げて置く", Description = "荷物を棚の高さまで持ち上げる（装置の持ち上げ機構、またはつかみ具で人が持ち上げる）",
-                AllowedModules = new[] { "payload", "shelf" }, JudgedByCriteria = true },
+                AllowedModules = new[] { "payload", "shelf" }, RequiredModules = new[] { "payload", "shelf" }, JudgedByCriteria = true },
         };
 
         public static readonly ModuleInfo[] Modules =
         {
-            new ModuleInfo { Id = "rain", LabelJa = "雨", Params = new[] { P("intensity", "雨量", "mm/h", 5f, 80f, 20f) } },
-            new ModuleInfo { Id = "wind", LabelJa = "風", Params = new[] { P("speed", "風速", "m/s", 0f, 15f, 3f), P("directionDeg", "風向", "°", 0f, 359.9f, 90f) } },
-            new ModuleInfo { Id = "obstacles", LabelJa = "障害物", Params = new[] { P("count", "障害物の数", "個", 0f, 10f, 4f) } },
-            new ModuleInfo { Id = "payload", LabelJa = "積荷", Params = new[] { P("kg", "積荷の重さ", "kg", 0f, 30f, 5f), P("sizeM", "積荷の大きさ（幅）", "m", 0.05f, 0.8f, 0.3f) } },
-            new ModuleInfo { Id = "target", LabelJa = "目標地点", Params = new[] { P("distanceM", "目標までの距離", "m", 4f, 10f, 7f) } },
+            new ModuleInfo { Id = "rain", LabelJa = "雨", Params = new[] { P("intensity", "雨量", "mm/h", 5f, 80f, 20f, step: 5f) } },
+            new ModuleInfo { Id = "wind", LabelJa = "風", Params = new[] { P("speed", "風速", "m/s", 0f, 15f, 3f, step: 1f), P("directionDeg", "風向", "°", 0f, 359.9f, 90f, step: 45f) } },
+            new ModuleInfo { Id = "obstacles", LabelJa = "障害物", Params = new[] { P("count", "障害物の数", "個", 0f, 10f, 4f, step: 1f, integer: true) } },
+            new ModuleInfo { Id = "payload", LabelJa = "積荷", Params = new[] { P("kg", "積荷の重さ", "kg", 0f, 30f, 5f, step: 5f), P("sizeM", "積荷の大きさ（幅）", "m", 0.05f, 0.8f, 0.3f, step: 0.05f) } },
+            new ModuleInfo { Id = "target", LabelJa = "目標地点", Params = new[] { P("distanceM", "目標までの距離", "m", 4f, 10f, 7f, step: 1f) } },
             // 4週目
-            new ModuleInfo { Id = "darkness", LabelJa = "暗さ", Params = new[] { P("lux", "周りの明るさ", "lx", 0f, 1000f, 2f) } },
-            new ModuleInfo { Id = "temperature", LabelJa = "気温", Params = new[] { P("ambientC", "気温", "°C", -20f, 45f, 5f), P("targetDeltaC", "目標の温度変化", "°C", 1f, 20f, 5f), P("minutes", "過ごす時間", "分", 1f, 60f, 15f) } },
-            new ModuleInfo { Id = "sunlight", LabelJa = "日差し", Params = new[] { P("elevationDeg", "太陽の高さ", "°", 5f, 90f, 60f), P("azimuthDeg", "太陽の方位", "°", 0f, 359.9f, 180f), P("irradiance", "日射の強さ", "W/m²", 100f, 1100f, 800f) } },
-            new ModuleInfo { Id = "drop", LabelJa = "落下", Params = new[] { P("heightM", "落とす高さ", "m", 0.2f, 3f, 1f), P("massKg", "落とす物の重さ", "kg", 0.1f, 5f, 0.5f) } },
-            new ModuleInfo { Id = "targets", LabelJa = "検知対象", Params = new[] { P("count", "対象の数", "個", 1f, 12f, 6f) } },
-            new ModuleInfo { Id = "shelf", LabelJa = "棚", Params = new[] { P("heightM", "棚の高さ", "m", 0.2f, 2f, 0.8f) } },
+            new ModuleInfo { Id = "darkness", LabelJa = "暗さ", Params = new[] { P("lux", "周りの明るさ", "lx", 0f, 1000f, 2f, levels: new[] { 0f, 0.2f, 1f, 2f, 5f, 10f, 20f, 50f, 100f, 300f, 1000f }) } },
+            new ModuleInfo { Id = "temperature", LabelJa = "気温", Params = new[] { P("ambientC", "気温", "°C", -20f, 45f, 5f, step: 5f), P("targetDeltaC", "目標の温度変化", "°C", 1f, 20f, 5f, step: 1f), P("minutes", "過ごす時間", "分", 1f, 60f, 15f, step: 5f) } },
+            new ModuleInfo { Id = "sunlight", LabelJa = "日差し", Params = new[] { P("elevationDeg", "太陽の高さ", "°", 5f, 90f, 60f, step: 5f), P("azimuthDeg", "太陽の方位", "°", 0f, 359.9f, 180f, step: 45f), P("irradiance", "日射の強さ", "W/m²", 100f, 1100f, 800f, step: 100f) } },
+            new ModuleInfo { Id = "drop", LabelJa = "落下", Params = new[] { P("heightM", "落とす高さ", "m", 0.2f, 3f, 1f, step: 0.2f), P("massKg", "落とす物の重さ", "kg", 0.1f, 5f, 0.5f, step: 0.1f) } },
+            new ModuleInfo { Id = "targets", LabelJa = "検知対象", Params = new[] { P("count", "対象の数", "個", 1f, 12f, 6f, step: 1f, integer: true) } },
+            new ModuleInfo { Id = "shelf", LabelJa = "棚", Params = new[] { P("heightM", "棚の高さ", "m", 0.2f, 2f, 0.8f, step: 0.1f) } },
         };
 
         static readonly string[] Rain = { "rain" };
@@ -148,8 +155,8 @@ namespace ImpossibleLab.Core
             new PlanCriterion { Metric = "liftTime", Op = "<=", Value = 10f, Reason = "10秒以内に棚へ置く（調整用）" },
         };
 
-        static ModuleParam P(string key, string label, string unit, float min, float max, float def) =>
-            new ModuleParam { Key = key, LabelJa = label, Unit = unit, Min = min, Max = max, Default = def };
+        static ModuleParam P(string key, string label, string unit, float min, float max, float def, float step = 0f, bool integer = false, float[] levels = null) =>
+            new ModuleParam { Key = key, LabelJa = label, Unit = unit, Min = min, Max = max, Default = def, Step = step, Integer = integer, Levels = levels };
 
         public static ScenarioInfo Scenario(string id) => Scenarios.FirstOrDefault(s => s.Id == id);
         public static ModuleInfo Module(string id) => Modules.FirstOrDefault(m => m.Id == id);

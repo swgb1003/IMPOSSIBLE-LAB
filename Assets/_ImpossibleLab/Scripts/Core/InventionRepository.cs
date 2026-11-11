@@ -180,6 +180,8 @@ namespace ImpossibleLab.Core
                     ["format"] = x.Format, ["lowerIsBetter"] = x.LowerIsBetter, ["primary"] = x.Primary,
                 })),
                 ["passed"] = r.Passed.HasValue ? new JValue(r.Passed.Value) : JValue.CreateNull(),
+                // 組み立て式の実験は条件が実験計画にしかないため、計画も残す（読み込み時に検証する）
+                ["plan"] = r.IsScenarioLab && r.Plan != null ? ExperimentPlanJson.ToJObject(r.Plan) : null,
                 ["criteria"] = r.Criteria ?? "",
                 ["notes"] = new JArray(r.Limits.Concat(r.Assumptions).Take(10)),
                 ["limitCount"] = r.Limits.Count,
@@ -206,7 +208,14 @@ namespace ImpossibleLab.Core
                     ObstacleCount = cond.Value<int?>("obstacleCount") ?? 4, PayloadKg = cond.Value<float?>("payloadKg") ?? 5f,
                     TargetDistance = cond.Value<float?>("targetDistance") ?? 7f,
                 }.Clamped();
-                if (!LabEnvironments.IsValid(env)) return null;
+                ExperimentPlan plan = null;
+                if (env == LabEnvironments.ScenarioLab)
+                {
+                    var rep = ExperimentPlanJson.Parse(o["plan"]?.ToString(Formatting.None) ?? "");
+                    if (!rep.IsValid) return null;
+                    plan = rep.Plan;
+                }
+                else if (!LabEnvironments.IsValid(env)) return null;
                 var res = new RainExperimentResult
                 {
                     Environment = env,
@@ -223,6 +232,7 @@ namespace ImpossibleLab.Core
                     MassKg = m.Value<float?>("massKg"), WindForceN = m.Value<float?>("windForceN"),
                     CanHoldPosition = m.Value<bool?>("canHoldPosition") ?? true,
                     Passed = o.Value<bool?>("passed"), Criteria = o.Value<string>("criteria") ?? "",
+                    Plan = plan, Scenario = plan?.Scenario ?? "",
                 };
                 if (o["items"] is JArray items)
                     foreach (var it in items.OfType<JObject>())

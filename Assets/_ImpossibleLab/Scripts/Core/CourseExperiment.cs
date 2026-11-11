@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
 namespace ImpossibleLab.Core
@@ -172,6 +173,13 @@ namespace ImpossibleLab.Core
         {
             var h = new List<string>();
             float V(string k) => r.Metric(k)?.Value ?? 0f;
+            if (r.IsScenarioLab)
+            {
+                // 組み立て式の実験：満たさなかった合格条件・制限をそのまま改良の手がかりにする
+                foreach (var l in r.Limits.Take(3)) h.Add(l + " → S03 で改良を依頼");
+                if (h.Count == 0) h.Add("合格条件をすべて満たしました。条件を厳しくして試してください");
+                return h;
+            }
             if (r.Environment == LabEnvironments.ObstacleCourse)
             {
                 if (r.Limits.Exists(s => s.Contains("運べない"))) h.Add("積荷が重すぎます →「重い荷物も運んで」");

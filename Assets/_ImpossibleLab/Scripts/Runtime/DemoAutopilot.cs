@@ -437,7 +437,91 @@ namespace ImpossibleLab
                 yield return null;
                 yield return Shot("S03_edit_ai_p3");
             }
+
+            // 6週目 S04：組み立て式の実験（機能ブロック）を実験計画で選び・編集して実行する
+            yield return PlanLabFlow("light", @"{ ""schemaVersion"": 2, ""id"": ""verify-night-light"", ""name"": ""夜道の足元ライト"", ""purpose"": ""夜道で足元を照らし、周りに知らせる"", ""tags"": [""lighting""], ""mount"": ""back"",
+  ""parts"": [ { ""id"": ""body"", ""type"": ""body"", ""position"": [0, 0, 0], ""scale"": [0.12, 0.08, 0.04] }, { ""id"": ""lamp"", ""type"": ""light"", ""position"": [0, 0.06, 0.03], ""scale"": [0.04, 0.04, 0.04] } ],
+  ""behaviors"": [ { ""type"": ""illuminate"", ""targetPart"": ""lamp"", ""parameters"": { ""lumens"": 150, ""beamAngleDeg"": 60, ""tiltDeg"": 50 } },
+                   { ""type"": ""alert"", ""targetPart"": ""lamp"", ""parameters"": { ""loudnessDb"": 0, ""lightLumens"": 30, ""flashHz"": 2 } } ], ""revision"": 1, ""parentRevision"": null }",
+                ExperimentCatalog.Stand, "footIlluminance", addModule: "sunlight", stepModule: "darkness", stepKey: "lux");
+            yield return PlanLabFlow("heater", @"{ ""schemaVersion"": 2, ""id"": ""verify-heater"", ""name"": ""背中ヒーター"", ""purpose"": ""寒い場所で座って過ごすときに背中を温める"", ""tags"": [""thermal""], ""mount"": ""back"",
+  ""parts"": [ { ""id"": ""body"", ""type"": ""body"", ""position"": [0, 0, 0], ""scale"": [0.25, 0.3, 0.03] }, { ""id"": ""pad"", ""type"": ""heater"", ""position"": [0, 0, 0.02], ""scale"": [0.2, 0.25, 0.01] } ],
+  ""behaviors"": [ { ""type"": ""heat"", ""targetPart"": ""pad"", ""parameters"": { ""powerW"": 10 } } ], ""revision"": 1, ""parentRevision"": null }",
+                ExperimentCatalog.SitStill, "timeToTarget", addModule: null, stepModule: "temperature", stepKey: "ambientC");
+            yield return PlanLabFlow("lifter", @"{ ""schemaVersion"": 2, ""id"": ""verify-lifter"", ""name"": ""棚上げアシスト"", ""purpose"": ""重い荷物を棚の高さまで持ち上げる"", ""tags"": [""daily""], ""mount"": ""ground"",
+  ""parts"": [ { ""id"": ""body"", ""type"": ""body"", ""position"": [0, 0, 0], ""scale"": [0.4, 0.2, 0.4] }, { ""id"": ""arm"", ""type"": ""arm"", ""position"": [0, 0.3, 0], ""scale"": [0.05, 0.6, 0.05] } ],
+  ""behaviors"": [ { ""type"": ""lift_load"", ""targetPart"": ""arm"", ""parameters"": { ""maxLoadKg"": 10, ""liftHeightM"": 1.2, ""speed"": 0.3 } } ], ""revision"": 1, ""parentRevision"": null }",
+                ExperimentCatalog.LiftTask, "liftTime", addModule: null, stepModule: "shelf", stepKey: "heightM");
             Time.timeScale = 1f;
+        }
+
+        /// <summary>
+        /// 組み立て式の実験の通し：保存した発明を読み込み → S04 で標準の計画が選ばれる → 条件の追加・値の変更 → 実行 → 結果（ScenarioLab）
+        /// → REALITY で比較 → 保存して読み直す（計画も復元される）。
+        /// </summary>
+        IEnumerator PlanLabFlow(string tag, string dnaJson, string scenario, string metric, string addModule, string stepModule, string stepKey)
+        {
+            var rep = DnaJson.Parse(dnaJson);
+            Check(rep.IsValid, $"plan-{tag}: verify DNA is valid {rep.Summary}");
+            if (!rep.IsValid) yield break;
+            _app.Repo.Save(new SavedInvention { Current = rep.Dna });
+            _app.OpenGallery();
+            yield return WaitState(LabState.Gallery);
+            _app.LoadFromGallery(rep.Dna.Id);
+            yield return WaitState(LabState.Editing);
+            _app.TestConfig.Mode = LabModes.Dream;
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            Check(_app.PlanOptions.Count > 0 && !_app.PlanIsLegacy && _app.ActivePlan()?.Scenario == scenario,
+                $"plan-{tag}: standard plan selected ({_app.PlanOptions.Count} options, scenario={_app.ActivePlan()?.Scenario})");
+            yield return Shot($"S04_plan_{tag}");
+            if (addModule != null)
+            {
+                _app.AddPlanModule(addModule);
+                yield return null;
+                Check(_app.EditPlan.Has(addModule), $"plan-{tag}: module {addModule} added");
+            }
+            float v0 = _app.EditPlan.Get(stepModule, stepKey);
+            _app.StepPlanParam(stepModule, stepKey, +1);
+            yield return null;
+            float v1 = _app.EditPlan.Get(stepModule, stepKey);
+            Check(v1 > v0, $"plan-{tag}: {stepModule}.{stepKey} {v0} -> {v1}");
+            yield return Shot($"S04_plan_{tag}_edited");
+            string key = PlanCandidates.ConditionKey(_app.ActivePlan());
+            // 前の流れの画面移動（フェード）が終わるまで待つ（その間の「実験開始」は受け付けない仕様）
+            float tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
+            _app.StartExperiment();
+            yield return WaitState(LabState.RunningTest);
+            yield return new WaitForSeconds(2f);
+            Check(!FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None).Any(t => t.text.StartsWith("実験中 — RainLab", StringComparison.Ordinal) || t.text.Contains("処理した雨粒")),
+                $"plan-{tag}: running screen shows the plan, not the rain lab");
+            yield return Shot($"S05_running_plan_{tag}", rainLab: true);
+            yield return WaitState(LabState.ReviewingResult, 60f);
+            var r = _app.LastResult;
+            Check(r != null && r.IsScenarioLab && r.Scenario == scenario && r.Metric(metric) != null && r.Passed.HasValue,
+                $"plan-{tag}: result has {metric} (passed={r?.Passed})");
+            Check(r != null && PlanCandidates.ConditionKey(r.Plan) == key, $"plan-{tag}: result keeps the edited plan");
+            Log($"RESULT plan-{tag} {r?.Plan?.Mode} passed={r?.Passed} {string.Join(" ", r?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])} | {r?.Criteria}");
+            yield return Shot($"S05_result_plan_{tag}", rainLab: true);
+            _app.RerunOtherMode();
+            yield return WaitState(LabState.ReviewingResult, 60f);
+            var r2 = _app.LastResult;
+            Check(r2 != null && r2 != r && r2.Plan.Mode == LabModes.Reality && _app.OtherModeResult == r, $"plan-{tag}: REALITY run compared with DREAM");
+            yield return Shot($"S05_result_plan_{tag}_reality", rainLab: true);
+            _app.TestConfig.Mode = LabModes.Dream;
+            _app.Save();
+            yield return WaitState(LabState.Saved, 20f);
+            var saved = _app.Repo.Load(rep.Dna.Id, out var err);
+            Check(saved != null && saved.Experiments.Count == 2 && saved.Experiments.All(e => e.IsScenarioLab && e.Plan != null && PlanCandidates.ConditionKey(e.Plan) == key),
+                $"plan-{tag}: saved with plans {err}");
+            // 同じ発明へ戻ったときは、選んだ計画と編集した値が残る
+            _app.ContinueEditing();
+            yield return WaitState(LabState.Editing);
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            Check(PlanCandidates.ConditionKey(_app.ActivePlan()) == key, $"plan-{tag}: edits kept when returning to S04");
+            _app.BackToEditing();
+            yield return WaitState(LabState.Editing);
         }
 
         /// <summary>記録したプロキシ応答をそのまま返す設計元（通信しない）。</summary>

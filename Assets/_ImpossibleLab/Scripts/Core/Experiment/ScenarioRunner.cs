@@ -87,6 +87,7 @@ namespace ImpossibleLab.Core
             if (errors.Count > 0) throw new ArgumentException("実験計画が不正です: " + string.Join(" / ", errors.Take(3)));
             var run = new CourseRun { Result = result };
             result.Scenario = plan.Scenario;
+            result.Plan = PlanEditor.Clone(plan);
             var ctx = new SimContext { Dna = dna, Plan = plan, Result = result, Run = run, Reality = plan.Mode == LabModes.Reality };
             var scenario = CreateScenario(plan);
             var models = CreateModels(plan, dna);
@@ -113,7 +114,7 @@ namespace ImpossibleLab.Core
         }
 
         /// <summary>
-        /// 4週目のシナリオ（stand・sit_still・drop_test・lift_task）を実行する入口。保存・画面の対応は6週目。
+        /// 組み立て式の実験（stand・sit_still・drop_test・lift_task）を実行する入口。結果の環境は ScenarioLab、条件は Plan に入る。
         /// </summary>
         public static CourseRun RunPlan(InventionDna dna, ExperimentPlan plan, string experimentId = null, string startTime = null)
         {

@@ -38,13 +38,17 @@ namespace ImpossibleLab
             if (sign != null) { _sign = sign.GetComponentInChildren<TextMeshProUGUI>(true); _signDefault = _sign != null ? _sign.text : null; }
         }
 
-        public void Begin(CourseRun run, InventionView view)
+        /// <summary>組み立て式の実験（ScenarioLab）で、発明品を人型モデルのどこに見せるか（取り付け位置から決める見た目だけのずれ）。</summary>
+        Vector3 _mountOffset;
+
+        public void Begin(CourseRun run, InventionView view, string mount = null)
         {
             Cleanup();
             _run = run; _view = view; _elapsed = 0f; _frame = 0; _collisionsShown = 0;
             SetMannequin(false);
             _props = new GameObject("CourseProps").transform;
             _props.SetParent(transform, false);
+            if (run.Result.IsScenarioLab) { BeginScenarioLab(run, mount); return; }
             bool carrier = run.Result.Environment == LabEnvironments.ObstacleCourse;
             if (_sign != null) _sign.text = carrier ? "TEST ZONE ｜ 障害物コース" : "TEST ZONE ｜ 飛行デッキ（観察）";
             var L = run.Layout;
@@ -76,13 +80,54 @@ namespace ImpossibleLab
             Apply(run.Frames.Count > 0 ? run.Frames[0] : default);
         }
 
+        /// <summary>
+        /// 組み立て式の実験の見た目（プリミティブのみ。明るさ・日差しの見た目は7週目）。計測は開始時に計算済みで、ここでは記録を再生するだけ。
+        /// </summary>
+        void BeginScenarioLab(CourseRun run, string mount)
+        {
+            var plan = run.Result.Plan;
+            string scenario = plan?.Scenario ?? run.Result.Scenario;
+            if (_sign != null) _sign.text = "TEST ZONE ｜ " + PlanCandidates.ScenarioLabel(scenario);
+            // 人型モデル（雨の判定用マネキン）は、物を落とす実験以外では立たせておく
+            SetMannequin(scenario != ExperimentCatalog.DropTest);
+            _mountOffset = Vector3.zero;
+            if (scenario == ExperimentCatalog.Stand || scenario == ExperimentCatalog.SitStill)
+                _mountOffset = mount == "back" ? new Vector3(0f, 0f, -0.22f) : mount == "head" || mount == "air" ? Vector3.zero : new Vector3(0f, 0f, 0.28f);
+            else if (scenario == ExperimentCatalog.LiftTask) _mountOffset = new Vector3(0.35f, 0f, 0.35f); // 荷物と一緒に動く
+            var L = run.Layout;
+            if (L != null)
+            {
+                foreach (var t in L.Targets)
+                    Prim(PrimitiveType.Cylinder, "Target", new Vector3(t.x, 0.5f, t.y), new Vector3(0.24f, 0.5f, 0.24f), _assets != null ? _assets.AccentBlue : null);
+                _obstacleRenderers.Clear();
+                foreach (var o in L.Obstacles)
+                {
+                    var go = Prim(PrimitiveType.Cylinder, "Obstacle", new Vector3(o.x, 0.6f, o.y), new Vector3(o.z * 2f, 0.6f, o.z * 2f), _assets != null ? _assets.AccentOrange : null);
+                    _obstacleRenderers.Add(go.GetComponent<Renderer>());
+                }
+            }
+            if (scenario == ExperimentCatalog.LiftTask && plan != null)
+            {
+                float h = plan.Get("shelf", "heightM");
+                Prim(PrimitiveType.Cube, "Shelf", new Vector3(0.9f, h * 0.5f, 0.6f), new Vector3(0.8f, h, 0.5f), _assets != null ? _assets.DarkMetal : null);
+                float size = plan.Get("payload", "sizeM");
+                _payload = Prim(PrimitiveType.Cube, "Payload", new Vector3(0.9f, size * 0.5f, 0.6f), Vector3.one * size, _assets != null ? _assets.AccentOrange : null).transform;
+            }
+            if (scenario == ExperimentCatalog.DropTest)
+                Prim(PrimitiveType.Cylinder, "DropPad", new Vector3(0f, 0.005f, 0f), new Vector3(0.9f, 0.005f, 0.9f), _assets != null ? _assets.AccentOrange : null);
+            if (_view != null) { _view.SetActive(false); _view.ExtraOffset = Vector3.zero; }
+            Apply(run.Frames.Count > 0 ? run.Frames[0] : default);
+        }
+
+        Transform _payload;
+
         public void Abort() { Cleanup(); }
 
         public void Cleanup()
         {
             _run = null;
             if (_props != null) Destroy(_props.gameObject);
-            _props = null; _leader = null; _pilot = null;
+            _props = null; _leader = null; _pilot = null; _payload = null;
             _obstacleRenderers.Clear();
             SetMannequin(true);
             if (_sign != null && _signDefault != null) _sign.text = _signDefault;
@@ -118,6 +163,19 @@ namespace ImpossibleLab
         void Apply(CourseFrame f)
         {
             if (_run == null) return;
+            if (_run.Result.IsScenarioLab)
+            {
+                if (_payload != null)
+                {
+                    // 持ち上げ：荷物は記録した高さ（床から棚の高さまで）。棚の前で持ち上げ、上がりきったら棚に載せる
+                    var plan = _run.Result.Plan;
+                    float shelf = plan != null ? plan.Get("shelf", "heightM") : 0.8f, size = _payload.localScale.y;
+                    bool onShelf = f.Device.y >= shelf - 1e-3f;
+                    _payload.localPosition = new Vector3(onShelf ? 0.9f : 0.35f, f.Device.y + size * 0.5f, onShelf ? 0.6f : 0.35f);
+                }
+                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device + _mountOffset), transform.rotation);
+                return;
+            }
             if (_run.Result.Environment == LabEnvironments.ObstacleCourse)
             {
                 if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device), transform.rotation * Quaternion.Euler(0f, f.YawDeg, 0f));

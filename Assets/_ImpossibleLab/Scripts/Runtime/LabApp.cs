@@ -323,6 +323,7 @@ namespace ImpossibleLab
             Stages[DesignStage.Assembly] = StageStatus.Done;
             Stages[DesignStage.Complete] = StageStatus.Done;
             Current = new SavedInvention { Current = dna };
+            _planKey = null; // 新しい発明では実験計画の候補を作り直す
             Preview = null;
             LastResult = BaselineResult = OtherModeResult = null;
             TestConfig.Mode = dna.Mode;
@@ -470,23 +471,140 @@ namespace ImpossibleLab
         /// <summary>移動の実験の風速の初期値。改良前（安定度 46 点）が不合格、改良後が合格になる強さ。</summary>
         public const float FlightDefaultWind = 4f;
 
+        // ---- 実験計画（6週目）：AI の提案と、発明の機能から決まる標準の計画から選び、値・環境モジュールを編集する ----
+        /// <summary>S04 の候補（AI 案 → 標準の計画）。</summary>
+        [NonSerialized] public List<PlanCandidate> PlanOptions = new List<PlanCandidate>();
+        /// <summary>今の設計では使えなかった AI 案と理由。</summary>
+        [NonSerialized] public List<string> PlanRejected = new List<string>();
+        [NonSerialized] public int PlanIndex;
+        /// <summary>組み立て式の実験で編集中の計画（既存の実験場の計画では null。条件は TestConfig にある）。</summary>
+        [NonSerialized] public ExperimentPlan EditPlan;
+        string _planKey;
+
+        public PlanCandidate SelectedPlan => PlanIndex >= 0 && PlanIndex < PlanOptions.Count ? PlanOptions[PlanIndex] : null;
+        /// <summary>既存の実験場（雨・障害物コース・飛行デッキ）の計画か。</summary>
+        public bool PlanIsLegacy => SelectedPlan == null || SelectedPlan.Legacy;
+
+        /// <summary>
+        /// 実行する計画（モード・シード込み）。既存の実験場は TestConfig から作る。組み立て式は、今のモード・発明で測れない計測項目と合格条件を外す
+        /// （外したものは removed へ）。
+        /// </summary>
+        public ExperimentPlan ActivePlan(List<string> removed = null)
+        {
+            if (Current == null) return null;
+            if (PlanIsLegacy || EditPlan == null) return ExperimentPlan.FromConfig(TestConfig);
+            return PlanEditor.Effective(EditPlan, TestConfig.Mode, TestConfig.Seed, Current.Current, removed);
+        }
+
+        /// <summary>画面の作り直しの判定用。</summary>
+        public string PlanSignature => $"{PlanIndex}/{PlanOptions.Count}/{(EditPlan != null ? PlanCandidates.ConditionKey(EditPlan) : "")}";
+
         public void GoToTestSetup()
         {
             if (Current == null) return;
-            if (LabCatalog.Category(Current.Current.Category)?.ExperimentAvailable != true)
-            { ShowToast("この発明カテゴリの実験場はこの版では未対応です"); return; }
+            EnsurePlanOptions();
+            if (PlanOptions.Count == 0) { ShowToast("この発明の機能で測れる実験が、この版にはまだありません"); return; }
             if (DeviceRunning) ToggleDevice();
             CoefficientPage = -1;
-            string env = LabEnvironments.ForCategory(Current.Current.Category);
+            Sm.Transition(LabState.ConfiguringTest);
+        }
+
+        /// <summary>
+        /// 発明・版が変わったときだけ候補を作り直す（同じ発明に戻ったときは選択と編集を残す）。
+        /// 版が変わっても同じ候補があれば選択を引き継ぎ、編集中の計画が今の設計でも通るならそのまま使う。
+        /// </summary>
+        void EnsurePlanOptions()
+        {
+            var dna = Current.Current;
+            var ai = LastOutcome != null && LastOutcome.Dna != null && LastOutcome.Dna.Id == dna.Id ? LastOutcome.Plans : new List<ProposedPlan>();
+            string key = $"{dna.Id}#{dna.Revision}#{ai.Count}";
+            if (key == _planKey && PlanOptions.Count > 0) return;
+            bool sameInvention = _planKey != null && _planKey.StartsWith(dna.Id + "#", StringComparison.Ordinal);
+            _planKey = key;
+            var prev = sameInvention ? SelectedPlan : null;
+            var prevEdit = EditPlan;
+            PlanRejected = new List<string>();
+            PlanOptions = PlanCandidates.Build(dna, ai, PlanRejected);
+            if (PlanOptions.Count == 0) { EditPlan = null; return; }
+            int keep = prev == null ? -1 : PlanOptions.FindIndex(c => c.Title == prev.Title && c.FromAi == prev.FromAi && PlanCandidates.SameShape(c.Plan, prev.Plan));
+            if (keep < 0) { SelectPlan(0, notify: false); return; }
+            PlanIndex = keep;
+            if (PlanOptions[keep].Legacy) { EditPlan = null; return; }
+            var errors = new List<string>();
+            if (prevEdit != null) ExperimentPlanJson.Validate(PlanEditor.Effective(prevEdit, TestConfig.Mode, TestConfig.Seed, dna), dna, errors);
+            EditPlan = prevEdit != null && errors.Count == 0 ? prevEdit : PlanEditor.Clone(PlanOptions[keep].Plan);
+        }
+
+        public void SelectPlan(int index) => SelectPlan(index, notify: true);
+
+        void SelectPlan(int index, bool notify)
+        {
+            if (index < 0 || index >= PlanOptions.Count) return;
+            if (Sm.State != LabState.ConfiguringTest && notify) return;
+            var c = PlanOptions[index];
+            PlanIndex = index;
+            CoefficientPage = -1;
+            if (c.Legacy)
+            {
+                EditPlan = null;
+                SetLegacyEnvironment(PlanCandidates.LegacyEnvironment(c.Plan));
+                if (c.FromAi)
+                {
+                    // AI 案の条件を設定へ（モード・シードは利用者の選択を残す）
+                    var cfg = c.Plan.ToConfig();
+                    TestConfig.RainIntensity = cfg.RainIntensity; TestConfig.WindSpeed = cfg.WindSpeed; TestConfig.WindDirectionDeg = cfg.WindDirectionDeg;
+                    TestConfig.ObstacleCount = cfg.ObstacleCount; TestConfig.PayloadKg = cfg.PayloadKg; TestConfig.TargetDistance = cfg.TargetDistance;
+                    TestConfig.DurationSec = cfg.DurationSec;
+                }
+            }
+            else EditPlan = PlanEditor.Clone(c.Plan);
+            if (notify) Notify();
+        }
+
+        /// <summary>実験場が変わったら風を初期値に戻す。移動（FlightDeck）は横風（0°・4 m/s）、ほかは設定の初期値（90°・3 m/s）。</summary>
+        void SetLegacyEnvironment(string env)
+        {
             if (env != TestConfig.Environment)
             {
-                // 実験場が変わったら風を初期値に戻す。移動（FlightDeck）は横風（0°・4 m/s）、ほかは設定の初期値（90°・3 m/s）
                 var defaults = new RainExperimentConfig();
                 if (env == LabEnvironments.FlightDeck) { TestConfig.WindDirectionDeg = 0f; TestConfig.WindSpeed = FlightDefaultWind; }
                 else if (TestConfig.Environment == LabEnvironments.FlightDeck) { TestConfig.WindDirectionDeg = defaults.WindDirectionDeg; TestConfig.WindSpeed = defaults.WindSpeed; }
             }
             TestConfig.Environment = env;
-            Sm.Transition(LabState.ConfiguringTest);
+        }
+
+        /// <summary>計画の値を1段階変える。既存の実験場は従来の設定（StepCondition）と同じ幅で変える。</summary>
+        public void StepPlanParam(string module, string key, int dir)
+        {
+            if (Sm.State != LabState.ConfiguringTest) return;
+            if (PlanIsLegacy)
+            {
+                string legacy = module == "rain" ? "rain" : module == "wind" ? (key == "directionDeg" ? "dir" : TestConfig.Environment == LabEnvironments.FlightDeck ? "flightwind" : "wind")
+                    : module == "obstacles" ? "obstacles" : module == "payload" ? "payload" : module == "target" ? "distance" : null;
+                if (legacy != null) StepCondition(legacy, dir);
+                return;
+            }
+            if (PlanEditor.StepParam(EditPlan, module, key, dir)) Notify();
+        }
+
+        public void AddPlanModule(string module)
+        {
+            if (Sm.State != LabState.ConfiguringTest || PlanIsLegacy || EditPlan == null) return;
+            if (PlanEditor.AddModule(EditPlan, module, Current.Current)) ShowToast("条件を追加しました：" + ExperimentCatalog.Module(module)?.LabelJa);
+        }
+
+        public void RemovePlanModule(string module)
+        {
+            if (Sm.State != LabState.ConfiguringTest || PlanIsLegacy || EditPlan == null) return;
+            if (PlanEditor.RemoveModule(EditPlan, module)) ShowToast("条件を外しました：" + ExperimentCatalog.Module(module)?.LabelJa);
+        }
+
+        /// <summary>選んだ候補の初期値に戻す。</summary>
+        public void ResetPlan()
+        {
+            if (Sm.State != LabState.ConfiguringTest || PlanIsLegacy || SelectedPlan == null) return;
+            EditPlan = PlanEditor.Clone(SelectedPlan.Plan);
+            ShowToast("候補の初期値に戻しました");
         }
 
         public void SetMode(string mode) { if (LabModes.IsValid(mode)) { TestConfig.Mode = mode; if (mode != LabModes.Reality) CoefficientPage = -1; Notify(); } }
@@ -524,25 +642,62 @@ namespace ImpossibleLab
         }
 
         // ================= S05 実験実行・結果 =================
+        /// <summary>実験場との移動（フェード・ゲート）の最中か。この間は実験開始などを受け付けない。</summary>
+        public bool Transitioning => _transitioning;
+
         public void StartExperiment()
         {
-            if (_transitioning || Current == null) return;
+            if (_transitioning || Current == null) { Debug.Log($"[ILAB] start ignored transitioning={_transitioning} current={Current != null}"); return; }
             if (Sm.State == LabState.ReviewingResult) Sm.Transition(LabState.ConfiguringTest);
             if (Sm.State != LabState.ConfiguringTest) return;
             CoefficientPage = -1;
             var snapshot = TestConfig.Clamped(); // 設定スナップショット
             var dna = Current.Current;
-            BaselineResult = FindComparable(snapshot, dna.Revision, sameRevision: false);
+            ExperimentPlan custom = null;
+            if (!PlanIsLegacy)
+            {
+                custom = ActivePlan();
+                var errors = new List<string>();
+                ExperimentPlanJson.Validate(custom, dna, errors);
+                if (errors.Count > 0) { ShowToast("この実験計画は実行できません：" + errors[0]); return; }
+                string key = PlanCandidates.ConditionKey(custom);
+                BaselineResult = Current.Experiments.LastOrDefault(e => e.IsScenarioLab && e.Revision != dna.Revision && e.Plan != null
+                    && e.Plan.Mode == custom.Mode && PlanCandidates.ConditionKey(e.Plan) == key);
+            }
+            else BaselineResult = FindComparable(snapshot, dna.Revision, sameRevision: false);
             OtherModeResult = null;
-            if (!InRainLab) StartCoroutine(MoveArea(toRainLab: true, then: () => BeginRun(dna, snapshot)));
-            else BeginRun(dna, snapshot);
+            if (!InRainLab) StartCoroutine(MoveArea(toRainLab: true, then: () => BeginRun(dna, snapshot, custom)));
+            else BeginRun(dna, snapshot, custom);
         }
 
-        void BeginRun(InventionDna dna, RainExperimentConfig cfg)
+        /// <summary>実行中の組み立て式の実験の計画（既存の実験場なら null）。画面は状態が変わった時点でこれを見る（再生の開始より先に作り直されるため）。</summary>
+        [NonSerialized] public ExperimentPlan RunningPlan;
+
+        void BeginRun(InventionDna dna, RainExperimentConfig cfg, ExperimentPlan custom = null)
         {
+            RunningPlan = custom;
             if (!Sm.Transition(LabState.RunningTest)) return;
             string expId = "exp-" + DateTime.Now.ToString("yyyyMMddHHmmss");
-            // 実験はすべて「実験計画」として扱う（画面の設定 → 計画 → 実行）
+            if (custom != null)
+            {
+                // 組み立て式の実験：計算は開始時に一括で行い、実験場では記録した動きを再生する
+                CourseRun run;
+                try { run = ScenarioRunner.RunPlan(dna, custom, expId, LabClock.NowIso()); }
+                catch (ArgumentException e)
+                {
+                    Debug.LogWarning("[ILAB] plan run failed: " + e.Message);
+                    Sm.Transition(LabState.Cancelled); Sm.Transition(LabState.ConfiguringTest);
+                    ShowToast("実験を実行できませんでした：" + e.Message);
+                    return;
+                }
+                LastResult = null;
+                Course.Begin(run, View, dna.Mount);
+                Fx.StartPulse(RainLab.transform.position, Assets != null ? Assets.Canopy : null);
+                Debug.Log($"[ILAB] plan run scenario={custom.Scenario} modules={string.Join(",", custom.Modules.Select(m => m.Type))} mode={custom.Mode} seed={custom.Seed} frames={run.Frames.Count} passed={run.Result.Passed} metrics={string.Join(",", run.Result.Metrics.Select(m => m.Key + "=" + m.Display))}");
+                Notify();
+                return;
+            }
+            // 既存の実験場も「実験計画」として扱う（画面の設定 → 計画 → 実行）
             var plan = ExperimentPlan.FromConfig(cfg);
             Debug.Log($"[ILAB] experiment plan scenario={plan.Scenario} modules={string.Join(",", plan.Modules.Select(m => m.Type))} mode={plan.Mode} seed={plan.Seed}");
             if (plan.Scenario != ExperimentCatalog.Stand)
@@ -585,7 +740,7 @@ namespace ImpossibleLab
             if (Sm.State != LabState.RunningTest) return;
             LastResult = r;
             Current.Experiments.Add(r);
-            OtherModeResult = Current.Experiments.LastOrDefault(e => e != r && e.Revision == r.Revision && e.Config.Mode != r.Config.Mode && e.Config.SameExceptMode(r.Config));
+            OtherModeResult = Current.Experiments.LastOrDefault(e => e != r && e.Revision == r.Revision && e.Config.Mode != r.Config.Mode && e.SameConditionsAs(r, compareMode: false));
             try { Repo.Save(Current); LastSavedPath = Repo.DirectoryPath; }
             catch (Exception e) { Debug.LogWarning("[ImpossibleLab] auto save failed: " + e.Message); ShowToast("実験記録の自動保存に失敗しました"); }
             Sm.Transition(LabState.ReviewingResult);
@@ -685,6 +840,7 @@ namespace ImpossibleLab
             var inv = Repo.Load(id, out var err);
             if (inv == null) { ShowToast("読み込めません：" + err); return; }
             Current = inv;
+            _planKey = null;
             LastResult = inv.Experiments.LastOrDefault();
             BaselineResult = OtherModeResult = null;
             PendingRevision = null; PendingProposal = null;

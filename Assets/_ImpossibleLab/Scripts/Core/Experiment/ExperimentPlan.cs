@@ -237,6 +237,14 @@ namespace ImpossibleLab.Core
             }
         }
 
+        /// <summary>この計画とこの発明でその計測項目を測れるか（測れない理由を返す。測れるなら null）。</summary>
+        public static string WhyCannotMeasure(MetricInfo mi, ExperimentPlan p, InventionDna dna)
+        {
+            var errors = new List<string>();
+            CheckMetric(mi, p, dna, errors);
+            return errors.Count == 0 ? null : errors[0];
+        }
+
         static void CheckMetric(MetricInfo mi, ExperimentPlan p, InventionDna dna, List<string> errors)
         {
             if (mi.Scenarios.Length > 0 && !mi.Scenarios.Contains(p.Scenario)) errors.Add($"{mi.LabelJa}はシナリオ {p.Scenario} では測れません");

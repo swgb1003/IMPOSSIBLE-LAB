@@ -167,6 +167,8 @@ namespace ImpossibleLab.Core
         public string Environment = "RainLab";
         /// <summary>実験計画のシナリオ（ScenarioRunner で実行したとき）。</summary>
         public string Scenario = "";
+        /// <summary>実行した実験計画（モード・シード込み）。組み立て式の実験（ScenarioLab）では条件はここにだけある。</summary>
+        public ExperimentPlan Plan;
         public RainExperimentConfig Config;
         public string StartTime;
         public int DropsTotal;
@@ -192,6 +194,17 @@ namespace ImpossibleLab.Core
         /// <summary>RainLab 以外の判定の説明（例：「衝突0回・到着の遅れ3秒以内」）。</summary>
         public string Criteria = "";
         public bool IsRain => Environment == LabEnvironments.RainLab;
+        public bool IsScenarioLab => Environment == LabEnvironments.ScenarioLab;
+        /// <summary>条件の説明（結果画面の見出し）。</summary>
+        public string DescribeConditions() => IsScenarioLab && Plan != null ? PlanText.Describe(Plan) : Config?.Describe() ?? "";
+        /// <summary>同じ条件か（モードを比べるかは指定）。ScenarioLab は実験計画で比べる。</summary>
+        public bool SameConditionsAs(RainExperimentResult o, bool compareMode)
+        {
+            if (o == null || Environment != o.Environment) return false;
+            if (IsScenarioLab)
+                return Plan != null && o.Plan != null && PlanCandidates.ConditionKey(Plan) == PlanCandidates.ConditionKey(o.Plan) && (!compareMode || Plan.Mode == o.Plan.Mode);
+            return compareMode ? Config.SameConditions(o.Config) : Config.SameExceptMode(o.Config);
+        }
         public bool Success => Passed ?? CoverageRatio >= SuccessCoverage;
         public const float SuccessCoverage = 0.8f;
         public ExperimentMetric Metric(string key) => Metrics.Find(m => m.Key == key);
