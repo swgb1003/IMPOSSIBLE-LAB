@@ -1,0 +1,276 @@
+{
+  "status": "ok",
+  "dna": {
+    "schemaVersion": 2,
+    "id": "ai-mw99960r-u9l",
+    "name": "うしろ見守りリュック",
+    "purpose": "背中側のセンサーで後ろから近づく自転車などを検知し、音と光で背負っている人に知らせるリュック。",
+    "tags": [
+      "safety",
+      "sensing",
+      "daily"
+    ],
+    "mount": "back",
+    "appearance": "safety_orange",
+    "mode": "dream",
+    "parts": [
+      {
+        "id": "pack",
+        "type": "body",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.3,
+          0.45,
+          0.15
+        ]
+      },
+      {
+        "id": "strap-l",
+        "type": "strap",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          -0.1,
+          0.05,
+          0.1
+        ],
+        "scale": [
+          0.05,
+          0.45,
+          0.01
+        ]
+      },
+      {
+        "id": "strap-r",
+        "type": "strap",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0.1,
+          0.05,
+          0.1
+        ],
+        "scale": [
+          0.05,
+          0.45,
+          0.01
+        ]
+      },
+      {
+        "id": "rear-sensor",
+        "type": "sensor",
+        "shape": "cylinder",
+        "material": "plastic",
+        "position": [
+          0,
+          0.12,
+          -0.09
+        ],
+        "scale": [
+          0.06,
+          0.03,
+          0.06
+        ]
+      },
+      {
+        "id": "shoulder-speaker",
+        "type": "speaker",
+        "shape": "cylinder",
+        "material": "plastic",
+        "position": [
+          0.1,
+          0.22,
+          0.12
+        ],
+        "scale": [
+          0.04,
+          0.02,
+          0.04
+        ]
+      },
+      {
+        "id": "battery",
+        "type": "battery",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0,
+          -0.12,
+          0
+        ],
+        "scale": [
+          0.08,
+          0.04,
+          0.06
+        ]
+      },
+      {
+        "id": "rear-panel",
+        "type": "panel",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0,
+          -0.05,
+          -0.08
+        ],
+        "scale": [
+          0.2,
+          0.1,
+          0.005
+        ]
+      }
+    ],
+    "behaviors": [
+      {
+        "type": "detect",
+        "targetPart": "rear-sensor",
+        "parameters": {
+          "rangeM": 15,
+          "fovDeg": 120
+        }
+      },
+      {
+        "type": "alert",
+        "targetPart": "shoulder-speaker",
+        "parameters": {
+          "loudnessDb": 70,
+          "lightLumens": 30,
+          "flashHz": 3
+        }
+      }
+    ],
+    "functionMap": [
+      {
+        "need": "後ろから近づく物の検知",
+        "blocks": [
+          "detect"
+        ],
+        "status": "simplified",
+        "note": "距離と視野角と遮りの幾何判定のみで、近づく速さや向きは考慮しません。"
+      },
+      {
+        "need": "背負っている人への通知",
+        "blocks": [
+          "alert"
+        ],
+        "status": "simplified",
+        "note": "音の届く距離と光の見える距離で評価し、周囲の騒音や本人が気づくかは扱いません。"
+      },
+      {
+        "need": "自転車だけを見分ける",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "検知対象は単純な物体で、自転車と歩行者などを区別する認識は模型にありません。"
+      },
+      {
+        "need": "背負い心地・防水",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "快適さや雨への耐久性はシミュレーションで評価できません。"
+      }
+    ],
+    "constraints": {
+      "maxParts": 24,
+      "maxSpeed": 3
+    },
+    "revision": 1,
+    "parentRevision": null
+  },
+  "designPoints": [
+    "センサーをリュック背面の高めの位置に付け、後方120°・15mを見張ります。",
+    "通知は肩ベルトのスピーカーで耳の近くから鳴らし、大きすぎない音量にしました。",
+    "電池は下部に置いて重心を低くしています。"
+  ],
+  "plans": [
+    {
+      "title": "後方検知テスト",
+      "aim": "後ろにいる対象をどれだけ見つけて知らせられるかを確かめる。",
+      "plan": {
+        "scenario": "stand",
+        "mode": "dream",
+        "durationSec": 20,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "targets",
+            "count": 6
+          }
+        ],
+        "metrics": [
+          "detectionRate",
+          "alertRange"
+        ],
+        "criteria": [
+          {
+            "metric": "detectionRate",
+            "op": ">=",
+            "value": 0.8,
+            "reason": "後ろの対象の8割以上を見つけたい（目安）"
+          },
+          {
+            "metric": "alertRange",
+            "op": ">=",
+            "value": 1,
+            "reason": "耳元の通知が本人に届く距離（目安）"
+          }
+        ]
+      }
+    },
+    {
+      "title": "人混みでの検知と電力",
+      "aim": "障害物で遮られるときの検知率と、必要な電力を確かめる。",
+      "plan": {
+        "scenario": "stand",
+        "mode": "reality",
+        "durationSec": 30,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "targets",
+            "count": 8
+          },
+          {
+            "type": "obstacles",
+            "count": 4
+          }
+        ],
+        "metrics": [
+          "detectionRate",
+          "blockPowerW"
+        ],
+        "criteria": [
+          {
+            "metric": "detectionRate",
+            "op": ">=",
+            "value": 0.6,
+            "reason": "遮りがあっても6割以上は見つけたい（目安）"
+          },
+          {
+            "metric": "blockPowerW",
+            "op": "<=",
+            "value": 5,
+            "reason": "小さな電池で1日使える程度の電力（目安）"
+          }
+        ]
+      }
+    }
+  ],
+  "fixes": [],
+  "message": "背面のセンサーで後ろから近づく物を検知し、肩元のスピーカーと光で知らせるリュックを設計しました。",
+  "model": "claude-opus-5-5",
+  "usage": {
+    "input": 48,
+    "output": 2344,
+    "cacheRead": 10215,
+    "cacheWrite": 0,
+    "ms": 22423,
+    "costUsd": 0.049115
+  }
+}

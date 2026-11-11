@@ -803,7 +803,7 @@ namespace ImpossibleLab
         {
             var hints = new List<string>();
             if (r == null) return hints;
-            if (!r.IsRain) return CourseSimulator.Hints(r);
+            if (!r.IsRain) return CourseSimulator.Hints(r, Current?.Current);
             int total = Mathf.Max(1, r.DeviceHits);
             if (r.HeadHits > total * 0.3f) hints.Add("頭部に雨が当たっています →「防ぐ範囲を広げて」");
             if (r.LowerHits + r.UpperHits > total * 0.5f && r.Config.WindSpeed > 1f) hints.Add("横からの雨が多い →「横からの雨も防いで」");

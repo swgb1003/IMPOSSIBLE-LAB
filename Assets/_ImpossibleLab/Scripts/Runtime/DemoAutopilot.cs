@@ -499,7 +499,95 @@ namespace ImpossibleLab
   ""behaviors"": [ { ""type"": ""drive"", ""targetPart"": ""m"", ""parameters"": { ""speedLimit"": 0.8, ""maxSlopeDeg"": 8 } },
                    { ""type"": ""carry_load"", ""targetPart"": ""body"", ""parameters"": { ""capacity"": 10 } } ], ""revision"": 1, ""parentRevision"": null }",
                 ExperimentCatalog.ClimbSlope, "climbedRatio", addModule: null, stepModule: "slope", stepKey: "angleDeg");
+
+            // 6週目の完了条件：代表6件（評価セットの AI 設計：防護・照明・温度・検知・持ち上げ・落下）で、設計 → 実験 → 改良 → 再実験 → 比較 → 保存
+            int repPassed = 0;
+            foreach (var id in new[] { "r03", "r15", "r18", "r22", "r09", "r05" })
+            {
+                bool ok = false;
+                yield return RepresentativeFlow(id, v => ok = v);
+                if (ok) repPassed++;
+            }
+            Check(repPassed == 6, $"representative: {repPassed}/6 completed design -> test -> revise -> retest -> save");
             Time.timeScale = 1f;
+        }
+
+        /// <summary>
+        /// 代表1件：記録した AI 設計 → 承認 → S04（AI 案の1つ目）→ 実験 → 改善案の依頼文で改良（オフライン改良ルール）→ 再実験
+        /// → 前の版と比較（判定に使った計測項目が良くなる。合格済みなら悪くならない）→ 保存して読み直す。
+        /// </summary>
+        IEnumerator RepresentativeFlow(string id, System.Action<bool> done)
+        {
+            string path = Path.Combine(Application.dataPath, $"_ImpossibleLab/Tests/EditMode/Fixtures/representative/ai_{id}.json");
+            if (!File.Exists(path)) { Check(false, $"rep-{id}: fixture exists"); done(false); yield break; }
+            _app.SetDesignServiceForVerify(new FixtureDesignService(File.ReadAllText(path)));
+            if (_app.Sm.State == LabState.Saved) _app.ContinueEditing();
+            _app.NewInvention();
+            _app.SetRequestText("代表 " + id);
+            float w = 0;
+            while (_app.Sm.State == LabState.Drafting && w < 10f) { _app.SubmitRequest(); w += Time.unscaledDeltaTime; yield return null; }
+            yield return WaitState(LabState.AwaitingApproval);
+            if (_app.Preview == null) { Check(false, $"rep-{id}: design"); done(false); yield break; }
+            _app.ApprovePreview();
+            yield return WaitState(LabState.Editing);
+            var dna = _app.Current.Current;
+            _app.TestConfig.Mode = LabModes.Dream;
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            Check(_app.SelectedPlan != null && _app.SelectedPlan.FromAi, $"rep-{id}: AI plan selected ({_app.SelectedPlan?.Title})");
+            string planTitle = _app.SelectedPlan?.Title;
+            float tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
+            _app.StartExperiment();
+            yield return WaitState(LabState.RunningTest);
+            yield return WaitState(LabState.ReviewingResult, 90f);
+            var r1 = _app.LastResult;
+            var checks1 = ResultCriteria.Evaluate(r1);
+            // 依頼文がある計測項目のうち、未達のものを優先
+            var target = checks1.Where(c => c.Measured).OrderBy(c => c.Passed ? 1 : 0).FirstOrDefault(c => OfflineRevisionRules.RequestForMetric(dna, c.Metric) != null);
+            string req = target != null ? OfflineRevisionRules.RequestForMetric(dna, target.Metric) : null;
+            req = req ?? OfflineRevisionRules.SuggestedRequestsFor(dna).First();
+            yield return Shot($"S05_rep_{id}_rev1", rainLab: true);
+            _app.ImproveAndRetest();
+            yield return WaitState(LabState.Editing);
+            _app.PickRevision(req);
+            _app.RequestRevision();
+            float tr = 0; while (_app.PendingRevision == null && _app.RevisionBusy && tr < 5f) { tr += Time.unscaledDeltaTime; yield return null; }
+            tr = 0; while (_app.PendingRevision == null && tr < 2f) { tr += Time.unscaledDeltaTime; yield return null; }
+            bool revised = _app.PendingRevision != null && _app.PendingRevision.Success;
+            Check(revised, $"rep-{id}: revision proposal for 「{req}」 ({_app.RevisionMessage})");
+            if (!revised) { done(false); yield break; }
+            _app.ApproveRevision();
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            Check(_app.SelectedPlan?.Title == planTitle, $"rep-{id}: same plan after revision ({_app.SelectedPlan?.Title})");
+            tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
+            _app.StartExperiment();
+            yield return WaitState(LabState.RunningTest);
+            yield return WaitState(LabState.ReviewingResult, 90f);
+            var r2 = _app.LastResult;
+            Check(_app.BaselineResult == r1, $"rep-{id}: compared with Rev.{r1?.Revision}");
+            bool better = false;
+            string change = "-";
+            if (target != null && r1 != null && r2 != null && r1.Metric(target.Metric) != null && r2.Metric(target.Metric) != null)
+            {
+                var info = ExperimentCatalog.Metric(target.Metric);
+                float a = r1.Metric(target.Metric).Value, b = r2.Metric(target.Metric).Value;
+                bool improved = info.LowerIsBetter ? b < a - 1e-4f : b > a + 1e-4f;
+                bool worse = info.LowerIsBetter ? b > a + 1e-4f : b < a - 1e-4f;
+                better = target.Passed ? !worse : improved;
+                change = $"{info.LabelJa} {a:0.###} -> {b:0.###}";
+            }
+            Check(better, $"rep-{id}: {change} after 「{req}」");
+            Log($"RESULT rep-{id} plan={planTitle} rev1 passed={r1?.Passed} rev2 passed={r2?.Passed} | {change} | request={req}");
+            yield return Shot($"S05_rep_{id}_rev2", rainLab: true);
+            _app.Save();
+            yield return WaitState(LabState.Saved, 20f);
+            var saved = _app.Repo.Load(dna.Id, out var err);
+            bool savedOk = saved != null && saved.Experiments.Count(e => e.IsScenarioLab) >= 2 && saved.Current.Revision == r2?.Revision;
+            Check(savedOk, $"rep-{id}: saved Rev.{saved?.Current.Revision} with {saved?.Experiments.Count} experiments {err}");
+            _app.ContinueEditing();
+            yield return WaitState(LabState.Editing);
+            done(revised && better && savedOk);
         }
 
         /// <summary>
@@ -592,8 +680,14 @@ namespace ImpossibleLab
                 if (o.Status == DesignStatus.Success) progress?.Report(DesignStage.Assembly);
                 return System.Threading.Tasks.Task.FromResult(o);
             }
+            /// <summary>改良はオフラインの改良ルールで返す（記録した設計応答には改良が含まれないため。AI は呼ばない）。</summary>
             public System.Threading.Tasks.Task<RevisionOutcome> ReviseAsync(InventionDna current, RainExperimentResult lastExperiment, string requestText, System.Threading.CancellationToken ct)
-                => System.Threading.Tasks.Task.FromResult(new RevisionOutcome { Status = DesignStatus.Failed, Message = "検証用の設計元は改良に対応しません" });
+            {
+                var proposal = OfflineRevisionRules.Propose(current, requestText ?? "");
+                return System.Threading.Tasks.Task.FromResult(proposal.Operations.Count == 0
+                    ? new RevisionOutcome { Status = DesignStatus.Unsupported, Proposal = proposal, Message = "オフライン改良ルールでは対応できません" }
+                    : new RevisionOutcome { Status = DesignStatus.Success, Proposal = proposal, Message = proposal.Summary });
+            }
         }
     }
 }

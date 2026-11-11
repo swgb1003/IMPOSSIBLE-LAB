@@ -197,7 +197,73 @@ namespace ImpossibleLab.Core
             new Rule { Category = "mobility", Words = new[] { "ゆっくり", "安全" }, Behavior = "move_forward", Parameter = "speedLimit", Delta = -0.4f, Text = "速度上限を下げる" },
             // 共通
             new Rule { Words = new[] { "風", "安定", "揺れ", "ぶれ", "流され" }, Behavior = "stabilize", Parameter = "stabilizationStrength", Delta = 0.3f, Text = "姿勢安定を強めて風で揺れにくくする" },
+            // 6週目：機能ブロック（分類に関係なく、発明にその機能があれば使う）
+            new Rule { Words = new[] { "明る", "照らし" }, Behavior = "illuminate", Parameter = "lumens", Delta = 150f, Text = "照明を明るくする" },
+            new Rule { Words = new[] { "日陰", "日差し", "まぶし" }, Behavior = "sun_shade", Parameter = "radius", Delta = 0.2f, Text = "日よけを広げる" },
+            new Rule { Words = new[] { "温か", "暖か", "寒" }, Behavior = "heat", Parameter = "powerW", Delta = 5f, Text = "加温の電力を上げる" },
+            new Rule { Words = new[] { "涼し", "冷や", "暑" }, Behavior = "cool", Parameter = "powerW", Delta = 5f, Text = "冷却の電力を上げる" },
+            new Rule { Words = new[] { "衝撃", "壊れ", "割れ" }, Behavior = "impact_cushion", Parameter = "thicknessM", Delta = 0.01f, Text = "緩衝材を厚くする" },
+            // 硬くすると、つぶれは小さく（∝ 1/√k）、衝撃は大きく（∝ √k）なる。docs/blocks.md 4章
+            new Rule { Words = new[] { "硬く", "つぶれ", "底つき" }, Behavior = "impact_cushion", Parameter = "stiffness", Delta = 5000f, Text = "緩衝材を硬くして、つぶれ切らないようにする" },
+            new Rule { Words = new[] { "落とさ", "しっかり", "滑ら" }, Behavior = "grip", Parameter = "gripForceN", Delta = 20f, Text = "つかむ力を強める" },
+            new Rule { Words = new[] { "持ち上げ" }, Behavior = "lift_load", Parameter = "speed", Delta = 0.1f, Text = "持ち上げる速さを上げる" },
+            new Rule { Words = new[] { "重い" }, Behavior = "lift_load", Parameter = "maxLoadKg", Delta = 5f, Text = "持ち上げられる重さを増やす" },
+            new Rule { Words = new[] { "遠く" }, Behavior = "detect", Parameter = "rangeM", Delta = 3f, Text = "検知距離を延ばす" },
+            new Rule { Words = new[] { "広く", "死角", "見逃" }, Behavior = "detect", Parameter = "fovDeg", Delta = 120f, Text = "検知の視野を広げる" },
+            new Rule { Words = new[] { "目立", "聞こえ", "知らせ" }, Behavior = "alert", Parameter = "loudnessDb", Delta = 10f, Text = "通知の音を大きくする" },
+            new Rule { Words = new[] { "目立", "見え", "知らせ" }, Behavior = "alert", Parameter = "lightLumens", Delta = 100f, Text = "通知の光を明るくする" },
+            new Rule { Words = new[] { "坂", "上れ", "登れ" }, Behavior = "drive", Parameter = "maxSlopeDeg", Delta = 5f, Text = "上れる坂の角度を上げる" },
         };
+
+        /// <summary>
+        /// 機能ブロックごとのおすすめの依頼文（上の規則で必ず改良案になる言い方）。既存3カテゴリ以外の発明の例と、結果画面の改善案に使う。
+        /// </summary>
+        static readonly (string behavior, string request)[] BehaviorRequests =
+        {
+            ("illuminate", "もっと明るくして"), ("sun_shade", "日陰を広げて"), ("heat", "もっと温かくして"), ("cool", "もっと涼しくして"),
+            ("impact_cushion", "落としても壊れないようにして"), ("grip", "落とさないようにしっかりつかんで"), ("lift_load", "もっと速く持ち上げて"),
+            ("detect", "もっと遠く広く気づいて"), ("alert", "もっと目立つように知らせて"), ("drive", "急な坂も上れるようにして"),
+            ("stabilize", "風で揺れないようにして"),
+        };
+
+        /// <summary>計測項目 → その値を良くする依頼文（どの機能を変えるか）。</summary>
+        static readonly (string metric, string behavior)[] MetricBehavior =
+        {
+            ("footIlluminance", "illuminate"), ("illuminanceMin", "illuminate"), ("shadeRatio", "sun_shade"), ("sunExposureW", "sun_shade"),
+            ("temperatureGain", "heat"), ("timeToTarget", "heat"), ("peakImpactG", "impact_cushion"), ("dropCount", "grip"),
+            ("liftTime", "lift_load"), ("detectionRate", "detect"), ("alertRange", "alert"), ("climbedRatio", "drive"), ("climbTime", "drive"),
+        };
+
+        /// <summary>機能ごとの依頼文とは別の言い方が必要な計測項目（同じ機能でも、変える値が違う）。</summary>
+        static readonly (string metric, string behavior, string request)[] MetricRequests =
+        {
+            ("cushionCompression", "impact_cushion", "緩衝材がつぶれ切らないように硬くして"),
+        };
+
+        /// <summary>この計測項目を良くするための依頼文（発明にその機能がなければ null）。加温・冷却は発明にある方を選ぶ。</summary>
+        public static string RequestForMetric(InventionDna dna, string metric)
+        {
+            foreach (var (m, b, req) in MetricRequests) if (m == metric && dna.FindBehavior(b) != null) return req;
+            foreach (var (m, b) in MetricBehavior)
+            {
+                if (m != metric) continue;
+                string behavior = b == "heat" && dna.FindBehavior("heat") == null && dna.FindBehavior("cool") != null ? "cool" : b;
+                if (dna.FindBehavior(behavior) == null) continue;
+                foreach (var (bb, req) in BehaviorRequests) if (bb == behavior) return req;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// S03 の例の依頼文。既存3カテゴリはこれまでの例、それ以外は発明にある機能ブロックの依頼文（最大4件）。
+        /// </summary>
+        public static IEnumerable<string> SuggestedRequestsFor(InventionDna dna)
+        {
+            if (dna == null) return Suggested["protection"];
+            if (Suggested.TryGetValue(dna.Category ?? "", out var s)) return s;
+            var list = BehaviorRequests.Where(x => dna.FindBehavior(x.behavior) != null).Select(x => x.request).Take(4).ToList();
+            return list.Count > 0 ? list : Suggested["protection"];
+        }
 
         static readonly Dictionary<string, string[]> Suggested = new Dictionary<string, string[]>
         {
@@ -240,10 +306,12 @@ namespace ImpossibleLab.Core
             }
             if (p.Operations.Count == 0 && p.Notes.Count == 0)
             {
-                string cat = current.Category != null && Capabilities.ContainsKey(current.Category) ? current.Category : "protection";
-                p.Notes.Add("対応できる改良：" + Capabilities[cat]);
-                p.Notes.Add("例：「" + string.Join("」「", SuggestedRequestsFor(cat)) + "」");
+                if (current.Category != null && Capabilities.ContainsKey(current.Category))
+                    p.Notes.Add("対応できる改良：" + Capabilities[current.Category]);
+                p.Notes.Add("例：「" + string.Join("」「", SuggestedRequestsFor(current)) + "」");
             }
+            // 機能が無い規則のメモは、改良案ができたときは出さない（言葉が別の分類の規則にも当たるため）
+            if (p.Operations.Count > 0) p.Notes.RemoveAll(n => n.Contains("この発明に無い機能が必要です"));
             p.Summary = texts.Count > 0 ? string.Join("、", texts) : "改良案なし";
             return p;
         }

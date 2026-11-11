@@ -169,25 +169,22 @@ namespace ImpossibleLab.Core
         }
 
         /// <summary>計測値に基づく改善案（単純な規則。AIではない）。</summary>
-        public static List<string> Hints(RainExperimentResult r)
+        public static List<string> Hints(RainExperimentResult r, InventionDna dna = null)
         {
             var h = new List<string>();
             float V(string k) => r.Metric(k)?.Value ?? 0f;
             if (r.IsScenarioLab)
             {
                 // 組み立て式の実験：満たさなかった合格条件・制限をそのまま改良の手がかりにする
-                // 合格条件の不足は判定の行に出ているため、ここでは「何を改良するか」だけを短く出す
-                const string unmet = "合格条件を満たさない：";
-                foreach (var l in r.Limits.Take(3))
+                // 合格条件の不足は判定の行に出ているため、ここでは「何を改良するか」と依頼文だけを短く出す
+                foreach (var c in ResultCriteria.Evaluate(r).Where(c => c.Measured && !c.Passed).Take(3))
                 {
-                    if (l.StartsWith(unmet, System.StringComparison.Ordinal))
-                    {
-                        string rest = l.Substring(unmet.Length);
-                        int sp = rest.IndexOf(' ');
-                        h.Add($"「{(sp > 0 ? rest.Substring(0, sp) : rest)}」が目標に届かない → S03 で改良を依頼");
-                    }
-                    else h.Add(l + " → S03 で改良を依頼");
+                    string label = ExperimentCatalog.Metric(c.Metric)?.LabelJa ?? c.Metric;
+                    string req = dna != null ? OfflineRevisionRules.RequestForMetric(dna, c.Metric) : null;
+                    h.Add($"「{label}」が目標に届かない → " + (req != null ? $"「{req}」" : "S03 で改良を依頼"));
                 }
+                foreach (var l in r.Limits.Where(l => !l.StartsWith("合格条件", System.StringComparison.Ordinal)).Take(3 - h.Count))
+                    h.Add(l + " → S03 で改良を依頼");
                 if (h.Count == 0) h.Add("合格条件をすべて満たしました。条件を厳しくして試してください");
                 return h;
             }

@@ -1,0 +1,301 @@
+{
+  "status": "ok",
+  "dna": {
+    "schemaVersion": 2,
+    "id": "ai-mw9988ud-ad5",
+    "name": "バス停ぬくぬく背中ヒーター",
+    "purpose": "冬のバス停で待つ間、背中に当てた加熱パッドで体を温める背負い型の道具。",
+    "tags": [
+      "thermal",
+      "daily",
+      "outdoor"
+    ],
+    "mount": "back",
+    "appearance": "night_navy",
+    "mode": "dream",
+    "parts": [
+      {
+        "id": "back-pad",
+        "type": "body",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.32,
+          0.4,
+          0.04
+        ]
+      },
+      {
+        "id": "heater-upper",
+        "type": "heater",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0,
+          0.1,
+          0.025
+        ],
+        "scale": [
+          0.26,
+          0.14,
+          0.01
+        ]
+      },
+      {
+        "id": "heater-lower",
+        "type": "heater",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0,
+          -0.1,
+          0.025
+        ],
+        "scale": [
+          0.26,
+          0.14,
+          0.01
+        ]
+      },
+      {
+        "id": "insulation",
+        "type": "cushion",
+        "shape": "box",
+        "material": "foam",
+        "position": [
+          0,
+          0,
+          -0.03
+        ],
+        "scale": [
+          0.32,
+          0.4,
+          0.02
+        ]
+      },
+      {
+        "id": "battery-pack",
+        "type": "battery",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0,
+          -0.17,
+          -0.06
+        ],
+        "scale": [
+          0.1,
+          0.06,
+          0.03
+        ]
+      },
+      {
+        "id": "temp-sensor",
+        "type": "sensor",
+        "shape": "sphere",
+        "material": "plastic",
+        "position": [
+          0,
+          0,
+          0.03
+        ],
+        "scale": [
+          0.02,
+          0.02,
+          0.02
+        ]
+      },
+      {
+        "id": "strap-left",
+        "type": "strap",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          -0.12,
+          0.05,
+          0.12
+        ],
+        "scale": [
+          0.04,
+          0.5,
+          0.2
+        ]
+      },
+      {
+        "id": "strap-right",
+        "type": "strap",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0.12,
+          0.05,
+          0.12
+        ],
+        "scale": [
+          0.04,
+          0.5,
+          0.2
+        ]
+      },
+      {
+        "id": "waist-belt",
+        "type": "strap",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0,
+          -0.2,
+          0.12
+        ],
+        "scale": [
+          0.5,
+          0.05,
+          0.25
+        ]
+      }
+    ],
+    "behaviors": [
+      {
+        "type": "heat",
+        "targetPart": "heater-upper",
+        "parameters": {
+          "powerW": 25
+        }
+      }
+    ],
+    "functionMap": [
+      {
+        "need": "背中を温める",
+        "blocks": [
+          "heat"
+        ],
+        "status": "simulated",
+        "note": "集中定数の熱モデルで温度の上がり方を計算します。"
+      },
+      {
+        "need": "寒い外気でも効く",
+        "blocks": [
+          "heat"
+        ],
+        "status": "simplified",
+        "note": "気温だけを変えて試します。バス停の風による冷え（風冷え）は座る実験では扱えません。"
+      },
+      {
+        "need": "待ち時間の間電池がもつ",
+        "blocks": [
+          "heat"
+        ],
+        "status": "simplified",
+        "note": "現実モードの消費電力から目安を見るだけで、電池の容量や劣化は計算しません。"
+      },
+      {
+        "need": "着け心地・コートとの相性",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "重さの感じ方や服との相性、低温やけどの危険はシミュレーションでは確かめられません。"
+      }
+    ],
+    "constraints": {
+      "maxParts": 24,
+      "maxSpeed": 3
+    },
+    "revision": 1,
+    "parentRevision": null
+  },
+  "designPoints": [
+    "背中は面積が広く体温を感じやすいので、上下2枚の加熱パッドを並べました。",
+    "外側に発泡材の断熱層を入れ、熱が外気に逃げにくい形にしました。",
+    "電池は腰の近くの低い位置に置き、肩への負担を減らす配置にしました。"
+  ],
+  "plans": [
+    {
+      "title": "バス停待ちの温まり実験",
+      "aim": "冬の気温で待つ間に背中が十分温まるかを確かめる。",
+      "plan": {
+        "scenario": "sit_still",
+        "mode": "dream",
+        "durationSec": 20,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "temperature",
+            "ambientC": -2,
+            "targetDeltaC": 8,
+            "minutes": 15
+          }
+        ],
+        "metrics": [
+          "temperatureGain",
+          "timeToTarget"
+        ],
+        "criteria": [
+          {
+            "metric": "temperatureGain",
+            "op": ">=",
+            "value": 8,
+            "reason": "15分の待ち時間で温かさを感じる差（目安）"
+          },
+          {
+            "metric": "timeToTarget",
+            "op": "<=",
+            "value": 10,
+            "reason": "バスが来る前に温まってほしい（目安）"
+          }
+        ]
+      }
+    },
+    {
+      "title": "真冬の電力チェック",
+      "aim": "より寒い日に必要な電力が持ち歩ける電池で足りそうかを確かめる。",
+      "plan": {
+        "scenario": "sit_still",
+        "mode": "reality",
+        "durationSec": 20,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "temperature",
+            "ambientC": -5,
+            "targetDeltaC": 10,
+            "minutes": 20
+          }
+        ],
+        "metrics": [
+          "temperatureGain",
+          "timeToTarget",
+          "blockPowerW"
+        ],
+        "criteria": [
+          {
+            "metric": "blockPowerW",
+            "op": "<=",
+            "value": 30,
+            "reason": "モバイル電池で長く使える電力の範囲（目安）"
+          },
+          {
+            "metric": "temperatureGain",
+            "op": ">=",
+            "value": 6,
+            "reason": "真冬でも温かさを感じられる差（目安）"
+          }
+        ]
+      }
+    }
+  ],
+  "fixes": [],
+  "message": "背中に背負う加温パッドで、冬のバス停で待つ間に背中を温める発明を設計しました。",
+  "model": "claude-opus-5-5",
+  "usage": {
+    "input": 47,
+    "output": 2188,
+    "cacheRead": 10215,
+    "cacheWrite": 0,
+    "ms": 18878,
+    "costUsd": 0.045991
+  }
+}

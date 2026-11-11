@@ -527,7 +527,7 @@ namespace ImpossibleLab
             var right = UiKit.Column("Revise", cols, LabTheme.Space1); UiKit.Size(right, flexW: 1);
             UiKit.Heading(right, "AIに改良を依頼", 26);
             var inRow = UiKit.Row("RevInput", right, LabTheme.Space1, 64);
-            _revisionInput = UiKit.Input(inRow, "例：" + OfflineRevisionRules.SuggestedRequestsFor(dna.Category).First(), RequestRules.MaxRequestLength, s => App.RevisionText = s);
+            _revisionInput = UiKit.Input(inRow, "例：" + OfflineRevisionRules.SuggestedRequestsFor(dna).First(), RequestRules.MaxRequestLength, s => App.RevisionText = s);
             _revisionInput.SetTextWithoutNotify(App.RevisionText);
             UiKit.Size(_revisionInput, flexW: 1, h: 64);
             UiKit.Button(inRow, "依頼", App.RequestRevision, ButtonStyle.Primary, 120, 64);
@@ -535,7 +535,7 @@ namespace ImpossibleLab
             var grid = chips.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
             grid.cellSize = new Vector2(298, 52); grid.spacing = new Vector2(8, 8);
             UiKit.Size(chips, h: 112);
-            foreach (var sug in OfflineRevisionRules.SuggestedRequestsFor(dna.Category))
+            foreach (var sug in OfflineRevisionRules.SuggestedRequestsFor(dna))
             {
                 var text = sug;
                 UiKit.Button(chips, text, () => { App.PickRevision(text); if (_revisionInput != null) _revisionInput.SetTextWithoutNotify(text); }, ButtonStyle.Secondary, -1, 52, LabTheme.FontSmall);

@@ -1,0 +1,381 @@
+{
+  "status": "ok",
+  "dna": {
+    "schemaVersion": 2,
+    "id": "ai-mw9967ly-ijq",
+    "name": "だんボール持ち上げリフト「アゲルくん」",
+    "purpose": "床に置いた段ボールを左右からはさみ、柱に沿って棚の高さまで持ち上げて置く道具。",
+    "tags": [
+      "assist",
+      "carrier",
+      "daily"
+    ],
+    "mount": "ground",
+    "appearance": "safety_orange",
+    "mode": "dream",
+    "parts": [
+      {
+        "id": "base",
+        "type": "body",
+        "shape": "box",
+        "material": "aluminum",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.5,
+          0.15,
+          0.6
+        ]
+      },
+      {
+        "id": "wheel-fl",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          0.22,
+          -0.08,
+          0.22
+        ],
+        "scale": [
+          0.12,
+          0.04,
+          0.12
+        ]
+      },
+      {
+        "id": "wheel-fr",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          -0.22,
+          -0.08,
+          0.22
+        ],
+        "scale": [
+          0.12,
+          0.04,
+          0.12
+        ]
+      },
+      {
+        "id": "wheel-bl",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          0.22,
+          -0.08,
+          -0.22
+        ],
+        "scale": [
+          0.12,
+          0.04,
+          0.12
+        ]
+      },
+      {
+        "id": "wheel-br",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          -0.22,
+          -0.08,
+          -0.22
+        ],
+        "scale": [
+          0.12,
+          0.04,
+          0.12
+        ]
+      },
+      {
+        "id": "mast",
+        "type": "frame",
+        "shape": "box",
+        "material": "aluminum",
+        "position": [
+          0,
+          0.9,
+          -0.22
+        ],
+        "scale": [
+          0.08,
+          1.65,
+          0.08
+        ]
+      },
+      {
+        "id": "lift-motor",
+        "type": "motor",
+        "shape": "cylinder",
+        "material": "steel",
+        "position": [
+          0,
+          0.14,
+          -0.22
+        ],
+        "scale": [
+          0.12,
+          0.12,
+          0.12
+        ]
+      },
+      {
+        "id": "lift-arm",
+        "type": "arm",
+        "shape": "box",
+        "material": "aluminum",
+        "position": [
+          0,
+          0.3,
+          0.05
+        ],
+        "scale": [
+          0.5,
+          0.04,
+          0.45
+        ]
+      },
+      {
+        "id": "gripper-l",
+        "type": "gripper",
+        "shape": "box",
+        "material": "rubber",
+        "position": [
+          0.25,
+          0.45,
+          0.1
+        ],
+        "scale": [
+          0.04,
+          0.3,
+          0.35
+        ]
+      },
+      {
+        "id": "gripper-r",
+        "type": "gripper",
+        "shape": "box",
+        "material": "rubber",
+        "position": [
+          -0.25,
+          0.45,
+          0.1
+        ],
+        "scale": [
+          0.04,
+          0.3,
+          0.35
+        ]
+      },
+      {
+        "id": "battery",
+        "type": "battery",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0,
+          0.04,
+          -0.05
+        ],
+        "scale": [
+          0.25,
+          0.08,
+          0.2
+        ]
+      },
+      {
+        "id": "top-sensor",
+        "type": "sensor",
+        "shape": "sphere",
+        "material": "plastic",
+        "position": [
+          0,
+          1.75,
+          -0.2
+        ],
+        "scale": [
+          0.06,
+          0.06,
+          0.06
+        ]
+      }
+    ],
+    "behaviors": [
+      {
+        "type": "lift_load",
+        "targetPart": "lift-motor",
+        "parameters": {
+          "maxLoadKg": 15,
+          "liftHeightM": 1.6,
+          "speed": 0.2
+        }
+      },
+      {
+        "type": "grip",
+        "targetPart": "gripper-l",
+        "parameters": {
+          "gripForceN": 150,
+          "openingM": 0.5
+        }
+      },
+      {
+        "type": "stabilize",
+        "targetPart": "base",
+        "parameters": {
+          "stabilizationStrength": 0.6
+        }
+      }
+    ],
+    "functionMap": [
+      {
+        "need": "段ボールを棚の高さまで持ち上げる",
+        "blocks": [
+          "lift_load"
+        ],
+        "status": "simulated",
+        "note": "一定の速さで持ち上げるモデルで、時間と電力を計算します。"
+      },
+      {
+        "need": "段ボールを落とさずつかむ",
+        "blocks": [
+          "grip"
+        ],
+        "status": "simplified",
+        "note": "2面ではさむ摩擦の式だけで判定し、段ボールのへこみや中身の偏りは考えません。"
+      },
+      {
+        "need": "棚の上に置く",
+        "blocks": [
+          "lift_load"
+        ],
+        "status": "simplified",
+        "note": "棚の高さまで届くかだけを見て、棚の奥へ押し込む動きは再現しません。"
+      },
+      {
+        "need": "持ち上げ中に倒れない",
+        "blocks": [
+          "stabilize"
+        ],
+        "status": "unverifiable",
+        "note": "持ち上げ実験では重心の移動による転倒を計算しないため確かめられません。"
+      }
+    ],
+    "constraints": {
+      "maxParts": 24,
+      "maxSpeed": 3
+    },
+    "revision": 1,
+    "parentRevision": null
+  },
+  "designPoints": [
+    "左右のゴムのつかみ具で段ボールをはさむので、床に置いたままでも下に爪を差し込まずに持てます。",
+    "柱に沿って駆動部でアームを上げる構造にし、1.6mまでの棚に届くようにしました。",
+    "重い電池と駆動部を台の低い位置に置き、持ち上げても倒れにくい重心にしています。"
+  ],
+  "plans": [
+    {
+      "title": "段ボール持ち上げテスト",
+      "aim": "5kgの段ボールを落とさず棚の高さまで持ち上げられるか確かめる。",
+      "plan": {
+        "scenario": "lift_task",
+        "mode": "dream",
+        "durationSec": 20,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "payload",
+            "kg": 5,
+            "sizeM": 0.4
+          },
+          {
+            "type": "shelf",
+            "heightM": 1.2
+          }
+        ],
+        "metrics": [
+          "dropCount",
+          "liftTime"
+        ],
+        "criteria": [
+          {
+            "metric": "dropCount",
+            "op": "<=",
+            "value": 0,
+            "reason": "一度も落とさないことが最低条件"
+          },
+          {
+            "metric": "liftTime",
+            "op": "<=",
+            "value": 10,
+            "reason": "人が手で上げるのと同じくらいの時間で終わる（目安）"
+          }
+        ]
+      }
+    },
+    {
+      "title": "重い箱を高い棚へ・電力チェック",
+      "aim": "10kgの重い段ボールを高い棚へ上げるとき、どれくらい電力が必要かを確かめる。",
+      "plan": {
+        "scenario": "lift_task",
+        "mode": "reality",
+        "durationSec": 30,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "payload",
+            "kg": 10,
+            "sizeM": 0.45
+          },
+          {
+            "type": "shelf",
+            "heightM": 1.5
+          }
+        ],
+        "metrics": [
+          "dropCount",
+          "liftTime",
+          "liftPowerW",
+          "blockPowerW"
+        ],
+        "criteria": [
+          {
+            "metric": "dropCount",
+            "op": "<=",
+            "value": 0,
+            "reason": "重い箱でも落とさないこと"
+          },
+          {
+            "metric": "liftPowerW",
+            "op": "<=",
+            "value": 300,
+            "reason": "家庭用の小型電池で動かせる程度の電力（目安）"
+          },
+          {
+            "metric": "liftTime",
+            "op": "<=",
+            "value": 15,
+            "reason": "待たされすぎない持ち上げ時間（目安）"
+          }
+        ]
+      }
+    }
+  ],
+  "fixes": [],
+  "message": "床の段ボールをはさんで棚の高さまで持ち上げる、自走式の小型リフトを設計しました。",
+  "model": "claude-opus-5-5",
+  "usage": {
+    "input": 51,
+    "output": 3030,
+    "cacheRead": 10215,
+    "cacheWrite": 0,
+    "ms": 32178,
+    "costUsd": 0.062847
+  }
+}

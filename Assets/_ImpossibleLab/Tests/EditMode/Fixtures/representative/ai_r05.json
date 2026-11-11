@@ -1,0 +1,329 @@
+{
+  "status": "ok",
+  "dna": {
+    "schemaVersion": 2,
+    "id": "ai-mw9951tq-jz7",
+    "name": "エアバンパー・スマホガード",
+    "purpose": "スマホの角とふちを厚めの緩衝材で囲み、落としたときに画面へ伝わる衝撃を小さくするケース。",
+    "tags": [
+      "safety",
+      "daily"
+    ],
+    "mount": "hand",
+    "appearance": "safety_orange",
+    "mode": "dream",
+    "parts": [
+      {
+        "id": "phone-shell",
+        "type": "body",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.08,
+          0.16,
+          0.012
+        ]
+      },
+      {
+        "id": "screen-guard",
+        "type": "panel",
+        "shape": "box",
+        "material": "glass",
+        "position": [
+          0,
+          0,
+          0.008
+        ],
+        "scale": [
+          0.072,
+          0.15,
+          0.005
+        ]
+      },
+      {
+        "id": "bumper-top",
+        "type": "cushion",
+        "shape": "capsule",
+        "material": "foam",
+        "position": [
+          0,
+          0.088,
+          0
+        ],
+        "scale": [
+          0.02,
+          0.09,
+          0.02
+        ]
+      },
+      {
+        "id": "bumper-bottom",
+        "type": "cushion",
+        "shape": "capsule",
+        "material": "foam",
+        "position": [
+          0,
+          -0.088,
+          0
+        ],
+        "scale": [
+          0.02,
+          0.09,
+          0.02
+        ]
+      },
+      {
+        "id": "corner-tl",
+        "type": "cushion",
+        "shape": "sphere",
+        "material": "rubber",
+        "position": [
+          -0.045,
+          0.085,
+          0
+        ],
+        "scale": [
+          0.025,
+          0.025,
+          0.025
+        ]
+      },
+      {
+        "id": "corner-tr",
+        "type": "cushion",
+        "shape": "sphere",
+        "material": "rubber",
+        "position": [
+          0.045,
+          0.085,
+          0
+        ],
+        "scale": [
+          0.025,
+          0.025,
+          0.025
+        ]
+      },
+      {
+        "id": "corner-bl",
+        "type": "cushion",
+        "shape": "sphere",
+        "material": "rubber",
+        "position": [
+          -0.045,
+          -0.085,
+          0
+        ],
+        "scale": [
+          0.025,
+          0.025,
+          0.025
+        ]
+      },
+      {
+        "id": "corner-br",
+        "type": "cushion",
+        "shape": "sphere",
+        "material": "rubber",
+        "position": [
+          0.045,
+          -0.085,
+          0
+        ],
+        "scale": [
+          0.025,
+          0.025,
+          0.025
+        ]
+      },
+      {
+        "id": "side-left",
+        "type": "cushion",
+        "shape": "box",
+        "material": "foam",
+        "position": [
+          -0.046,
+          0,
+          0
+        ],
+        "scale": [
+          0.012,
+          0.14,
+          0.016
+        ]
+      },
+      {
+        "id": "side-right",
+        "type": "cushion",
+        "shape": "box",
+        "material": "foam",
+        "position": [
+          0.046,
+          0,
+          0
+        ],
+        "scale": [
+          0.012,
+          0.14,
+          0.016
+        ]
+      },
+      {
+        "id": "hand-strap",
+        "type": "strap",
+        "shape": "box",
+        "material": "fabric",
+        "position": [
+          0,
+          -0.03,
+          -0.01
+        ],
+        "scale": [
+          0.06,
+          0.02,
+          0.005
+        ]
+      }
+    ],
+    "behaviors": [
+      {
+        "type": "impact_cushion",
+        "targetPart": "bumper-bottom",
+        "parameters": {
+          "thicknessM": 0.015,
+          "stiffness": 8000
+        }
+      }
+    ],
+    "functionMap": [
+      {
+        "need": "落としたときの衝撃を減らす",
+        "blocks": [
+          "impact_cushion"
+        ],
+        "status": "simulated",
+        "note": "ばね・ダンパーの落下モデルで最大の衝撃（G）と緩衝材のつぶれを測ります。"
+      },
+      {
+        "need": "画面が割れない",
+        "blocks": [
+          "impact_cushion"
+        ],
+        "status": "simplified",
+        "note": "ガラスが割れるかどうかは計算せず、最大の衝撃Gが小さいほど割れにくいと考える目安で判定します。落ちる向きや床の角への当たり方も扱いません。"
+      },
+      {
+        "need": "手から滑り落ちにくい",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "手との摩擦や持ちやすさはシミュレーターのモデルにないため確かめられません。"
+      },
+      {
+        "need": "ポケットに入る薄さ・見た目",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "かさばり具合や使い心地は人の感じ方によるため確かめられません。"
+      }
+    ],
+    "constraints": {
+      "maxParts": 24,
+      "maxSpeed": 3
+    },
+    "revision": 1,
+    "parentRevision": null
+  },
+  "designPoints": [
+    "画面が割れる主な原因は角やふちからの衝撃なので、四隅をゴム、上下左右を発泡材で囲みました。",
+    "緩衝材は厚さ1.5cm・やわらかめにして、つぶれきらずに衝撃をゆっくり受け止めるようにしています。",
+    "画面の前にガラス板をのせ、クッションが画面より少し前に出て床に先に当たる形にしました。",
+    "手首用ストラップで、そもそも落としにくくする工夫も加えています（効果は検証外）。"
+  ],
+  "plans": [
+    {
+      "title": "ポケットの高さから落とす",
+      "aim": "日常でよくある約1mの落下で、衝撃が小さく抑えられるかを確かめる。",
+      "plan": {
+        "scenario": "drop_test",
+        "mode": "dream",
+        "durationSec": 5,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "drop",
+            "heightM": 1,
+            "massKg": 0.2
+          }
+        ],
+        "metrics": [
+          "peakImpactG",
+          "cushionCompression"
+        ],
+        "criteria": [
+          {
+            "metric": "peakImpactG",
+            "op": "<=",
+            "value": 100,
+            "reason": "画面が割れにくいと考える衝撃の上限（目安）"
+          },
+          {
+            "metric": "cushionCompression",
+            "op": "<=",
+            "value": 0.012,
+            "reason": "厚さ1.5cmを使い切らずに受け止める（目安）"
+          }
+        ]
+      }
+    },
+    {
+      "title": "耳の高さから落とす",
+      "aim": "通話中に手から落とすような1.6mの高さでも衝撃を抑えられるかを確かめる。",
+      "plan": {
+        "scenario": "drop_test",
+        "mode": "dream",
+        "durationSec": 5,
+        "seed": 1234,
+        "modules": [
+          {
+            "type": "drop",
+            "heightM": 1.6,
+            "massKg": 0.2
+          }
+        ],
+        "metrics": [
+          "peakImpactG",
+          "cushionCompression"
+        ],
+        "criteria": [
+          {
+            "metric": "peakImpactG",
+            "op": "<=",
+            "value": 150,
+            "reason": "高い所からでも大きすぎる衝撃にしない（目安）"
+          },
+          {
+            "metric": "cushionCompression",
+            "op": "<=",
+            "value": 0.015,
+            "reason": "緩衝材がつぶれきって底づきしないこと（目安）"
+          }
+        ]
+      }
+    }
+  ],
+  "fixes": [],
+  "message": "スマホの角とふちを発泡材のクッションで囲み、落としたときの衝撃を落下実験で確かめるケースを設計しました。",
+  "model": "claude-opus-5-5",
+  "usage": {
+    "input": 42,
+    "output": 2505,
+    "cacheRead": 10215,
+    "cacheWrite": 0,
+    "ms": 22690,
+    "costUsd": 0.052311
+  }
+}
