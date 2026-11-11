@@ -68,6 +68,8 @@ namespace ImpossibleLab
         [NonSerialized] public string Toast;
         [NonSerialized] public List<GalleryEntry> GalleryEntries = new List<GalleryEntry>();
         [NonSerialized] public string PendingDeleteId;
+        /// <summary>ギャラリーを開いた回数（開き直したら1ページ目に戻すため）。</summary>
+        [NonSerialized] public int GalleryOpenCount;
         public bool InRainLab { get; private set; }
         public bool DeviceRunning => View != null && View.Active;
         public bool Seated { get; private set; }
@@ -845,6 +847,7 @@ namespace ImpossibleLab
             if (DeviceRunning) ToggleDevice();
             if (Sm.State == LabState.Editing || Sm.State == LabState.Saved || Sm.State == LabState.Drafting || Sm.State == LabState.Idle || Sm.State == LabState.Error)
             {
+                GalleryOpenCount++; // 画面はこの値が変わったら1ページ目を出す
                 RefreshGallery();
                 Sm.Transition(LabState.Gallery);
             }

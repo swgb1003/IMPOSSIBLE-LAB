@@ -284,6 +284,18 @@ namespace ImpossibleLab
             yield return WaitState(LabState.Gallery);
             Check(_app.PendingDeleteId == null, "gallery opens without delete dialog");
             yield return Shot("S06_gallery");
+            // 7件以上ならページ送り（新しい順に6件ずつ）
+            var gui = FindFirstObjectByType<LabUI>();
+            if (_app.GalleryEntries.Count > LabUI.GalleryPerPage)
+            {
+                gui.StepGalleryPage(+1);
+                yield return null;
+                Check(gui.GalleryPage == 1, $"gallery moves to page 2 ({_app.GalleryEntries.Count} entries)");
+                yield return Shot("S06_gallery_p2");
+                gui.StepGalleryPage(-1);
+                yield return null;
+            }
+            else Log($"gallery paging not exercised ({_app.GalleryEntries.Count} entries)");
             _app.AskDelete(_app.Current.Current.Id);
             yield return null; yield return null;
             yield return Shot("S06_delete_confirm");

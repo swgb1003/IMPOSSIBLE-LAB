@@ -24,13 +24,20 @@ namespace ImpossibleLab.EditorTools
                 EditorUserBuildSettings.SwitchActiveBuildTarget(NamedBuildTarget.Android, BuildTarget.Android);
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             EditorUserBuildSettings.buildAppBundle = false;
-            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+            // 日本語フォントに使う文字を登録してから（実機で文字を描くたびに止まらないように）ビルドし、終わったら元に戻す
+            FontPrewarm.Prepare();
+            BuildReport report;
+            try
             {
-                scenes = new[] { SceneBuilder.ScenePath },
-                target = BuildTarget.Android,
-                locationPathName = path,
-                options = options,
-            });
+                report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
+                {
+                    scenes = new[] { SceneBuilder.ScenePath },
+                    target = BuildTarget.Android,
+                    locationPathName = path,
+                    options = options,
+                });
+            }
+            finally { FontPrewarm.Restore(); }
             Debug.Log($"ILAB_ANDROID_BUILD {report.summary.result} size={report.summary.totalSize} time={report.summary.totalTime}");
             if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded) throw new BuildFailedException("Quest APK build failed: " + report.summary.result);
         }

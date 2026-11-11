@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage);
             return sb.ToString();
         }
 
@@ -155,6 +155,21 @@ namespace ImpossibleLab
         }
 
         void Rebuild()
+        {
+            // 計測：作り直しにかかった時間と、フォントに実行中に追加された文字数（実機の引っかかりの原因を切り分ける）
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            int glyphs0 = GlyphCount();
+            RebuildScreens();
+            sw.Stop();
+            int added = GlyphCount() - glyphs0;
+            if (sw.Elapsed.TotalMilliseconds > 20.0 || added > 0)
+                Debug.Log($"[ILAB] ui rebuild state={App.Sm.State} ms={sw.Elapsed.TotalMilliseconds:F0} glyphsAdded={added} glyphs={GlyphCount()}");
+        }
+
+        static int GlyphCount() =>
+            (LabTheme.Font != null ? LabTheme.Font.characterTable.Count : 0) + (LabTheme.FontBold != null ? LabTheme.FontBold.characterTable.Count : 0);
+
+        void RebuildScreens()
         {
             UiKit.Clear(_header); UiKit.Clear(_body); UiKit.Clear(_footer); UiKit.Clear(_leftBody); UiKit.Clear(_rightBody);
             if (_overlay != null) { Destroy(_overlay.gameObject); _overlay = null; }
@@ -808,15 +823,21 @@ namespace ImpossibleLab
         /// 組み立て式の実験の側面：左＝シナリオと計算の前提、右＝計測項目と合格条件・事前に分かる制限。
         /// 実行前に同じ計算（ScenarioRunner）を走らせて表示する（計算は一括・数ミリ秒）。
         /// </summary>
+        string _previewKey;
+        CourseRun _preview;
+
         void PlanSidePanels(ExperimentPlan plan, InventionDna dna, List<string> removed)
         {
             CourseRun preview = null;
             string fail = null;
             var errors = new List<string>();
             ExperimentPlanJson.Validate(plan, dna, errors);
-            if (errors.Count == 0)
+            // 事前計算は、発明の版と計画（モード・合格条件を含む）が同じなら使い回す（ボタンを押すたびに計算しない）
+            string key = dna.Id + "#" + dna.Revision + "#" + ExperimentPlanJson.ToJson(plan);
+            if (errors.Count == 0 && key == _previewKey) preview = _preview;
+            else if (errors.Count == 0)
             {
-                try { preview = ScenarioRunner.RunPlan(dna, plan); }
+                try { preview = ScenarioRunner.RunPlan(dna, plan); _preview = preview; _previewKey = key; }
                 catch (System.ArgumentException e) { fail = e.Message; }
             }
             else fail = errors[0];
@@ -1153,6 +1174,16 @@ namespace ImpossibleLab
 
         void Update() { if (_liveText != null) UpdateLive(); }
 
+        // 計測：フォントへの文字の追加は作り直しの後（描画の直前）に起きるため、フレームごとに数の変化と前のフレームの時間を記録する
+        int _lastGlyphs = -1;
+        void LateUpdate()
+        {
+            int g = GlyphCount();
+            if (_lastGlyphs >= 0 && g != _lastGlyphs)
+                Debug.Log($"[ILAB] glyphs added={g - _lastGlyphs} total={g} prevFrameMs={Time.unscaledDeltaTime * 1000f:F0} state={App.Sm.State}");
+            _lastGlyphs = g;
+        }
+
         void UpdateLive()
         {
             if (App.TestConfig.Environment != LabEnvironments.RainLab || App.RunningPlan != null)
@@ -1215,6 +1246,8 @@ namespace ImpossibleLab
             }
             Title("発明品ギャラリー", "共有・公開はこの版では非対応");
             var entries = App.GalleryEntries;
+            if (_galleryShownFor != App.GalleryOpenCount) { _galleryShownFor = App.GalleryOpenCount; _galleryPage = 0; }
+            _galleryPage = Mathf.Clamp(_galleryPage, 0, GalleryPages(entries.Count) - 1);
             if (entries.Count == 0)
             {
                 Para(_body, "保存された発明はまだありません。発明して「保存」すると、ここに表示されます。", LabTheme.FontBody, LabTheme.TextPrimary, 80);
@@ -1224,27 +1257,47 @@ namespace ImpossibleLab
             {
                 var gridRt = UiKit.Rect("Grid", _body); UiKit.Size(gridRt, flexH: 1);
                 var grid = gridRt.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
-                grid.cellSize = new Vector2(472, 200); // 2段でもフッターがはみ出さない高さ（カードの中身は約 190） grid.spacing = new Vector2(16, 16);
-                foreach (var e in entries.Take(6)) GalleryCard(gridRt, e);
+                grid.cellSize = new Vector2(472, 200); // 2段でもフッターがはみ出さない高さ（カードの中身は約 190）
+                grid.spacing = new Vector2(16, 16);
+                foreach (var e in entries.Skip(_galleryPage * GalleryPerPage).Take(GalleryPerPage)) GalleryCard(gridRt, e);
             }
             var a2 = UiKit.Row("Actions", _body, LabTheme.Space2, 64);
             UiKit.Button(a2, "戻る", App.CloseGallery, ButtonStyle.Ghost, 220);
-            // 7件以上は操作の行に件数だけ出す（別の行にするとフッターがパネルからはみ出す）
-            if (entries.Count > 6)
+            // 7件以上はページ送り（新しい順に6件ずつ）。操作の行に置く（別の行にするとフッターがパネルからはみ出す）
+            int gPages = GalleryPages(entries.Count);
+            if (gPages > 1)
             {
-                var more = UiKit.Text(a2, $"ほか {entries.Count - 6} 件（新しい順に6件を表示）", LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft);
-                UiKit.Size(more, flexW: 1);
+                var fill = UiKit.Rect("Fill", a2); UiKit.Size(fill, flexW: 1);
+                var prev = UiKit.Button(a2, "◀ 新しい", () => StepGalleryPage(-1), ButtonStyle.Secondary, 190, 60, LabTheme.FontSmall);
+                UiKit.SetInteractable(prev, _galleryPage > 0);
+                var pt = UiKit.Text(a2, $"{_galleryPage + 1} / {gPages}（全 {entries.Count} 件）", LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.Center);
+                UiKit.Size(pt, w: 260);
+                var next = UiKit.Button(a2, "古い ▶", () => StepGalleryPage(+1), ButtonStyle.Secondary, 190, 60, LabTheme.FontSmall);
+                UiKit.SetInteractable(next, _galleryPage < gPages - 1);
             }
             GallerySide();
             if (App.PendingDeleteId != null) BuildDeleteDialog();
+        }
+
+        // ---- ギャラリーのページ（新しい順に6件ずつ）----
+        public const int GalleryPerPage = 6;
+        int _galleryPage, _galleryShownFor = -1;
+        public int GalleryPage => _galleryPage;
+        static int GalleryPages(int count) => Mathf.Max(1, (count + GalleryPerPage - 1) / GalleryPerPage);
+        public void StepGalleryPage(int dir)
+        {
+            _galleryPage = Mathf.Clamp(_galleryPage + dir, 0, GalleryPages(App.GalleryEntries.Count) - 1);
+            Refresh();
         }
 
         void GalleryCard(Transform parent, GalleryEntry e)
         {
             var card = UiKit.Panel("Card_" + e.Id, parent, LabTheme.BgPanel);
             UiKit.VList(card, 6, LabTheme.Space2);
-            Para(card, $"<b><color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>{e.Name}</color></b>", LabTheme.FontBody, h: 36);
-            Para(card, $"{e.TagsJa} ／ Rev.{e.Revision} ／ 更新 {e.UpdatedAt}", LabTheme.FontSmall, h: 30);
+            // 名前と説明は1行ずつに収める（折り返すと下の行と重なる）。更新日時は年を省く
+            Para(card, $"<b><color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>{Short(e.Name, 16)}</color></b>", LabTheme.FontBody, h: 36);
+            string when = e.UpdatedAt != null && e.UpdatedAt.Length >= 16 ? e.UpdatedAt.Substring(5) : e.UpdatedAt;
+            Para(card, $"{Short(e.TagsJa, 8)} ／ Rev.{e.Revision} ／ {when}", LabTheme.FontSmall, h: 30);
             Para(card, e.Tested ? "✓ 実験済み" : "未実験", LabTheme.FontSmall, e.Tested ? LabTheme.AccentLight : LabTheme.TextSecondary, 30);
             var row = UiKit.Row("Btns", card, LabTheme.Space1, 56);
             string id = e.Id;
