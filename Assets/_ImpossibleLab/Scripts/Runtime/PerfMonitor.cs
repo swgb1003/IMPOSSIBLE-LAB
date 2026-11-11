@@ -51,7 +51,7 @@ namespace ImpossibleLab
         {
             if (_app == null) return "?";
             string s = _app.Sm.State.ToString();
-            if (_app.ExperimentRunning) s += "+" + _app.TestConfig.Environment;
+            if (_app.ExperimentRunning) s += "+" + (_app.RunningPlan != null ? "ScenarioLab:" + _app.RunningPlan.Scenario : _app.TestConfig.Environment); // 組み立て式の実験はシナリオ名で記録
             return s;
         }
 
