@@ -215,6 +215,8 @@ namespace ImpossibleLab
             LastOutcome = null; Preview = null;
             var progress = new Progress<DesignStage>(stage =>
             {
+                // 進み具合の通知は非同期に届くため、設計が終わった後に届いた分は無視する（承認待ちでホログラムが再表示されていた）
+                if (Sm.State != LabState.GeneratingDesign) return;
                 foreach (var s in DesignStageText.All)
                 {
                     if (s == stage) { Stages[s] = StageStatus.Running; break; }
@@ -254,7 +256,8 @@ namespace ImpossibleLab
                 SetHologram(true, null);
                 return;
             }
-            Stages[DesignStage.PartDesign] = StageStatus.Done;
+            // 設計が終わった時点で、組み立てより前の段階はすべて完了（遅れて届く進み具合の通知は無視するため、ここで揃える）
+            foreach (var st in DesignStageText.All) if (st < DesignStage.Assembly) Stages[st] = StageStatus.Done;
             Preview = outcome.Dna;
             SetHologram(false, null);
             Sm.Transition(LabState.AwaitingApproval);
@@ -494,6 +497,16 @@ namespace ImpossibleLab
             if (Current == null) return null;
             if (PlanIsLegacy || EditPlan == null) return ExperimentPlan.FromConfig(TestConfig);
             return PlanEditor.Effective(EditPlan, TestConfig.Mode, TestConfig.Seed, Current.Current, removed);
+        }
+
+        /// <summary>
+        /// S02 の機能対応表（要望ごとの検証の状態・使う機能・確かめる実験計画）。実験計画の候補は S04 と同じ作り方
+        /// （この設計に付いてきた AI 案 → 標準の計画）。derived = AI の対応表がなく、機能から作った表。
+        /// </summary>
+        public List<FunctionRow> FunctionRows(InventionDna dna, out bool derived)
+        {
+            var ai = LastOutcome != null && LastOutcome.Dna != null && dna != null && LastOutcome.Dna.Id == dna.Id ? LastOutcome.Plans : new List<ProposedPlan>();
+            return FunctionMapView.Build(dna, PlanCandidates.Build(dna, ai), out derived);
         }
 
         /// <summary>画面の作り直しの判定用。</summary>

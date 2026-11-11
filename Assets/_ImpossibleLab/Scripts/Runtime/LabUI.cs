@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage);
             return sb.ToString();
         }
 
@@ -354,11 +354,11 @@ namespace ImpossibleLab
 
             SideHeading(_leftBody, "YOUR IDEA", "入力したアイデア");
             Para(_leftBody, "「" + App.RequestText + "」", LabTheme.FontBody, LabTheme.TextPrimary, 110);
-            UiKit.Heading(_leftBody, "確認事項", 26);
-            Para(_leftBody, "・AIの出力はデータとして検証し、登録済みの部品と機能だけで組み立てます\n・現実の製品としての安全性や実現性は保証しません", LabTheme.FontSmall, h: 180);
 
             if (s == LabState.GeneratingDesign)
             {
+                UiKit.Heading(_leftBody, "確認事項", 26);
+                Para(_leftBody, "・AIの出力はデータとして検証し、登録済みの部品と機能だけで組み立てます\n・現実の製品としての安全性や実現性は保証しません", LabTheme.FontSmall, h: 180);
                 Para(_body, "段階表示は実際の処理段階に対応しています（進捗率は表示しません）。", LabTheme.FontSmall, h: 32);
                 var a = UiKit.Row("Actions", _body, LabTheme.Space2, 64);
                 UiKit.Button(a, "キャンセル", App.CancelGeneration, ButtonStyle.Secondary, 260);
@@ -370,15 +370,17 @@ namespace ImpossibleLab
             var dna = s == LabState.AwaitingApproval ? App.Preview : App.Current?.Current ?? App.Preview;
             if (dna == null) return;
             var cols = UiKit.Row("Preview", _body, LabTheme.Space3); UiKit.Size(cols, flexH: 1);
-            var c1 = UiKit.Column("Info", cols, LabTheme.Space1); UiKit.Size(c1, flexW: 1);
+            cols.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().childAlignment = TextAnchor.UpperLeft; // 行数が少ないページでも上に揃える
+            // 左列：設計の概要（名前・目的・分類・検証結果）
+            var c1 = UiKit.Column("Info", cols, LabTheme.Space1); UiKit.Size(c1, w: 430);
             Para(c1, $"<b><color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>{dna.Name}</color></b>", LabTheme.FontHeading, h: 42);
-            Para(c1, "目的：" + dna.Purpose, LabTheme.FontBody, h: 70);
-            Para(c1, $"分類：{LabCatalog.TagsJa(dna.Tags)}　｜　取り付け：{LabCatalog.Mount(dna.Mount)?.LabelJa ?? dna.Mount}　｜　部品 {dna.Parts.Count} / 上限 {dna.Constraints.MaxParts}", LabTheme.FontBody, h: 36);
+            Para(c1, "目的：" + dna.Purpose, LabTheme.FontSmall, LabTheme.TextPrimary, 60);
+            Para(c1, $"分類：{LabCatalog.TagsJa(dna.Tags)}\n取り付け：{LabCatalog.Mount(dna.Mount)?.LabelJa ?? dna.Mount}　部品 {dna.Parts.Count} / 上限 {dna.Constraints.MaxParts}", LabTheme.FontSmall, h: 60);
             var rep = App.LastOutcome?.Report;
             Para(c1, "検証：" + (rep != null ? rep.Summary : "—") + (App.LastOutcome != null ? "\n" + App.LastOutcome.Message : ""), LabTheme.FontSmall, LabTheme.AccentLight, 64);
-            var c2 = UiKit.Column("Behaviors", cols, LabTheme.Space1); UiKit.Size(c2, flexW: 1);
-            UiKit.Heading(c2, "動作（機能モジュール）", 26);
-            foreach (var p in App.LastOutcome?.DesignPoints ?? new List<string>()) Para(c2, "・" + p, LabTheme.FontSmall, LabTheme.TextPrimary, 62);
+            // 右列：機能対応表
+            var c2 = UiKit.Column("FunctionMap", cols, 6); UiKit.Size(c2, flexW: 1);
+            BuildFunctionMap(c2, dna);
 
             if (s == LabState.AwaitingApproval)
             {
@@ -389,10 +391,75 @@ namespace ImpossibleLab
                 UiKit.Button(a, "承認して組み立てる ▶", App.ApprovePreview, ButtonStyle.Primary, 420, 68);
             }
 
+            UiKit.Heading(_leftBody, "設計の要点", 26);
+            var points = App.LastOutcome?.DesignPoints ?? new List<string>();
+            CappedLines(_leftBody, points.Select(p => ("・" + p, LabTheme.FontSmall, LabTheme.TextPrimary, 56f)).ToList(), 4);
+            if (points.Count == 0) Para(_leftBody, "（要点の説明はありません）", LabTheme.FontSmall, h: 30);
+            Para(_leftBody, "現実の製品としての安全性や実現性は保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 30);
+
             SideHeading(_rightBody, "PARTS", "採用機能と部品");
             var lines = dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）", LabTheme.FontBody, LabTheme.TextPrimary, 38f))
                 .Concat(dna.Behaviors.Select(b => ($"◆ {LabCatalog.Behavior(b.Type)?.LabelJa} → {b.TargetPart}", LabTheme.FontSmall, LabTheme.AccentLight, 34f))).ToList();
             CappedLines(_rightBody, lines, 9);
+        }
+
+        // ---- 機能対応表（S02）：要望ごとに ✓ 検証する／△ 単純化して検証／× 検証できない。記号・色・文字の3つで区別する ----
+        // （✕ U+2715 は日本語フォントに無く□になるため × U+00D7 を使う）
+        int _needPage;
+        string _needPageFor;
+        const int NeedsPerPage = 4;
+        public int NeedPage => _needPage;
+        public void StepNeedPage(int dir) { _needPage = Mathf.Max(0, _needPage + dir); Refresh(); }
+
+        void BuildFunctionMap(RectTransform parent, InventionDna dna)
+        {
+            var rows = App.FunctionRows(dna, out bool derived);
+            if (_needPageFor != dna.Id + "#" + dna.Revision) { _needPageFor = dna.Id + "#" + dna.Revision; _needPage = 0; }
+            int pages = Mathf.Max(1, (rows.Count + NeedsPerPage - 1) / NeedsPerPage);
+            _needPage = Mathf.Clamp(_needPage, 0, pages - 1);
+            var (sim, simp, unv) = FunctionMapView.Count(rows);
+
+            var head = UiKit.Row("MapHead", parent, LabTheme.Space1, 48);
+            var h = UiKit.Heading(head, "機能対応表", 26); UiKit.Size(h, w: 170);
+            var cnt = UiKit.Text(head, $"<color=#{LabTheme.ToHex(LabTheme.AccentLight)}>✓ 検証 {sim}</color>　<color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>△ 単純化 {simp}</color>　<color=#{LabTheme.ToHex(LabTheme.AccentWarning)}>× 検証できない {unv}</color>",
+                LabTheme.FontSmall, align: TextAlignmentOptions.MidlineLeft);
+            UiKit.Size(cnt, flexW: 1);
+            if (pages > 1)
+            {
+                var prev = UiKit.Button(head, "◀", () => StepNeedPage(-1), ButtonStyle.Secondary, 56, 48);
+                UiKit.SetInteractable(prev, _needPage > 0);
+                var pt = UiKit.Text(head, $"{_needPage + 1}/{pages}", LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.Center); UiKit.Size(pt, w: 60);
+                var next = UiKit.Button(head, "▶", () => StepNeedPage(+1), ButtonStyle.Secondary, 56, 48);
+                UiKit.SetInteractable(next, _needPage < pages - 1);
+            }
+            if (derived)
+                Para(parent, "AI の対応表がない設計のため、機能ごとに「この版の実験で動くか」を表示しています", LabTheme.FontSmall, LabTheme.TextSecondary, 28);
+            if (rows.Count == 0) { Para(parent, "機能がありません", LabTheme.FontSmall, h: 30); return; }
+            foreach (var r in rows.Skip(_needPage * NeedsPerPage).Take(NeedsPerPage)) NeedRow(parent, r);
+        }
+
+        void NeedRow(Transform parent, FunctionRow r)
+        {
+            var row = UiKit.Row("Need", parent, LabTheme.Space2, 62);
+            var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
+            row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(8, 12, 3, 3);
+            string icon = r.Status == "simulated" ? "✓" : r.Status == "simplified" ? "△" : "×";
+            string label = r.Status == "simulated" ? "検証する" : r.Status == "simplified" ? "単純化" : "検証できない";
+            Color c = r.Status == "simulated" ? LabTheme.AccentLight : r.Status == "simplified" ? LabTheme.TextSecondary : LabTheme.AccentWarning;
+            var badge = UiKit.Badge(row, $"{icon} {label}", c, LabTheme.BgDeep, 176);
+            UiKit.Size(badge.transform.parent.GetComponent<RectTransform>(), h: 48);
+            string sub = LabTheme.ToHex(LabTheme.TextSecondary);
+            string detail;
+            if (!r.Verifiable) detail = "理由：" + (r.Note.Length > 0 ? r.Note : "（理由の記載なし）");
+            else
+            {
+                detail = (r.BlocksJa.Length > 0 ? "機能：" + r.BlocksJa + "　" : "") +
+                    (r.PlanTitle != null ? $"実験：{r.PlanTitle}" : $"<color=#{LabTheme.ToHex(LabTheme.AccentWarning)}>⚠ この版の実験の候補では動かない</color>");
+                // 単純化は「何を単純化したか」を優先して出す（2行目は1行に収める）
+                if (r.Status == "simplified" && r.Note.Length > 0) detail = (r.PlanTitle != null ? $"実験：{r.PlanTitle}　" : "") + "単純化：" + r.Note;
+            }
+            var t = UiKit.Text(row, $"{Short(r.Need, 34)}\n<size=82%><color=#{sub}>{Short(detail, 42)}</color></size>", LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.MidlineLeft);
+            UiKit.Size(t, flexW: 1);
         }
 
         void BuildError()
@@ -588,7 +655,9 @@ namespace ImpossibleLab
                 string tag = c.FromAi ? "AI案" : "標準";
                 // 1件でも横いっぱいに伸ばさない（選択肢が1つだと分かるように）。6件で 1 行に収まる幅
                 float tabW = Mathf.Min(300f, (MainW - 2 * LabTheme.Space3 - 64 - LabTheme.Space1 * 7) / Mathf.Max(1, App.PlanOptions.Count));
-                UiKit.Button(tabs, $"<size=72%><color=#{LabTheme.ToHex(sel ? LabTheme.BgDeep : LabTheme.AccentLight)}>{tag}</color></size>\n{Short(c.Title, 11)}",
+                // 名前は1行に収める（全角 22px として、ボタンの左右の余白を除いた文字数）
+                int chars = Mathf.Max(4, Mathf.FloorToInt((tabW - 28f) / LabTheme.FontSmall));
+                UiKit.Button(tabs, $"<size=72%><color=#{LabTheme.ToHex(sel ? LabTheme.BgDeep : LabTheme.AccentLight)}>{tag}</color></size>\n{Short(c.Title, chars)}",
                     () => App.SelectPlan(idx), sel ? ButtonStyle.Selected : ButtonStyle.Secondary, tabW, 60, LabTheme.FontSmall);
             }
             var tabFill = UiKit.Rect("Fill", tabs); UiKit.Size(tabFill, flexW: 1);

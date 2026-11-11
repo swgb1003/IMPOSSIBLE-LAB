@@ -59,7 +59,7 @@ namespace ImpossibleLab
                     case "move_forward":
                         // 発明台での試用では見た目の変化なし。性能は実験場（CourseSimulator）で計測する
                         behavior = root.AddComponent<PassiveBehavior>(); ((PassiveBehavior)behavior).Type = b.Type; break;
-                    default: result.Warnings.Add($"機能 {b.Type} はこの版では見た目のみ（動作モジュール未実装）"); break;
+                    default: result.Warnings.Add($"「{LabCatalog.Behavior(b.Type)?.LabelJa ?? b.Type}」は試用では動きません（実験では計算します）"); break;
                 }
                 if (behavior == null) continue;
                 behavior.Configure(b, view);

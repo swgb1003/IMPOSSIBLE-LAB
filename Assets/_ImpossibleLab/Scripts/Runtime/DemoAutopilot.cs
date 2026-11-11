@@ -438,6 +438,47 @@ namespace ImpossibleLab
                 yield return Shot("S03_edit_ai_p3");
             }
 
+            // 6週目 S02・S04：AI v2 の設計（記録した応答 r03：要望5件・実験計画3案）。機能対応表のページ送り → AI 案を選んで実行
+            string fixtureV2 = Path.Combine(Application.dataPath, "_ImpossibleLab/Tests/EditMode/Fixtures/ai_design_v2_r03.json");
+            Check(File.Exists(fixtureV2), "AI v2 design fixture exists");
+            if (File.Exists(fixtureV2))
+            {
+                _app.SetDesignServiceForVerify(new FixtureDesignService(File.ReadAllText(fixtureV2)));
+                _app.NewInvention();
+                _app.SetRequestText("暑い日の通学で日陰がほしい");
+                float wait2 = 0;
+                while (_app.Sm.State == LabState.Drafting && wait2 < 10f) { _app.SubmitRequest(); wait2 += Time.unscaledDeltaTime; yield return null; }
+                yield return WaitState(LabState.AwaitingApproval);
+                var mapRows = _app.FunctionRows(_app.Preview, out bool mapDerived);
+                Check(mapRows.Count == 5 && !mapDerived && mapRows.Any(r => !r.Verifiable) && mapRows.Where(r => r.Verifiable).All(r => r.PlanTitle != null),
+                    $"S02: AI function map ({mapRows.Count} rows, derived={mapDerived}, plans={string.Join(",", mapRows.Select(r => r.PlanTitle ?? "-"))})");
+                yield return Shot("S02_function_map_ai_p1");
+                var ui2 = FindFirstObjectByType<LabUI>();
+                ui2.StepNeedPage(+1);
+                yield return null;
+                Check(ui2.NeedPage == 1, "S02: function map moves to page 2");
+                yield return Shot("S02_function_map_ai_p2");
+                _app.ApprovePreview();
+                yield return WaitState(LabState.Editing);
+                _app.GoToTestSetup();
+                yield return WaitState(LabState.ConfiguringTest);
+                Check(_app.PlanOptions.Count(c => c.FromAi) == 3 && _app.SelectedPlan.FromAi, $"S04: AI plans listed first ({_app.PlanOptions.Count(c => c.FromAi)} AI / {_app.PlanOptions.Count})");
+                yield return Shot("S04_plan_ai");
+                _app.SelectPlan(1);
+                yield return null;
+                Check(_app.PlanIndex == 1 && _app.SelectedPlan.FromAi, "S04: second AI plan selected");
+                float tw2 = 0; while (_app.Transitioning && tw2 < 10f) { tw2 += Time.unscaledDeltaTime; yield return null; }
+                _app.StartExperiment();
+                yield return WaitState(LabState.RunningTest);
+                yield return WaitState(LabState.ReviewingResult, 60f);
+                var ra = _app.LastResult;
+                Check(ra != null && ra.IsScenarioLab && ra.Metrics.Count > 0, $"S05: AI plan ran ({ra?.Criteria})");
+                Log($"RESULT plan-ai passed={ra?.Passed} {string.Join(" ", ra?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])} | {ra?.Criteria}");
+                yield return Shot("S05_result_plan_ai", rainLab: true);
+                _app.BackToEditing();
+                yield return WaitState(LabState.Editing);
+            }
+
             // 6週目 S04：組み立て式の実験（機能ブロック）を実験計画で選び・編集して実行する
             yield return PlanLabFlow("light", @"{ ""schemaVersion"": 2, ""id"": ""verify-night-light"", ""name"": ""夜道の足元ライト"", ""purpose"": ""夜道で足元を照らし、周りに知らせる"", ""tags"": [""lighting""], ""mount"": ""back"",
   ""parts"": [ { ""id"": ""body"", ""type"": ""body"", ""position"": [0, 0, 0], ""scale"": [0.12, 0.08, 0.04] }, { ""id"": ""lamp"", ""type"": ""light"", ""position"": [0, 0.06, 0.03], ""scale"": [0.04, 0.04, 0.04] } ],

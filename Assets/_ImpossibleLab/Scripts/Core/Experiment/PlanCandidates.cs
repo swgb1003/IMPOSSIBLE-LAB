@@ -125,6 +125,32 @@ namespace ImpossibleLab.Core
             return $"{p.Scenario}|{p.Seed}|{p.DurationSec.ToString("0.###", ci)}|{string.Join(";", mods)}";
         }
 
+        /// <summary>既存の実験場で、モデルが使う機能（計測項目の AnyBlocks に出てこないものを含む）。</summary>
+        static readonly Dictionary<string, string[]> LegacyBlocks = new Dictionary<string, string[]>
+        {
+            [ExperimentCatalog.Stand] = new[] { "rain_shield", "follow_head", "stabilize" },
+            [ExperimentCatalog.WalkRoute] = new[] { "follow_user", "avoid_obstacle", "carry_load" },
+            [ExperimentCatalog.FlyToTarget] = new[] { "hover", "move_forward", "stabilize" },
+        };
+
+        /// <summary>
+        /// この計画で、発明のどの機能が実際に動いて結果に効くか。組み立て式の実験は「測れる計測項目が必要とする機能」、
+        /// 既存の実験場はそのモデルが使う機能。
+        /// </summary>
+        public static HashSet<string> BlocksExercised(ExperimentPlan plan, InventionDna dna)
+        {
+            var set = new HashSet<string>();
+            if (plan == null || dna == null) return set;
+            if (IsLegacy(plan) && LegacyBlocks.TryGetValue(plan.Scenario, out var used))
+            {
+                foreach (var b in used) if (dna.FindBehavior(b) != null) set.Add(b);
+                return set;
+            }
+            foreach (var m in PlanEditor.ExpectedMetrics(plan, dna))
+                foreach (var b in m.AnyBlocks) if (dna.FindBehavior(b) != null) set.Add(b);
+            return set;
+        }
+
         public static string ScenarioLabel(string id) => ExperimentCatalog.Scenario(id)?.LabelJa ?? id;
 
         static string Short(string s, int max) => string.IsNullOrEmpty(s) ? "" : s.Length > max ? s.Substring(0, max) + "…" : s;
