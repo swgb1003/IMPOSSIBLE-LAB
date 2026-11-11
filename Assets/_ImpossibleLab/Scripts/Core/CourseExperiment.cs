@@ -176,7 +176,18 @@ namespace ImpossibleLab.Core
             if (r.IsScenarioLab)
             {
                 // 組み立て式の実験：満たさなかった合格条件・制限をそのまま改良の手がかりにする
-                foreach (var l in r.Limits.Take(3)) h.Add(l + " → S03 で改良を依頼");
+                // 合格条件の不足は判定の行に出ているため、ここでは「何を改良するか」だけを短く出す
+                const string unmet = "合格条件を満たさない：";
+                foreach (var l in r.Limits.Take(3))
+                {
+                    if (l.StartsWith(unmet, System.StringComparison.Ordinal))
+                    {
+                        string rest = l.Substring(unmet.Length);
+                        int sp = rest.IndexOf(' ');
+                        h.Add($"「{(sp > 0 ? rest.Substring(0, sp) : rest)}」が目標に届かない → S03 で改良を依頼");
+                    }
+                    else h.Add(l + " → S03 で改良を依頼");
+                }
                 if (h.Count == 0) h.Add("合格条件をすべて満たしました。条件を厳しくして試してください");
                 return h;
             }

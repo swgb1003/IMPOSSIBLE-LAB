@@ -975,7 +975,7 @@ namespace ImpossibleLab
             }
             else Para(c2, "比較対象なし：同じ条件の別の版、または別モードの結果がまだありません。改良して再実験するか、モードを切り替えてください。", LabTheme.FontSmall, h: 100);
             UiKit.Heading(c2, "改善案（計測値からの規則）", 24);
-            foreach (var h in App.ImprovementHints(r).Take(3)) Para(c2, "・" + h, LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+            foreach (var h in App.ImprovementHints(r).Take(2)) Para(c2, "・" + Short(h, 64), LabTheme.FontSmall, LabTheme.TextPrimary, 30);
 
             var a2 = UiKit.Row("Actions", _body, LabTheme.Space1, 68);
             UiKit.Button(a2, "同じ条件で再実験", App.RerunSameConditions, ButtonStyle.Secondary, 280);
@@ -992,16 +992,33 @@ namespace ImpossibleLab
         {
             bool ok = r.Success;
             Title("実験結果", $"Rev.{r.Revision} ／ {r.DescribeConditions()}");
+            var checks = ResultCriteria.Evaluate(r);
+            int passedN = checks.Count(c => c.Passed);
             var verdictRow = UiKit.Row("Verdict", _body, LabTheme.Space2, 60);
             var vb = UiKit.Badge(verdictRow, ok ? "✓ 成功" : "! 要改良", ok ? LabTheme.AccentLight : LabTheme.AccentWarning, LabTheme.BgDeep, 220);
             UiKit.Size(vb.transform.parent.GetComponent<RectTransform>(), h: 56);
-            var crit = UiKit.Text(verdictRow, "合格条件：" + r.Criteria, LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.MidlineLeft);
+            // 合格条件はすべて満たしたのに不合格（積荷を運べない・電池切れなど、モデルが決める条件）のときは、その理由を出す
+            string why = checks.Count == 0 ? "合格条件なし（測れる計測項目に目安がない）"
+                : ok ? $"合格条件 {checks.Count} 件をすべて満たしました"
+                : passedN < checks.Count ? $"合格条件 {passedN} / {checks.Count} 件を満たしました"
+                : "合格条件は満たしましたが、" + (r.Limits.FirstOrDefault() ?? "ほかの条件を満たしません");
+            var crit = UiKit.Text(verdictRow, why, LabTheme.FontBody, ok ? LabTheme.TextPrimary : LabTheme.AccentWarning, align: TextAlignmentOptions.MidlineLeft);
             UiKit.Size(crit, flexW: 1);
 
             var cols = UiKit.Row("Cols", _body, LabTheme.Space3); UiKit.Size(cols, flexH: 1);
-            var c1 = UiKit.Column("Metrics", cols, 4); UiKit.Size(c1, flexW: 1);
-            UiKit.Heading(c1, r.IsScenarioLab ? "計測値（簡易モデルの計算）" : "計測値（Unityシミュレーションの実測）", 24);
-            foreach (var m in r.Metrics.Take(7)) Metric(c1, (m.Primary ? "" : "参考：") + m.LabelJa, m.Display, 200);
+            cols.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().childAlignment = TextAnchor.UpperLeft;
+            var c1 = UiKit.Column("Metrics", cols, 4); UiKit.Size(c1, w: 700); // 固定幅（右列の長い文に押されて狭くならないように）
+            UiKit.Heading(c1, "合格条件ごとの判定" + (r.IsScenarioLab ? "（簡易モデルの計算）" : "（シミュレーションの実測）"), 24);
+            foreach (var c in checks.Take(4)) CriterionRow(c1, c);
+            // 合格条件にない計測値（主なもの）を残りの行に
+            var judged = new HashSet<string>(checks.Select(c => c.Metric));
+            var others = r.Metrics.Where(m => !judged.Contains(m.Key)).OrderBy(m => m.Primary ? 0 : 1).ToList();
+            int room = checks.Count <= 2 ? 3 : 1; // 判定の行（52px）が多いときは、残りの計測値を減らしてパネル内に収める
+            if (others.Count > 0)
+            {
+                UiKit.Heading(c1, "そのほかの計測値", 22);
+                foreach (var m in others.Take(room)) Metric(c1, (m.Primary ? "" : "参考：") + m.LabelJa, m.Display, 200);
+            }
 
             var c2 = UiKit.Column("Compare", cols, 4); UiKit.Size(c2, flexW: 1);
             UiKit.Heading(c2, "同一条件での比較", 24);
@@ -1019,7 +1036,7 @@ namespace ImpossibleLab
             }
             else Para(c2, "比較対象なし：同じ条件の別の版、または別モードの結果がまだありません。改良して再実験するか、モードを切り替えてください。", LabTheme.FontSmall, h: 100);
             UiKit.Heading(c2, "改善案（計測値からの規則）", 24);
-            foreach (var h in App.ImprovementHints(r).Take(3)) Para(c2, "・" + h, LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+            foreach (var h in App.ImprovementHints(r).Take(2)) Para(c2, "・" + Short(h, 64), LabTheme.FontSmall, LabTheme.TextPrimary, 30);
 
             var a2 = UiKit.Row("Actions", _body, LabTheme.Space1, 68);
             UiKit.Button(a2, "同じ条件で再実験", App.RerunSameConditions, ButtonStyle.Secondary, 280);
@@ -1029,6 +1046,23 @@ namespace ImpossibleLab
             UiKit.Button(a2, "改良して再実験 ▶", App.ImproveAndRetest, ButtonStyle.Primary, 340, 68);
             BuildMethodPanel(r.Config, r);
             BuildBridgePanel();
+        }
+
+        /// <summary>合格条件1件：達成／未達／測れない を記号・色・文字で区別し、目標と実測を並べる。</summary>
+        void CriterionRow(Transform parent, CriterionCheck c)
+        {
+            var row = UiKit.Row("Crit_" + c.Metric, parent, LabTheme.Space1, 52);
+            var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
+            row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(6, 10, 2, 2);
+            string label = !c.Measured ? "— 測れず" : c.Passed ? "✓ 達成" : "× 未達";
+            Color col = !c.Measured ? LabTheme.TextSecondary : c.Passed ? LabTheme.AccentLight : LabTheme.AccentWarning;
+            var badge = UiKit.Badge(row, label, col, LabTheme.BgDeep, 116);
+            UiKit.Size(badge.transform.parent.GetComponent<RectTransform>(), h: 44);
+            string sub = LabTheme.ToHex(LabTheme.TextSecondary);
+            var t = UiKit.Text(row, c.Target + (c.Reason.Length > 0 ? $"\n<size=80%><color=#{sub}>{Short(c.Reason, 30)}</color></size>" : ""), LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.MidlineLeft);
+            UiKit.Size(t, flexW: 1);
+            var v = UiKit.Text(row, c.Actual, LabTheme.FontSmall, col, bold: true, align: TextAlignmentOptions.MidlineRight);
+            UiKit.Size(v, w: 150);
         }
 
         void Metric(Transform parent, string label, string value, float valueWidth = 400)
@@ -1054,9 +1088,9 @@ namespace ImpossibleLab
             if (r != null && r.IsScenarioLab)
             {
                 // 組み立て式の実験：計算の前提は結果に入っている（ScenarioRunner が書く）
-                CappedLines(_leftBody, r.Assumptions.Select(x => ("・" + x, LabTheme.FontSmall, LabTheme.TextPrimary, 60f)).ToList(), 3);
-                Para(_leftBody, "・簡易モデルの計算を開始時に一括で行い、実験場では記録を再生（シード固定で再現可能）", LabTheme.FontSmall, h: 34);
-                foreach (var l in r.Limits.Take(2)) Para(_leftBody, "⚠ " + l, LabTheme.FontSmall, LabTheme.AccentWarning, 64);
+                CappedLines(_leftBody, r.Assumptions.Select(x => ("・" + Short(x, 64), LabTheme.FontSmall, LabTheme.TextPrimary, 60f)).ToList(), 3);
+                Para(_leftBody, "・計算は開始時に一括、実験場では記録を再生（シード固定で再現可能）", LabTheme.FontSmall, h: 34);
+                foreach (var l in r.Limits.Take(1)) Para(_leftBody, "⚠ " + Short(l, 64), LabTheme.FontSmall, LabTheme.AccentWarning, 64);
                 return;
             }
             if (cfg.Environment == LabEnvironments.ObstacleCourse)
@@ -1080,43 +1114,41 @@ namespace ImpossibleLab
             if (r != null) foreach (var s in r.Limits.Take(2)) Para(_leftBody, "⚠ " + s, LabTheme.FontSmall, LabTheme.AccentWarning, 64);
         }
 
+        /// <summary>
+        /// 右パネル（S05）：上＝要望の検証状況（この実験で確かめた／別の実験で確かめる／検証できない）、
+        /// 下＝現実化の課題（仕様：参考技術と課題、根拠と不確実性を明示）。
+        /// </summary>
         void BuildBridgePanel()
         {
-            SideHeading(_rightBody, "REALITY LAB", "現実化の課題（推定・要調査を含む）");
-            var curDna = App.Current?.Current;
-            string cat = curDna?.Category;
-            if (string.IsNullOrEmpty(cat) && curDna != null)
+            var dna = App.Current?.Current;
+            var res = App.Sm.State == LabState.ReviewingResult ? App.LastResult : null;
+            var plan = res != null ? ResultCriteria.PlanOf(res) : App.RunningPlan ?? ExperimentPlan.FromConfig(App.TestConfig);
+            SideHeading(_rightBody, "REQUESTS", "要望の検証状況");
+            if (dna != null)
             {
-                var unv = curDna.FunctionMap.Where(f => f.Status == "unverifiable").ToList();
-                var simp = curDna.FunctionMap.Where(f => f.Status == "simplified").ToList();
-                Para(_rightBody, "<b>現実の目的</b>：" + Short(curDna.Purpose, 60), LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-                if (unv.Count > 0) Para(_rightBody, "<b>この実験では検証できない要望</b>：" + string.Join("、", unv.Take(3).Select(f => Short(f.Need, 24))), LabTheme.FontSmall, LabTheme.AccentWarning, 64);
-                if (simp.Count > 0) Para(_rightBody, "<b>単純化して検証した要望</b>：" + string.Join("、", simp.Take(3).Select(f => Short(f.Need, 24))), LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-                Para(_rightBody, "<b>追加検証</b>：試作品での計測、係数の出典確認（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 34);
-                Para(_rightBody, "この表示は工学的な実現性・安全性を保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 34);
-                return;
+                var rows = App.RequestRows(dna, plan, out bool derived);
+                // 1グループ＝2行まで（側面パネルは1行約21文字）。理由や実験名は S02・S04 にある
+                string Names(IEnumerable<FunctionRow> xs) => Short(string.Join("、", xs.Select(x => x.Need)), 28);
+                var here = rows.Where(x => x.CoveredHere).ToList();
+                var elsewhere = rows.Where(x => x.Verifiable && !x.CoveredHere && x.PlanTitle != null).ToList();
+                var none = rows.Where(x => x.Verifiable && !x.CoveredHere && x.PlanTitle == null).ToList();
+                var unv = rows.Where(x => !x.Verifiable).ToList();
+                string verb = res != null ? "確かめた" : "確かめる";
+                Para(_rightBody, $"✓ この実験で{verb} {here.Count}：" + (here.Count > 0 ? Names(here) : "なし"), LabTheme.FontSmall, LabTheme.AccentLight, 30);
+                if (elsewhere.Count > 0) Para(_rightBody, $"→ 別の実験で {elsewhere.Count}：" + Names(elsewhere), LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+                if (none.Count > 0) Para(_rightBody, $"⚠ 実験の候補なし {none.Count}：" + Names(none), LabTheme.FontSmall, LabTheme.AccentWarning, 30);
+                if (unv.Count > 0) Para(_rightBody, $"× 検証できない {unv.Count}：" + Names(unv), LabTheme.FontSmall, LabTheme.AccentWarning, 30);
+                if (derived) Para(_rightBody, "（AI の対応表なし：機能ごと）", LabTheme.FontSmall, LabTheme.TextSecondary, 28);
             }
-            if (cat == "carrier")
-            {
-                Para(_rightBody, "<b>現実の目的</b>：買い物・介護・配送などで重い荷物を持たずに移動する", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-                Para(_rightBody, "<b>近い既知技術</b>：追従型の運搬ロボット・配送ロボット（具体例・性能は要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-                Para(_rightBody, "<b>未解決の課題</b>：人混みや段差での安全、持ち主の見失い、歩道走行のルール（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
-                Para(_rightBody, "この表示は工学的な実現性・安全性を保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 34);
-                return;
-            }
-            if (cat == "mobility")
-            {
-                Para(_rightBody, "<b>現実の目的</b>：短い距離を、段差や混雑を越えて移動する", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-                Para(_rightBody, "<b>最大の課題</b>：人を浮かせる電力。REALITY の推定では数十〜数百 kW が必要で、靴に載る電池では数秒しか浮けない", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
-                Para(_rightBody, "<b>ほかの課題</b>：噴流・騒音・転落の安全、法規制（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-                Para(_rightBody, "この表示は工学的な実現性・安全性を保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 34);
-                return;
-            }
-            Para(_rightBody, "<b>現実の目的</b>：両手がふさがった状態での雨対策", LabTheme.FontSmall, LabTheme.TextPrimary, 34);
-            Para(_rightBody, "<b>近い既知技術</b>：ドローン・頭上追従カメラ等（具体例は要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-            Para(_rightBody, "<b>未解決の課題</b>：バッテリー持続、プロペラの安全性、騒音、強風時の制御、法規制（要調査）", LabTheme.FontSmall, LabTheme.TextPrimary, 92);
-            Para(_rightBody, "<b>追加検証</b>：実機の重量・推力測定、風洞試験、安全基準の確認", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
-            Para(_rightBody, "この表示は工学的な実現性・安全性を保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 34);
+            UiKit.Divider(_rightBody);
+            UiKit.Heading(_rightBody, "現実化の課題（推定・要調査を含む）", 24);
+            string cat = dna?.Category;
+            string bridge = cat == "carrier" ? "<b>近い技術</b>：追従型の運搬ロボット\n<b>課題</b>：人混み・段差の安全、歩道のルール"
+                : cat == "mobility" ? "<b>課題</b>：人を浮かせる電力（推定で数十〜数百 kW）、噴流・転落の安全、法規制"
+                : cat == "protection" ? "<b>近い技術</b>：ドローン・頭上追従カメラ\n<b>課題</b>：電池、プロペラの安全、騒音、強風"
+                : "<b>課題</b>：試作品での計測と、係数の出典の確認";
+            Para(_rightBody, bridge, LabTheme.FontSmall, LabTheme.TextPrimary, 60);
+            Para(_rightBody, "※実現性・安全性は保証しません", LabTheme.FontSmall, LabTheme.AccentWarning, 30);
         }
 
         void Update() { if (_liveText != null) UpdateLive(); }

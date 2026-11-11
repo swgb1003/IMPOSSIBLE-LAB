@@ -9,6 +9,9 @@ namespace ImpossibleLab.Core
         public string Need = "", Status = "simulated", Note = "";
         /// <summary>使う機能ブロック（日本語、「・」区切り）。</summary>
         public string BlocksJa = "";
+        public List<string> Blocks = new List<string>();
+        /// <summary>結果画面用：表示中の実験で、この要望の機能が動いたか（ForResult で入る）。</summary>
+        public bool CoveredHere;
         /// <summary>この要望を確かめる実験計画の候補（なければ null）。</summary>
         public string PlanTitle;
         public bool Verifiable => Status != "unverifiable";
@@ -37,6 +40,7 @@ namespace ImpossibleLab.Core
                     {
                         Need = n.Need, Status = n.Status, Note = n.Note ?? "",
                         BlocksJa = string.Join("・", n.Blocks.Select(b => LabCatalog.Behavior(b)?.LabelJa ?? b)),
+                        Blocks = new List<string>(n.Blocks),
                         PlanTitle = n.Status == "unverifiable" ? null : PlanFor(n.Blocks),
                     });
                 return rows;
@@ -51,11 +55,24 @@ namespace ImpossibleLab.Core
                 {
                     Need = info?.LabelJa ?? b.Type,
                     BlocksJa = info?.LabelJa ?? b.Type,
+                    Blocks = new List<string> { b.Type },
                     Status = plan != null ? "simulated" : "unverifiable",
                     Note = plan != null ? "" : "この版の実験では動かない（試用で動きを見るだけ）",
                     PlanTitle = plan,
                 });
             }
+            return rows;
+        }
+
+        /// <summary>
+        /// 結果画面（S05）用：要望ごとに、この実験（plan）で機能が動いたかを入れる。
+        /// 動かなかった「検証する」要望は、別の候補の実験名（PlanTitle）で確かめられる。
+        /// </summary>
+        public static List<FunctionRow> ForResult(InventionDna dna, IList<PlanCandidate> candidates, ExperimentPlan plan, out bool derived)
+        {
+            var rows = Build(dna, candidates, out derived);
+            var here = PlanCandidates.BlocksExercised(plan, dna);
+            foreach (var r in rows) r.CoveredHere = r.Verifiable && r.Blocks.Any(here.Contains);
             return rows;
         }
 

@@ -509,6 +509,15 @@ namespace ImpossibleLab
             return FunctionMapView.Build(dna, PlanCandidates.Build(dna, ai), out derived);
         }
 
+        /// <summary>
+        /// S05 の「要望の検証状況」：要望ごとに、表示中の実験（plan）で機能が動いたか・別の候補で確かめるか・検証できないか。
+        /// </summary>
+        public List<FunctionRow> RequestRows(InventionDna dna, ExperimentPlan plan, out bool derived)
+        {
+            var ai = LastOutcome != null && LastOutcome.Dna != null && dna != null && LastOutcome.Dna.Id == dna.Id ? LastOutcome.Plans : new List<ProposedPlan>();
+            return FunctionMapView.ForResult(dna, PlanCandidates.Build(dna, ai), plan, out derived);
+        }
+
         /// <summary>画面の作り直しの判定用。</summary>
         public string PlanSignature => $"{PlanIndex}/{PlanOptions.Count}/{(EditPlan != null ? PlanCandidates.ConditionKey(EditPlan) : "")}";
 

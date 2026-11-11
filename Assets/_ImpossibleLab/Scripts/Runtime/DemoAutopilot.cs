@@ -544,6 +544,9 @@ namespace ImpossibleLab
             Check(r != null && PlanCandidates.ConditionKey(r.Plan) == key, $"plan-{tag}: result keeps the edited plan");
             Log($"RESULT plan-{tag} {r?.Plan?.Mode} passed={r?.Passed} {string.Join(" ", r?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])} | {r?.Criteria}");
             yield return Shot($"S05_result_plan_{tag}", rainLab: true);
+            var texts = FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None).Select(t => t.text).ToList();
+            Check(texts.Any(t => t.StartsWith("合格条件ごとの判定", StringComparison.Ordinal)) && texts.Any(t => t == "✓ 達成" || t == "× 未達")
+                && texts.Any(t => t.StartsWith("✓ この実験で確かめた", StringComparison.Ordinal)), $"plan-{tag}: S05 shows per-criterion verdicts and request coverage");
             _app.RerunOtherMode();
             yield return WaitState(LabState.ReviewingResult, 60f);
             var r2 = _app.LastResult;
