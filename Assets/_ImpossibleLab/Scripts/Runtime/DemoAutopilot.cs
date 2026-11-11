@@ -493,6 +493,12 @@ namespace ImpossibleLab
   ""parts"": [ { ""id"": ""body"", ""type"": ""body"", ""position"": [0, 0, 0], ""scale"": [0.4, 0.2, 0.4] }, { ""id"": ""arm"", ""type"": ""arm"", ""position"": [0, 0.3, 0], ""scale"": [0.05, 0.6, 0.05] } ],
   ""behaviors"": [ { ""type"": ""lift_load"", ""targetPart"": ""arm"", ""parameters"": { ""maxLoadKg"": 10, ""liftHeightM"": 1.2, ""speed"": 0.3 } } ], ""revision"": 1, ""parentRevision"": null }",
                 ExperimentCatalog.LiftTask, "liftTime", addModule: null, stepModule: "shelf", stepKey: "heightM");
+            yield return PlanLabFlow("cart", @"{ ""schemaVersion"": 2, ""id"": ""verify-ramp-cart"", ""name"": ""スロープ運搬カート"", ""purpose"": ""荷物を載せて車いす用スロープを上る"", ""tags"": [""carrier""], ""mount"": ""ground"",
+  ""parts"": [ { ""id"": ""body"", ""type"": ""container"", ""position"": [0, 0.25, 0], ""scale"": [0.5, 0.25, 0.4] }, { ""id"": ""w1"", ""type"": ""wheel"", ""position"": [0.2, 0.08, 0.2], ""scale"": [0.16, 0.05, 0.16] },
+             { ""id"": ""w2"", ""type"": ""wheel"", ""position"": [-0.2, 0.08, 0.2], ""scale"": [0.16, 0.05, 0.16] }, { ""id"": ""m"", ""type"": ""motor"", ""position"": [0, 0.1, 0], ""scale"": [0.08, 0.08, 0.08] } ],
+  ""behaviors"": [ { ""type"": ""drive"", ""targetPart"": ""m"", ""parameters"": { ""speedLimit"": 0.8, ""maxSlopeDeg"": 8 } },
+                   { ""type"": ""carry_load"", ""targetPart"": ""body"", ""parameters"": { ""capacity"": 10 } } ], ""revision"": 1, ""parentRevision"": null }",
+                ExperimentCatalog.ClimbSlope, "climbedRatio", addModule: null, stepModule: "slope", stepKey: "angleDeg");
             Time.timeScale = 1f;
         }
 
@@ -513,6 +519,9 @@ namespace ImpossibleLab
             _app.TestConfig.Mode = LabModes.Dream;
             _app.GoToTestSetup();
             yield return WaitState(LabState.ConfiguringTest);
+            // 先頭が別の候補（例：運搬の分類なら障害物コース）のときは、目的のシナリオの候補を選ぶ
+            int want = _app.PlanOptions.FindIndex(c => c.Plan.Scenario == scenario);
+            if (want > 0) { _app.SelectPlan(want); yield return null; }
             Check(_app.PlanOptions.Count > 0 && !_app.PlanIsLegacy && _app.ActivePlan()?.Scenario == scenario,
                 $"plan-{tag}: standard plan selected ({_app.PlanOptions.Count} options, scenario={_app.ActivePlan()?.Scenario})");
             yield return Shot($"S04_plan_{tag}");

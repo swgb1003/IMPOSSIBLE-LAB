@@ -507,6 +507,35 @@
       "modelJa": "一定の速さで持ち上げる：電力 = m g v ÷ 効率"
     },
     {
+      "type": "drive",
+      "labelJa": "走行",
+      "requiresTargetPart": true,
+      "allowedTargetTypes": [
+        "wheel",
+        "motor",
+        "body"
+      ],
+      "parameters": [
+        {
+          "key": "speedLimit",
+          "labelJa": "走る速さ",
+          "unit": "m/s",
+          "min": 0.1,
+          "max": 3.0,
+          "default": 1.0
+        },
+        {
+          "key": "maxSlopeDeg",
+          "labelJa": "上れる坂の角度",
+          "unit": "°",
+          "min": 0.0,
+          "max": 30.0,
+          "default": 10.0
+        }
+      ],
+      "modelJa": "坂の角度 ≤ 上れる角度なら制限速度で上る。電力 P = m g (sinθ + 転がり抵抗係数 cosθ) v ÷ 駆動効率"
+    },
+    {
       "type": "detect",
       "labelJa": "検知",
       "requiresTargetPart": true,
@@ -784,6 +813,15 @@
           "payload",
           "shelf"
         ]
+      },
+      {
+        "id": "climb_slope",
+        "labelJa": "坂を上る",
+        "description": "発明品が坂を上る（荷物を載せることもある）",
+        "allowedModules": [
+          "slope",
+          "payload"
+        ]
       }
     ],
     "modules": [
@@ -994,6 +1032,28 @@
             "min": 0.2,
             "max": 2.0,
             "default": 0.8
+          }
+        ]
+      },
+      {
+        "id": "slope",
+        "labelJa": "坂",
+        "params": [
+          {
+            "key": "angleDeg",
+            "labelJa": "坂の角度",
+            "unit": "°",
+            "min": 0.0,
+            "max": 20.0,
+            "default": 4.76
+          },
+          {
+            "key": "lengthM",
+            "labelJa": "坂の長さ",
+            "unit": "m",
+            "min": 2.0,
+            "max": 10.0,
+            "default": 5.0
           }
         ]
       }
@@ -1497,13 +1557,109 @@
         "scenarios": [
           "stand",
           "sit_still",
-          "lift_task"
+          "lift_task",
+          "climb_slope"
         ],
         "anyBlocks": [],
         "modules": [],
         "standModules": [],
         "min": 0.0,
         "max": 100000.0
+      },
+      {
+        "key": "climbedRatio",
+        "labelJa": "坂を上った割合",
+        "unit": "",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "climb_slope"
+        ],
+        "anyBlocks": [
+          "drive"
+        ],
+        "modules": [
+          "slope"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1.0
+      },
+      {
+        "key": "climbTime",
+        "labelJa": "坂を上り切る時間",
+        "unit": "秒",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "climb_slope"
+        ],
+        "anyBlocks": [
+          "drive"
+        ],
+        "modules": [
+          "slope"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 60.0
+      },
+      {
+        "key": "drivePowerW",
+        "labelJa": "坂を上る電力",
+        "unit": "W",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "climb_slope"
+        ],
+        "anyBlocks": [
+          "drive"
+        ],
+        "modules": [
+          "slope"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0
+      },
+      {
+        "key": "totalMassKg",
+        "labelJa": "総質量（推定）",
+        "unit": "kg",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "stand",
+          "sit_still",
+          "drop_test",
+          "lift_task",
+          "climb_slope"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 10000.0
+      },
+      {
+        "key": "mountLoadRatio",
+        "labelJa": "装着部位の重さの目安に対する割合",
+        "unit": "",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "stand",
+          "sit_still",
+          "drop_test",
+          "lift_task",
+          "climb_slope"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1000.0
       }
     ]
   },

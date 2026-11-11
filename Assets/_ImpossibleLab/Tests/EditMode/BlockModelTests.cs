@@ -170,7 +170,7 @@ namespace ImpossibleLab.Tests
             Assert.AreEqual(1e-4f, AlertModel.NoticeLux(Mathf.Pow(10f, 1.5f)), 1e-6f, "31.6 lx は夜と昼の中間（対数）");
             var r = AlertModel.Evaluate(80f, 50f, 2f, 0.1f);
             Assert.AreEqual(r.LightRangeM, r.RangeM);
-            Assert.AreEqual(4f * Mathf.PI * 1e-4f / 0.01f + 50f / 100f * 0.5f, r.PowerW, 1e-4f, "音 0.126 W ＋ 光 0.25 W（点滅で半分）");
+            Assert.AreEqual(4f * Mathf.PI * 1e-4f / BlockCoefficients.V("speakerEfficiency") + 50f / BlockCoefficients.V("ledEfficacy") * 0.5f, r.PowerW, 1e-4f, "音（音響出力÷スピーカー効率）＋ 光 0.25 W（点滅で半分）");
         }
 
         // ---------------- 全モデル：範囲の端でも NaN・無限大が出ない ----------------

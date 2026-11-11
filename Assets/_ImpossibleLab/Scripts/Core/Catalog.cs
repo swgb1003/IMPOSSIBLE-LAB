@@ -213,6 +213,11 @@ namespace ImpossibleLab.Core
                 P("maxLoadKg", "持ち上げられる重さ", "kg", 0.5f, 30f, 5f, "0.0"),
                 P("liftHeightM", "持ち上げられる高さ", "m", 0.1f, 2f, 0.8f),
                 P("speed", "持ち上げる速さ", "m/s", 0.05f, 1f, 0.2f) } },
+            // ---- 機能ブロック 第2弾（6週目）。計算式は Core/Blocks/MassAndDriveModels.cs・docs/blocks.md 8章 ----
+            new BehaviorInfo { Type = "drive", LabelJa = "走行", RequiresTargetPart = true,
+                AllowedTargetTypes = new[] { "wheel", "motor", "body" }, ModelJa = "坂の角度 ≤ 上れる角度なら制限速度で上る。電力 P = m g (sinθ + 転がり抵抗係数 cosθ) v ÷ 駆動効率", Parameters = new[] {
+                P("speedLimit", "走る速さ", "m/s", 0.1f, 3f, 1f, "0.0"),
+                P("maxSlopeDeg", "上れる坂の角度", "°", 0f, 30f, 10f, "0") } },
             new BehaviorInfo { Type = "detect", LabelJa = "検知", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "sensor" }, ModelJa = "距離・視野角・障害物による遮りの幾何判定", Parameters = new[] {
                 P("rangeM", "検知距離", "m", 0.5f, 30f, 5f, "0.0"),

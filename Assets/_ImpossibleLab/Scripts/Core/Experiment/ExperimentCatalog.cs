@@ -62,6 +62,7 @@ namespace ImpossibleLab.Core
         public const int MaxModules = 6, MaxMetrics = 8, MaxCriteria = 4, MaxReasonLength = 80;
         public const string Stand = "stand", WalkRoute = "walk_route", FlyToTarget = "fly_to_target";
         public const string SitStill = "sit_still", DropTest = "drop_test", LiftTask = "lift_task";
+        public const string ClimbSlope = "climb_slope";
 
         public static readonly ScenarioInfo[] Scenarios =
         {
@@ -77,6 +78,9 @@ namespace ImpossibleLab.Core
                 AllowedModules = new[] { "drop" }, RequiredModules = new[] { "drop" }, JudgedByCriteria = true },
             new ScenarioInfo { Id = LiftTask, LabelJa = "持ち上げて置く", Description = "荷物を棚の高さまで持ち上げる（装置の持ち上げ機構、またはつかみ具で人が持ち上げる）",
                 AllowedModules = new[] { "payload", "shelf" }, RequiredModules = new[] { "payload", "shelf" }, JudgedByCriteria = true },
+            // 6週目：機能ブロック第2弾
+            new ScenarioInfo { Id = ClimbSlope, LabelJa = "坂を上る", Description = "発明品が坂を上る（荷物を載せることもある）",
+                AllowedModules = new[] { "slope", "payload" }, RequiredModules = new[] { "slope" }, JudgedByCriteria = true },
         };
 
         public static readonly ModuleInfo[] Modules =
@@ -93,9 +97,17 @@ namespace ImpossibleLab.Core
             new ModuleInfo { Id = "drop", LabelJa = "落下", Params = new[] { P("heightM", "落とす高さ", "m", 0.2f, 3f, 1f, step: 0.2f), P("massKg", "落とす物の重さ", "kg", 0.1f, 5f, 0.5f, step: 0.1f) } },
             new ModuleInfo { Id = "targets", LabelJa = "検知対象", Params = new[] { P("count", "対象の数", "個", 1f, 12f, 6f, step: 1f, integer: true) } },
             new ModuleInfo { Id = "shelf", LabelJa = "棚", Params = new[] { P("heightM", "棚の高さ", "m", 0.2f, 2f, 0.8f, step: 0.1f) } },
+            // 6週目。4.76° は車いす用スロープの最大勾配（ADA 1:12）
+            new ModuleInfo { Id = "slope", LabelJa = "坂", Params = new[] {
+                P("angleDeg", "坂の角度", "°", 0f, 20f, 4.76f, levels: new[] { 0f, 2f, 4.76f, 6f, 8f, 10f, 12f, 15f, 20f }),
+                P("lengthM", "坂の長さ", "m", 2f, 10f, 5f, step: 1f) } },
         };
 
         static readonly string[] Rain = { "rain" };
+
+        /// <summary>総質量を出すシナリオ（合格条件で判定する組み立て式の実験。雨の stand は RainSimulator のため出さない）。
+        /// Metrics より前に宣言する（静的フィールドは書いた順に初期化される）。</summary>
+        static readonly string[] MassScenarios = { Stand, SitStill, DropTest, LiftTask, ClimbSlope };
 
         public static readonly MetricInfo[] Metrics =
         {
@@ -131,8 +143,18 @@ namespace ImpossibleLab.Core
             new MetricInfo { Key = "dropCount", LabelJa = "落とした回数", Unit = " 回", Format = "0", Scenarios = new[] { LiftTask }, AnyBlocks = new[] { "grip", "lift_load" }, Min = 0, Max = 100 },
             new MetricInfo { Key = "liftTime", LabelJa = "持ち上げ時間", Unit = " 秒", Format = "0.0", Scenarios = new[] { LiftTask }, AnyBlocks = new[] { "grip", "lift_load" }, Min = 0, Max = LiftTimeout },
             new MetricInfo { Key = "liftPowerW", LabelJa = "持ち上げの電力", Unit = " W", Format = "0.0", Primary = false, Scenarios = new[] { LiftTask }, AnyBlocks = new[] { "lift_load" }, Min = 0, Max = 100000 },
-            new MetricInfo { Key = "blockPowerW", LabelJa = "機能の消費電力", Unit = " W", Format = "0.0", Primary = false, RealityOnly = true, Scenarios = new[] { Stand, SitStill, LiftTask }, Min = 0, Max = 100000 },
+            new MetricInfo { Key = "blockPowerW", LabelJa = "機能の消費電力", Unit = " W", Format = "0.0", Primary = false, RealityOnly = true, Scenarios = new[] { Stand, SitStill, LiftTask, ClimbSlope }, Min = 0, Max = 100000 },
+            // 6週目：走行（坂）
+            new MetricInfo { Key = "climbedRatio", LabelJa = "坂を上った割合", Format = "0.00", LowerIsBetter = false, Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = 1 },
+            new MetricInfo { Key = "climbTime", LabelJa = "坂を上り切る時間", Unit = " 秒", Format = "0.0", Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = ClimbTimeout },
+            new MetricInfo { Key = "drivePowerW", LabelJa = "坂を上る電力", Unit = " W", Format = "0", Primary = false, RealityOnly = true, Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = 100000 },
+            // 6週目：REALITY の共通層（組み立て式の実験で出す。部品の形・大きさ・素材から推定）
+            new MetricInfo { Key = "totalMassKg", LabelJa = "総質量（推定）", Unit = " kg", Format = "0.00", Primary = false, RealityOnly = true, Scenarios = MassScenarios, Min = 0, Max = 10000 },
+            new MetricInfo { Key = "mountLoadRatio", LabelJa = "装着部位の重さの目安に対する割合", Format = "0.00", RealityOnly = true, Scenarios = MassScenarios, Min = 0, Max = 1000 },
         };
+
+        /// <summary>坂を上り切れなかったときの「坂を上り切る時間」の値（秒）。</summary>
+        public const float ClimbTimeout = 60f;
 
         /// <summary>届かなかったときの「目標の温度に届くまで」の値（分）。</summary>
         public const float NotReached = 999f;
@@ -153,6 +175,8 @@ namespace ImpossibleLab.Core
             new PlanCriterion { Metric = "peakImpactG", Op = "<=", Value = 100f, Reason = "中身が壊れにくい衝撃の目安（要出典）" },
             new PlanCriterion { Metric = "dropCount", Op = "<=", Value = 0f, Reason = "落とさない" },
             new PlanCriterion { Metric = "liftTime", Op = "<=", Value = 10f, Reason = "10秒以内に棚へ置く（調整用）" },
+            new PlanCriterion { Metric = "climbedRatio", Op = ">=", Value = 1f, Reason = "坂を上り切る" },
+            new PlanCriterion { Metric = "mountLoadRatio", Op = "<=", Value = 1f, Reason = "装着部位の重さの目安以内（目安の出典は係数の表）" },
         };
 
         static ModuleParam P(string key, string label, string unit, float min, float max, float def, float step = 0f, bool integer = false, float[] levels = null) =>

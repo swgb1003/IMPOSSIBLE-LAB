@@ -1169,6 +1169,7 @@ namespace ImpossibleLab
                     {
                         case ExperimentCatalog.SitStill: body += string.Format(ci, "（{0:0} 分を早送り）\n装着部の温度 {1:0.0} °C", res.Plan?.Get("temperature", "minutes") ?? 0f, f.Value.Aux); break;
                         case ExperimentCatalog.DropTest: body += string.Format(ci, "\n高さ {0:0.00} m", f.Value.Device.y) + (f.Value.Aux > 0f ? string.Format(ci, "\n床に当たった：最大の衝撃 <color=#{1}>{0:0} G</color>", f.Value.Aux, LabTheme.ToHex(LabTheme.AccentWarning)) : ""); break;
+                        case ExperimentCatalog.ClimbSlope: body += string.Format(ci, "\n坂を進んだ距離 {0:0.0} / {1:0.0} m", f.Value.Aux, res.Plan?.Get("slope", "lengthM") ?? 0f); break;
                         case ExperimentCatalog.LiftTask: body += string.Format(ci, "\n荷物の高さ {0:0.00} m", f.Value.Device.y) + (f.Value.Aux > 0f ? $"\n<color=#{LabTheme.ToHex(LabTheme.AccentWarning)}>持ち上げられない・落とした</color>" : ""); break;
                         default: body += "\n計測は開始時に計算済み：" + string.Join("　", res.Metrics.Where(m => m.Primary).Take(2).Select(m => m.LabelJa + " " + m.Display)); break;
                     }

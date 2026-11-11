@@ -91,6 +91,15 @@ namespace ImpossibleLab.Core
             if (Has("impact_cushion"))
                 yield return C("落としたときの衝撃", "1 m から落としても、中身が壊れにくい衝撃に収まるか", ExperimentCatalog.DropTest,
                     M("drop", ("heightM", 1f), ("massKg", 0.5f)));
+            if (Has("drive"))
+            {
+                // 車いす用スロープの最大勾配（ADA 1:12、約 4.76°）。運ぶ機能があれば荷物を載せる
+                float ramp = BlockCoefficients.V("rampMaxSlopeDeg");
+                var mods = new List<PlanModule> { M("slope", ("angleDeg", ramp), ("lengthM", 5f)) };
+                if (Has("carry_load")) mods.Add(M("payload", ("kg", 5f), ("sizeM", 0.3f)));
+                yield return C("スロープを上る", Has("carry_load") ? "車いす用スロープの上限の坂（約 4.8°）を、5 kg の荷物を載せて上れるか" : "車いす用スロープの上限の坂（約 4.8°）を上れるか",
+                    ExperimentCatalog.ClimbSlope, mods.ToArray());
+            }
             if (Has("grip") || Has("lift_load"))
                 yield return C("荷物を棚へ上げる", "5 kg の荷物を落とさずに棚（0.8 m）へ上げられるか", ExperimentCatalog.LiftTask,
                     M("payload", ("kg", 5f), ("sizeM", 0.3f)), M("shelf", ("heightM", 0.8f)));
@@ -245,6 +254,7 @@ namespace ImpossibleLab.Core
             if (scenario == ExperimentCatalog.Stand && type == "obstacles" && Has("detect")) return true; // 視線を遮る
             if (scenario == ExperimentCatalog.Stand && type == "darkness" && Has("alert")) return true;   // 光の通知が届く距離
             if (scenario == ExperimentCatalog.FlyToTarget && type == "wind") return true;
+            if (scenario == ExperimentCatalog.ClimbSlope && type == "payload" && Has("drive")) return true; // 荷物で必要な電力が変わる
             return false;
         }
 

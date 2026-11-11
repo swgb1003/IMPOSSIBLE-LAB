@@ -309,4 +309,84 @@ namespace ImpossibleLab.Core
             if (ctx.T > _done + 1f) ctx.Stop = true;
         }
     }
+    // ================= 6週目：走行（坂） =================
+
+    /// <summary>climb_slope：坂の下から上まで走る。坂は人型モデルの奥（z = 3 m）に置く（操作パネル越しに見えるように）。</summary>
+    public sealed class ClimbSlopeScenario : IScenario
+    {
+        public const float LaneZ = 3.0f;
+        public float MaxTime => ExperimentCatalog.ClimbTimeout + 2f;
+        public void Begin(SimContext ctx)
+        {
+            ctx.Run.Layout = new CourseLayout();
+            float a = ctx.Plan.Get("slope", "angleDeg"), L = ctx.Plan.Get("slope", "lengthM");
+            ctx.Device = new Vector3(StartX(a, L), 0f, LaneZ);
+            ctx.Result.Assumptions.Add($"長さ {L:0.0} m・角度 {a:0.0}° の坂を下から上まで走る" + (ctx.Plan.Has("payload") ? $"（荷物 {ctx.Plan.Get("payload", "kg"):0.0} kg を載せる）" : ""));
+        }
+        public void StepAvatar(SimContext ctx) { }
+        /// <summary>坂の下の端の x（坂の中央を x = 0 に置く）。</summary>
+        public static float StartX(float angleDeg, float lengthM) => -0.5f * lengthM * Mathf.Cos(angleDeg * Mathf.Deg2Rad);
+    }
+
+    /// <summary>
+    /// 走行：坂を上れるか・上り切る時間・必要な電力（docs/blocks.md 8章）。走行の機能がなければ上れない（理由を制限に出す）。
+    /// 滑り・段差・加速と減速は扱わない。
+    /// </summary>
+    public sealed class DriveBlock : StaticBlockModel
+    {
+        float _angle, _len, _speed, _reach, _done;
+
+        public override void Begin(SimContext ctx)
+        {
+            var dna = ctx.Dna; var plan = ctx.Plan; var res = ctx.Result;
+            _angle = plan.Get("slope", "angleDeg"); _len = plan.Get("slope", "lengthM");
+            bool has = dna.FindBehavior("drive") != null;
+            float payload = plan.Has("payload") ? plan.Get("payload", "kg") : 0f;
+            if (!has)
+            {
+                res.Limits.Add("「走行」の機能がないため、坂を上れない");
+                _speed = 0f; _reach = 0f; _done = 0f;
+                ctx.AddMetric("climbedRatio", 0f);
+                ctx.AddMetric("climbTime", ExperimentCatalog.ClimbTimeout);
+                return;
+            }
+            float mass = MassModel.TotalKg(dna) + payload;
+            var r = DriveModel.Climb(mass, dna.GetParameter("drive", "speedLimit", 1f), dna.GetParameter("drive", "maxSlopeDeg", 10f), _angle, _len);
+            _speed = r.Speed;
+            if (!r.CanClimb)
+            {
+                res.Limits.Add("坂を上れない：" + r.Reason);
+                _reach = 0f; _done = 0f;
+            }
+            else
+            {
+                _reach = Mathf.Min(_len, _speed * ExperimentCatalog.ClimbTimeout);
+                _done = _reach / _speed;
+                if (_reach < _len) res.Limits.Add($"{ExperimentCatalog.ClimbTimeout:0} 秒以内に上り切れなかった（遅すぎる）");
+            }
+            bool full = r.CanClimb && _reach >= _len - 1e-4f;
+            ctx.AddMetric("climbedRatio", _len > 0f ? _reach / _len : 0f);
+            ctx.AddMetric("climbTime", full ? r.TimeSec : ExperimentCatalog.ClimbTimeout);
+            res.Assumptions.Add($"走行：{_speed:0.0} m/s の一定の速さで上る。坂の角度 ≤ 上れる角度（{dna.GetParameter("drive", "maxSlopeDeg", 10f):0}°）なら上れる（滑り・段差・加減速は扱わない）");
+            if (ctx.Reality && r.CanClimb)
+            {
+                ctx.AddMetric("drivePowerW", r.PowerW);
+                ctx.BlockPowerW += r.PowerW;
+                res.Assumptions.Add($"電力 P = m g (sinθ + 転がり抵抗 {BlockCoefficients.V("rollingResistance"):0.00} × cosθ) v ÷ 効率 {BlockCoefficients.V("driveEfficiency"):0.0} = 約 {r.PowerW:0} W（m = 総質量（推定）{mass - payload:0.00} kg ＋ 荷物 {payload:0.0} kg）");
+            }
+        }
+
+        public override void Step(SimContext ctx)
+        {
+            float s = Mathf.Min(_reach, _speed * ctx.T);
+            float th = _angle * Mathf.Deg2Rad;
+            ctx.Device = new Vector3(ClimbSlopeScenario.StartX(_angle, _len) + s * Mathf.Cos(th), s * Mathf.Sin(th), ClimbSlopeScenario.LaneZ);
+            ctx.Aux = s;
+        }
+
+        public override void AfterFrame(SimContext ctx)
+        {
+            if (ctx.T > _done + 1f) ctx.Stop = true;
+        }
+    }
 }

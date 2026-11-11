@@ -113,6 +113,18 @@ namespace ImpossibleLab
                 float size = plan.Get("payload", "sizeM");
                 _payload = Prim(PrimitiveType.Cube, "Payload", new Vector3(0.9f, size * 0.5f, 0.6f), Vector3.one * size, _assets != null ? _assets.AccentOrange : null).transform;
             }
+            if (scenario == ExperimentCatalog.ClimbSlope && plan != null)
+            {
+                // 坂：中央を x = 0 に置き、z 軸まわりに傾けた板（計算と同じ寸法）
+                float a = plan.Get("slope", "angleDeg"), len = plan.Get("slope", "lengthM"), th = a * Mathf.Deg2Rad;
+                var ramp = Prim(PrimitiveType.Cube, "Slope", new Vector3(0f, 0.5f * len * Mathf.Sin(th) - 0.02f, ClimbSlopeScenario.LaneZ), new Vector3(len, 0.04f, 1.0f), _assets != null ? _assets.DarkMetal : null);
+                ramp.transform.localRotation = Quaternion.Euler(0f, 0f, a);
+                if (plan.Has("payload"))
+                {
+                    float size = plan.Get("payload", "sizeM");
+                    _payload = Prim(PrimitiveType.Cube, "Payload", Vector3.zero, Vector3.one * size, _assets != null ? _assets.AccentOrange : null).transform;
+                }
+            }
             if (scenario == ExperimentCatalog.DropTest)
                 Prim(PrimitiveType.Cylinder, "DropPad", new Vector3(0f, 0.005f, 0f), new Vector3(0.9f, 0.005f, 0.9f), _assets != null ? _assets.AccentOrange : null);
             if (_view != null) { _view.SetActive(false); _view.ExtraOffset = Vector3.zero; }
@@ -165,7 +177,9 @@ namespace ImpossibleLab
             if (_run == null) return;
             if (_run.Result.IsScenarioLab)
             {
-                if (_payload != null)
+                if (_payload != null && _run.Result.Scenario == ExperimentCatalog.ClimbSlope)
+                    _payload.localPosition = f.Device + Vector3.up * (0.25f + _payload.localScale.y * 0.5f); // 発明品の上に載せる
+                else if (_payload != null)
                 {
                     // 持ち上げ：荷物は記録した高さ（床から棚の高さまで）。棚の前で持ち上げ、上がりきったら棚に載せる
                     var plan = _run.Result.Plan;

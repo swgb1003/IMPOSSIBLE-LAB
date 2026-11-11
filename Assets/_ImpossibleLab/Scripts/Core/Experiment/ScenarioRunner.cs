@@ -136,6 +136,7 @@ namespace ImpossibleLab.Core
                 case ExperimentCatalog.SitStill: return new SitStillScenario();
                 case ExperimentCatalog.DropTest: return new DropTestScenario();
                 case ExperimentCatalog.LiftTask: return new LiftTaskScenario();
+                case ExperimentCatalog.ClimbSlope: return new ClimbSlopeScenario();
                 case ExperimentCatalog.Stand:
                     if (plan.Has("rain")) throw new ArgumentException("雨のある stand は RainSimulator で実行してください");
                     return new StandScenario();
@@ -163,6 +164,7 @@ namespace ImpossibleLab.Core
                 case ExperimentCatalog.SitStill: if (Has("heat") || Has("cool")) list.Add(new ThermalBlock()); break;
                 case ExperimentCatalog.DropTest: list.Add(new CushionBlock()); break;
                 case ExperimentCatalog.LiftTask: if (Has("lift_load") || Has("grip")) list.Add(new LiftBlock()); break;
+                case ExperimentCatalog.ClimbSlope: list.Add(new DriveBlock()); break; // 走行がなくても「上れない」と結果に出す
             }
             return list;
         }
@@ -175,6 +177,7 @@ namespace ImpossibleLab.Core
         {
             var r = ctx.Result;
             if (ctx.Reality && ctx.BlockPowerW > 0f) ctx.AddMetric("blockPowerW", ctx.BlockPowerW);
+            if (ctx.Reality) AddMass(ctx);
             if (modelCount == 0) r.Limits.Add("このシナリオで働く機能がこの発明にない");
             var criteria = ctx.Plan.Criteria.Count > 0 ? ctx.Plan.Criteria : ExperimentCatalog.DefaultCriteria.Where(c => r.Metric(c.Metric) != null).ToList();
             bool ok = criteria.Count > 0;
@@ -190,6 +193,20 @@ namespace ImpossibleLab.Core
             }
             r.Passed = ok;
             r.Criteria = texts.Count > 0 ? string.Join("・", texts) : "合格条件なし（測れる計測項目がない）";
+        }
+
+        /// <summary>REALITY の共通層：総質量（推定）と、装着部位の重さの目安に対する割合（体に付けるものだけ）。</summary>
+        static void AddMass(SimContext ctx)
+        {
+            var dna = ctx.Dna; var r = ctx.Result;
+            float kg = MassModel.TotalKg(dna), lo = MassModel.TotalKg(dna, RealityCase.Optimistic), hi = MassModel.TotalKg(dna, RealityCase.Pessimistic);
+            ctx.AddMetric("totalMassKg", kg);
+            r.Assumptions.Add($"総質量 約 {kg:0.00} kg（{lo:0.00}〜{hi:0.00} kg）：部品を中空の殻として、表面積×外殻の厚み×素材の密度で推定（布は面密度、発泡材・電池は中身が詰まったもの）");
+            var limit = MassModel.MountLimitKg(dna.Mount);
+            if (limit == null) return;
+            ctx.AddMetric("mountLoadRatio", kg / limit.Value);
+            string where = LabCatalog.Mount(dna.Mount)?.LabelJa ?? dna.Mount;
+            if (kg > limit.Value) r.Limits.Add($"{where}に付けるには重い：約 {kg:0.00} kg（目安 {limit.Value:0.0} kg）");
         }
     }
 
