@@ -28,6 +28,7 @@ namespace ImpossibleLab.EditorTools
         public const string Root = "Assets/_ImpossibleLab";
         public const string MatDir = Root + "/Art/Materials";
         public const string FontDir = Root + "/Art/Fonts";
+        public const string ModelDir = Root + "/Art/Models";
         public const string SettingsDir = Root + "/Settings";
         public const string LabAssetsPath = Root + "/Settings/LabAssets.asset";
 
@@ -190,11 +191,121 @@ namespace ImpossibleLab.EditorTools
             a.MannequinHit = Transparent(Lit("WetZoneHit", new Color(LabTheme.AccentWarning.r, LabTheme.AccentWarning.g, LabTheme.AccentWarning.b, 0.35f), 0.2f, 0f));
             a.Ground = Lit("Ground", new Color(0.30f, 0.34f, 0.36f), 0.35f, 0f);
             a.RainParticle = Particle("RainParticle");
+            // 部品の素材（DNA の material）。樹脂は RobotWhite、ガラスは Glass を使う
+            a.PartAluminum = Lit("PartAluminum", new Color(0.80f, 0.82f, 0.85f), 0.62f, 0.85f);
+            a.PartSteel = Lit("PartSteel", new Color(0.42f, 0.44f, 0.47f), 0.5f, 0.9f);
+            a.PartFabric = Lit("PartFabric", new Color(0.20f, 0.25f, 0.33f), 0.08f, 0f);
+            a.PartFoam = Lit("PartFoam", new Color(0.86f, 0.84f, 0.76f), 0.03f, 0f);
+            a.PartRubber = Lit("PartRubber", new Color(0.09f, 0.10f, 0.11f), 0.22f, 0f);
+            a.GlowOrange = Emissive(Lit("GlowOrange", LabTheme.AccentWarning, 0.4f, 0f), LabTheme.AccentWarning * 1.2f);
+            a.LightPanel = Emissive(Lit("LightPanel", new Color(0.95f, 0.96f, 0.97f), 0.5f, 0f), new Color(1f, 0.98f, 0.95f) * 1.4f);
+            a.FloorConcrete = FloorMaterial();
+            a.Screen = Emissive(Lit("Screen", new Color(0.02f, 0.08f, 0.16f), 0.8f, 0f), new Color(0.10f, 0.45f, 0.85f) * 1.6f);
+            a.Sky = SkyMaterial();
+            a.PlantLeaves = LeavesMaterial();
+            a.CentralDevice = ImportModel("CentralDevice", a);
+            a.LabRoom = ImportModel("LabRoom", a);
+            a.RobotArm = ImportModel("RobotArm", a);
+            a.Workbench = ImportModel("Workbench", a);
+            a.GalleryCase = ImportModel("GalleryCase", a);
+            a.Gate = ImportModel("Gate", a);
+            a.Plant = ImportModel("Plant", a);
             a.Fader = Transparent(Unlit("Fader", new Color(0, 0, 0, 0)));
             a.Fader.renderQueue = 4000;
             a.RainSample = AssetDatabase.LoadAssetAtPath<TextAsset>(Root + "/Data/Samples/Resources/ImpossibleLabSamples/handsfree_rain.json");
             EditorUtility.SetDirty(a);
             return a;
+        }
+
+        /// <summary>
+        /// Blender で作ったモデル（ArtSource/blender から書き出した FBX）の取り込み設定。
+        /// マテリアル（MAT_*）は LabAssets のマテリアルへ置き換え、モデル側のマテリアルは作らない。ファイルが無ければ null（シーンは従来の簡易形状）。
+        /// </summary>
+        static GameObject ImportModel(string name, LabAssets a)
+        {
+            string path = $"{ModelDir}/{name}.fbx";
+            if (!(AssetImporter.GetAtPath(path) is ModelImporter mi)) return null;
+            mi.globalScale = 1f; mi.useFileScale = true;
+            mi.importCameras = false; mi.importLights = false;
+            mi.importAnimation = false; mi.animationType = ModelImporterAnimationType.None;
+            mi.importBlendShapes = false; mi.addCollider = false; mi.isReadable = false;
+            mi.importNormals = ModelImporterNormals.Import;
+            mi.generateSecondaryUV = true; // ライトの焼き込み用
+            mi.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
+            var map = new (string, Material)[]
+            {
+                ("MAT_White", a.RobotWhite), ("MAT_Dark", a.DarkMetal), ("MAT_Metal", a.MatteMetal), ("MAT_Blue", a.AccentBlue),
+                ("MAT_Orange", a.GlowOrange), ("MAT_Glass", a.Glass), ("MAT_LightWhite", a.LightPanel),
+                ("MAT_Floor", a.FloorConcrete), ("MAT_Wall", a.Concrete), ("MAT_Screen", a.Screen), ("MAT_PlantLeaves", a.PlantLeaves),
+            };
+            foreach (var (src, m) in map)
+                if (m != null) mi.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), src), m);
+            mi.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        const string PolyHavenDir = Root + "/Art/Textures/PolyHaven";
+
+        /// <summary>床：Poly Haven の concrete_floor_worn_001（CC0、1K の色・法線）。テクスチャが無ければ単色。</summary>
+        static Material FloorMaterial()
+        {
+            var m = Lit("FloorConcrete", new Color(0.92f, 0.93f, 0.94f), 0.55f, 0f);
+            string dir = PolyHavenDir + "/concrete_floor_worn_001";
+            var diff = ImportTexture($"{dir}/concrete_floor_worn_001_diff_1k_light.jpg", 1024, normal: false);
+            var nor = ImportTexture($"{dir}/concrete_floor_worn_001_nor_gl_1k.jpg", 1024, normal: true);
+            if (diff != null) m.SetTexture("_BaseMap", diff);
+            if (nor != null) { m.SetTexture("_BumpMap", nor); m.SetFloat("_BumpScale", 0.6f); m.EnableKeyword("_NORMALMAP"); }
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        /// <summary>窓の外の空：Poly Haven の kloofendal_43d_clear（CC0、トーンマップ済みを 2048×1024 に縮小）を正距円筒のスカイボックスに。</summary>
+        static Material SkyMaterial()
+        {
+            var tex = ImportTexture(PolyHavenDir + "/kloofendal_43d_clear/kloofendal_43d_clear_2k.jpg", 2048, normal: false, sky: true);
+            if (tex == null) return null;
+            string p = $"{MatDir}/Sky.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(p);
+            if (m == null) { m = new Material(Shader.Find("Skybox/Panoramic")); AssetDatabase.CreateAsset(m, p); }
+            m.SetTexture("_MainTex", tex);
+            m.SetFloat("_Exposure", 1.0f);
+            m.SetFloat("_Rotation", 0f);
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        /// <summary>観葉植物の葉：色＋切り抜き（アルファ）、両面。Quest では切り抜きの面積が小さいので負荷は小さい。</summary>
+        static Material LeavesMaterial()
+        {
+            string dir = PolyHavenDir + "/potted_plant_02";
+            var diff = ImportTexture($"{dir}/potted_plant_02_leaves_diff_alpha_1k.png", 1024, normal: false);
+            if (diff == null) return null;
+            var nor = ImportTexture($"{dir}/potted_plant_02_leaves_nor_gl_1k.png", 1024, normal: true);
+            var m = Lit("PlantLeaves", Color.white, 0.35f, 0f);
+            m.SetTexture("_BaseMap", diff);
+            if (nor != null) { m.SetTexture("_BumpMap", nor); m.EnableKeyword("_NORMALMAP"); }
+            m.SetFloat("_AlphaClip", 1f); m.SetFloat("_Cutoff", 0.5f); m.EnableKeyword("_ALPHATEST_ON");
+            m.SetFloat("_Cull", (float)CullMode.Off);
+            m.renderQueue = (int)RenderQueue.AlphaTest;
+            m.SetOverrideTag("RenderType", "TransparentCutout");
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        static Texture2D ImportTexture(string path, int maxSize, bool normal, bool sky = false)
+        {
+            if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) return null;
+            ti.textureType = normal ? TextureImporterType.NormalMap : TextureImporterType.Default;
+            ti.maxTextureSize = maxSize;
+            ti.sRGBTexture = !normal;
+            ti.mipmapEnabled = !sky;
+            ti.wrapModeU = TextureWrapMode.Repeat;
+            ti.wrapModeV = sky ? TextureWrapMode.Clamp : TextureWrapMode.Repeat;
+            ti.textureCompression = TextureImporterCompression.Compressed;
+            ti.alphaSource = TextureImporterAlphaSource.FromInput;
+            ti.alphaIsTransparency = !normal && !sky && path.EndsWith(".png");
+            ti.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
 
         static TMP_FontAsset CreateFont(string fileName)

@@ -90,18 +90,8 @@ namespace ImpossibleLab
 
         GameObject CreatePrimitive(PartSpec part, InventionDna dna)
         {
-            // 素材（見た目）は部品タイプで決め、形は DNA の shape（未指定なら部品タイプの既定の形）で決める
-            Material mat;
-            switch (part.Type)
-            {
-                case "canopy": mat = _assets.Canopy; break;
-                case "wheel": case "thruster": case "motor": case "battery": case "speaker": case "strap": mat = _assets.DarkMetal; break;
-                case "sensor": case "light": case "cooler": mat = _assets.AccentBlue; break;
-                case "stabilizer": case "heater": mat = _assets.AccentOrange; break;
-                case "arm": case "container": case "frame": case "gripper": case "connector": mat = _assets.MatteMetal; break;
-                case "solar": mat = _assets.Glass; break;
-                default: mat = _assets.RobotWhite; break; // body, panel, cushion
-            }
+            // 見た目は DNA の素材（機能部品は機能の色）、形は DNA の shape（未指定なら部品タイプの既定）で決める（PartLook）
+            Material mat = _assets.For(PartLook.Surface(part));
             Vector3 scale = part.Scale;
             Quaternion rot = Quaternion.identity;
             PrimitiveType type;
@@ -121,11 +111,8 @@ namespace ImpossibleLab
             go.transform.localScale = scale;
             var rend = go.GetComponent<Renderer>();
             rend.sharedMaterial = mat;
-            // 外観プリセット：本体系は本体色、センサー・安定ユニットはアクセント色（マテリアルは共有のまま色だけ変える）
-            var look = LabCatalog.Appearance(dna.Appearance) ?? LabCatalog.Appearance(LabCatalog.DefaultAppearance);
-            int? rgb = part.Type == "body" || part.Type == "container" || part.Type == "arm" || part.Type == "connector"
-                    || part.Type == "frame" || part.Type == "panel" || part.Type == "gripper" ? look.BodyRgb
-                : part.Type == "sensor" || part.Type == "stabilizer" || part.Type == "light" ? look.AccentRgb : (int?)null;
+            // 外観プリセットの色（マテリアルは共有のまま色だけ変える）
+            int? rgb = PartLook.Tint(part, dna.Appearance);
             if (rgb.HasValue)
             {
                 var mpb = new MaterialPropertyBlock();

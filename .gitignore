@@ -22,3 +22,8 @@ proxy/node_modules/
 # Unity一時ファイル・テスト結果
 /.utmp/
 /test-results.xml
+
+# Blender の作業ファイル（ArtSource/blender のスクリプトから作り直せる）と、Poly Haven から取り込んだ元の素材
+/ArtSource/blender/*.blend
+/ArtSource/blender/*.blend1
+/ArtSource/polyhaven/

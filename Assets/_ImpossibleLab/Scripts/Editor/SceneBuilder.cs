@@ -24,7 +24,8 @@ namespace ImpossibleLab.EditorTools
         public const string ScenePath = ProjectSetup.Root + "/Scenes/LabHub.unity";
         const string SamplesRoot = "Assets/Samples/XR Interaction Toolkit/3.0.8";
         static LabAssets A;
-        static readonly Vector3 RainLabPos = new Vector3(0, 0, 60);
+        // 実験場は窓（奥の壁 +Z）から見えないよう、窓のない手前の壁の向こうに置く
+        static readonly Vector3 RainLabPos = new Vector3(0, 0, -80);
 
         public static void Build()
         {
@@ -36,8 +37,9 @@ namespace ImpossibleLab.EditorTools
             RenderSettings.ambientMode = AmbientMode.Trilight;
             RenderSettings.ambientSkyColor = new Color(0.78f, 0.82f, 0.88f);
             RenderSettings.ambientEquatorColor = new Color(0.55f, 0.58f, 0.62f);
-            RenderSettings.ambientGroundColor = new Color(0.30f, 0.31f, 0.33f);
+            RenderSettings.ambientGroundColor = new Color(0.52f, 0.54f, 0.57f); // 明るい床からの照り返し（天井・下向きの面）
             RenderSettings.fog = false;
+            if (A.Sky != null) RenderSettings.skybox = A.Sky;
             var lightGo = new GameObject("Key Light");
             var light = lightGo.AddComponent<Light>();
             light.type = LightType.Directional; light.intensity = 1.1f; light.color = new Color(1f, 0.97f, 0.92f);
@@ -67,7 +69,7 @@ namespace ImpossibleLab.EditorTools
             var cam = origin.Camera;
             cam.nearClipPlane = 0.05f;
             cam.backgroundColor = new Color(0.62f, 0.70f, 0.78f);
-            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.clearFlags = A.Sky != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
             var faderQuad = GameObject.CreatePrimitive(PrimitiveType.Quad);
             faderQuad.name = "Fader";
             Object.DestroyImmediate(faderQuad.GetComponent<Collider>());
@@ -121,36 +123,45 @@ namespace ImpossibleLab.EditorTools
             // 床（約12m×12m＋周辺）・壁・天井梁
             var floor = Box("Floor", lab, new Vector3(0, -0.05f, 0), new Vector3(16, 0.1f, 16), A.Concrete);
             AddTeleport(floor);
-            Cyl("FloorPlate", lab, new Vector3(0, 0.004f, 0), new Vector3(5.2f, 0.004f, 5.2f), A.DarkMetal);
-            Cyl("FloorPlateInner", lab, new Vector3(0, 0.008f, 0), new Vector3(4.9f, 0.004f, 4.9f), A.Concrete);
             Box("Wall_Back", lab, new Vector3(0, 2.5f, 8), new Vector3(16, 5, 0.2f), A.Concrete);
             Box("Wall_Left", lab, new Vector3(-8, 2.5f, 0), new Vector3(0.2f, 5, 16), A.Concrete);
             Box("Wall_Right_A", lab, new Vector3(8, 2.5f, -4.75f), new Vector3(0.2f, 5, 6.5f), A.Concrete);
             Box("Wall_Right_B", lab, new Vector3(8, 2.5f, 4.75f), new Vector3(0.2f, 5, 6.5f), A.Concrete);
             Box("Wall_Right_Top", lab, new Vector3(8, 4.25f, 0), new Vector3(0.2f, 1.5f, 3f), A.Concrete);
             Box("Wall_Front", lab, new Vector3(0, 2.5f, -8), new Vector3(16, 5, 0.2f), A.Concrete);
-            // 窓（ガラス帯）と柱
-            Box("Window_Back", lab, new Vector3(0, 3.2f, 7.88f), new Vector3(13, 1.6f, 0.05f), A.Glass);
-            for (int i = -3; i <= 3; i++) Box("Pillar_" + i, lab, new Vector3(i * 2.2f, 2.5f, 7.75f), new Vector3(0.25f, 5, 0.25f), A.MatteMetal);
-            Box("CeilingBeam_X", lab, new Vector3(0, 4.9f, 0), new Vector3(16, 0.25f, 0.4f), A.MatteMetal);
-            Box("CeilingBeam_Z", lab, new Vector3(0, 4.9f, 0), new Vector3(0.4f, 0.25f, 16), A.MatteMetal);
-
-            // 中央発明台（直径3m）
-            Cyl("InventionTable_Base", lab, new Vector3(0, 0.42f, 0), new Vector3(3.0f, 0.42f, 3.0f), A.RobotWhite);
-            Cyl("InventionTable_Rim", lab, new Vector3(0, 0.86f, 0), new Vector3(3.1f, 0.03f, 3.1f), A.DarkMetal);
-            Cyl("InventionTable_Top", lab, new Vector3(0, 0.9f, 0), new Vector3(2.3f, 0.02f, 2.3f), A.MatteMetal);
-            for (int i = 0; i < 12; i++)
+            if (A.LabRoom != null) PlaceLabRoom(lab);
+            else
             {
-                float ang = i * 30f * Mathf.Deg2Rad;
-                Box("Vent_" + i, lab, new Vector3(Mathf.Sin(ang) * 1.51f, 0.45f, Mathf.Cos(ang) * 1.51f), new Vector3(0.5f, 0.25f, 0.02f), A.DarkMetal)
-                    .transform.rotation = Quaternion.Euler(0, i * 30f, 0);
+                // 窓（ガラス帯）と柱
+                Box("Window_Back", lab, new Vector3(0, 3.2f, 7.88f), new Vector3(13, 1.6f, 0.05f), A.Glass);
+                for (int i = -3; i <= 3; i++) Box("Pillar_" + i, lab, new Vector3(i * 2.2f, 2.5f, 7.75f), new Vector3(0.25f, 5, 0.25f), A.MatteMetal);
+                Box("CeilingBeam_X", lab, new Vector3(0, 4.9f, 0), new Vector3(16, 0.25f, 0.4f), A.MatteMetal);
+                Box("CeilingBeam_Z", lab, new Vector3(0, 4.9f, 0), new Vector3(0.4f, 0.25f, 16), A.MatteMetal);
             }
-            // 天井の円環構造と照明（イベント時のみ明るく）
-            Cyl("CeilingRing", lab, new Vector3(0, 4.4f, 0), new Vector3(3.6f, 0.25f, 3.6f), A.MatteMetal);
-            var ringGo = Cyl("RingLight", lab, new Vector3(0, 4.13f, 0), new Vector3(3.0f, 0.02f, 3.0f), A.AccentBlue, isStatic: false);
-            ring = ringGo.GetComponent<Renderer>();
-            Cyl("HoloGlass", lab, new Vector3(0, 1.7f, 0), new Vector3(1.6f, 0.78f, 1.6f), A.Glass);
-            Cyl("HoloEmitter", lab, new Vector3(0, 0.93f, 0), new Vector3(1.4f, 0.02f, 1.4f), A.AccentBlue);
+
+            if (A.CentralDevice != null) ring = PlaceCentralDevice(lab);
+            else
+            {
+                Cyl("FloorPlate", lab, new Vector3(0, 0.004f, 0), new Vector3(5.2f, 0.004f, 5.2f), A.DarkMetal);
+                Cyl("FloorPlateInner", lab, new Vector3(0, 0.008f, 0), new Vector3(4.9f, 0.004f, 4.9f), A.Concrete);
+                // 中央発明台（直径3m）
+                Cyl("InventionTable_Base", lab, new Vector3(0, 0.42f, 0), new Vector3(3.0f, 0.42f, 3.0f), A.RobotWhite);
+                Cyl("InventionTable_Rim", lab, new Vector3(0, 0.86f, 0), new Vector3(3.1f, 0.03f, 3.1f), A.DarkMetal);
+                Cyl("InventionTable_Top", lab, new Vector3(0, 0.9f, 0), new Vector3(2.3f, 0.02f, 2.3f), A.MatteMetal);
+                for (int i = 0; i < 12; i++)
+                {
+                    float ang = i * 30f * Mathf.Deg2Rad;
+                    Box("Vent_" + i, lab, new Vector3(Mathf.Sin(ang) * 1.51f, 0.45f, Mathf.Cos(ang) * 1.51f), new Vector3(0.5f, 0.25f, 0.02f), A.DarkMetal)
+                        .transform.rotation = Quaternion.Euler(0, i * 30f, 0);
+                }
+                // 天井の円環構造と照明（イベント時のみ明るく）
+                Cyl("CeilingRing", lab, new Vector3(0, 4.4f, 0), new Vector3(3.6f, 0.25f, 3.6f), A.MatteMetal);
+                var ringGo = Cyl("RingLight", lab, new Vector3(0, 4.13f, 0), new Vector3(3.0f, 0.02f, 3.0f), A.AccentBlue, isStatic: false);
+                ring = ringGo.GetComponent<Renderer>();
+                Cyl("HoloGlass", lab, new Vector3(0, 1.7f, 0), new Vector3(1.6f, 0.78f, 1.6f), A.Glass);
+                Cyl("HoloEmitter", lab, new Vector3(0, 0.93f, 0), new Vector3(1.4f, 0.02f, 1.4f), A.AccentBlue);
+            }
+
             // 発明品の表示位置
             displayPoint = new GameObject("DisplayPoint").transform;
             displayPoint.SetParent(lab, false);
@@ -162,13 +173,14 @@ namespace ImpossibleLab.EditorTools
             var ht = UiKit.Text(holoCanvas.transform, "AI INVENTOR\n<size=60%>どんな発明をしますか？</size>", 90, LabTheme.AccentLight, bold: true, align: TextAlignmentOptions.Center);
             UiKit.Stretch(ht.rectTransform);
 
-            // ロボットアーム（演出物・低ポリゴン）
+            // ロボットアーム（演出物）。モデルがあれば肩（ARM_Upper）を関節として使う
             var joints = new List<Transform>();
             foreach (float side in new[] { -1f, 1f })
             {
                 var root = new GameObject(side < 0 ? "RobotArm_L" : "RobotArm_R").transform;
                 root.SetParent(lab, false);
                 root.localPosition = new Vector3(2.1f * side, 0, 0.6f);
+                if (A.RobotArm != null) { joints.Add(PlaceRobotArm(root)); continue; }
                 root.localRotation = Quaternion.Euler(0, side < 0 ? 60 : -60, 0);
                 Cyl("Base", root, new Vector3(0, 0.15f, 0), new Vector3(0.6f, 0.15f, 0.6f), A.RobotWhite, isStatic: false);
                 Cyl("Column", root, new Vector3(0, 0.6f, 0), new Vector3(0.32f, 0.3f, 0.32f), A.RobotWhite, isStatic: false);
@@ -190,8 +202,19 @@ namespace ImpossibleLab.EditorTools
             // 作業台（実務的な机・モニター）
             for (int i = 0; i < 3; i++)
             {
+                if (A.Workbench != null) { Place(A.Workbench, "Workbench_" + i, lab, new Vector3(-6.6f, 0, -3 + i * 3), Quaternion.identity); continue; }
                 Box("Bench_L" + i, lab, new Vector3(-6.6f, 0.4f, -3 + i * 3), new Vector3(1.2f, 0.8f, 2.2f), A.RobotWhite);
                 Box("Monitor_L" + i, lab, new Vector3(-6.8f, 1.15f, -3 + i * 3), new Vector3(0.05f, 0.5f, 0.85f), A.DarkMetal).transform.rotation = Quaternion.Euler(0, 0, -8);
+            }
+            // 観葉植物（窓際の角と、実験ゲートの横）
+            if (A.Plant != null)
+            {
+                var plants = new[] { new Vector3(-7.1f, 0, 7.0f), new Vector3(7.1f, 0, 7.0f), new Vector3(7.2f, 0, -3.2f) };
+                for (int i = 0; i < plants.Length; i++)
+                {
+                    var pl = Place(A.Plant, "Plant_" + i, lab, plants[i], Quaternion.Euler(0, 70f * i, 0));
+                    foreach (var r in pl.GetComponentsInChildren<MeshRenderer>()) if (r.name == "PLANT_Leaves") r.shadowCastingMode = ShadowCastingMode.Off;
+                }
             }
             // サイン（上部ナビの代わりに研究室の固定サインで案内, 仕様21.3）
             var sign = SignCanvas("Sign_Main", lab, new Vector3(-7.85f, 2.9f, 1.5f), Quaternion.Euler(0, -90, 0), new Vector2(3200, 900));
@@ -199,32 +222,40 @@ namespace ImpossibleLab.EditorTools
             UiKit.Stretch(st.rectTransform, 80, 40, 40, 40);
             SignBackground(sign);
 
-            // INVENTION GALLERY（展示台：簡易）
+            // INVENTION GALLERY（展示台）
             for (int i = 0; i < 3; i++)
             {
                 var p = new Vector3(-2.6f + i * 2.6f, 0, 6.6f);
+                if (A.GalleryCase != null) { Place(A.GalleryCase, "GalleryCase_" + i, lab, p, Quaternion.identity); continue; }
                 Cyl("GalleryPedestal_" + i, lab, p + new Vector3(0, 0.35f, 0), new Vector3(1.0f, 0.35f, 1.0f), A.RobotWhite);
                 Cyl("GalleryGlass_" + i, lab, p + new Vector3(0, 1.3f, 0), new Vector3(0.9f, 0.6f, 0.9f), A.Glass);
             }
-            var gsign = SignCanvas("Sign_Gallery", lab, new Vector3(0, 3.9f, 7.85f), Quaternion.identity, new Vector2(2600, 300));
+            // 窓の柱（Z 7.76〜8.0）より手前に出す
+            var gsign = SignCanvas("Sign_Gallery", lab, new Vector3(0, 3.9f, 7.6f), Quaternion.identity, new Vector2(3000, 300));
             SignBackground(gsign);
-            var gt = UiKit.Text(gsign.transform, "05  INVENTION GALLERY ｜ 発明品展示室", 150, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.Center);
+            var gt = UiKit.Text(gsign.transform, "05  INVENTION GALLERY ｜ 発明品展示室", 140, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.Center);
             UiKit.Stretch(gt.rectTransform);
 
             // EXPERIMENT GATE（可動式扉）
             var gate = new GameObject("EXPERIMENT GATE").transform;
             gate.SetParent(lab, false);
             gate.localPosition = new Vector3(7.9f, 0, 0);
-            gate.localRotation = Quaternion.Euler(0, -90, 0);
-            Box("Frame_L", gate, new Vector3(-1.6f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.5f), A.MatteMetal);
-            Box("Frame_R", gate, new Vector3(1.6f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.5f), A.MatteMetal);
-            Box("Frame_Top", gate, new Vector3(0, 3.55f, 0), new Vector3(3.5f, 0.3f, 0.5f), A.MatteMetal);
-            Box("GateLight", gate, new Vector3(0, 3.38f, -0.26f), new Vector3(3.0f, 0.04f, 0.02f), A.AccentBlue);
-            gateL = Box("Door_L", gate, new Vector3(-0.6f, 1.7f, 0), new Vector3(1.2f, 3.4f, 0.12f), A.DarkMetal, isStatic: false).transform;
-            gateR = Box("Door_R", gate, new Vector3(0.6f, 1.7f, 0), new Vector3(1.2f, 3.4f, 0.12f), A.DarkMetal, isStatic: false).transform;
-            var gs = SignCanvas("Sign_Gate", gate, new Vector3(0, 4.05f, -0.3f), Quaternion.identity, new Vector2(2400, 300));
+            // ローカル −Z（サイン・光の線の側）が部屋の内側（−X）を向くように
+            gate.localRotation = Quaternion.Euler(0, 90, 0);
+            if (A.Gate != null) PlaceGate(gate, out gateL, out gateR);
+            else
+            {
+                Box("Frame_L", gate, new Vector3(-1.6f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.5f), A.MatteMetal);
+                Box("Frame_R", gate, new Vector3(1.6f, 1.75f, 0), new Vector3(0.3f, 3.5f, 0.5f), A.MatteMetal);
+                Box("Frame_Top", gate, new Vector3(0, 3.55f, 0), new Vector3(3.5f, 0.3f, 0.5f), A.MatteMetal);
+                Box("GateLight", gate, new Vector3(0, 3.38f, -0.26f), new Vector3(3.0f, 0.04f, 0.02f), A.AccentBlue);
+                gateL = Box("Door_L", gate, new Vector3(-0.6f, 1.7f, 0), new Vector3(1.2f, 3.4f, 0.12f), A.DarkMetal, isStatic: false).transform;
+                gateR = Box("Door_R", gate, new Vector3(0.6f, 1.7f, 0), new Vector3(1.2f, 3.4f, 0.12f), A.DarkMetal, isStatic: false).transform;
+            }
+            // モデルのゲートは上の梁（高さ 3.6〜4.1 m・手前の面 Z −0.4）の上の背板の前に出す
+            var gs = SignCanvas("Sign_Gate", gate, A.Gate != null ? new Vector3(0, 4.25f, -0.45f) : new Vector3(0, 4.05f, -0.3f), Quaternion.identity, new Vector2(2800, 300));
             SignBackground(gs);
-            var gst = UiKit.Text(gs.transform, "03  EXPERIMENT GATE ｜ 実験ゲート", 140, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.Center);
+            var gst = UiKit.Text(gs.transform, "03  EXPERIMENT GATE ｜ 実験ゲート", 125, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.Center);
             UiKit.Stretch(gst.rectTransform);
 
             // 立ち位置とコンソール（正面約1.2m・やや下向き）
@@ -233,6 +264,81 @@ namespace ImpossibleLab.EditorTools
             var cspot = new GameObject("WorkshopConsoleSpot").transform;
             cspot.SetParent(lab, false); cspot.localPosition = new Vector3(0, 1.0f, -2.1f); cspot.localRotation = Quaternion.identity;
             return lab;
+        }
+
+        // ================= 研究室のモデル（Blender 制作） =================
+        /// <summary>モデルを置く（静的・影は落とす）。</summary>
+        static GameObject Place(GameObject model, string name, Transform parent, Vector3 pos, Quaternion rot)
+        {
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(model);
+            go.name = name;
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = pos; go.transform.localRotation = rot;
+            foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
+                GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.OccludeeStatic);
+            return go;
+        }
+
+        /// <summary>床・壁・窓・天井。当たり判定とテレポートはシーンの箱（Floor・Wall_*）を使い、箱の表示だけ消す。
+        /// 天井・壁は影を落とさない（日光で室内を照らすため。Quest の影の負荷も減る）。</summary>
+        static void PlaceLabRoom(Transform lab)
+        {
+            foreach (Transform t in lab)
+                if (t.name == "Floor" || t.name.StartsWith("Wall_"))
+                    Object.DestroyImmediate(t.GetComponent<MeshRenderer>());
+            var go = Place(A.LabRoom, "LabRoom", lab, Vector3.zero, Quaternion.identity);
+            foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
+                if (r.name != "ROOM_Floor") r.shadowCastingMode = ShadowCastingMode.Off;
+        }
+
+        /// <summary>ロボットアーム。肘（ARM_Fore）の向きから、腕が発明台の中心を向くように根元を回す。肩（ARM_Upper）を返す。</summary>
+        static Transform PlaceRobotArm(Transform root)
+        {
+            var go = Place(A.RobotArm, "Model", root, Vector3.zero, Quaternion.identity);
+            var upper = go.transform.Find("ARM_Upper");
+            var fore = upper != null ? upper.Find("ARM_Fore") : null;
+            if (upper == null || fore == null) throw new System.InvalidOperationException("RobotArm.fbx に ARM_Upper／ARM_Fore がありません");
+            foreach (var t in new[] { upper, fore }) GameObjectUtility.SetStaticEditorFlags(t.gameObject, 0);
+            var reach = go.transform.InverseTransformPoint(fore.position); reach.y = 0f;
+            var toCenter = -root.localPosition; toCenter.y = 0f;
+            root.localRotation = Quaternion.FromToRotation(reach.normalized, toCenter.normalized);
+            return upper;
+        }
+
+        /// <summary>実験ゲート。扉は動かすので静的にしない。左右は位置で決める（モデルの座標の向きに依らない）。</summary>
+        static void PlaceGate(Transform gate, out Transform doorL, out Transform doorR)
+        {
+            var go = Place(A.Gate, "GateModel", gate, Vector3.zero, Quaternion.identity);
+            var a = go.transform.Find("GATE_DoorL"); var b = go.transform.Find("GATE_DoorR");
+            if (a == null || b == null) throw new System.InvalidOperationException("Gate.fbx に GATE_DoorL／GATE_DoorR がありません");
+            foreach (var t in new[] { a, b }) GameObjectUtility.SetStaticEditorFlags(t.gameObject, 0);
+            bool aLeft = a.localPosition.x < b.localPosition.x;
+            doorL = aLeft ? a : b; doorR = aLeft ? b : a;
+            Debug.Log($"ILAB_GATE doorL={doorL.localPosition} doorR={doorR.localPosition}");
+        }
+
+        // ================= 中央装置（Blender 制作のモデル） =================
+        /// <summary>中央装置のモデルを置く。下面の光の輪（CL_RingLight）はイベント時に明るくするため静的にしない。発明台の当たり判定は円柱で別に置く。</summary>
+        static Renderer PlaceCentralDevice(Transform lab)
+        {
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(A.CentralDevice);
+            go.name = "CentralDevice";
+            go.transform.SetParent(lab, false);
+            go.transform.localPosition = Vector3.zero; go.transform.localRotation = Quaternion.identity;
+            Renderer ring = null;
+            foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if (r.name == "CL_RingLight") { ring = r; continue; }
+                GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.OccludeeStatic);
+                // ガラス・光の線は影を落とさない
+                if (r.name == "CL_HoloGlass" || r.name == "CL_HoloBars" || r.name.Contains("Light") || r.name.Contains("Glow") || r.name == "CL_CeilingHalo")
+                    r.shadowCastingMode = ShadowCastingMode.Off;
+            }
+            if (ring == null) Debug.LogWarning("ILAB: CentralDevice に CL_RingLight がありません");
+            var col = Cyl("InventionTable_Base", lab, new Vector3(0, 0.45f, 0), new Vector3(3.1f, 0.45f, 3.1f), A.RobotWhite);
+            Object.DestroyImmediate(col.GetComponent<MeshRenderer>());
+            Object.DestroyImmediate(col.GetComponent<MeshFilter>());
+            return ring;
         }
 
         // ================= RainLab =================

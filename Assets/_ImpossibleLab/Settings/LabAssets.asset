@@ -29,3 +29,21 @@ MonoBehaviour:
   Fader: {fileID: 2100000, guid: a0aa2ae1442c8f54e84460a97310fac2, type: 2}
   Ground: {fileID: 2100000, guid: cdb08815f3cbfcc4d9cad4d65eabb967, type: 2}
   RainSample: {fileID: 4900000, guid: 864f7b84ee405be48aa3b1ce35b4a7f2, type: 3}
+  PartAluminum: {fileID: 2100000, guid: f8c9985c112c92a4493215c2676c1204, type: 2}
+  PartSteel: {fileID: 2100000, guid: 069ebbad9253be04ab67fd4a3b34cb4b, type: 2}
+  PartFabric: {fileID: 2100000, guid: 7faaf582417f08246a012ecf670064de, type: 2}
+  PartFoam: {fileID: 2100000, guid: c545519d9e3b9c94c9dd596a3be00698, type: 2}
+  PartRubber: {fileID: 2100000, guid: 0ab4a569eee85c54c997a88f90fa099d, type: 2}
+  GlowOrange: {fileID: 2100000, guid: 93b77b06f810f9540b8de984c1ff238f, type: 2}
+  LightPanel: {fileID: 2100000, guid: b4a2c6646dcbbc444a1799cf0735e4fa, type: 2}
+  CentralDevice: {fileID: 919132149155446097, guid: 8b58c7e02f3a58d4cb968e0787da938c, type: 3}
+  LabRoom: {fileID: 919132149155446097, guid: aff467f74e162a14f9bc39140b82c271, type: 3}
+  RobotArm: {fileID: 919132149155446097, guid: ce5297c026fe59345af8a111bfea097b, type: 3}
+  Workbench: {fileID: 919132149155446097, guid: c717169afad5e7c46a14e3437554cb64, type: 3}
+  GalleryCase: {fileID: 919132149155446097, guid: 2c19c58e71206494eb308b4e1a13081c, type: 3}
+  Gate: {fileID: 919132149155446097, guid: f5df470bdccd1b243989602e9f72aaf7, type: 3}
+  FloorConcrete: {fileID: 2100000, guid: 54fc84725033c234b9c33d7b70bf9afd, type: 2}
+  Screen: {fileID: 2100000, guid: d9a767308ff1d9c48bac6416104cd1e6, type: 2}
+  Sky: {fileID: 2100000, guid: 35765abaae30dc44eb88f80063be9e4f, type: 2}
+  Plant: {fileID: 919132149155446097, guid: 4e3ec562bbfad254bb9c56d5f28efcdd, type: 3}
+  PlantLeaves: {fileID: 2100000, guid: 9bca8b4556ae98941958bac50a9bed03, type: 2}

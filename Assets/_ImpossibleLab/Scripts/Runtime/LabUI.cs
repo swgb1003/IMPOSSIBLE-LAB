@@ -578,7 +578,7 @@ namespace ImpossibleLab
             UiKit.Button(a, "実験へ ▶", App.GoToTestSetup, ButtonStyle.Primary, 260, 68);
 
             SideHeading(_leftBody, "DESIGN STUDIO", "部品一覧（掴む：グリップ／起動：掴んでトリガー）");
-            CappedLines(_leftBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}  <size=80%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>{part.Id} ／ {part.Scale.x:0.00}×{part.Scale.y:0.00}×{part.Scale.z:0.00} m</color></size>", LabTheme.FontBody, LabTheme.TextPrimary, 40f)).ToList(), 6);
+            CappedLines(_leftBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}  <size=80%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>{part.Id} ／ {LabCatalog.Material(part.MaterialOrDefault)?.LabelJa} ／ {part.Scale.x:0.00}×{part.Scale.y:0.00}×{part.Scale.z:0.00} m</color></size>", LabTheme.FontBody, LabTheme.TextPrimary, 40f)).ToList(), 6);
             var lookRow = UiKit.Row("Appearance", _leftBody, LabTheme.Space1, 52);
             var lookLabel = UiKit.Text(lookRow, "外観", LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft); UiKit.Size(lookLabel, w: 70);
             UiKit.Button(lookRow, "◀", () => App.StepAppearance(-1), ButtonStyle.Secondary, 56, 48);
