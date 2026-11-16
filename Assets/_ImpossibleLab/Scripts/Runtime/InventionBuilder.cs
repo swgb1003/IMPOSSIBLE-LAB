@@ -90,6 +90,8 @@ namespace ImpossibleLab
 
         GameObject CreatePrimitive(PartSpec part, InventionDna dna)
         {
+            var kit = PartKitLibrary.Find(_assets, part.Type, part.ShapeOrDefault);
+            if (kit != null) return CreateFromKit(part, dna, kit);
             // 見た目は DNA の素材（機能部品は機能の色）、形は DNA の shape（未指定なら部品タイプの既定）で決める（PartLook）
             Material mat = _assets.For(PartLook.Surface(part));
             Vector3 scale = part.Scale;
@@ -120,6 +122,63 @@ namespace ImpossibleLab
                 rend.SetPropertyBlock(mpb);
             }
             return go;
+        }
+
+        /// <summary>部品キットのメッシュで作る。大きさの基準は基本形状と同じ（円柱・カプセルは高さ2）。飾りは子にして同じ大きさを掛ける。</summary>
+        GameObject CreateFromKit(PartSpec part, InventionDna dna, PartKitLibrary.Entry kit)
+        {
+            Vector3 scale = part.Scale;
+            string shape = part.ShapeOrDefault;
+            if (shape == "cylinder" || shape == "capsule") scale.y *= 0.5f;
+            var go = new GameObject($"Part_{part.Id}_{part.Type}");
+            go.transform.localRotation = part.Type == "wheel" && shape == "cylinder" ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+            go.transform.localScale = scale;
+            // 機能の色を飾りが持つキットでは、筐体は素材の色にする
+            var surface = kit.HasAccent ? PartLook.Housing(part) : PartLook.Surface(part);
+            AddMesh(go, kit.Mesh, _assets.For(surface), PartLook.Tint(surface, part, dna.Appearance));
+            var fn = PartLook.Surface(part);
+            foreach (var x in kit.Extras)
+            {
+                var child = new GameObject(x.Name);
+                child.transform.SetParent(go.transform, false);
+                bool functionColor = x.IsAccent && (fn == PartSurface.AccentBlue || fn == PartSurface.AccentOrange);
+                AddMesh(child, x.Mesh, functionColor ? _assets.For(fn) : x.Material, functionColor ? PartLook.Tint(fn, part, dna.Appearance) : null);
+            }
+            if (part.Type == "sensor" && shape == "sphere" && kit.HasAccent && _assets.LensGlow != null) AddLensGlow(go.transform, scale);
+            return go;
+        }
+
+        /// <summary>
+        /// センサーのレンズ（キットでは前面 z=0.3、半径0.36）に光のにじみの板を重ねる。
+        /// 部品は縦横で違う大きさを掛けているので、にじみが楕円にならないよう子の大きさで打ち消す。
+        /// </summary>
+        void AddLensGlow(Transform part, Vector3 scale)
+        {
+            var q = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            q.name = "LensGlow";
+            Object.Destroy(q.GetComponent<Collider>());
+            q.transform.SetParent(part, false);
+            q.transform.localPosition = new Vector3(0, 0, 0.34f);
+            float d = 0.36f * 2f * 3.6f * Mathf.Min(Mathf.Abs(scale.x), Mathf.Abs(scale.y)); // レンズの直径の約3.6倍
+            q.transform.localScale = new Vector3(d / Mathf.Max(1e-4f, Mathf.Abs(scale.x)), d / Mathf.Max(1e-4f, Mathf.Abs(scale.y)), 1f);
+            var r = q.GetComponent<MeshRenderer>();
+            r.sharedMaterial = _assets.LensGlow;
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            r.receiveShadows = false;
+        }
+
+        static void AddMesh(GameObject go, Mesh mesh, Material mat, int? rgb)
+        {
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var rend = go.AddComponent<MeshRenderer>();
+            rend.sharedMaterial = mat;
+            rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            if (rgb.HasValue)
+            {
+                var mpb = new MaterialPropertyBlock();
+                mpb.SetColor("_BaseColor", RgbColor(rgb.Value));
+                rend.SetPropertyBlock(mpb);
+            }
         }
 
         static Color RgbColor(int rgb) => new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f);

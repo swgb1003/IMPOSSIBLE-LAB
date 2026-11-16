@@ -46,4 +46,7 @@ MonoBehaviour:
   Screen: {fileID: 2100000, guid: d9a767308ff1d9c48bac6416104cd1e6, type: 2}
   Sky: {fileID: 2100000, guid: 35765abaae30dc44eb88f80063be9e4f, type: 2}
   Plant: {fileID: 919132149155446097, guid: 4e3ec562bbfad254bb9c56d5f28efcdd, type: 3}
+  PartKit: {fileID: 919132149155446097, guid: 3fd7ec635203f834b8f77eccde0e65cd, type: 3}
+  PartCanopy: {fileID: 2100000, guid: 00829e73aa420d74a9bb35c824dfa119, type: 2}
+  LensGlow: {fileID: 2100000, guid: f74f1056b1f6c7646909aa91e1b8db47, type: 2}
   PlantLeaves: {fileID: 2100000, guid: 9bca8b4556ae98941958bac50a9bed03, type: 2}

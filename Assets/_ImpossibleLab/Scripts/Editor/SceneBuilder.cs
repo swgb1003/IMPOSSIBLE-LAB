@@ -42,8 +42,10 @@ namespace ImpossibleLab.EditorTools
             if (A.Sky != null) RenderSettings.skybox = A.Sky;
             var lightGo = new GameObject("Key Light");
             var light = lightGo.AddComponent<Light>();
-            light.type = LightType.Directional; light.intensity = 1.1f; light.color = new Color(1f, 0.97f, 0.92f);
+            light.type = LightType.Directional; light.intensity = 1.1f; light.color = new Color(1f, 0.99f, 0.97f); // 白寄り（焼き込みで暖色にくすまないように）
             light.shadows = LightShadows.Soft;
+            // 直接光と影は従来どおり実行中に計算し、壁・床で跳ね返る柔らかい光（間接光）と角の暗さだけを焼き込む
+            light.lightmapBakeType = LightmapBakeType.Mixed;
             lightGo.transform.rotation = Quaternion.Euler(52, -30, 0);
 
             var env = new GameObject("Environment").transform;
@@ -108,6 +110,10 @@ namespace ImpossibleLab.EditorTools
             ui.App = app; ui.ConsoleRoot = consoleRoot;
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
+            EditorSceneManager.SaveScene(scene, ScenePath);
+            AddLightProbes(displayPoint);
+            BakeLighting();
+            BakeDisplayProbe(displayPoint);
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             AssetDatabase.SaveAssets();
@@ -275,7 +281,11 @@ namespace ImpossibleLab.EditorTools
             go.transform.SetParent(parent, false);
             go.transform.localPosition = pos; go.transform.localRotation = rot;
             foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
-                GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.OccludeeStatic);
+            {
+                GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.ReflectionProbeStatic | StaticEditorFlags.OccludeeStatic);
+                // 光る面（照明パネル）は光源として焼き込みに使うが、自分は焼き込みの画像を貼らない（明るすぎて色が崩れるため）
+                if (r.sharedMaterial == A.LightPanel) r.receiveGI = ReceiveGI.LightProbes;
+            }
             return go;
         }
 
@@ -329,10 +339,11 @@ namespace ImpossibleLab.EditorTools
             foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
             {
                 if (r.name == "CL_RingLight") { ring = r; continue; }
-                GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.OccludeeStatic);
+                GameObjectUtility.SetStaticEditorFlags(r.gameObject, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.ReflectionProbeStatic | StaticEditorFlags.OccludeeStatic);
                 // ガラス・光の線は影を落とさない
                 if (r.name == "CL_HoloGlass" || r.name == "CL_HoloBars" || r.name.Contains("Light") || r.name.Contains("Glow") || r.name == "CL_CeilingHalo")
                     r.shadowCastingMode = ShadowCastingMode.Off;
+                if (r.sharedMaterial == A.LightPanel) r.receiveGI = ReceiveGI.LightProbes; // 光る面は焼き込みの画像を貼らない
             }
             if (ring == null) Debug.LogWarning("ILAB: CentralDevice に CL_RingLight がありません");
             var col = Cyl("InventionTable_Base", lab, new Vector3(0, 0.45f, 0), new Vector3(3.1f, 0.45f, 3.1f), A.RobotWhite);
@@ -423,6 +434,73 @@ namespace ImpossibleLab.EditorTools
             img.transform.SetAsFirstSibling();
         }
 
+        /// <summary>
+        /// 研究室の間接光と角の暗さ（アンビエントオクルージョン）を焼き込む。Blender のモデル（2つ目の UV を生成済み）だけがライトマップを使い、
+        /// Unity の基本形状の静的な物と、動く物（試作品・ロボットアームなど）はライトプローブから光を受ける。
+        /// </summary>
+        static void BakeLighting()
+        {
+            string path = Path.Combine(Path.GetDirectoryName(ScenePath), "LabHub_Lighting.lighting").Replace('\\', '/');
+            var ls = AssetDatabase.LoadAssetAtPath<LightingSettings>(path);
+            if (ls == null) { ls = new LightingSettings { name = "LabHub_Lighting" }; AssetDatabase.CreateAsset(ls, path); }
+            ls.bakedGI = true;
+            ls.realtimeGI = false;
+            ls.mixedBakeMode = MixedLightingMode.IndirectOnly;
+            ls.lightmapper = LightingSettings.Lightmapper.ProgressiveGPU;
+            ls.lightmapResolution = 16f;       // 1m あたりの画素数（影の境目を細かく。1枚 1024 まで）
+            ls.lightmapPadding = 2;
+            ls.lightmapMaxSize = 1024;
+            ls.lightmapCompression = LightmapCompression.NormalQuality;
+            ls.directSampleCount = 32;
+            ls.indirectSampleCount = 256;
+            ls.maxBounces = 2;
+            ls.ao = true;
+            ls.aoMaxDistance = 0.8f;
+            ls.indirectScale = 1.2f;   // 白い研究室なので跳ね返る光を強めに（くすみを防ぐ）
+            ls.albedoBoost = 1.25f;
+            EditorUtility.SetDirty(ls);
+            Lightmapping.lightingSettings = ls;
+            var t0 = System.DateTime.Now;
+            bool ok = Lightmapping.Bake();
+            Debug.Log($"ILAB_LIGHTMAP bake={(ok ? "ok" : "failed")} sec={(System.DateTime.Now - t0).TotalSeconds:0} lightmaps={LightmapSettings.lightmaps.Length}");
+        }
+
+        /// <summary>発明台と作業場所のまわりのライトプローブ（動く物・基本形状が間接光を受けるため）。</summary>
+        static void AddLightProbes(Transform displayPoint)
+        {
+            var go = new GameObject("LabLightProbes");
+            var g = go.AddComponent<LightProbeGroup>();
+            var pts = new List<Vector3>();
+            Vector3 c = displayPoint.position;
+            for (float x = -4f; x <= 4.01f; x += 2f)
+                for (float z = -4f; z <= 4.01f; z += 2f)
+                    foreach (float y in new[] { 0.3f, 1.3f, 2.5f })
+                        pts.Add(new Vector3(c.x + x, y, c.z + z));
+            g.probePositions = pts.ToArray();
+        }
+
+        /// <summary>
+        /// 発明台のまわりの映り込み（樹脂・金属のつや用）。研究室の静的な物を1回だけ写して画像に保存し、実行中は描き直さない（Quest の負担を増やさない）。
+        /// </summary>
+        static void BakeDisplayProbe(Transform displayPoint)
+        {
+            var go = new GameObject("DisplayReflectionProbe");
+            go.transform.position = displayPoint.position + Vector3.up * 0.3f;
+            var probe = go.AddComponent<ReflectionProbe>();
+            probe.mode = ReflectionProbeMode.Custom;
+            probe.size = new Vector3(16f, 8f, 16f);
+            probe.resolution = 128;
+            probe.importance = 1;
+            string path = Path.Combine(Path.GetDirectoryName(ScenePath), "LabHub_DisplayProbe.exr").Replace('\\', '/');
+            if (Lightmapping.BakeReflectionProbe(probe, path))
+            {
+                AssetDatabase.ImportAsset(path);
+                probe.customBakedTexture = AssetDatabase.LoadAssetAtPath<Texture>(path);
+                Debug.Log("ILAB_PROBE baked " + path);
+            }
+            else Debug.LogWarning("ILAB_PROBE bake failed");
+        }
+
         static GameObject Prim(PrimitiveType t, string name, Transform parent, Vector3 pos, Vector3 scale, Material m, bool isStatic, bool keepCollider)
         {
             var go = GameObject.CreatePrimitive(t);
@@ -431,7 +509,9 @@ namespace ImpossibleLab.EditorTools
             go.transform.localPosition = pos; go.transform.localScale = scale;
             go.GetComponent<Renderer>().sharedMaterial = m;
             if (!keepCollider) Object.DestroyImmediate(go.GetComponent<Collider>());
-            if (isStatic) GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
+            // 基本形状のメッシュには焼き込み用の2つ目の UV がないので、静的でもライトプローブから光を受ける
+            if (isStatic) go.GetComponent<MeshRenderer>().receiveGI = ReceiveGI.LightProbes;
+            if (isStatic) GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.ReflectionProbeStatic | StaticEditorFlags.OccluderStatic | StaticEditorFlags.OccludeeStatic);
             return go;
         }
 

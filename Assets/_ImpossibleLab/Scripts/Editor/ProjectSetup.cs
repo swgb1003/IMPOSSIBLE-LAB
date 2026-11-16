@@ -181,11 +181,14 @@ namespace ImpossibleLab.EditorTools
             a.Concrete = Lit("Concrete", LabTheme.SurfaceLab, 0.25f, 0f);
             a.MatteMetal = Lit("MatteMetal", new Color(0.62f, 0.66f, 0.70f), 0.45f, 0.7f);
             a.DarkMetal = Lit("DarkMetal", new Color(0.16f, 0.19f, 0.23f), 0.4f, 0.6f);
-            a.RobotWhite = Lit("RobotWhite", new Color(0.93f, 0.94f, 0.95f), 0.55f, 0.05f);
+            a.RobotWhite = Lit("RobotWhite", new Color(0.93f, 0.94f, 0.95f), 0.62f, 0.05f); // つやのある白い樹脂（映り込みが乗る）
             a.Glass = Transparent(Lit("Glass", new Color(0.55f, 0.78f, 0.92f, 0.16f), 0.9f, 0f));
             a.AccentBlue = Emissive(Lit("AccentBlue", LabTheme.AccentPrimary, 0.6f, 0f), LabTheme.AccentPrimary * 0.6f);
             a.AccentOrange = Lit("AccentOrange", LabTheme.AccentWarning, 0.5f, 0f);
             a.Canopy = Transparent(Lit("Canopy", new Color(LabTheme.AccentLight.r, LabTheme.AccentLight.g, LabTheme.AccentLight.b, 0.42f), 0.8f, 0f));
+            // 試作品のキャノピー：下の人は透けて見えるが、円盤としてはっきり見える水色（参考：描き直した画像）
+            a.LensGlow = LensGlowMaterial();
+            a.PartCanopy = Transparent(Lit("PartCanopy", new Color(0.74f, 0.87f, 0.97f, 0.85f), 0.55f, 0f));
             a.Mannequin = Lit("Mannequin", new Color(0.78f, 0.80f, 0.82f), 0.3f, 0f);
             a.WetZone = Transparent(Lit("WetZone", new Color(LabTheme.TextSecondary.r, LabTheme.TextSecondary.g, LabTheme.TextSecondary.b, 0.12f), 0.2f, 0f));
             a.MannequinHit = Transparent(Lit("WetZoneHit", new Color(LabTheme.AccentWarning.r, LabTheme.AccentWarning.g, LabTheme.AccentWarning.b, 0.35f), 0.2f, 0f));
@@ -198,7 +201,7 @@ namespace ImpossibleLab.EditorTools
             a.PartFoam = Lit("PartFoam", new Color(0.86f, 0.84f, 0.76f), 0.03f, 0f);
             a.PartRubber = Lit("PartRubber", new Color(0.09f, 0.10f, 0.11f), 0.22f, 0f);
             a.GlowOrange = Emissive(Lit("GlowOrange", LabTheme.AccentWarning, 0.4f, 0f), LabTheme.AccentWarning * 1.2f);
-            a.LightPanel = Emissive(Lit("LightPanel", new Color(0.95f, 0.96f, 0.97f), 0.5f, 0f), new Color(1f, 0.98f, 0.95f) * 1.4f);
+            a.LightPanel = Emissive(Lit("LightPanel", new Color(0.95f, 0.96f, 0.97f), 0.5f, 0f), new Color(1f, 0.99f, 0.98f) * 2.2f, bakeGI: true);
             a.FloorConcrete = FloorMaterial();
             a.Screen = Emissive(Lit("Screen", new Color(0.02f, 0.08f, 0.16f), 0.8f, 0f), new Color(0.10f, 0.45f, 0.85f) * 1.6f);
             a.Sky = SkyMaterial();
@@ -210,6 +213,7 @@ namespace ImpossibleLab.EditorTools
             a.GalleryCase = ImportModel("GalleryCase", a);
             a.Gate = ImportModel("Gate", a);
             a.Plant = ImportModel("Plant", a);
+            a.PartKit = ImportModel("PartKit", a, bakeAxis: true);
             a.Fader = Transparent(Unlit("Fader", new Color(0, 0, 0, 0)));
             a.Fader.renderQueue = 4000;
             a.RainSample = AssetDatabase.LoadAssetAtPath<TextAsset>(Root + "/Data/Samples/Resources/ImpossibleLabSamples/handsfree_rain.json");
@@ -221,7 +225,7 @@ namespace ImpossibleLab.EditorTools
         /// Blender で作ったモデル（ArtSource/blender から書き出した FBX）の取り込み設定。
         /// マテリアル（MAT_*）は LabAssets のマテリアルへ置き換え、モデル側のマテリアルは作らない。ファイルが無ければ null（シーンは従来の簡易形状）。
         /// </summary>
-        static GameObject ImportModel(string name, LabAssets a)
+        static GameObject ImportModel(string name, LabAssets a, bool bakeAxis = false)
         {
             string path = $"{ModelDir}/{name}.fbx";
             if (!(AssetImporter.GetAtPath(path) is ModelImporter mi)) return null;
@@ -230,7 +234,9 @@ namespace ImpossibleLab.EditorTools
             mi.importAnimation = false; mi.animationType = ModelImporterAnimationType.None;
             mi.importBlendShapes = false; mi.addCollider = false; mi.isReadable = false;
             mi.importNormals = ModelImporterNormals.Import;
-            mi.generateSecondaryUV = true; // ライトの焼き込み用
+            mi.generateSecondaryUV = !bakeAxis; // ライトの焼き込み用（部品キットは動く物なので不要）
+            // 部品キットは DNA の大きさをそのまま掛けるので、軸の変換をメッシュに焼き込み、各部品の回転を無しにする
+            mi.bakeAxisConversion = bakeAxis;
             mi.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
             var map = new (string, Material)[]
             {
@@ -380,16 +386,53 @@ namespace ImpossibleLab.EditorTools
             return m;
         }
 
-        static Material Emissive(Material m, Color e)
+        static Material Emissive(Material m, Color e, bool bakeGI = false)
         {
             m.EnableKeyword("_EMISSION");
             m.SetColor("_EmissionColor", e);
-            m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+            // bakeGI：光る面を焼き込みの光源にする（天井の照明パネルなど。実行中の負担はない）
+            m.globalIlluminationFlags = bakeGI ? MaterialGlobalIlluminationFlags.BakedEmissive : MaterialGlobalIlluminationFlags.None;
             EditorUtility.SetDirty(m);
             return m;
         }
 
         /// <summary>URP Lit/Unlit を半透明（アルファブレンド）にする。Questでは使用箇所を最小限にする。</summary>
+        /// <summary>レンズの光のにじみ：中心が明るく外へ向かって消える円（64px の画像をコードで作る）を、加算で重ねる。</summary>
+        static Material LensGlowMaterial()
+        {
+            string tp = Root + "/Art/Textures/LensGlow.png";
+            if (!File.Exists(tp))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(tp));
+                const int n = 64;
+                var t = new Texture2D(n, n, TextureFormat.RGBA32, false);
+                for (int y = 0; y < n; y++)
+                    for (int x = 0; x < n; x++)
+                    {
+                        float dx = (x + 0.5f) / n * 2f - 1f, dy = (y + 0.5f) / n * 2f - 1f;
+                        float r = Mathf.Sqrt(dx * dx + dy * dy);
+                        float a = Mathf.Clamp01(1f - r);
+                        a = a * a * (3f - 2f * a); // なめらかに消える
+                        t.SetPixel(x, y, new Color(1f, 1f, 1f, a * a));
+                    }
+                File.WriteAllBytes(tp, t.EncodeToPNG());
+                UnityEngine.Object.DestroyImmediate(t);
+                AssetDatabase.ImportAsset(tp);
+            }
+            var tex = ImportTexture(tp, 64, normal: false);
+            if (tex != null && AssetImporter.GetAtPath(tp) is TextureImporter ti && ti.wrapMode != TextureWrapMode.Clamp)
+            {
+                ti.wrapMode = TextureWrapMode.Clamp; ti.SaveAndReimport();
+                tex = AssetDatabase.LoadAssetAtPath<Texture2D>(tp);
+            }
+            var m = Transparent(Unlit("LensGlow", new Color(0.35f, 0.75f, 1f, 0.9f)));
+            m.SetFloat("_DstBlend", (float)BlendMode.One); // 加算（明るく光る）
+            m.SetFloat("_Cull", 0f);                       // 両面
+            if (tex != null) m.SetTexture("_BaseMap", tex);
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
         static Material Transparent(Material m)
         {
             m.SetFloat("_Surface", 1f);

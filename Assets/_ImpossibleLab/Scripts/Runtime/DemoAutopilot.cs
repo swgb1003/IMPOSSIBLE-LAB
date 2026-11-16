@@ -62,12 +62,33 @@ namespace ImpossibleLab
             yield return null; yield return null;
         }
 
-        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null)
+        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null, bool device = false, string devicePart = null)
         {
             yield return null; // batchmode では WaitForEndOfFrame が呼ばれないため
             Vector3 basePos = rainLab ? _app.RainLab.transform.position : Vector3.zero;
             var panel = facePanel != null ? _app.ConsoleRoot.Find(facePanel) : null;
-            if (panel != null)
+            bool hideConsole = false;
+            Transform hiddenFrame = null;
+            if (device && _app.View != null)
+            {
+                // 試作品に寄って撮る（部品の見た目の確認用）。パネルが手前に来るので一時的に隠す
+                // devicePart を指定すると、その部品のまわりに寄る（下から見上げる）
+                Transform focus = _app.View.transform;
+                if (devicePart != null && _app.View.Parts.TryGetValue(devicePart, out var pt)) focus = pt;
+                var rs = focus.GetComponentsInChildren<Renderer>();
+                var b = rs.Length > 0 ? rs[0].bounds : new Bounds(focus.position, Vector3.one * 0.3f);
+                foreach (var r in rs) b.Encapsulate(r.bounds);
+                // 前（+Z）から、少し下から見上げる（参考：描き直した画像の角度）
+                float d = Mathf.Max(0.35f, b.extents.magnitude * (devicePart != null ? 3.2f : 1.15f));
+                var dir = (devicePart != null ? new Vector3(0.6f, -0.35f, 1f) : new Vector3(0.35f, -0.1f, 1f)).normalized;
+                _cam.transform.SetPositionAndRotation(b.center + dir * d, Quaternion.LookRotation(-dir));
+                hideConsole = _app.ConsoleRoot.gameObject.activeSelf;
+                _app.ConsoleRoot.gameObject.SetActive(false);
+                // 選択中の部品の枠は見た目の確認では隠す
+                hiddenFrame = _app.View.transform.Find("PartHighlight");
+                if (hiddenFrame != null) hiddenFrame.gameObject.SetActive(false);
+            }
+            else if (panel != null)
             {
                 // 側面のパネルを正面から撮る（文字の読みやすさの確認用）
                 _cam.transform.SetPositionAndRotation(panel.position - panel.forward * 1.15f, Quaternion.LookRotation(panel.forward));
@@ -92,6 +113,8 @@ namespace ImpossibleLab
             File.WriteAllBytes(file, tex.EncodeToPNG());
             Destroy(tex);
             Log("SHOT " + file);
+            if (hiddenFrame != null) hiddenFrame.gameObject.SetActive(true);
+            if (hideConsole) { _app.ConsoleRoot.gameObject.SetActive(true); yield break; }
             if (!overview) CheckFits(name);
         }
 
@@ -197,6 +220,8 @@ namespace ImpossibleLab
             yield return Shot("S02_building");
             yield return WaitState(LabState.Editing);
             yield return Shot("S03_edit");
+            yield return Shot("S03_device_rain", device: true);
+            yield return Shot("S03_device_rain_core", device: true, devicePart: "core");
 
             // 試用：起動して追従（Editorではカメラが頭）
             _app.ToggleDevice();
@@ -372,6 +397,7 @@ namespace ImpossibleLab
                 _app.ApprovePreview();
                 yield return WaitState(LabState.Editing);
                 yield return Shot($"S03_edit_{cat}");
+                yield return Shot($"S03_device_{cat}", device: true);
                 if (cat == "carrier")
                 {
                     int rev = _app.Current.Current.Revision;
@@ -585,6 +611,7 @@ namespace ImpossibleLab
             _app.ApprovePreview();
             yield return WaitState(LabState.Editing);
             var dna = _app.Current.Current;
+            yield return Shot($"S03_device_rep_{id}", device: true);
             _app.TestConfig.Mode = LabModes.Dream;
             _app.GoToTestSetup();
             yield return WaitState(LabState.ConfiguringTest);

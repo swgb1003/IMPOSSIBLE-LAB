@@ -31,11 +31,30 @@ namespace ImpossibleLab.Core
             }
         }
 
+        /// <summary>筐体の見た目（機能の色を使わず、素材だけで決める）。部品キットで機能の色を飾り（レンズ・表示帯）に移すときに使う。</summary>
+        public static PartSurface Housing(PartSpec part)
+        {
+            if (part.Type == "canopy") return PartSurface.Canopy;
+            switch (part.MaterialOrDefault)
+            {
+                case "aluminum": return PartSurface.Aluminum;
+                case "steel": return PartSurface.Steel;
+                case "fabric": return PartSurface.Fabric;
+                case "foam": return PartSurface.Foam;
+                case "rubber": return PartSurface.Rubber;
+                case "glass": return PartSurface.Glass;
+                default: return PartSurface.Plastic;
+            }
+        }
+
         /// <summary>外観プリセットで塗る色（0xRRGGBB）。塗らない部品は null。</summary>
-        public static int? Tint(PartSpec part, string appearanceId)
+        public static int? Tint(PartSpec part, string appearanceId) => Tint(Surface(part), part, appearanceId);
+
+        /// <summary>見た目の種類ごとの塗り（部品キットの筐体・飾りで別々に使う）。</summary>
+        public static int? Tint(PartSurface surface, PartSpec part, string appearanceId)
         {
             var look = LabCatalog.Appearance(appearanceId) ?? LabCatalog.Appearance(LabCatalog.DefaultAppearance);
-            switch (Surface(part))
+            switch (surface)
             {
                 case PartSurface.Plastic: return look.BodyRgb;
                 case PartSurface.AccentBlue: return part.Type == "cooler" ? (int?)null : look.AccentRgb;

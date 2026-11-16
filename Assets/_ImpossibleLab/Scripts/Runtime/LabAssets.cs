@@ -44,6 +44,9 @@ namespace ImpossibleLab
         public Material Screen;          // モニターの画面
         public Material Sky;
         public GameObject Plant;         // 観葉植物（葉：Poly Haven potted_plant_02、CC0。鉢は自作）
+        public GameObject PartKit;       // 部品キット（ArtSource/blender/part_kit.py、DECISIONS D-26）
+        public Material PartCanopy;
+        public Material LensGlow;        // センサーのレンズの光のにじみ（加算の半透明・円形のぼかし）      // 部品のキャノピー（水色の半透明。Canopy より見えやすい）
         public Material PlantLeaves;     // 葉（切り抜き・両面）             // 窓の外の空（Poly Haven kloofendal_43d_clear、CC0）
 
         /// <summary>部品の見た目に使うマテリアル（未生成の素材は近いものに代える）。</summary>
@@ -57,7 +60,7 @@ namespace ImpossibleLab
                 case PartSurface.Foam: return PartFoam != null ? PartFoam : RobotWhite;
                 case PartSurface.Rubber: return PartRubber != null ? PartRubber : DarkMetal;
                 case PartSurface.Glass: return Glass;
-                case PartSurface.Canopy: return Canopy;
+                case PartSurface.Canopy: return PartCanopy != null ? PartCanopy : Canopy;
                 case PartSurface.AccentBlue: return AccentBlue;
                 case PartSurface.AccentOrange: return AccentOrange;
                 default: return RobotWhite;
