@@ -1,6 +1,6 @@
 {
   "generatedBy": "ImpossibleLab.Core.LabCatalog.ToProxyJson (Unity で再生成すること。手で編集しない)",
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "partTypes": [
     {
       "type": "body",

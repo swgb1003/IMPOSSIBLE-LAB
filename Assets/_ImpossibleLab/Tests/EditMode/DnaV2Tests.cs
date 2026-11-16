@@ -33,7 +33,7 @@ namespace ImpossibleLab.Tests
             {
                 var r = DnaJson.Parse(Sample(file));
                 Assert.IsTrue(r.IsValid, file + ": " + r.Summary);
-                Assert.AreEqual(2, r.Dna.SchemaVersion);
+                Assert.AreEqual(InventionDna.CurrentSchemaVersion, r.Dna.SchemaVersion); // 読み込み時に最新（v3）へ変換
                 Assert.AreEqual(cat, r.Dna.Category);
                 CollectionAssert.AreEqual(new[] { cat }, r.Dna.Tags);
                 Assert.AreEqual(mount, r.Dna.Mount, file);
@@ -52,7 +52,7 @@ namespace ImpossibleLab.Tests
         {
             var dna = DnaJson.Parse(Sample("carrier_robot")).Dna;
             string json = DnaJson.ToJson(dna);
-            StringAssert.Contains("\"schemaVersion\": 2", json);
+            StringAssert.Contains("\"schemaVersion\": 3", json); // 保存は最新（v3。仕様 30.1）
             StringAssert.DoesNotContain("\"category\"", json);
             var back = DnaJson.Parse(json);
             Assert.IsTrue(back.IsValid, back.Summary);
@@ -133,7 +133,7 @@ namespace ImpossibleLab.Tests
                 Assert.AreEqual("head", inv.Current.Mount);
                 Assert.AreEqual(1, inv.History.Count);
                 repo.Save(inv);
-                StringAssert.Contains("\"schemaVersion\": 2", File.ReadAllText(Path.Combine(dir, "inventions", "inv-handsfree-rain.json")));
+                StringAssert.Contains("\"schemaVersion\": 3", File.ReadAllText(Path.Combine(dir, "inventions", "inv-handsfree-rain.json")));
                 Assert.IsNotNull(repo.Load("inv-handsfree-rain", out _));
             }
             finally { if (Directory.Exists(dir)) Directory.Delete(dir, true); }

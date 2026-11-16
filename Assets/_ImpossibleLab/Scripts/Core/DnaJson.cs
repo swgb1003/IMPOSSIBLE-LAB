@@ -32,8 +32,10 @@ namespace ImpossibleLab.Core
         { "schemaVersion", "id", "name", "category", "purpose", "mode", "appearance", "parts", "behaviors", "constraints", "revision", "parentRevision" };
         static readonly HashSet<string> RootFieldsV2 = new HashSet<string>
         { "schemaVersion", "id", "name", "purpose", "tags", "mount", "appearance", "mode", "parts", "behaviors", "functionMap", "constraints", "revision", "parentRevision" };
+        static readonly HashSet<string> RootFieldsV3 = new HashSet<string>(RootFieldsV2) { "program" };
         static readonly HashSet<string> PartFieldsV1 = new HashSet<string> { "id", "type", "position", "scale" };
         static readonly HashSet<string> PartFieldsV2 = new HashSet<string> { "id", "type", "shape", "material", "position", "scale" };
+        static readonly HashSet<string> PartFieldsV3 = new HashSet<string>(PartFieldsV2) { "joint" };
         static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "status", "note" };
         static readonly HashSet<string> BehaviorFields = new HashSet<string> { "type", "targetPart", "parameters" };
         static readonly HashSet<string> ConstraintFields = new HashSet<string> { "maxParts", "maxSpeed" };
@@ -67,10 +69,10 @@ namespace ImpossibleLab.Core
         {
             var dna = new InventionDna();
             var sv = Int(root, "schemaVersion", r, required: true);
-            if (sv.HasValue && sv.Value != 1 && sv.Value != 2)
-            { r.Errors.Add($"schemaVersion {sv.Value} は非対応です（対応: 1, 2）"); return r; }
+            if (sv.HasValue && sv.Value != 1 && sv.Value != 2 && sv.Value != 3)
+            { r.Errors.Add($"schemaVersion {sv.Value} は非対応です（対応: 1, 2, 3）"); return r; }
             int version = sv ?? InventionDna.CurrentSchemaVersion;
-            RejectUnknown(root, version == 1 ? RootFieldsV1 : RootFieldsV2, "ルート", r);
+            RejectUnknown(root, version == 1 ? RootFieldsV1 : version == 2 ? RootFieldsV2 : RootFieldsV3, "ルート", r);
 
             dna.Id = Str(root, "id", r, true, LabCatalog.MaxIdLength) ?? "";
             if (dna.Id.Length > 0 && !IsSafeId(dna.Id)) r.Errors.Add("id は英小文字・数字・-・_ のみ使用できます");
@@ -122,7 +124,12 @@ namespace ImpossibleLab.Core
             ParseBehaviors(root, dna, r);
             if (version == 1) dna.Mount = InferMount(dna);
             else ParseFunctionMap(root, dna, r);
-            dna.SchemaVersion = InventionDna.CurrentSchemaVersion; // v1 は読み込み時に v2 へ変換する
+            if (version >= 3)
+            {
+                MotionProgramJson.ValidateJoints(dna, r);
+                if (r.Errors.Count == 0 && root.TryGetValue("program", out var prog)) dna.Program = MotionProgramJson.ParseProgram(prog, dna, r);
+            }
+            dna.SchemaVersion = InventionDna.CurrentSchemaVersion; // v1・v2 は読み込み時に v3 へ変換する（追加の項目は空）
             if (r.Errors.Count == 0) r.Dna = dna;
             return r;
         }
@@ -193,7 +200,7 @@ namespace ImpossibleLab.Core
             {
                 string at = $"parts[{i}]";
                 if (!(parts[i] is JObject po)) { r.Errors.Add(at + " がオブジェクトではありません"); continue; }
-                RejectUnknown(po, version == 1 ? PartFieldsV1 : PartFieldsV2, at, r);
+                RejectUnknown(po, version == 1 ? PartFieldsV1 : version == 2 ? PartFieldsV2 : PartFieldsV3, at, r);
                 var p = new PartSpec();
                 p.Id = Str(po, "id", r, true, LabCatalog.MaxIdLength, at) ?? "";
                 if (p.Id.Length > 0 && !IsSafeId(p.Id)) r.Errors.Add($"{at}.id が不正です");
@@ -228,6 +235,7 @@ namespace ImpossibleLab.Core
                         Clamp(v.y, info.MinScale, info.MaxScale, at + ".scale.y", r),
                         Clamp(v.z, info.MinScale, info.MaxScale, at + ".scale.z", r));
                 }
+                if (version >= 3 && po.TryGetValue("joint", out var jt) && jt.Type != JTokenType.Null) p.Joint = MotionProgramJson.ParseJoint(jt, at + ".joint", r);
                 dna.Parts.Add(p);
             }
         }
@@ -293,11 +301,15 @@ namespace ImpossibleLab.Core
         {
             var parts = new JArray();
             foreach (var p in dna.Parts)
-                parts.Add(new JObject
+            {
+                var po = new JObject
                 {
                     ["id"] = p.Id, ["type"] = p.Type, ["shape"] = p.ShapeOrDefault, ["material"] = p.MaterialOrDefault,
                     ["position"] = V(p.Position), ["scale"] = V(p.Scale),
-                });
+                };
+                if (p.Joint != null) po["joint"] = MotionProgramJson.JointToJson(p.Joint);
+                parts.Add(po);
+            }
             var needs = new JArray();
             foreach (var n in dna.FunctionMap)
             {
@@ -315,7 +327,7 @@ namespace ImpossibleLab.Core
                 bo["parameters"] = po;
                 behaviors.Add(bo);
             }
-            return new JObject
+            var root = new JObject
             {
                 ["schemaVersion"] = InventionDna.CurrentSchemaVersion, ["id"] = dna.Id, ["name"] = dna.Name,
                 ["purpose"] = dna.Purpose, ["tags"] = new JArray(dna.Tags), ["mount"] = dna.Mount ?? "fixed",
@@ -325,6 +337,8 @@ namespace ImpossibleLab.Core
                 ["revision"] = dna.Revision,
                 ["parentRevision"] = dna.ParentRevision.HasValue ? new JValue(dna.ParentRevision.Value) : JValue.CreateNull(),
             };
+            if (dna.Program != null) root["program"] = MotionProgramJson.ProgramToJson(dna.Program);
+            return root;
         }
 
         static JArray V(Vector3 v) => new JArray(Round(v.x), Round(v.y), Round(v.z));

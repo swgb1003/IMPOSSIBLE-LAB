@@ -7,8 +7,11 @@ namespace ImpossibleLab.Core
     /// <summary>発明DNA（仕様5章）。AI出力・保存データはすべて DnaValidator を通してから本型になる。</summary>
     public sealed class InventionDna
     {
-        /// <summary>2 = タグ・取り付け位置・部品の形と素材・機能対応表（docs/GENERAL_INVENTION_DESIGN.md 2章）。1 は読み込み時に変換する。</summary>
-        public const int CurrentSchemaVersion = 2;
+        /// <summary>
+        /// 2 = タグ・取り付け位置・部品の形と素材・機能対応表（docs/GENERAL_INVENTION_DESIGN.md 2章）。
+        /// 3 = 動作プログラム（program）と部品の関節（parts[].joint）を任意で追加（仕様 28・30.1）。1・2 は読み込み時に変換する。
+        /// </summary>
+        public const int CurrentSchemaVersion = 3;
 
         public int SchemaVersion = CurrentSchemaVersion;
         public string Id = "";
@@ -42,6 +45,8 @@ namespace ImpossibleLab.Core
         public InventionConstraints Constraints = new InventionConstraints();
         public int Revision = 1;
         public int? ParentRevision;
+        /// <summary>動作プログラム（任意。仕様 28）。</summary>
+        public MotionProgram Program;
 
         public PartSpec FindPart(string id) => Parts.Find(p => p.Id == id);
         public BehaviorSpec FindBehavior(string type) => Behaviors.Find(b => b.Type == type);
@@ -60,6 +65,7 @@ namespace ImpossibleLab.Core
             c.Tags = new List<string>(Tags);
             c.FunctionMap = FunctionMap.ConvertAll(f => f.Clone());
             c.Constraints = new InventionConstraints { MaxParts = Constraints.MaxParts, MaxSpeed = Constraints.MaxSpeed };
+            c.Program = Program?.Clone();
             return c;
         }
     }
@@ -74,8 +80,15 @@ namespace ImpossibleLab.Core
         public string Shape = "";
         /// <summary>素材（LabCatalog.Materials）。空なら部品タイプの既定の素材。</summary>
         public string Material = "";
+        /// <summary>関節（任意。仕様 28.2）。</summary>
+        public JointSpec Joint;
 
-        public PartSpec Clone() => (PartSpec)MemberwiseClone();
+        public PartSpec Clone()
+        {
+            var c = (PartSpec)MemberwiseClone();
+            c.Joint = Joint?.Clone();
+            return c;
+        }
         public string ShapeOrDefault => !string.IsNullOrEmpty(Shape) ? Shape : LabCatalog.Part(Type)?.DefaultShape ?? "cylinder";
         public string MaterialOrDefault => !string.IsNullOrEmpty(Material) ? Material : LabCatalog.Part(Type)?.DefaultMaterial ?? "plastic";
     }

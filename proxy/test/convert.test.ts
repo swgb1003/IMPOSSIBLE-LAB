@@ -39,8 +39,9 @@ const nightLight = {
   }],
 };
 
-test("catalog v2 has every block, experiment catalog and legacy categories", () => {
-  assert.equal(catalog.schemaVersion, 2);
+test("catalog has every block, experiment catalog and legacy categories", () => {
+  // アプリの DNA は v3（動作プログラム・関節を任意で追加）。AI の設計出力は動作プログラムを加えるまで（G-A3）v2 のまま
+  assert.equal(catalog.schemaVersion, 3);
   for (const t of ["illuminate", "heat", "cool", "sun_shade", "impact_cushion", "grip", "lift_load", "detect", "alert", "rain_shield", "follow_user", "hover"])
     assert.ok(catalog.behaviors.some((b) => b.type === t), t);
   assert.ok(catalog.experiments.scenarios.some((s) => s.id === "sit_still"));

@@ -109,7 +109,7 @@ namespace ImpossibleLab.Tests
             };
             var o = ProxyProtocol.ParseDesign(200, body.ToString(), null);
             Assert.AreEqual(DesignStatus.Success, o.Status, o.Message);
-            Assert.AreEqual(2, o.Dna.SchemaVersion);
+            Assert.AreEqual(InventionDna.CurrentSchemaVersion, o.Dna.SchemaVersion); // v2 で受け取り、v3 に変換して持つ
             Assert.AreEqual("back", o.Dna.Mount);
             Assert.AreEqual(3, o.Dna.FunctionMap.Count);
             Assert.AreEqual(1, o.Plans.Count);
