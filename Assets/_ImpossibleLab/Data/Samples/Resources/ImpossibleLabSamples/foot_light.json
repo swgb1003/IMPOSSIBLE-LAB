@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 2,
+  "id": "ai-mwbequnj-rip",
+  "name": "夜道あんしん足元ライト",
+  "purpose": "夜道を歩くとき、腰に付けたライトが足元を斜め下に照らして暗さの不安を減らす道具です。",
+  "tags": [
+    "lighting",
+    "safety",
+    "daily"
+  ],
+  "mount": "waist",
+  "appearance": "night_navy",
+  "mode": "dream",
+  "parts": [
+    {
+      "id": "body",
+      "type": "body",
+      "shape": "box",
+      "material": "plastic",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.12,
+        0.07,
+        0.04
+      ]
+    },
+    {
+      "id": "belt",
+      "type": "strap",
+      "shape": "box",
+      "material": "fabric",
+      "position": [
+        0,
+        0,
+        -0.03
+      ],
+      "scale": [
+        0.36,
+        0.04,
+        0.01
+      ]
+    },
+    {
+      "id": "main-light",
+      "type": "light",
+      "shape": "cylinder",
+      "material": "glass",
+      "position": [
+        0,
+        -0.01,
+        0.03
+      ],
+      "scale": [
+        0.05,
+        0.02,
+        0.05
+      ]
+    },
+    {
+      "id": "battery",
+      "type": "battery",
+      "shape": "box",
+      "material": "plastic",
+      "position": [
+        0,
+        0.045,
+        0
+      ],
+      "scale": [
+        0.08,
+        0.02,
+        0.03
+      ]
+    },
+    {
+      "id": "dark-sensor",
+      "type": "sensor",
+      "shape": "sphere",
+      "material": "glass",
+      "position": [
+        0.045,
+        0.025,
+        0.022
+      ],
+      "scale": [
+        0.012,
+        0.012,
+        0.012
+      ]
+    }
+  ],
+  "behaviors": [
+    {
+      "type": "illuminate",
+      "targetPart": "main-light",
+      "parameters": {
+        "lumens": 300,
+        "beamAngleDeg": 90,
+        "tiltDeg": 60
+      }
+    }
+  ],
+  "functionMap": [
+    {
+      "need": "足元を明るく照らす",
+      "blocks": [
+        "illuminate"
+      ],
+      "status": "simulated",
+      "note": "光束・広がり・下向き角度から床の照度を計算して確かめます。"
+    },
+    {
+      "need": "暗くなると自動で点灯",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "周りの明るさで自動点灯する仕組みのモデルがないため、実験では常に点灯している状態として扱います。"
+    },
+    {
+      "need": "夜道の怖さを減らす",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "安心感などの気持ちはシミュレーションでは測れません。"
+    },
+    {
+      "need": "歩いても邪魔にならない",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "付け心地や重さの感じ方は実験の対象外です。"
+    }
+  ],
+  "constraints": {
+    "maxParts": 24,
+    "maxSpeed": 3
+  },
+  "revision": 1,
+  "parentRevision": null
+}

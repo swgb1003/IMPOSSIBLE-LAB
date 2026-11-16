@@ -81,12 +81,13 @@ namespace ImpossibleLab.Core
     /// </summary>
     public sealed class OfflineDesignService : IInventionDesignService
     {
-        readonly Dictionary<string, string> _samples; // category -> json
+        readonly Dictionary<string, string> _samples; // 種類（下の Kinds のキー） -> json
         readonly int _stageDelayMs;
 
-        public OfflineDesignService(Dictionary<string, string> samplesByCategory, int stageDelayMs = 0)
+        /// <param name="samples">種類 → 設計図の JSON。種類は Kinds のキー（protection・mobility・carrier と、機能ブロックの例 sun_shade など）。</param>
+        public OfflineDesignService(Dictionary<string, string> samples, int stageDelayMs = 0)
         {
-            _samples = samplesByCategory;
+            _samples = samples;
             _stageDelayMs = stageDelayMs;
         }
 
@@ -96,17 +97,36 @@ namespace ImpossibleLab.Core
         static readonly string[] MobilityWords = { "飛", "靴", "シューズ", "浮", "移動" };
         static readonly string[] CarrierWords = { "運", "荷物", "ついてくる", "追従", "ロボット" };
 
+        /// <summary>依頼文からサンプル設計図の種類を決める（上から順に判定）。機能ブロックの例は代表6件の AI 設計（評価セット r03・r15・r18・r09・r22・r05）。
+        /// 持ち上げは「荷物」を含むことがあるので運搬より先に見る。</summary>
+        public static readonly (string Key, string[] Words)[] Kinds =
+        {
+            ("protection", RainWords),
+            ("sun_shade", new[] { "日陰", "日差し", "日よけ", "日傘", "暑" }),
+            ("lighting", new[] { "照ら", "ライト", "暗く", "暗い", "夜道" }),
+            ("heating", new[] { "温め", "あたため", "暖", "寒", "ヒーター" }),
+            ("lifting", new[] { "持ち上げ", "棚", "段ボール", "だんボール" }),
+            ("sensing", new[] { "気づ", "検知", "教えて", "知らせ", "近づ", "見守" }),
+            ("impact", new[] { "落と", "割れ", "衝撃" }),
+            ("mobility", MobilityWords),
+            ("carrier", CarrierWords),
+        };
+
+        public static string KindOf(string requestText)
+        {
+            string text = (requestText ?? "").Trim().ToLowerInvariant();
+            foreach (var (key, words) in Kinds) if (words.Any(text.Contains)) return key;
+            return null;
+        }
+
         public async Task<DesignOutcome> GenerateAsync(string requestText, IProgress<DesignStage> progress, CancellationToken ct)
         {
             var err = RequestRules.Check(requestText);
             if (err != null) return new DesignOutcome { Status = DesignStatus.InvalidInput, Message = err };
-            string text = requestText.Trim().ToLowerInvariant();
 
             progress?.Report(DesignStage.IntentAnalysis);
             await Pause(ct);
-            string category = RainWords.Any(text.Contains) ? "protection"
-                : MobilityWords.Any(text.Contains) ? "mobility"
-                : CarrierWords.Any(text.Contains) ? "carrier" : null;
+            string category = KindOf(requestText);
 
             progress?.Report(DesignStage.FeatureSelection);
             await Pause(ct);
@@ -119,7 +139,7 @@ namespace ImpossibleLab.Core
                     Message = cat == null
                         ? "オフラインでは、この指示に対応する設計図がありません。"
                         : $"「{cat.LabelJa}」カテゴリの設計図はこの版では未対応です。",
-                    Suggestions = { "対応している発明：ハンズフリー雨具・追従運搬ロボット・空飛ぶ靴", "例：「手を使わず雨を防ぐ装置を作って」「荷物を運んでついてくるロボットを作って」" },
+                    Suggestions = { "オフラインで作れる発明：クイック発明の9件（雨具・空飛ぶ靴・運搬ロボット・日よけ・足元ライト・背中ヒーター・持ち上げ機・見守りリュック・スマホケース）", "AIに接続すると、自由な依頼文から設計できます" },
                 };
             }
 

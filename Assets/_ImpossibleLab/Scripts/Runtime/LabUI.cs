@@ -130,7 +130,7 @@ namespace ImpossibleLab
                 case LabState.GeneratingDesign: return "処理中：他の操作はできません（キャンセル可）";
                 case LabState.Building: return "組み立て中…";
                 case LabState.RunningTest: return "実験中：停止すると記録せず初期状態に戻ります";
-                default: return "状態：" + StateJa(App.Sm.State) + "　｜　高さ：右手A▼ B▲ ／ 移動：下のバーをグリップ";
+                default: return "状態：" + StateJa(App.Sm.State) + " ｜ 高さ：右手A▼B▲ ／ 移動：下のバーを握る";
             }
         }
 
@@ -305,15 +305,20 @@ namespace ImpossibleLab
             if (App.InputWarning != null) Para(_body, "⚠ " + App.InputWarning, LabTheme.FontBody, LabTheme.AccentWarning, 36);
             else Para(_body, "文字入力しにくい場合は下の例を選ぶだけで進められます。声で入れたいときは、Questキーボードのマイクボタンを試してください（実機で確認中）。", LabTheme.FontSmall, h: 32);
 
-            UiKit.Heading(_body, "クイック発明（例から選ぶ → 入力欄に反映）", LabTheme.FontHeading);
-            var cards = UiKit.Row("Cards", _body, LabTheme.Space2, 150);
-            QuickCard(cards, "手を使わない傘", "ハンズフリー雨具 ・ 実験できます", LabAppText.RainRequest, true);
-            QuickCard(cards, "空を飛べる靴", "移動 ・ 飛行デッキで実験できます", "空を飛べる靴を作って", true);
-            QuickCard(cards, "自動でついてくる運搬ロボット", "運搬 ・ 障害物コースで実験できます", "自動でついてくる運搬ロボットを作って", true);
+            // 見出しの行の右にギャラリーへのボタン（9 件のカードを入れるため、操作の行を見出しにまとめる）
+            var quickHead = UiKit.Heading(_body, "クイック発明（例から選ぶ → 入力欄に反映）", LabTheme.FontHeading);
+            UiKit.Button(quickHead, "保存済みの発明（ギャラリー）", App.OpenGallery, ButtonStyle.Secondary, 420, 50);
+            // 3 列 × 3 行。カードの高さ 80 mm（レイで押しやすい 64 mm 以上）。分類は色だけでなく文字でも示す
+            for (int r = 0; r < 3; r++)
+            {
+                var cards = UiKit.Row("Cards" + r, _body, LabTheme.Space1, QuickCardH);
+                for (int c = 0; c < 3; c++)
+                {
+                    int i = r * 3 + c;
+                    if (i < QuickInventions.All.Length) QuickCard(cards, QuickInventions.All[i]);
+                }
+            }
 
-            var actions = UiKit.Row("Actions", _body, LabTheme.Space2, 64);
-            UiKit.Button(actions, "保存済みの発明（ギャラリー）", App.OpenGallery, ButtonStyle.Secondary, 440);
-            var spacer = UiKit.Rect("Spacer", actions); UiKit.Size(spacer, flexW: 1);
 
             SideHeading(_leftBody, "CENTRAL LAB", "中央研究室");
             Para(_leftBody, "AIと対話し、まだ存在しない道具をこの場所で発明できます。発明台の上に試作品が組み立てられます。", LabTheme.FontBody, LabTheme.TextPrimary, 150);
@@ -328,11 +333,13 @@ namespace ImpossibleLab
             FlowStep(_rightBody, "4", "改良・発展", "計測値を見て言葉で改良");
         }
 
-        void QuickCard(Transform parent, string title, string note, string request, bool supported)
+        const float QuickCardH = 80f;
+
+        void QuickCard(Transform parent, QuickInventions.Item item)
         {
-            var b = UiKit.Button(parent, $"{title}\n<size=75%><color=#{LabTheme.ToHex(supported ? LabTheme.AccentLight : LabTheme.TextSecondary)}>{note}</color></size>",
-                () => { App.PickQuickInvention(request); if (_requestInput != null) _requestInput.SetTextWithoutNotify(request); },
-                ButtonStyle.Secondary, -1, 150);
+            var b = UiKit.Button(parent, $"{item.Title}\n<size=75%><color=#{LabTheme.ToHex(LabTheme.AccentLight)}>{item.Kind}</color><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}> ・ {item.Experiment}</color></size>",
+                () => { App.PickQuickInvention(item.Request); if (_requestInput != null) _requestInput.SetTextWithoutNotify(item.Request); },
+                ButtonStyle.Secondary, -1, QuickCardH);
             UiKit.Size(b, flexW: 1);
         }
 

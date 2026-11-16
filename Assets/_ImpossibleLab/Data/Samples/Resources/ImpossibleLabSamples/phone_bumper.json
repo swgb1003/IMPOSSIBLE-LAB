@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 2,
+  "id": "ai-mw9951tq-jz7",
+  "name": "エアバンパー・スマホガード",
+  "purpose": "スマホの角とふちを厚めの緩衝材で囲み、落としたときに画面へ伝わる衝撃を小さくするケース。",
+  "tags": [
+    "safety",
+    "daily"
+  ],
+  "mount": "hand",
+  "appearance": "safety_orange",
+  "mode": "dream",
+  "parts": [
+    {
+      "id": "phone-shell",
+      "type": "body",
+      "shape": "box",
+      "material": "plastic",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.08,
+        0.16,
+        0.012
+      ]
+    },
+    {
+      "id": "screen-guard",
+      "type": "panel",
+      "shape": "box",
+      "material": "glass",
+      "position": [
+        0,
+        0,
+        0.008
+      ],
+      "scale": [
+        0.072,
+        0.15,
+        0.005
+      ]
+    },
+    {
+      "id": "bumper-top",
+      "type": "cushion",
+      "shape": "capsule",
+      "material": "foam",
+      "position": [
+        0,
+        0.088,
+        0
+      ],
+      "scale": [
+        0.02,
+        0.09,
+        0.02
+      ]
+    },
+    {
+      "id": "bumper-bottom",
+      "type": "cushion",
+      "shape": "capsule",
+      "material": "foam",
+      "position": [
+        0,
+        -0.088,
+        0
+      ],
+      "scale": [
+        0.02,
+        0.09,
+        0.02
+      ]
+    },
+    {
+      "id": "corner-tl",
+      "type": "cushion",
+      "shape": "sphere",
+      "material": "rubber",
+      "position": [
+        -0.045,
+        0.085,
+        0
+      ],
+      "scale": [
+        0.025,
+        0.025,
+        0.025
+      ]
+    },
+    {
+      "id": "corner-tr",
+      "type": "cushion",
+      "shape": "sphere",
+      "material": "rubber",
+      "position": [
+        0.045,
+        0.085,
+        0
+      ],
+      "scale": [
+        0.025,
+        0.025,
+        0.025
+      ]
+    },
+    {
+      "id": "corner-bl",
+      "type": "cushion",
+      "shape": "sphere",
+      "material": "rubber",
+      "position": [
+        -0.045,
+        -0.085,
+        0
+      ],
+      "scale": [
+        0.025,
+        0.025,
+        0.025
+      ]
+    },
+    {
+      "id": "corner-br",
+      "type": "cushion",
+      "shape": "sphere",
+      "material": "rubber",
+      "position": [
+        0.045,
+        -0.085,
+        0
+      ],
+      "scale": [
+        0.025,
+        0.025,
+        0.025
+      ]
+    },
+    {
+      "id": "side-left",
+      "type": "cushion",
+      "shape": "box",
+      "material": "foam",
+      "position": [
+        -0.046,
+        0,
+        0
+      ],
+      "scale": [
+        0.012,
+        0.14,
+        0.016
+      ]
+    },
+    {
+      "id": "side-right",
+      "type": "cushion",
+      "shape": "box",
+      "material": "foam",
+      "position": [
+        0.046,
+        0,
+        0
+      ],
+      "scale": [
+        0.012,
+        0.14,
+        0.016
+      ]
+    },
+    {
+      "id": "hand-strap",
+      "type": "strap",
+      "shape": "box",
+      "material": "fabric",
+      "position": [
+        0,
+        -0.03,
+        -0.01
+      ],
+      "scale": [
+        0.06,
+        0.02,
+        0.005
+      ]
+    }
+  ],
+  "behaviors": [
+    {
+      "type": "impact_cushion",
+      "targetPart": "bumper-bottom",
+      "parameters": {
+        "thicknessM": 0.015,
+        "stiffness": 8000
+      }
+    }
+  ],
+  "functionMap": [
+    {
+      "need": "落としたときの衝撃を減らす",
+      "blocks": [
+        "impact_cushion"
+      ],
+      "status": "simulated",
+      "note": "ばね・ダンパーの落下モデルで最大の衝撃（G）と緩衝材のつぶれを測ります。"
+    },
+    {
+      "need": "画面が割れない",
+      "blocks": [
+        "impact_cushion"
+      ],
+      "status": "simplified",
+      "note": "ガラスが割れるかどうかは計算せず、最大の衝撃Gが小さいほど割れにくいと考える目安で判定します。落ちる向きや床の角への当たり方も扱いません。"
+    },
+    {
+      "need": "手から滑り落ちにくい",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "手との摩擦や持ちやすさはシミュレーターのモデルにないため確かめられません。"
+    },
+    {
+      "need": "ポケットに入る薄さ・見た目",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "かさばり具合や使い心地は人の感じ方によるため確かめられません。"
+    }
+  ],
+  "constraints": {
+    "maxParts": 24,
+    "maxSpeed": 3
+  },
+  "revision": 1,
+  "parentRevision": null
+}

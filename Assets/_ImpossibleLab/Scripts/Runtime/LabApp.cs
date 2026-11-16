@@ -90,7 +90,10 @@ namespace ImpossibleLab
             _builder = new InventionBuilder(Assets);
             var samples = new Dictionary<string, string>();
             if (Assets != null && Assets.RainSample != null) samples["protection"] = Assets.RainSample.text;
-            foreach (var (cat, file) in new[] { ("carrier", "carrier_robot"), ("mobility", "flying_shoes") })
+            // 機能ブロックの例は代表6件の AI 設計（評価セットで検証済み）をオフラインの設計図として使う（OfflineDesignService.Kinds）
+            foreach (var (cat, file) in new[] { ("carrier", "carrier_robot"), ("mobility", "flying_shoes"),
+                         ("sun_shade", "sun_canopy"), ("lighting", "foot_light"), ("heating", "back_heater"),
+                         ("lifting", "box_lifter"), ("sensing", "rear_watch_pack"), ("impact", "phone_bumper") })
             {
                 var ta = Resources.Load<TextAsset>("ImpossibleLabSamples/" + file);
                 if (ta != null) samples[cat] = ta.text; else Debug.LogWarning("[ILAB] sample missing: " + file);

@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 2,
+  "id": "ai-mwber1rn-vsk",
+  "name": "ついてくる日陰キャノピー",
+  "purpose": "夏の通学路で頭の上に浮かび、強い日差しをさえぎって体に日陰を作る道具。",
+  "tags": [
+    "outdoor",
+    "daily",
+    "protection"
+  ],
+  "mount": "head",
+  "appearance": "lab_white",
+  "mode": "dream",
+  "parts": [
+    {
+      "id": "core",
+      "type": "body",
+      "shape": "cylinder",
+      "material": "plastic",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.16,
+        0.06,
+        0.16
+      ]
+    },
+    {
+      "id": "shade",
+      "type": "canopy",
+      "shape": "cylinder",
+      "material": "fabric",
+      "position": [
+        0,
+        0.08,
+        0
+      ],
+      "scale": [
+        1.2,
+        0.03,
+        1.2
+      ]
+    },
+    {
+      "id": "rib-frame",
+      "type": "frame",
+      "shape": "box",
+      "material": "aluminum",
+      "position": [
+        0,
+        0.06,
+        0
+      ],
+      "scale": [
+        1.1,
+        0.01,
+        0.02
+      ]
+    },
+    {
+      "id": "rib-frame2",
+      "type": "frame",
+      "shape": "box",
+      "material": "aluminum",
+      "position": [
+        0,
+        0.06,
+        0
+      ],
+      "scale": [
+        0.02,
+        0.01,
+        1.1
+      ]
+    },
+    {
+      "id": "fan-fl",
+      "type": "thruster",
+      "shape": "cylinder",
+      "material": "plastic",
+      "position": [
+        0.18,
+        -0.02,
+        0.18
+      ],
+      "scale": [
+        0.1,
+        0.04,
+        0.1
+      ]
+    },
+    {
+      "id": "fan-fr",
+      "type": "thruster",
+      "shape": "cylinder",
+      "material": "plastic",
+      "position": [
+        -0.18,
+        -0.02,
+        0.18
+      ],
+      "scale": [
+        0.1,
+        0.04,
+        0.1
+      ]
+    },
+    {
+      "id": "fan-bl",
+      "type": "thruster",
+      "shape": "cylinder",
+      "material": "plastic",
+      "position": [
+        0.18,
+        -0.02,
+        -0.18
+      ],
+      "scale": [
+        0.1,
+        0.04,
+        0.1
+      ]
+    },
+    {
+      "id": "fan-br",
+      "type": "thruster",
+      "shape": "cylinder",
+      "material": "plastic",
+      "position": [
+        -0.18,
+        -0.02,
+        -0.18
+      ],
+      "scale": [
+        0.1,
+        0.04,
+        0.1
+      ]
+    },
+    {
+      "id": "gyro",
+      "type": "stabilizer",
+      "shape": "sphere",
+      "material": "plastic",
+      "position": [
+        0,
+        -0.05,
+        0
+      ],
+      "scale": [
+        0.06,
+        0.06,
+        0.06
+      ]
+    },
+    {
+      "id": "pack",
+      "type": "battery",
+      "shape": "box",
+      "material": "plastic",
+      "position": [
+        0,
+        -0.03,
+        -0.04
+      ],
+      "scale": [
+        0.1,
+        0.03,
+        0.06
+      ]
+    },
+    {
+      "id": "head-eye",
+      "type": "sensor",
+      "shape": "sphere",
+      "material": "glass",
+      "position": [
+        0,
+        -0.05,
+        0.07
+      ],
+      "scale": [
+        0.03,
+        0.03,
+        0.03
+      ]
+    }
+  ],
+  "behaviors": [
+    {
+      "type": "follow_head",
+      "targetPart": "core",
+      "parameters": {
+        "heightOffset": 0.35
+      }
+    },
+    {
+      "type": "sun_shade",
+      "targetPart": "shade",
+      "parameters": {
+        "radius": 0.6,
+        "opacity": 0.9
+      }
+    },
+    {
+      "type": "hover",
+      "parameters": {
+        "lift": 0.3,
+        "maxHeight": 2.3
+      }
+    },
+    {
+      "type": "stabilize",
+      "targetPart": "gyro",
+      "parameters": {
+        "stabilizationStrength": 0.5
+      }
+    }
+  ],
+  "functionMap": [
+    {
+      "need": "頭上に日陰を作る",
+      "blocks": [
+        "sun_shade"
+      ],
+      "status": "simulated",
+      "note": "平行光線と円柱の人型モデルで影を判定します。"
+    },
+    {
+      "need": "朝夕の低い日差しも防ぐ",
+      "blocks": [
+        "sun_shade"
+      ],
+      "status": "simulated",
+      "note": "太陽の高さを下げた条件で日陰率を確かめます。"
+    },
+    {
+      "need": "歩いても頭上についてくる",
+      "blocks": [
+        "follow_head",
+        "hover"
+      ],
+      "status": "simplified",
+      "note": "実験は立った状態のみで、歩行中の追従や揺れは試せません。"
+    },
+    {
+      "need": "暑さ・涼しさの体感",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "体感温度や快適さはモデル化されていないため確かめられません。"
+    },
+    {
+      "need": "通学で使える安全さ・周りへの配慮",
+      "blocks": [],
+      "status": "unverifiable",
+      "note": "人混みでの安全性やルール面は判定できません。"
+    }
+  ],
+  "constraints": {
+    "maxParts": 24,
+    "maxSpeed": 3
+  },
+  "revision": 1,
+  "parentRevision": null
+}
