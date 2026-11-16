@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage);
             return sb.ToString();
         }
 
@@ -419,10 +419,23 @@ namespace ImpossibleLab
             if (points.Count == 0) Para(_leftBody, "（要点の説明はありません）", LabTheme.FontSmall, h: 30);
             Para(_leftBody, "現実の製品としての安全性や実現性は保証しません。", LabTheme.FontSmall, LabTheme.AccentWarning, 30);
 
-            SideHeading(_rightBody, "PARTS", "採用機能と部品");
-            var lines = dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）", LabTheme.FontBody, LabTheme.TextPrimary, 38f))
-                .Concat(dna.Behaviors.Select(b => ($"◆ {LabCatalog.Behavior(b.Type)?.LabelJa} → {b.TargetPart}", LabTheme.FontSmall, LabTheme.AccentLight, 34f))).ToList();
-            CappedLines(_rightBody, lines, 9);
+            if (dna.Program != null)
+            {
+                // 動きの手順：文は AI ではなく、プログラムからアプリが定型文で作る（仕様 28.9）
+                SideHeading(_rightBody, "MOTION", "動きの手順（プログラムから作った文）");
+                CappedLines(_rightBody, ProgramText.Rules(dna).Select(t => (t, LabTheme.FontSmall, LabTheme.TextPrimary, 96f)).ToList(), 3);
+                var notes = (App.LastOutcome?.Report?.Warnings ?? new List<string>()).Where(w => w.Contains("ルール") || w.Contains("フラグ")).Take(2);
+                foreach (var w in notes) Para(_rightBody, "⚠ " + w, LabTheme.FontSmall, LabTheme.AccentWarning, 56);
+                UiKit.Heading(_rightBody, "部品", 24);
+                CappedLines(_rightBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）{(part.Joint != null ? "　↻ 関節" : "")}", LabTheme.FontSmall, LabTheme.TextPrimary, 30f)).ToList(), 3);
+            }
+            else
+            {
+                SideHeading(_rightBody, "PARTS", "採用機能と部品");
+                var lines = dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）", LabTheme.FontBody, LabTheme.TextPrimary, 38f))
+                    .Concat(dna.Behaviors.Select(b => ($"◆ {LabCatalog.Behavior(b.Type)?.LabelJa} → {b.TargetPart}", LabTheme.FontSmall, LabTheme.AccentLight, 34f))).ToList();
+                CappedLines(_rightBody, lines, 9);
+            }
         }
 
         // ---- 機能対応表（S02）：要望ごとに ✓ 検証する／△ 単純化して検証／× 検証できない。記号・色・文字の3つで区別する ----
@@ -466,8 +479,8 @@ namespace ImpossibleLab
             var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
             row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(8, 12, 3, 3);
             string icon = r.Status == "simulated" ? "✓" : r.Status == "simplified" ? "△" : r.Status == "demonstrated" ? "▶" : "×";
-            string label = r.Status == "simulated" ? "検証する" : r.Status == "simplified" ? "単純化" : "検証できない";
-            Color c = r.Status == "simulated" ? LabTheme.AccentLight : r.Status == "simplified" ? LabTheme.TextSecondary : LabTheme.AccentWarning;
+            string label = r.Status == "simulated" ? "検証する" : r.Status == "simplified" ? "単純化" : r.Status == "demonstrated" ? "動きで見せる" : "検証できない";
+            Color c = r.Status == "simulated" ? LabTheme.AccentLight : r.Status == "simplified" || r.Status == "demonstrated" ? LabTheme.TextSecondary : LabTheme.AccentWarning;
             var badge = UiKit.Badge(row, $"{icon} {label}", c, LabTheme.BgDeep, 176);
             UiKit.Size(badge.transform.parent.GetComponent<RectTransform>(), h: 48);
             string sub = LabTheme.ToHex(LabTheme.TextSecondary);
@@ -509,6 +522,86 @@ namespace ImpossibleLab
         public int ParamPage => _paramPage;
         public void StepParamPage(int dir) { _paramPage = Mathf.Max(0, _paramPage + dir); Refresh(); }
 
+        // ---- S03 動きの手順（仕様 28.9）：ルールごとのオン・オフ、数値の増減、「動かしてみる」。編集は版の履歴に残す ----
+        bool _s03Program;
+        int _programPage;
+        string _programPageFor;
+        const int ProgramRowsPerPage = 5;
+        public bool ProgramTab { get => _s03Program; set { _s03Program = value; Refresh(); } }
+
+        void BuildProgramRows(Transform parent, Transform headRow, InventionDna dna)
+        {
+            // 行の一覧：ルールの見出し → 数値の条件 → 関節の目標 → 待つ時間
+            var rows = new List<System.Action<Transform>>();
+            for (int i = 0; i < dna.Program.Rules.Count; i++)
+            {
+                var rule = dna.Program.Rules[i];
+                int ri = i;
+                string id = rule.Id;
+                rows.Add(t => RuleHeadRow(t, dna, rule, ri));
+                for (int k = 0; k < rule.When.Count; k++)
+                {
+                    var c = rule.When[k];
+                    var s = ProgramCatalog.Sensor(c.Sensor);
+                    if (c.IsFlag || s == null || s.IsBool) continue;
+                    int ck = k;
+                    rows.Add(t => ValueRow(t, "条件：" + ProgramText.Condition(c, dna), (c.Sensor == "joint_position" ? ProgramText.JointValue(dna, c.Joint, c.Value) : $"{c.Value:0.##}{s.Unit}"),
+                        () => App.StepRule(id, "when", ck, -1), () => App.StepRule(id, "when", ck, +1)));
+                }
+                for (int k = 0; k < rule.Do.Count; k++)
+                {
+                    var a = rule.Do[k];
+                    int ak = k;
+                    if (a.Action == ProgramAction.MoveJoint)
+                        rows.Add(t => ValueRow(t, $"{ProgramText.PartName(dna, a.Joint)}の目標", ProgramText.JointValue(dna, a.Joint, a.Target),
+                            () => App.StepRule(id, "target", ak, -1), () => App.StepRule(id, "target", ak, +1)));
+                    else if (a.Action == ProgramAction.Wait)
+                        rows.Add(t => ValueRow(t, "待つ時間", $"{a.Seconds:0.#} 秒", () => App.StepRule(id, "seconds", ak, -1), () => App.StepRule(id, "seconds", ak, +1)));
+                }
+            }
+            if (_programPageFor != dna.Id) { _programPageFor = dna.Id; _programPage = 0; }
+            int pages = Mathf.Max(1, (rows.Count + ProgramRowsPerPage - 1) / ProgramRowsPerPage);
+            _programPage = Mathf.Clamp(_programPage, 0, pages - 1);
+            var fill = UiKit.Rect("Fill", headRow); UiKit.Size(fill, flexW: 1);
+            if (pages > 1)
+            {
+                var prev = UiKit.Button(headRow, "◀", () => { _programPage--; Refresh(); }, ButtonStyle.Secondary, 64, 48);
+                UiKit.SetInteractable(prev, _programPage > 0);
+                var pt = UiKit.Text(headRow, $"{_programPage + 1} / {pages}", LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.Center);
+                UiKit.Size(pt, w: 80);
+                var next = UiKit.Button(headRow, "▶", () => { _programPage++; Refresh(); }, ButtonStyle.Secondary, 64, 48);
+                UiKit.SetInteractable(next, _programPage < pages - 1);
+            }
+            foreach (var r in rows.Skip(_programPage * ProgramRowsPerPage).Take(ProgramRowsPerPage)) r(parent);
+        }
+
+        void RuleHeadRow(Transform parent, InventionDna dna, ProgramRule rule, int index)
+        {
+            var row = UiKit.Row("Rule_" + rule.Id, parent, LabTheme.Space1, 74);
+            var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
+            row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(12, 8, 4, 4);
+            string label = string.IsNullOrEmpty(rule.Label) ? rule.Id : rule.Label;
+            string sub = rule.Trigger == ProgramRule.While ? "成り立っている間ずっと" : $"成り立ったら1回（間隔 {rule.Cooldown:0.#} 秒）";
+            var l = UiKit.Text(row, $"{ProgramText.Number(index)} {label}\n<size=72%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>{sub}</color></size>", LabTheme.FontSmall, rule.Enabled ? LabTheme.TextPrimary : LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft);
+            UiKit.Size(l, flexW: 1);
+            string id = rule.Id;
+            UiKit.Button(row, rule.Enabled ? "オン" : "オフ", () => App.ToggleRule(id), rule.Enabled ? ButtonStyle.Selected : ButtonStyle.Secondary, 96, 52, LabTheme.FontSmall);
+            var play = UiKit.Button(row, "動かしてみる", () => App.PreviewRule(id), ButtonStyle.Secondary, 190, 52, LabTheme.FontSmall);
+            UiKit.SetInteractable(play, rule.Enabled && rule.Trigger == ProgramRule.Rise && rule.Do.Any(a => a.Action == ProgramAction.MoveJoint));
+        }
+
+        void ValueRow(Transform parent, string label, string value, UnityEngine.Events.UnityAction minus, UnityEngine.Events.UnityAction plus)
+        {
+            var row = UiKit.Row("PV", parent, LabTheme.Space1, 60);
+            row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(40, 8, 2, 2);
+            var l = UiKit.Text(row, label, LabTheme.FontSmall, LabTheme.TextPrimary, align: TextAlignmentOptions.MidlineLeft);
+            UiKit.Size(l, flexW: 1);
+            UiKit.Button(row, "−", minus, ButtonStyle.Secondary, 56, 50);
+            var v = UiKit.Text(row, value, LabTheme.FontBody, LabTheme.AccentLight, bold: true, align: TextAlignmentOptions.Center);
+            UiKit.Size(v, w: 130);
+            UiKit.Button(row, "＋", plus, ButtonStyle.Secondary, 56, 50);
+        }
+
         /// <summary>行を上限まで並べ、超えた分は「ほか N 件」にまとめる（側面パネルからはみ出さないように）。</summary>
         void CappedLines(Transform parent, List<(string text, float size, Color color, float h)> lines, int max)
         {
@@ -534,7 +627,16 @@ namespace ImpossibleLab
             int pages = Mathf.Max(1, (rows.Count + perPage - 1) / perPage);
             _paramPage = Mathf.Clamp(_paramPage, 0, pages - 1);
             var headRow = UiKit.Row("ParamHead", left, LabTheme.Space1, 48);
-            var head = UiKit.Heading(headRow, "性能パラメータ（許可範囲・単位）", 26);
+            bool hasProgram = dna.Program != null && Features.MotionProgram;
+            if (hasProgram)
+            {
+                UiKit.Button(headRow, "性能", () => { _s03Program = false; Refresh(); }, _s03Program ? ButtonStyle.Secondary : ButtonStyle.Selected, 120, 48, LabTheme.FontSmall);
+                UiKit.Button(headRow, "動きの手順", () => { _s03Program = true; Refresh(); }, _s03Program ? ButtonStyle.Selected : ButtonStyle.Secondary, 180, 48, LabTheme.FontSmall);
+            }
+            if (hasProgram && _s03Program) BuildProgramRows(left, headRow, dna);
+            else
+            {
+            var head = UiKit.Heading(headRow, hasProgram ? "" : "性能パラメータ（許可範囲・単位）", 26);
             UiKit.Size(head, flexW: 1);
             if (pages > 1)
             {
@@ -546,6 +648,7 @@ namespace ImpossibleLab
                 UiKit.SetInteractable(next, _paramPage < pages - 1);
             }
             foreach (var (info, p, v) in rows.Skip(_paramPage * perPage).Take(perPage)) ParamRow(left, info, p, v);
+            }
             var right = UiKit.Column("Revise", cols, LabTheme.Space1); UiKit.Size(right, flexW: 1);
             UiKit.Heading(right, "AIに改良を依頼", 26);
             var inRow = UiKit.Row("RevInput", right, LabTheme.Space1, 64);
@@ -890,6 +993,11 @@ namespace ImpossibleLab
             var metrics = PlanEditor.ExpectedMetrics(plan, dna);
             Para(_rightBody, "<b>測る</b>：" + (metrics.Count > 0 ? string.Join("・", metrics.Where(x => x.Primary).Select(x => x.LabelJa)) : "（この条件で測れる計測項目がありません）"),
                 LabTheme.FontSmall, LabTheme.TextPrimary, 60);
+            if (plan.Scenario == ExperimentCatalog.ApproachDevice)
+            {
+                var ex = plan.Expect ?? ProgramExpectation.FromProgram(dna);
+                Para(_rightBody, "<b>期待</b>：" + (ex != null ? ex.Describe(dna) : "（決められません：距離の条件で関節を動かすルールがない）"), LabTheme.FontSmall, LabTheme.TextPrimary, 60);
+            }
             var crit = PlanEditor.EffectiveCriteria(plan, dna);
             string src = plan.Criteria.Count > 0 ? (App.SelectedPlan?.FromAi == true ? "AI案の条件" : "計画の条件") : "目安（調整用・要出典）";
             Para(_rightBody, $"<b>合格条件</b>（{src}）", LabTheme.FontSmall, LabTheme.TextPrimary, 30);
@@ -1095,8 +1203,16 @@ namespace ImpossibleLab
                 foreach (var m in ExperimentComparer.Compare(dream, real).Take(4)) CompareRow(c2, m);
             }
             else Para(c2, "比較対象なし：同じ条件の別の版、または別モードの結果がまだありません。改良して再実験するか、モードを切り替えてください。", LabTheme.FontSmall, h: 100);
+            if (r.Timeline.Count > 0)
+            {
+                // 動作プログラムの発火（仕様 28.9）：起動・関節の動き・打ち切りだけを、時刻の順に
+                var lines = r.Timeline.Where(t => !t.Contains(" set_flag ")).Select(t => ProgramText.TimelineLine(t, App.Current?.Current)).ToList();
+                UiKit.Heading(c2, $"発火のタイムライン（{r.Timeline.Count(t => t.Contains(" start "))} 回）", 24);
+                foreach (var t in lines.Take(3)) Para(c2, Short(t, 40), LabTheme.FontSmall, LabTheme.TextPrimary, 28);
+                if (lines.Count > 3) Para(c2, $"…ほか {lines.Count - 3} 件", LabTheme.FontSmall, LabTheme.TextSecondary, 26);
+            }
             UiKit.Heading(c2, "改善案（計測値からの規則）", 24);
-            foreach (var h in App.ImprovementHints(r).Take(2)) Para(c2, "・" + Short(h, 64), LabTheme.FontSmall, LabTheme.TextPrimary, 30);
+            foreach (var h in App.ImprovementHints(r).Take(r.Timeline.Count > 0 ? 1 : 2)) Para(c2, "・" + Short(h, 64), LabTheme.FontSmall, LabTheme.TextPrimary, 30);
 
             var a2 = UiKit.Row("Actions", _body, LabTheme.Space1, 68);
             UiKit.Button(a2, "同じ条件で再実験", App.RerunSameConditions, ButtonStyle.Secondary, 280);
@@ -1348,7 +1464,7 @@ namespace ImpossibleLab
             // 名前と説明は1行ずつに収める（折り返すと下の行と重なる）。更新日時は年を省く
             Para(card, $"<b><color=#{LabTheme.ToHex(LabTheme.TextPrimary)}>{Short(e.Name, 16)}</color></b>", LabTheme.FontBody, h: 36);
             string when = e.UpdatedAt != null && e.UpdatedAt.Length >= 16 ? e.UpdatedAt.Substring(5) : e.UpdatedAt;
-            Para(card, $"{Short(e.TagsJa, 8)} ／ Rev.{e.Revision} ／ {when}", LabTheme.FontSmall, h: 30);
+            Para(card, $"{(e.HasProgram ? "▶動き ／ " : "")}{Short(e.TagsJa, e.HasProgram ? 4 : 8)} ／ Rev.{e.Revision} ／ {when}", LabTheme.FontSmall, h: 30);
             Para(card, e.Tested ? "✓ 実験済み" : "未実験", LabTheme.FontSmall, e.Tested ? LabTheme.AccentLight : LabTheme.TextSecondary, 30);
             var row = UiKit.Row("Btns", card, LabTheme.Space1, 56);
             string id = e.Id;

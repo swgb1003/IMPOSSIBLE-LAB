@@ -223,6 +223,46 @@ namespace ImpossibleLab.Tests
             Assert.IsTrue(Features.MotionProgram);
         }
 
+        [Test] public void ProgramText_DescribesRuleFromData()
+        {
+            var dna = Parse(Dna()).Dna;
+            string t = ProgramText.Rule(dna.Program.Rules[0], 0, dna);
+            StringAssert.StartsWith("①", t);
+            StringAssert.Contains("対象までの距離が 1m より小さい", t);
+            StringAssert.Contains("状態「opened」が偽", t);
+            StringAssert.Contains("板（lid）を 100°へ", t);
+            StringAssert.Contains("3秒待つ", t);
+            StringAssert.Contains("▶ 人が近づいたらフタを開ける", ProgramText.TimelineLine("2.02 open_lid start", dna));
+        }
+
+        static RevisionResult UpdateRule(InventionDna dna, string field, int index, float value)
+        {
+            var p = new RevisionProposal { Source = "manual" };
+            p.Operations.Add(new RevisionOperation { Op = RevisionOps.UpdateRule, RuleId = "open_lid", RuleField = field, Index = index, Value = value });
+            return RevisionEngine.Apply(dna, p);
+        }
+
+        [Test] public void UpdateRule_ChangesValuesWithClampAndHistory()
+        {
+            var dna = Parse(Dna()).Dna;
+            var off = UpdateRule(dna, "enabled", 0, 0f);
+            Assert.IsTrue(off.Success, string.Join(",", off.Errors));
+            Assert.IsFalse(off.NewDna.Program.Rules[0].Enabled);
+            Assert.IsTrue(dna.Program.Rules[0].Enabled, "元の版は変えない");
+            var wait = UpdateRule(dna, "seconds", 2, 999f);
+            Assert.IsTrue(wait.Success);
+            Assert.AreEqual(ProgramCatalog.MaxWait, wait.NewDna.Program.Rules[0].Do[2].Seconds, "範囲内に補正");
+            Assert.IsTrue(wait.Warnings.Any(w => w.Contains("補正")));
+            var target = UpdateRule(dna, "target", 0, 80f);
+            Assert.AreEqual(80f, target.NewDna.Program.Rules[0].Do[0].Target);
+            StringAssert.Contains("100°", target.Changes[0].Before);
+            var dist = UpdateRule(dna, "when", 0, 1.5f);
+            Assert.AreEqual(1.5f, dist.NewDna.Program.Rules[0].When[0].Value);
+            Assert.IsFalse(UpdateRule(dna, "when", 1, 1f).Success, "フラグの条件は数値ではない");
+            Assert.IsFalse(UpdateRule(dna, "target", 2, 10f).Success, "wait は関節の動きではない");
+            Assert.IsFalse(RevisionOps.IsValid(RevisionOps.UpdateRule), "AI の改良提案ではまだ使えない");
+        }
+
         [Test] public void Revision_KeepsProgramAndJoints()
         {
             var dna = Parse(Dna()).Dna;

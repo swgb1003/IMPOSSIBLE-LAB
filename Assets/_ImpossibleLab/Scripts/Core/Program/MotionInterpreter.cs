@@ -79,10 +79,24 @@ namespace ImpossibleLab.Core
             _state = _program.Rules.Select(_ => new RuleState()).ToArray();
         }
 
+        /// <summary>実行中のルールがあるか。</summary>
+        public bool Program_AnyRunning() => _state.Any(s => s.Running);
+
         public bool IsRunning(string ruleId)
         {
             int i = _program.Rules.FindIndex(r => r.Id == ruleId);
             return i >= 0 && _state[i].Running;
+        }
+
+        /// <summary>条件に関係なくルールを起動する（S03 の「動かしてみる」）。</summary>
+        public bool ForceStart(string ruleId)
+        {
+            int i = _program.Rules.FindIndex(r => r.Id == ruleId);
+            if (i < 0 || _program.Rules[i].Trigger != ProgramRule.Rise) return false;
+            var st = _state[i];
+            st.Running = true; st.Next = 0; st.WaitUntil = 0f; st.StartedAt = Time;
+            Log(_program.Rules[i], "start", "動かしてみる");
+            return true;
         }
 
         /// <summary>1刻み進める。</summary>

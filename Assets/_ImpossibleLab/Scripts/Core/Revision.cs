@@ -15,6 +15,8 @@ namespace ImpossibleLab.Core
         public const string RemoveBehavior = "remove_behavior";
         /// <summary>部品の形・素材の変更（S03 の手動の切り替えだけで使う。AI の改良提案では受け付けない）。</summary>
         public const string UpdatePart = "update_part";
+        /// <summary>動作プログラムのルールの変更（S03 の手動の編集。enabled・when・target・seconds）。AI の改良提案ではまだ受け付けない（G-A3）。</summary>
+        public const string UpdateRule = "update_rule";
         public static bool IsValid(string op) => op == AddPart || op == RemovePart || op == UpdateParameter || op == AddBehavior || op == RemoveBehavior;
     }
 
@@ -33,6 +35,10 @@ namespace ImpossibleLab.Core
         /// <summary>update_part：新しい形・素材（null なら変えない）。</summary>
         public string Shape;
         public string Material;
+        /// <summary>update_rule：ルール id・変える項目（enabled / when / target / seconds）・条件や動作の番号。値は Value（enabled は 0/1）。</summary>
+        public string RuleId;
+        public string RuleField;
+        public int Index;
     }
 
     public sealed class RevisionProposal
@@ -82,6 +88,7 @@ namespace ImpossibleLab.Core
                     case RevisionOps.AddBehavior: ApplyAddBehavior(next, op, result); break;
                     case RevisionOps.RemoveBehavior: ApplyRemoveBehavior(next, op, result); break;
                     case RevisionOps.UpdatePart: ApplyUpdatePart(next, op, result); break;
+                    case RevisionOps.UpdateRule: ApplyUpdateRule(next, op, result); break;
                     default: result.Errors.Add($"未対応の変更操作: {op.Op}"); break;
                 }
             }
@@ -184,6 +191,70 @@ namespace ImpossibleLab.Core
                 }
             }
             r.Changes.Add(new ChangeLine { Label = "機能削除", Before = info?.LabelJa ?? b.Type, After = "—" });
+        }
+
+        /// <summary>ルールの変更。範囲の外は範囲内に補正して注意を出す（仕様 28.5：改良では補正して差分に表示）。</summary>
+        static void ApplyUpdateRule(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            var rule = dna.Program?.Rules.Find(x => x.Id == op.RuleId);
+            if (rule == null) { r.Errors.Add($"ルールがありません: {op.RuleId}"); return; }
+            if (float.IsNaN(op.Value) || float.IsInfinity(op.Value)) { r.Errors.Add("不正な数値です"); return; }
+            string name = $"ルール「{(string.IsNullOrEmpty(rule.Label) ? rule.Id : rule.Label)}」";
+            float Clamp(float v, float min, float max, string what)
+            {
+                float c = Mathf.Clamp(v, min, max);
+                if (!Mathf.Approximately(c, v)) r.Warnings.Add($"{what}は範囲 {min:0.##}〜{max:0.##} に補正しました");
+                return c;
+            }
+            switch (op.RuleField)
+            {
+                case "enabled":
+                {
+                    bool on = op.Value >= 0.5f;
+                    if (rule.Enabled == on) return;
+                    r.Changes.Add(new ChangeLine { Label = name, Before = rule.Enabled ? "オン" : "オフ", After = on ? "オン" : "オフ" });
+                    rule.Enabled = on;
+                    return;
+                }
+                case "when":
+                {
+                    if (op.Index < 0 || op.Index >= rule.When.Count || rule.When[op.Index].IsFlag) { r.Errors.Add($"{name} の条件 {op.Index} は数値ではありません"); return; }
+                    var c = rule.When[op.Index];
+                    var s = ProgramCatalog.Sensor(c.Sensor);
+                    if (s == null || s.IsBool) { r.Errors.Add($"{name} の条件 {op.Index} は数値ではありません"); return; }
+                    float min = s.Min, max = c.Sensor == "target_distance" ? dna.GetParameter("detect", "rangeM", s.Max) : s.Max;
+                    if (c.Sensor == "joint_position") { var j = dna.FindPart(c.Joint)?.Joint; if (j != null) { min = j.Min; max = j.Max; } }
+                    float v = Clamp(op.Value, min, max, s.LabelJa);
+                    if (Mathf.Approximately(v, c.Value)) return;
+                    r.Changes.Add(new ChangeLine { Label = name + "：" + s.LabelJa, Before = ProgramText.Condition(c, dna), After = null });
+                    c.Value = v;
+                    r.Changes[r.Changes.Count - 1].After = ProgramText.Condition(c, dna);
+                    return;
+                }
+                case "target":
+                {
+                    if (op.Index < 0 || op.Index >= rule.Do.Count || rule.Do[op.Index].Action != ProgramAction.MoveJoint) { r.Errors.Add($"{name} の動作 {op.Index} は関節の動きではありません"); return; }
+                    var a = rule.Do[op.Index];
+                    var j = dna.FindPart(a.Joint)?.Joint;
+                    if (j == null) { r.Errors.Add($"関節 {a.Joint} がありません"); return; }
+                    float v = Clamp(op.Value, j.Min, j.Max, "関節の目標");
+                    if (Mathf.Approximately(v, a.Target)) return;
+                    r.Changes.Add(new ChangeLine { Label = name + "：関節の目標", Before = ProgramText.JointValue(dna, a.Joint, a.Target), After = ProgramText.JointValue(dna, a.Joint, v) });
+                    a.Target = v;
+                    return;
+                }
+                case "seconds":
+                {
+                    if (op.Index < 0 || op.Index >= rule.Do.Count || rule.Do[op.Index].Action != ProgramAction.Wait) { r.Errors.Add($"{name} の動作 {op.Index} は待つ動作ではありません"); return; }
+                    var a = rule.Do[op.Index];
+                    float v = Clamp(op.Value, ProgramCatalog.MinWait, ProgramCatalog.MaxWait, "待つ時間");
+                    if (Mathf.Approximately(v, a.Seconds)) return;
+                    r.Changes.Add(new ChangeLine { Label = name + "：待つ時間", Before = $"{a.Seconds:0.#}秒", After = $"{v:0.#}秒" });
+                    a.Seconds = v;
+                    return;
+                }
+                default: r.Errors.Add($"未対応のルールの項目: {op.RuleField}"); return;
+            }
         }
 
         static void ApplyUpdatePart(InventionDna dna, RevisionOperation op, RevisionResult r)

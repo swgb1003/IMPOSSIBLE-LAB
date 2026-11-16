@@ -41,7 +41,10 @@ namespace ImpossibleLab.Core
                         Need = n.Need, Status = n.Status, Note = n.Note ?? "",
                         BlocksJa = string.Join("・", n.Blocks.Select(b => LabCatalog.Behavior(b)?.LabelJa ?? b)),
                         Blocks = new List<string>(n.Blocks),
-                        PlanTitle = n.Status == "unverifiable" ? null : PlanFor(n.Blocks),
+                        // 動きで見せる要望は、動作プログラムの実験（近づいて離れる）で再現する
+                        PlanTitle = n.Status == "unverifiable" ? null
+                            : n.Status == "demonstrated" && dna.Program != null ? exercised.FirstOrDefault(e => e.Title == "近づいて離れる").Title ?? PlanFor(n.Blocks)
+                            : PlanFor(n.Blocks),
                     });
                 return rows;
             }

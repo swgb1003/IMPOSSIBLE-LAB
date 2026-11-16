@@ -387,6 +387,64 @@ namespace ImpossibleLab
             ShowToast(on ? $"起動しました：{what}（試用）" : "停止して発明台に戻しました");
         }
 
+        // ---- S03：動作プログラムの手順の編集（版の履歴に残す）と「動かしてみる」 ----
+        public void ToggleRule(string ruleId)
+        {
+            var rule = Current?.Current.Program?.Rules.Find(r => r.Id == ruleId);
+            if (rule == null) return;
+            ApplyRuleChange(new RevisionOperation { Op = RevisionOps.UpdateRule, RuleId = ruleId, RuleField = "enabled", Value = rule.Enabled ? 0f : 1f });
+        }
+
+        /// <summary>条件の値・関節の目標・待つ時間を1段ずつ増減する。</summary>
+        public void StepRule(string ruleId, string field, int index, int dir)
+        {
+            var dna = Current?.Current;
+            var rule = dna?.Program?.Rules.Find(r => r.Id == ruleId);
+            if (rule == null) return;
+            float now, step;
+            switch (field)
+            {
+                case "when":
+                {
+                    var c = rule.When[index]; var s = ProgramCatalog.Sensor(c.Sensor);
+                    now = c.Value;
+                    float range = c.Sensor == "target_distance" ? dna.GetParameter("detect", "rangeM", s.Max) - s.Min : s.Max - s.Min;
+                    step = range <= 10f ? 0.1f : range <= 100f ? 1f : Mathf.Pow(10f, Mathf.Floor(Mathf.Log10(range / 20f)));
+                    break;
+                }
+                case "target":
+                {
+                    var a = rule.Do[index]; var j = dna.FindPart(a.Joint)?.Joint;
+                    now = a.Target; step = j != null && !j.IsHinge ? 0.05f : 10f;
+                    break;
+                }
+                case "seconds": now = rule.Do[index].Seconds; step = 0.5f; break;
+                default: return;
+            }
+            ApplyRuleChange(new RevisionOperation { Op = RevisionOps.UpdateRule, RuleId = ruleId, RuleField = field, Index = index, Value = Mathf.Round((now + step * dir) / step) * step });
+        }
+
+        void ApplyRuleChange(RevisionOperation op)
+        {
+            if (Current == null || Sm.State != LabState.Editing || RevisionBusy) return;
+            var proposal = new RevisionProposal { Source = "manual", Summary = "動きの手順の変更" };
+            proposal.Operations.Add(op);
+            var res = RevisionEngine.Apply(Current.Current, proposal);
+            if (!res.Success) { ShowToast(string.Join(" / ", res.Errors.Concat(res.Warnings).Take(1).DefaultIfEmpty("変更できません"))); return; }
+            Commit(res.NewDna);
+            var c = res.Changes[0];
+            ShowToast($"Rev.{res.NewDna.Revision}　{c.Label}：{c.Before} → {c.After}");
+        }
+
+        public void PreviewRule(string ruleId)
+        {
+            if (View == null || Sm.State != LabState.Editing) return;
+            var runner = View.Get<ProgramRunner>();
+            if (runner == null) return;
+            if (View.Active) { ShowToast("試用中は「動かしてみる」を使えません（停止してから）"); return; }
+            if (runner.Preview(ruleId)) ShowToast("動かしてみる：条件に関係なく、この手順を1回動かします");
+        }
+
         /// <summary>試用中に動作プログラムのルールが動いたら知らせる。</summary>
         void OnProgramFired(ProgramEvent e)
         {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ImpossibleLab.Core;
 using UnityEngine;
 
@@ -44,8 +45,35 @@ namespace ImpossibleLab
             _view?.ResetJoints();
         }
 
+        // ---- S03 の「動かしてみる」：条件に関係なく1つのルールを起動し、終わったら初期値に戻す ----
+        MotionInterpreter _preview;
+        float _previewHold;
+        public bool Previewing => _preview != null;
+
+        public bool Preview(string ruleId)
+        {
+            if (Running || _view?.Dna?.Program == null) return false;
+            _preview = new MotionInterpreter(_view.Dna);
+            if (!_preview.ForceStart(ruleId)) { _preview = null; return false; }
+            _acc = 0f; _previewHold = 0.6f;
+            return true;
+        }
+
+        sealed class NoSensors : IProgramSensors { public bool TryGet(string s, out float v) { v = 0f; return false; } }
+        static readonly NoSensors None = new NoSensors();
+
+        void UpdatePreview()
+        {
+            _acc += Mathf.Min(Time.deltaTime, 0.1f);
+            while (_acc >= MotionInterpreter.Step) { _acc -= MotionInterpreter.Step; _preview.Tick(None); }
+            foreach (var kv in _preview.JointValues) _view.SetJoint(kv.Key, kv.Value);
+            bool done = !_preview.Program_AnyRunning() && _preview.JointValues.Keys.All(k => _preview.JointAtTarget(k));
+            if (done && (_previewHold -= Time.deltaTime) <= 0f) { _preview = null; _view.ResetJoints(); }
+        }
+
         void Update()
         {
+            if (_preview != null && !Running) { UpdatePreview(); return; }
             if (!Running || _it == null) return;
             _acc += Mathf.Min(Time.deltaTime, 0.1f); // 引っかかったときに一気に進めない
             while (_acc >= MotionInterpreter.Step && !_it.Stopped)

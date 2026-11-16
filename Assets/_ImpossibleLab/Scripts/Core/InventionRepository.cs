@@ -24,6 +24,8 @@ namespace ImpossibleLab.Core
         public string TagsJa = "";
         /// <summary>分類タグの ID（S06 の絞り込み用）。</summary>
         public List<string> Tags = new List<string>();
+        /// <summary>動作プログラムを持つか（S06 の印）。</summary>
+        public bool HasProgram;
         public int Revision;
         public bool Tested;
     }
@@ -138,7 +140,7 @@ namespace ImpossibleLab.Core
                 if (inv == null) continue;
                 list.Add(new GalleryEntry
                 {
-                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags), Tags = new List<string>(inv.Current.Tags),
+                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags), Tags = new List<string>(inv.Current.Tags), HasProgram = inv.Current.Program != null,
                     Revision = inv.Current.Revision, UpdatedAt = inv.UpdatedAt, Tested = inv.Tested,
                 });
             }
@@ -202,6 +204,8 @@ namespace ImpossibleLab.Core
                 ["criteria"] = r.Criteria ?? "",
                 ["notes"] = new JArray(r.Limits.Concat(r.Assumptions).Take(10)),
                 ["limitCount"] = r.Limits.Count,
+                // 動作プログラムの発火の記録（S05 のタイムライン）。長くなりすぎないよう先頭 120 件
+                ["timeline"] = r.Timeline.Count > 0 ? new JArray(r.Timeline.Take(120)) : null,
             };
         }
 
@@ -268,6 +272,8 @@ namespace ImpossibleLab.Core
                 int limits = o.Value<int?>("limitCount") ?? 0;
                 if (o["notes"] is JArray notes)
                     foreach (var n in notes.Take(limits)) { var t = n.Value<string>(); if (!string.IsNullOrEmpty(t)) res.Limits.Add(Trunc(t, 160)); }
+                if (o["timeline"] is JArray tl)
+                    foreach (var n in tl.Take(120)) if (n.Type == JTokenType.String) res.Timeline.Add(Trunc(n.Value<string>(), 120));
                 return res;
             }
             catch (Exception) { return null; }

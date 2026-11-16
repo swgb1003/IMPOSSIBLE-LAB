@@ -619,8 +619,31 @@ namespace ImpossibleLab
             while (_app.Sm.State == LabState.Drafting && w0 < 10f) { _app.SubmitRequest(); w0 += Time.unscaledDeltaTime; yield return null; }
             yield return WaitState(LabState.AwaitingApproval);
             Check(_app.Preview != null && _app.Preview.Program != null, "motion: offline design has a motion program");
+            yield return Shot("S02_preview_motion_bin");
             _app.ApprovePreview();
             yield return WaitState(LabState.Editing);
+            // S03：動きの手順（オン・オフ、待つ時間の変更、元に戻す、動かしてみる）
+            var gui = FindFirstObjectByType<LabUI>();
+            gui.ProgramTab = true;
+            yield return null;
+            yield return Shot("S03_program_motion_bin");
+            int rev0 = _app.Current.Current.Revision;
+            _app.ToggleRule("open_lid");
+            yield return null;
+            Check(_app.Current.Current.Revision == rev0 + 1 && !_app.Current.Current.Program.Rules[0].Enabled, "motion: rule off is recorded as a revision");
+            _app.Undo();
+            _app.StepRule("open_lid", "seconds", 2, +1);
+            yield return null;
+            Check(Mathf.Approximately(_app.Current.Current.Program.Rules[0].Do[2].Seconds, 3.5f) && _app.Current.Current.Revision == rev0 + 1, "motion: wait time steps by 0.5 s as a revision");
+            _app.Undo();
+            yield return null;
+            Check(_app.Current.Current.Revision == rev0 && _app.Current.Current.Program.Rules[0].Enabled, "motion: undo restores the rule");
+            _app.PreviewRule("open_lid");
+            yield return new WaitForSeconds(1.2f);
+            Check(_app.View.Joints["lid"].Value > 80f, $"motion: preview moves the lid ({_app.View.Joints["lid"].Value:0} deg)");
+            yield return Shot("S03_program_preview", device: true);
+            yield return new WaitForSeconds(4.5f);
+            gui.ProgramTab = false;
             var runner = _app.View != null ? _app.View.Get<ProgramRunner>() : null;
             Check(runner != null && _app.View.Joints.ContainsKey("lid"), "motion: lid joint and program runner are built");
             if (runner == null || !_app.View.Joints.ContainsKey("lid")) yield break;
