@@ -30,6 +30,8 @@ namespace ImpossibleLab.Core
         public float Aux;
         /// <summary>動いている機能ブロックの消費電力の合計（REALITY の「機能の消費電力」）。</summary>
         public float BlockPowerW;
+        /// <summary>関節の値（ProgramModel が書き、再生用の記録に写す）。</summary>
+        public float[] Joints;
 
         /// <summary>
         /// 計測を結果に入れる。実験計画にない計測、シナリオ・環境モジュール・モードの条件を満たさない計測は入れない
@@ -103,7 +105,7 @@ namespace ImpossibleLab.Core
                 foreach (var m in models) m.AfterTick(ctx);
                 if (ctx.T >= nextFrame || ctx.CollidedNow)
                 {
-                    run.Frames.Add(new CourseFrame { Time = ctx.T, Device = ctx.Device, YawDeg = ctx.DeviceYaw, Leader = new Vector3(ctx.Leader.x, 0f, ctx.Leader.y), Collision = ctx.CollidedNow, Aux = ctx.Aux });
+                    run.Frames.Add(new CourseFrame { Time = ctx.T, Device = ctx.Device, YawDeg = ctx.DeviceYaw, Leader = new Vector3(ctx.Leader.x, 0f, ctx.Leader.y), Collision = ctx.CollidedNow, Aux = ctx.Aux, Joints = ctx.Joints != null ? (float[])ctx.Joints.Clone() : null });
                     if (ctx.T >= nextFrame) nextFrame += FrameInterval;
                 }
                 foreach (var m in models) m.AfterFrame(ctx);
@@ -137,6 +139,7 @@ namespace ImpossibleLab.Core
                 case ExperimentCatalog.DropTest: return new DropTestScenario();
                 case ExperimentCatalog.LiftTask: return new LiftTaskScenario();
                 case ExperimentCatalog.ClimbSlope: return new ClimbSlopeScenario();
+                case ExperimentCatalog.ApproachDevice: return new ApproachDeviceScenario();
                 case ExperimentCatalog.Stand:
                     if (plan.Has("rain")) throw new ArgumentException("雨のある stand は RainSimulator で実行してください");
                     return new StandScenario();
@@ -165,6 +168,7 @@ namespace ImpossibleLab.Core
                 case ExperimentCatalog.DropTest: list.Add(new CushionBlock()); break;
                 case ExperimentCatalog.LiftTask: if (Has("lift_load") || Has("grip")) list.Add(new LiftBlock()); break;
                 case ExperimentCatalog.ClimbSlope: list.Add(new DriveBlock()); break; // 走行がなくても「上れない」と結果に出す
+                case ExperimentCatalog.ApproachDevice: if (Features.MotionProgram && dna.Program != null) list.Add(new ProgramModel()); break;
             }
             return list;
         }

@@ -16,6 +16,8 @@ namespace ImpossibleLab.Core
         public bool Collision;
         /// <summary>シナリオごとの追加の値（sit_still：温度 °C、drop_test：衝撃 G、lift_task：落としたら 1）。</summary>
         public float Aux;
+        /// <summary>関節の値（RainExperimentResult.JointIds の順。動作プログラムの実験だけ）。</summary>
+        public float[] Joints;
     }
 
     /// <summary>実験場の配置（可視化と計算で同じものを使う）。</summary>

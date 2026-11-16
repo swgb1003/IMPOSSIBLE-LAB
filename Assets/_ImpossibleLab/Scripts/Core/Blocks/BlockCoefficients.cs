@@ -35,6 +35,8 @@ namespace ImpossibleLab.Core
             C("shellThicknessM", "部品の外殻の厚み（樹脂・金属・ゴム・ガラス）", "m", 0.002f, 0.001f, 0.004f, "tuning", "部品は中空の殻と仮定し、表面積×厚み×密度で重さを出す（調整用の仮定）"),
             C("fabricArealDensity", "布の面密度", "kg/m²", 0.15f, 0.08f, 0.3f, "estimate", "傘・日よけ用の布の目安（要調査）"),
             C("batteryDensity", "電池の密度", "kg/m³", 2000f, 1500f, 2500f, "estimate", "リチウムイオン電池パックの体積あたりの重さの目安（要調査）"),
+            // 8週目：動作プログラムの関節（REALITY の関節の消費電力量）
+            C("jointMotorPowerW", "関節を動かす駆動部の電力（動いている間）", "W", 5f, 2f, 15f, "estimate", "小型のギヤードモーター・サーボが動いている間の消費電力の目安（要調査）"),
             C("mountLimitHead", "頭に付ける重さの目安", "kg", 0.5f, 0.3f, 0.6f, "literature", "VRヘッドセット Meta Quest 3 が 515 g、ロード用自転車ヘルメットが 250〜300 g（製品仕様）。長時間の快適さの基準ではない"),
             C("mountLimitBack", "背負う重さの目安", "kg", 6f, 3f, 9f, "literature", "子どものかばんは体重の 10〜15% が目安としてよく引用される（米国小児科学会の名で 5〜20% と幅があり、根拠は限られる）。体重 60 kg の 10%"),
             C("mountLimitWaist", "腰に付ける重さの目安", "kg", 3f, 1.5f, 5f, "estimate", "工具ベルト・ウエストバッグの目安（要調査）"),

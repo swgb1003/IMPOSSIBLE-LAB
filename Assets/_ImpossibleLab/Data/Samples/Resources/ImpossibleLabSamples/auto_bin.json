@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 3,
+  "id": "inv-auto-bin",
+  "name": "自動で開くゴミ箱",
+  "purpose": "両手がふさがっていても、近づくだけでフタが開き、離れると閉じるゴミ箱。",
+  "tags": ["daily"],
+  "mount": "fixed",
+  "appearance": "lab_white",
+  "mode": "dream",
+  "parts": [
+    { "id": "bin", "type": "container", "shape": "box", "material": "plastic", "position": [0, 0, 0], "scale": [0.36, 0.6, 0.36] },
+    { "id": "lid", "type": "panel", "shape": "box", "material": "plastic", "position": [0, 0.31, 0], "scale": [0.38, 0.025, 0.38],
+      "joint": { "type": "hinge", "parent": "bin", "axis": "x", "pivot": [0, 0, -0.19], "min": 0, "max": 110, "speed": 120, "home": 0 } },
+    { "id": "eye", "type": "sensor", "shape": "sphere", "material": "plastic", "position": [0, 0.2, 0.19], "scale": [0.04, 0.03, 0.04] },
+    { "id": "hinge-motor", "type": "motor", "shape": "cylinder", "material": "steel", "position": [0, 0.31, -0.19], "scale": [0.04, 0.3, 0.04] }
+  ],
+  "behaviors": [
+    { "type": "detect", "targetPart": "eye", "parameters": { "rangeM": 3.0, "fovDeg": 120 } }
+  ],
+  "functionMap": [
+    { "need": "近づいたらフタが開く", "blocks": ["detect"], "status": "demonstrated", "note": "人型モデルが近づく実験で、フタの角度と反応時間を記録する" },
+    { "need": "臭いが漏れない", "blocks": [], "status": "unverifiable", "note": "密閉性や臭いは実験できない" }
+  ],
+  "program": {
+    "version": 1,
+    "flags": ["opened"],
+    "rules": [
+      { "id": "open_lid", "label": "人が近づいたらフタを開ける", "trigger": "rise", "cooldown": 1.0,
+        "when": { "all": [ { "sensor": "target_distance", "op": "<", "value": 1.0 }, { "flag": "opened", "is": false } ] },
+        "do": [
+          { "action": "move_joint", "joint": "lid", "target": 100 },
+          { "action": "set_flag", "name": "opened", "value": true },
+          { "action": "wait", "seconds": 3 },
+          { "action": "move_joint", "joint": "lid", "target": 0 },
+          { "action": "set_flag", "name": "opened", "value": false }
+        ] }
+    ]
+  }
+}

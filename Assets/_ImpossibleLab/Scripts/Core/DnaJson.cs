@@ -185,7 +185,7 @@ namespace ImpossibleLab.Core
                     }
                 }
                 if (n.Status == "unverifiable" && n.Note.Length == 0) r.Errors.Add($"{at}：検証できない要望には理由（note）が必要です");
-                if ((n.Status == "simulated" || n.Status == "simplified") && n.Blocks.Count == 0) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）が必要です");
+                if ((n.Status == "simulated" || n.Status == "simplified" || n.Status == "demonstrated") && n.Blocks.Count == 0) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）が必要です");
                 dna.FunctionMap.Add(n);
             }
         }

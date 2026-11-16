@@ -494,6 +494,9 @@ namespace ImpossibleLab
                 Check(saved != null && saved.Experiments.Count >= 3 && saved.Experiments.All(e => e.Environment == LabEnvironments.ForCategory(cat)), $"{cat}: saved with experiments {serr}");
             }
 
+            // 動作プログラム（仕様 28、G-A2）：見本「自動で開くゴミ箱」を研究室で試用する
+            yield return MotionBinFlow();
+
             // 移動の実験のあとに雨具へ戻ると、風が雨の初期値（90°・3 m/s）に戻る（Quest 実機で 4 m/s が引き継がれた不具合）
             _app.LoadFromGallery(rainId);
             yield return WaitState(LabState.Editing);
@@ -602,6 +605,64 @@ namespace ImpossibleLab
             }
             Check(repPassed == 6, $"representative: {repPassed}/6 completed design -> test -> revise -> retest -> save");
             Time.timeScale = 1f;
+        }
+
+        /// <summary>
+        /// 動作プログラムの試用：依頼文 → オフラインの見本（自動で開くゴミ箱）→ 起動 → 対象が近づくとフタが開き、離れると3秒後に閉じる。
+        /// 対象はカメラの代わりの空の物体（ProgramRunner.TargetOverride）で動かす。
+        /// </summary>
+        IEnumerator MotionBinFlow()
+        {
+            _app.NewInvention();
+            _app.SetRequestText("近づくと自動で開くゴミ箱が欲しい");
+            float w0 = 0;
+            while (_app.Sm.State == LabState.Drafting && w0 < 10f) { _app.SubmitRequest(); w0 += Time.unscaledDeltaTime; yield return null; }
+            yield return WaitState(LabState.AwaitingApproval);
+            Check(_app.Preview != null && _app.Preview.Program != null, "motion: offline design has a motion program");
+            _app.ApprovePreview();
+            yield return WaitState(LabState.Editing);
+            var runner = _app.View != null ? _app.View.Get<ProgramRunner>() : null;
+            Check(runner != null && _app.View.Joints.ContainsKey("lid"), "motion: lid joint and program runner are built");
+            if (runner == null || !_app.View.Joints.ContainsKey("lid")) yield break;
+            var target = new GameObject("VerifyTarget").transform;
+            runner.TargetOverride = target;
+            var p = _app.View.transform.position;
+            target.position = p + new Vector3(0, 0, 2.5f);
+            _app.ToggleDevice();
+            yield return new WaitForSeconds(0.5f);
+            Check(_app.View.Joints["lid"].Value < 1f, "motion: lid stays closed while nobody is near");
+            target.position = p + new Vector3(0, 0, 0.6f);
+            yield return new WaitForSeconds(1.5f);
+            float open = _app.View.Joints["lid"].Value;
+            Check(open > 80f, $"motion: lid opens when approached ({open:0} deg)");
+            Check(_app.Toast != null && _app.Toast.Contains("フタを開ける"), "motion: rule firing is shown as a notice");
+            yield return Shot("S03_device_motion_bin_open", device: true);
+            target.position = p + new Vector3(0, 0, 2.5f);
+            yield return new WaitForSeconds(4.5f);
+            float closed = _app.View.Joints["lid"].Value;
+            Check(closed < 5f, $"motion: lid closes after the wait ({closed:0} deg)");
+            _app.ToggleDevice();
+            Destroy(target.gameObject);
+
+            // 実験：近づいて離れる（AT-13）
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            Check(_app.EditPlan != null && _app.EditPlan.Scenario == ExperimentCatalog.ApproachDevice, $"motion: first plan is approach_device ({_app.EditPlan?.Scenario})");
+            yield return Shot("S04_motion_bin");
+            float tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
+            _app.StartExperiment();
+            yield return WaitState(LabState.RunningTest);
+            yield return new WaitForSeconds(3.2f);
+            yield return Shot("S05_running_motion_bin", rainLab: true);
+            yield return WaitState(LabState.ReviewingResult, 90f);
+            var res = _app.LastResult;
+            Check(res != null && res.Metric("ruleFiredCount") != null && res.Metric("reactionTime") != null && res.Metric("expectationRate") != null,
+                $"motion: experiment measured firing, reaction time and expectation ({res?.Criteria})");
+            Check(res != null && res.Passed == true, $"motion: experiment passed ({string.Join(" / ", res?.Limits ?? new System.Collections.Generic.List<string>())})");
+            Log($"RESULT motion-bin fired={res?.Metric("ruleFiredCount")?.Value} reaction={res?.Metric("reactionTime")?.Value:0.00} expectation={res?.Metric("expectationRate")?.Value:0.00}");
+            yield return Shot("S05_result_motion_bin", rainLab: true);
+            _app.Save();
+            yield return WaitState(LabState.Saved, 20f); // 次の検証は保存完了の画面から新しい発明を始める
         }
 
         /// <summary>

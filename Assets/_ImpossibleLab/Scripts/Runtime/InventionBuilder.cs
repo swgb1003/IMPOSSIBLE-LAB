@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ImpossibleLab.Core;
 using UnityEngine;
 
@@ -42,6 +43,15 @@ namespace ImpossibleLab
                 go.transform.SetParent(root.transform, false);
                 go.transform.localPosition = part.Position;
                 view.Parts[part.Id] = go.transform;
+            }
+            BuildJoints(report.Dna, view);
+
+            // 動作プログラム（仕様 28）：試用で同じインタプリタを動かす
+            if (Features.MotionProgram && report.Dna.Program != null)
+            {
+                var runner = root.AddComponent<ProgramRunner>();
+                runner.Configure(null, view);
+                view.Behaviors.Add(runner);
             }
 
             foreach (var b in report.Dna.Behaviors)
@@ -183,6 +193,35 @@ namespace ImpossibleLab
 
         static Color RgbColor(int rgb) => new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f);
 
+        /// <summary>
+        /// 関節（仕様 28.2）：回転・移動の中心に空の親を置き、部品をその子にする。親の関節があればその下に入れる（親を先に作る）。
+        /// hinge は正の値で、軸の負の向きまわりに回す（x 軸なら前 +Z 側が持ち上がる）。slider は軸の向きに動かす。
+        /// </summary>
+        static void BuildJoints(InventionDna dna, InventionView view)
+        {
+            int Depth(PartSpec p) { int d = 0; var cur = p; while (cur?.Joint != null && !string.IsNullOrEmpty(cur.Joint.Parent) && d < 8) { cur = dna.FindPart(cur.Joint.Parent); d++; } return d; }
+            foreach (var p in dna.Parts.Where(x => x.Joint != null).OrderBy(Depth))
+            {
+                if (!view.Parts.TryGetValue(p.Id, out var partT)) continue;
+                var pivot = new GameObject("Joint_" + p.Id).transform;
+                Vector3 at = p.Position + p.Joint.Pivot; // 発明の座標での中心
+                if (!string.IsNullOrEmpty(p.Joint.Parent) && view.Joints.TryGetValue(p.Joint.Parent, out var parentJoint))
+                {
+                    pivot.SetParent(parentJoint.Pivot, false);
+                    pivot.localPosition = at - parentJoint.RootPosition;
+                }
+                else
+                {
+                    pivot.SetParent(view.transform, false);
+                    pivot.localPosition = at;
+                }
+                partT.SetParent(pivot, false);
+                partT.localPosition = p.Position - at;
+                view.Joints[p.Id] = new InventionView.JointView { Spec = p.Joint, Pivot = pivot, Origin = pivot.localPosition, RootPosition = at };
+                view.SetJoint(p.Id, p.Joint.Home);
+            }
+        }
+
         public void Clear(InventionView view)
         {
             if (view != null) Object.Destroy(view.gameObject);
@@ -196,6 +235,32 @@ namespace ImpossibleLab
         public readonly Dictionary<string, Transform> Parts = new Dictionary<string, Transform>();
         public readonly List<IInventionBehavior> Behaviors = new List<IInventionBehavior>();
         public bool Active { get; private set; }
+
+        /// <summary>関節の表示（回転・移動の中心の Transform）。</summary>
+        public sealed class JointView
+        {
+            public JointSpec Spec;
+            public Transform Pivot;
+            public Vector3 Origin;
+            /// <summary>中心の位置（発明の座標）。子の関節の位置を求めるのに使う。</summary>
+            public Vector3 RootPosition;
+            public float Value;
+        }
+        public readonly Dictionary<string, JointView> Joints = new Dictionary<string, JointView>();
+
+        static Vector3 AxisOf(string a) => a == "x" ? Vector3.right : a == "z" ? Vector3.forward : Vector3.up;
+
+        /// <summary>関節を値（hinge は度、slider は m）にする。範囲の外は丸める。</summary>
+        public void SetJoint(string id, float value)
+        {
+            if (!Joints.TryGetValue(id, out var j)) return;
+            j.Value = Mathf.Clamp(value, j.Spec.Min, j.Spec.Max);
+            var axis = AxisOf(j.Spec.Axis);
+            if (j.Spec.IsHinge) j.Pivot.localRotation = Quaternion.AngleAxis(-j.Value, axis);
+            else j.Pivot.localPosition = j.Origin + axis * j.Value;
+        }
+
+        public void ResetJoints() { foreach (var kv in Joints) SetJoint(kv.Key, kv.Value.Spec.Home); }
         /// <summary>REALITY の風による流れ（実験場のみ）。</summary>
         public Vector3 ExtraOffset;
 

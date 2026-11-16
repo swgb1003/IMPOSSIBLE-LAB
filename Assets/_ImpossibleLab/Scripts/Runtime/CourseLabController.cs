@@ -88,8 +88,9 @@ namespace ImpossibleLab
             var plan = run.Result.Plan;
             string scenario = plan?.Scenario ?? run.Result.Scenario;
             if (_sign != null) _sign.text = "TEST ZONE ｜ " + PlanCandidates.ScenarioLabel(scenario);
-            // 人型モデル（雨の判定用マネキン）は、物を落とす実験以外では立たせておく
-            SetMannequin(scenario != ExperimentCatalog.DropTest);
+            // 人型モデル（雨の判定用マネキン）は、物を落とす実験以外では立たせておく。近づいて離れる実験では、動く人型モデルを別に置く
+            SetMannequin(scenario != ExperimentCatalog.DropTest && scenario != ExperimentCatalog.ApproachDevice);
+            if (scenario == ExperimentCatalog.ApproachDevice) _leader = Figure("Approacher", _assets != null ? _assets.Mannequin : null);
             _mountOffset = Vector3.zero;
             if (scenario == ExperimentCatalog.Stand || scenario == ExperimentCatalog.SitStill)
                 _mountOffset = mount == "back" ? new Vector3(0f, 0f, -0.22f) : mount == "head" || mount == "air" ? Vector3.zero : new Vector3(0f, 0f, 0.28f);
@@ -169,7 +170,13 @@ namespace ImpossibleLab
             if (_frame + 1 >= _run.Frames.Count) return a;
             var b = _run.Frames[_frame + 1];
             float k = Mathf.Clamp01((_elapsed - a.Time) / Mathf.Max(1e-4f, b.Time - a.Time));
-            return new CourseFrame { Time = _elapsed, Device = Vector3.Lerp(a.Device, b.Device, k), Leader = Vector3.Lerp(a.Leader, b.Leader, k), YawDeg = Mathf.LerpAngle(a.YawDeg, b.YawDeg, k) };
+            float[] joints = a.Joints;
+            if (a.Joints != null && b.Joints != null && a.Joints.Length == b.Joints.Length)
+            {
+                joints = new float[a.Joints.Length];
+                for (int i = 0; i < joints.Length; i++) joints[i] = Mathf.Lerp(a.Joints[i], b.Joints[i], k);
+            }
+            return new CourseFrame { Time = _elapsed, Device = Vector3.Lerp(a.Device, b.Device, k), Leader = Vector3.Lerp(a.Leader, b.Leader, k), YawDeg = Mathf.LerpAngle(a.YawDeg, b.YawDeg, k), Joints = joints };
         }
 
         void Apply(CourseFrame f)
@@ -188,6 +195,15 @@ namespace ImpossibleLab
                     _payload.localPosition = new Vector3(onShelf ? 0.9f : 0.35f, f.Device.y + size * 0.5f, onShelf ? 0.6f : 0.35f);
                 }
                 if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device + _mountOffset), transform.rotation);
+                if (_leader != null && _run.Result.Scenario == ExperimentCatalog.ApproachDevice)
+                {
+                    _leader.localPosition = f.Leader;
+                    var toDevice = new Vector3(-f.Leader.x, 0f, -f.Leader.z); // 発明（原点）の方を向く
+                    _leader.localRotation = Quaternion.LookRotation(toDevice.sqrMagnitude > 1e-6f ? toDevice : Vector3.back);
+                }
+                // 動作プログラムの関節（記録の並びは Result.JointIds）
+                if (_view != null && f.Joints != null)
+                    for (int i = 0; i < f.Joints.Length && i < _run.Result.JointIds.Count; i++) _view.SetJoint(_run.Result.JointIds[i], f.Joints[i]);
                 return;
             }
             if (_run.Result.Environment == LabEnvironments.ObstacleCourse)

@@ -465,7 +465,7 @@ namespace ImpossibleLab
             var row = UiKit.Row("Need", parent, LabTheme.Space2, 62);
             var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
             row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(8, 12, 3, 3);
-            string icon = r.Status == "simulated" ? "✓" : r.Status == "simplified" ? "△" : "×";
+            string icon = r.Status == "simulated" ? "✓" : r.Status == "simplified" ? "△" : r.Status == "demonstrated" ? "▶" : "×";
             string label = r.Status == "simulated" ? "検証する" : r.Status == "simplified" ? "単純化" : "検証できない";
             Color c = r.Status == "simulated" ? LabTheme.AccentLight : r.Status == "simplified" ? LabTheme.TextSecondary : LabTheme.AccentWarning;
             var badge = UiKit.Badge(row, $"{icon} {label}", c, LabTheme.BgDeep, 176);
@@ -796,17 +796,29 @@ namespace ImpossibleLab
             UiKit.Size(b, h: 60);
         }
 
+        const int ParamsPerModuleRow = 3;
+
         void ModuleRow(Transform parent, PlanModule m, ExperimentPlan plan, bool legacy)
         {
             var info = ExperimentCatalog.Module(m.Type);
             if (info == null) return;
-            var row = UiKit.Row("Mod_" + m.Type, parent, LabTheme.Space1, 60);
-            var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
-            row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(12, 8, 2, 2);
-            var name = UiKit.Text(row, info.LabelJa, LabTheme.FontBody, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.MidlineLeft);
-            UiKit.Size(name, w: 130);
-            foreach (var p in info.Params.Where(x => m.Params.ContainsKey(x.Key)))
+            // 値が4つ以上の条件（近づき方など）は、3つずつ行を分ける（1行に並べるとパネルからはみ出す）
+            var ps = info.Params.Where(x => m.Params.ContainsKey(x.Key)).ToList();
+            RectTransform row = null, firstRow = null;
+            for (int i = 0; i < ps.Count || i == 0; i++)
             {
+                if (i % ParamsPerModuleRow == 0)
+                {
+                    if (row != null) { var f = UiKit.Rect("Fill", row); UiKit.Size(f, flexW: 1); }
+                    row = UiKit.Row("Mod_" + m.Type + (i == 0 ? "" : "_" + i), parent, LabTheme.Space1, 60);
+                    var bg = row.gameObject.AddComponent<UnityEngine.UI.Image>(); bg.color = LabTheme.Row; bg.raycastTarget = false;
+                    row.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().padding = new RectOffset(12, 8, 2, 2);
+                    var name = UiKit.Text(row, i == 0 ? info.LabelJa : "", LabTheme.FontBody, LabTheme.TextPrimary, bold: true, align: TextAlignmentOptions.MidlineLeft);
+                    UiKit.Size(name, w: 130);
+                    if (firstRow == null) firstRow = row;
+                }
+                if (i >= ps.Count) break;
+                var p = ps[i];
                 float v = m.Params[p.Key];
                 string value = m.Type == "wind" && p.Key == "directionDeg" ? DirJa(v) : PlanText.FormatParam(p, v);
                 string mod = m.Type, key = p.Key;
@@ -820,7 +832,7 @@ namespace ImpossibleLab
             if (!legacy)
             {
                 string type = m.Type;
-                var rm = UiKit.Button(row, PlanEditor.CanRemove(App.EditPlan, type) ? "外す" : "必須", () => App.RemovePlanModule(type), ButtonStyle.Ghost, 96, 52, LabTheme.FontSmall);
+                var rm = UiKit.Button(firstRow, PlanEditor.CanRemove(App.EditPlan, type) ? "外す" : "必須", () => App.RemovePlanModule(type), ButtonStyle.Ghost, 96, 52, LabTheme.FontSmall);
                 UiKit.SetInteractable(rm, PlanEditor.CanRemove(App.EditPlan, type));
             }
         }

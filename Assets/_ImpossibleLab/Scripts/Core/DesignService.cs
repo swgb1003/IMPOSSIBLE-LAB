@@ -102,6 +102,7 @@ namespace ImpossibleLab.Core
         public static readonly (string Key, string[] Words)[] Kinds =
         {
             ("protection", RainWords),
+            ("motion_bin", new[] { "ゴミ箱", "ごみ箱", "フタ", "ふた" }), // 動作プログラムの見本（「近づ」で検知の見本に当たらないよう先に判定）
             ("sun_shade", new[] { "日陰", "日差し", "日よけ", "日傘", "暑" }),
             ("lighting", new[] { "照ら", "ライト", "暗く", "暗い", "夜道" }),
             ("heating", new[] { "温め", "あたため", "暖", "寒", "ヒーター" }),

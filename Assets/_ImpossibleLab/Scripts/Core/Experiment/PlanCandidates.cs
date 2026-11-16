@@ -63,6 +63,10 @@ namespace ImpossibleLab.Core
         {
             bool Has(string b) => dna.FindBehavior(b) != null;
             string cat = dna.Category;
+            // 動作プログラム（仕様 28.7）：近づいて離れる。動きの手順がある発明では最初の候補にする
+            if (Features.MotionProgram && dna.Program != null)
+                yield return C("近づいて離れる", "人が近づいたとき、期待どおりに動くか（反応時間・期待の達成率）", ExperimentCatalog.ApproachDevice,
+                    M("approach", ("count", 3f), ("speed", 1f), ("nearM", 0.5f), ("farM", 3f), ("dwellSec", 2f)));
             if (Has("rain_shield") || cat == "protection")
                 yield return C("雨と風の中に立つ", "頭上の雨をどれだけ防げるか（防護率）", ExperimentCatalog.Stand,
                     M("rain", ("intensity", 20f)), M("wind", ("speed", 3f), ("directionDeg", 90f)));
@@ -174,6 +178,7 @@ namespace ImpossibleLab.Core
             Modules = p.Modules.Select(m => new PlanModule { Type = m.Type, Params = new Dictionary<string, float>(m.Params) }).ToList(),
             Metrics = new List<string>(p.Metrics),
             Criteria = p.Criteria.Select(c => new PlanCriterion { Metric = c.Metric, Op = c.Op, Value = c.Value, Reason = c.Reason }).ToList(),
+            Expect = p.Expect?.Clone(),
         };
 
         /// <summary>方位のように一周する値か（0〜359.9）。</summary>

@@ -93,7 +93,7 @@ namespace ImpossibleLab
             // 機能ブロックの例は代表6件の AI 設計（評価セットで検証済み）をオフラインの設計図として使う（OfflineDesignService.Kinds）
             foreach (var (cat, file) in new[] { ("carrier", "carrier_robot"), ("mobility", "flying_shoes"),
                          ("sun_shade", "sun_canopy"), ("lighting", "foot_light"), ("heating", "back_heater"),
-                         ("lifting", "box_lifter"), ("sensing", "rear_watch_pack"), ("impact", "phone_bumper") })
+                         ("lifting", "box_lifter"), ("sensing", "rear_watch_pack"), ("impact", "phone_bumper"), ("motion_bin", "auto_bin") })
             {
                 var ta = Resources.Load<TextAsset>("ImpossibleLabSamples/" + file);
                 if (ta != null) samples[cat] = ta.text; else Debug.LogWarning("[ILAB] sample missing: " + file);
@@ -378,10 +378,21 @@ namespace ImpossibleLab
             if (follow != null) { follow.Target = on ? Origin.Camera.transform : null; follow.TargetHeadTop = 0.1f; }
             var followUser = View.Get<FollowUserBehavior>();
             if (followUser != null) { followUser.Target = on ? Origin.Camera.transform : null; followUser.FloorY = WorkshopPlayerSpot != null ? WorkshopPlayerSpot.position.y : 0f; }
+            var program = View.Get<ProgramRunner>();
+            if (program != null) { program.Fired -= OnProgramFired; if (on) program.Fired += OnProgramFired; }
             View.SetActive(on);
             if (!on) View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayPoint.rotation);
-            string what = follow != null ? "頭上に追従します" : followUser != null ? "床に降りて、あなたの後ろをついてきます" : View.Get<HoverBehavior>() != null ? "その場で浮き上がります" : "動作します";
+            string what = follow != null ? "頭上に追従します" : followUser != null ? "床に降りて、あなたの後ろをついてきます" : View.Get<HoverBehavior>() != null ? "その場で浮き上がります"
+                : program != null ? "動きの手順を試せます（近づく・離れるなどで反応します）" : "動作します";
             ShowToast(on ? $"起動しました：{what}（試用）" : "停止して発明台に戻しました");
+        }
+
+        /// <summary>試用中に動作プログラムのルールが動いたら知らせる。</summary>
+        void OnProgramFired(ProgramEvent e)
+        {
+            if (e.Kind == "stopped") { ShowToast("動作プログラムを止めました（" + e.Detail + "）"); return; }
+            var rule = Current?.Current.Program?.Rules.Find(r => r.Id == e.RuleId);
+            ShowToast("動きの手順：" + (rule != null && !string.IsNullOrEmpty(rule.Label) ? rule.Label : e.RuleId));
         }
 
         public void StepParameter(string behavior, string param, int direction)

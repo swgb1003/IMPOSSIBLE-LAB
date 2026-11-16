@@ -36,6 +36,8 @@ namespace ImpossibleLab.Core
         /// <summary>出す計測項目（空ならシナリオで出せるものすべて）。</summary>
         public List<string> Metrics = new List<string>();
         public List<PlanCriterion> Criteria = new List<PlanCriterion>();
+        /// <summary>期待（動作プログラムの実験。null なら発明のプログラムから既定の期待を作る）。</summary>
+        public ProgramExpectation Expect;
 
         public PlanModule Module(string type) => Modules.Find(m => m.Type == type);
         public bool Has(string type) => Module(type) != null;
@@ -133,7 +135,8 @@ namespace ImpossibleLab.Core
     public static class ExperimentPlanJson
     {
         public const int MaxJsonLength = 8 * 1024;
-        static readonly HashSet<string> RootFields = new HashSet<string> { "scenario", "mode", "durationSec", "seed", "modules", "metrics", "criteria" };
+        static readonly HashSet<string> RootFields = new HashSet<string> { "scenario", "mode", "durationSec", "seed", "modules", "metrics", "criteria", "expect" };
+        static readonly HashSet<string> ExpectFields = new HashSet<string> { "when", "joint", "atLeast", "minRatio" };
 
         public static PlanReport Parse(string json, InventionDna dna = null)
         {
@@ -183,9 +186,28 @@ namespace ImpossibleLab.Core
                         Value = Num(co["value"], "criteria.value", r), Reason = co.Value<string>("reason") ?? "",
                     });
                 }
+            if (o["expect"] is JObject eo) plan.Expect = ParseExpect(eo, r);
+            else if (o["expect"] != null && o["expect"].Type != JTokenType.Null) r.Errors.Add("expect はオブジェクトです");
             if (r.Errors.Count == 0) Validate(plan, dna, r.Errors);
             if (r.Errors.Count == 0) r.Plan = plan;
             return r;
+        }
+
+        /// <summary>期待：{ "when": { "sensor", "op", "value" }, "joint", "atLeast", "minRatio" }（仕様 28.7）。</summary>
+        static ProgramExpectation ParseExpect(JObject o, PlanReport r)
+        {
+            foreach (var p in o.Properties()) if (!ExpectFields.Contains(p.Name)) r.Errors.Add("expect に未知のフィールド: " + Short(p.Name));
+            var e = new ProgramExpectation();
+            if (o["when"] is JObject w)
+            {
+                e.Sensor = w.Value<string>("sensor") ?? ""; e.Op = w.Value<string>("op") ?? "";
+                e.Value = Num(w["value"], "expect.when.value", r);
+            }
+            else r.Errors.Add("expect.when（条件）がありません");
+            e.Joint = o.Value<string>("joint") ?? "";
+            e.AtLeast = Num(o["atLeast"], "expect.atLeast", r);
+            e.MinRatio = o["minRatio"] != null ? Num(o["minRatio"], "expect.minRatio", r) : 0.7f;
+            return e;
         }
 
         /// <summary>計画の中身の検証（JSON を経ない計画にも使う）。dna を渡すと、計測に必要な機能があるかも確かめる。</summary>
@@ -225,6 +247,17 @@ namespace ImpossibleLab.Core
                 if (!metricSet.Add(key)) errors.Add($"計測項目が重複しています: {key}");
                 CheckMetric(mi, p, dna, errors);
             }
+            if (p.Expect != null)
+            {
+                var e = p.Expect;
+                var s = ProgramCatalog.Sensor(e.Sensor);
+                if (s == null || s.IsBool) errors.Add($"期待の条件に使えないセンサー: {Short(e.Sensor)}");
+                if (!ExperimentCatalog_Ops.Contains(e.Op)) errors.Add("期待の比較は < <= > >= です");
+                if (e.MinRatio < 0f || e.MinRatio > 1f) errors.Add("期待の minRatio は 0〜1 です");
+                var j = dna?.FindPart(e.Joint)?.Joint;
+                if (dna != null && j == null) errors.Add($"期待の関節 {Short(e.Joint)} がありません");
+                if (j != null && (e.AtLeast < j.Min || e.AtLeast > j.Max)) errors.Add($"期待の atLeast は関節の範囲 {j.Min}〜{j.Max} の中です");
+            }
             foreach (var c in p.Criteria)
             {
                 var mi = ExperimentCatalog.Metric(c.Metric);
@@ -252,11 +285,26 @@ namespace ImpossibleLab.Core
             if (p.Scenario == ExperimentCatalog.Stand)
                 foreach (var need in mi.StandModules) if (!p.Has(need)) errors.Add($"{mi.LabelJa}をシナリオ stand で測るには環境モジュール {need} が必要です");
             if (mi.RealityOnly && p.Mode != LabModes.Reality) errors.Add($"{mi.LabelJa}は REALITY MODE でのみ測れます");
+            if (dna != null && mi.RequiresProgram && dna.Program == null) errors.Add($"{mi.LabelJa}を測るには動作プログラムが必要です");
             if (dna != null && mi.AnyBlocks.Length > 0 && !mi.AnyBlocks.Any(b => dna.FindBehavior(b) != null))
                 errors.Add($"{mi.LabelJa}を測るには機能 {string.Join(" か ", mi.AnyBlocks)} が必要です");
         }
 
-        public static JObject ToJObject(ExperimentPlan p) => new JObject
+        static readonly string[] ExperimentCatalog_Ops = { "<", "<=", ">", ">=" };
+
+        public static JObject ToJObject(ExperimentPlan p)
+        {
+            var o = ToJObjectBase(p);
+            if (p.Expect != null)
+                o["expect"] = new JObject
+                {
+                    ["when"] = new JObject { ["sensor"] = p.Expect.Sensor, ["op"] = p.Expect.Op, ["value"] = Math.Round(p.Expect.Value, 4) },
+                    ["joint"] = p.Expect.Joint, ["atLeast"] = Math.Round(p.Expect.AtLeast, 4), ["minRatio"] = Math.Round(p.Expect.MinRatio, 4),
+                };
+            return o;
+        }
+
+        static JObject ToJObjectBase(ExperimentPlan p) => new JObject
         {
             ["scenario"] = p.Scenario, ["mode"] = p.Mode, ["durationSec"] = p.DurationSec, ["seed"] = p.Seed,
             ["modules"] = new JArray(p.Modules.Select(m =>

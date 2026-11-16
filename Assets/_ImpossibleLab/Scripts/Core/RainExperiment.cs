@@ -193,6 +193,10 @@ namespace ImpossibleLab.Core
         public bool? Passed;
         /// <summary>RainLab 以外の判定の説明（例：「衝突0回・到着の遅れ3秒以内」）。</summary>
         public string Criteria = "";
+        /// <summary>動作プログラムの発火の記録（approach_device、表示用。保存はしない）。</summary>
+        public List<string> Timeline = new List<string>();
+        /// <summary>再生の記録（CourseFrame.Joints）の並びに対応する関節（部品 id）。</summary>
+        public List<string> JointIds = new List<string>();
         public bool IsRain => Environment == LabEnvironments.RainLab;
         public bool IsScenarioLab => Environment == LabEnvironments.ScenarioLab;
         /// <summary>条件の説明（結果画面の見出し）。</summary>

@@ -154,8 +154,9 @@ namespace ImpossibleLab.Core
         public static MaterialInfo Material(string id) => Materials.FirstOrDefault(x => x.Id == id);
         public static NamedOption Tag(string id) => Tags.FirstOrDefault(x => x.Id == id);
         public static NamedOption Mount(string id) => Mounts.FirstOrDefault(x => x.Id == id);
-        public static readonly string[] FunctionStatuses = { "simulated", "simplified", "unverifiable" };
-        public static string FunctionStatusJa(string s) => s == "simulated" ? "検証する" : s == "simplified" ? "単純化して検証" : "検証できない";
+        /// <summary>demonstrated：動きを再現して見せるが、数値では検証しない（動作プログラム、仕様 28.7）。</summary>
+        public static readonly string[] FunctionStatuses = { "simulated", "simplified", "demonstrated", "unverifiable" };
+        public static string FunctionStatusJa(string s) => s == "simulated" ? "検証する" : s == "simplified" ? "単純化して検証" : s == "demonstrated" ? "動きで見せる" : "検証できない";
 
         public static readonly BehaviorInfo[] Behaviors =
         {
