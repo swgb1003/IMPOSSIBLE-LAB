@@ -103,6 +103,7 @@ namespace ImpossibleLab.Core
         {
             ("protection", RainWords),
             ("motion_bin", new[] { "ゴミ箱", "ごみ箱", "フタ", "ふた" }), // 動作プログラムの見本（「近づ」で検知の見本に当たらないよう先に判定）
+            ("motion_light", new[] { "点く", "点灯", "センサーライト", "人感" }), // 動作プログラムの見本2（照明の見本より先に判定）
             ("sun_shade", new[] { "日陰", "日差し", "日よけ", "日傘", "暑" }),
             ("lighting", new[] { "照ら", "ライト", "暗く", "暗い", "夜道" }),
             ("heating", new[] { "温め", "あたため", "暖", "寒", "ヒーター" }),
@@ -264,6 +265,11 @@ namespace ImpossibleLab.Core
         /// <summary>この計測項目を良くするための依頼文（発明にその機能がなければ null）。加温・冷却は発明にある方を選ぶ。</summary>
         public static string RequestForMetric(InventionDna dna, string metric)
         {
+            if (dna?.Program != null)
+            {
+                if (metric == "reactionTime") return "もっと早く開いて";
+                if (metric == "expectationRate") return "もっと早く開いて"; // 既定の実験（留まる2秒）では開くまでの時間が効く
+            }
             foreach (var (m, b, req) in MetricRequests) if (m == metric && dna.FindBehavior(b) != null) return req;
             foreach (var (m, b) in MetricBehavior)
             {
@@ -281,6 +287,13 @@ namespace ImpossibleLab.Core
         public static IEnumerable<string> SuggestedRequestsFor(InventionDna dna)
         {
             if (dna == null) return Suggested["protection"];
+            if (dna.Program != null)
+            {
+                bool joint = dna.Parts.Any(x => x.Joint != null);
+                var prog = joint ? new List<string> { "もっと早く開いて", "5秒開けておいて", "もっと遠くから反応して" } : new List<string> { "10秒点けておいて", "もっと遠くから反応して" };
+                prog.AddRange(BehaviorRequests.Where(x => dna.FindBehavior(x.behavior) != null && x.behavior != "detect").Select(x => x.request));
+                return prog.Take(4).ToList();
+            }
             if (Suggested.TryGetValue(dna.Category ?? "", out var s)) return s;
             var list = BehaviorRequests.Where(x => dna.FindBehavior(x.behavior) != null).Select(x => x.request).Take(4).ToList();
             return list.Count > 0 ? list : Suggested["protection"];
@@ -304,12 +317,68 @@ namespace ImpossibleLab.Core
         public static IEnumerable<string> SuggestedRequestsFor(string category) =>
             category != null && Suggested.TryGetValue(category, out var s) ? s : Suggested["protection"];
 
+        // ---- 動作プログラムの改良（仕様 28.8 オフライン）：ルールの値だけを変える（update_rule） ----
+        static readonly string[] FasterWords = { "早く開", "速く開", "すぐ開", "早く反応", "すばやく", "素早く", "もっと早く" };
+        static readonly string[] HoldWords = { "開けておい", "開けたまま", "長く開", "点けておい", "長く点", "ついたまま", "秒" };
+        static readonly string[] FartherWords = { "遠くから", "手前で", "早めに" };
+
+        static void ProposeProgram(InventionDna dna, string text, RevisionProposal p, List<string> texts)
+        {
+            if (dna?.Program == null) return;
+            var rules = dna.Program.Rules.Where(r => r.Enabled && r.Trigger == ProgramRule.Rise).ToList();
+            // 速く：最初に関節を動かすルールの「動かす速さ」を上げる（関節の上限まで）
+            if (FasterWords.Any(text.Contains))
+                foreach (var r in rules)
+                {
+                    int i = r.Do.FindIndex(a => a.Action == ProgramAction.MoveJoint);
+                    if (i < 0) continue;
+                    var a = r.Do[i]; var j = dna.FindPart(a.Joint)?.Joint;
+                    if (j == null) continue;
+                    float now = a.Speed ?? j.Speed;
+                    if (now >= j.Speed - 1e-3f) { p.Notes.Add($"動かす速さはすでに関節の上限（{j.Speed:0.##}）です"); break; }
+                    p.Operations.Add(new RevisionOperation { Op = RevisionOps.UpdateRule, RuleId = r.Id, RuleField = "speed", Index = i, Value = UnityEngine.Mathf.Min(j.Speed, now * 1.5f) });
+                    texts.Add("動かす速さを上げる");
+                    break;
+                }
+            // 長く：最初の wait を「N秒」（数字がなければ +2 秒）にする
+            if (HoldWords.Any(text.Contains))
+                foreach (var r in rules)
+                {
+                    int i = r.Do.FindIndex(a => a.Action == ProgramAction.Wait);
+                    if (i < 0) continue;
+                    var m = System.Text.RegularExpressions.Regex.Match(text, @"([0-9０-９]+(?:\.[0-9]+)?)\s*秒");
+                    float sec = r.Do[i].Seconds + 2f;
+                    if (m.Success && float.TryParse(m.Groups[1].Value.Normalize(System.Text.NormalizationForm.FormKC), NumberStyles.Float, CultureInfo.InvariantCulture, out var v)) sec = v;
+                    sec = UnityEngine.Mathf.Clamp(sec, ProgramCatalog.MinWait, ProgramCatalog.MaxWait);
+                    if (UnityEngine.Mathf.Approximately(sec, r.Do[i].Seconds)) break;
+                    p.Operations.Add(new RevisionOperation { Op = RevisionOps.UpdateRule, RuleId = r.Id, RuleField = "seconds", Index = i, Value = sec });
+                    texts.Add($"待つ時間を {sec:0.#} 秒にする");
+                    break;
+                }
+            // 遠くから：距離の条件を 0.5 m 広げる（検知距離まで）
+            if (FartherWords.Any(text.Contains))
+                foreach (var r in rules)
+                {
+                    int i = r.When.FindIndex(c => c.Sensor == "target_distance" && (c.Op == "<" || c.Op == "<="));
+                    if (i < 0) continue;
+                    float max = dna.GetParameter("detect", "rangeM", 3f);
+                    float v = UnityEngine.Mathf.Min(max, r.When[i].Value + 0.5f);
+                    if (UnityEngine.Mathf.Approximately(v, r.When[i].Value)) { p.Notes.Add("反応する距離はすでに検知距離の上限です"); break; }
+                    p.Operations.Add(new RevisionOperation { Op = RevisionOps.UpdateRule, RuleId = r.Id, RuleField = "when", Index = i, Value = v });
+                    texts.Add("反応する距離を広げる");
+                    break;
+                }
+        }
+
         public static RevisionProposal Propose(InventionDna current, string request)
         {
             var p = new RevisionProposal { Source = "offline" };
             string text = request.Trim();
             var used = new HashSet<string>();
             var texts = new List<string>();
+            ProposeProgram(current, text, p, texts);
+            // 動作プログラムの改良になった言葉は、機能の値の規則には回さない（「遠く」が検知距離に当たるなど）
+            if (p.Operations.Count > 0) { p.Summary = string.Join("、", texts); return p; }
             foreach (var rule in Rules)
             {
                 if (rule.Category != null && rule.Category != current.Category) continue;

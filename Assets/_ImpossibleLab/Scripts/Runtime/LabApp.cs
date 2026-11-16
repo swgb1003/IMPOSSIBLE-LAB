@@ -93,7 +93,7 @@ namespace ImpossibleLab
             // 機能ブロックの例は代表6件の AI 設計（評価セットで検証済み）をオフラインの設計図として使う（OfflineDesignService.Kinds）
             foreach (var (cat, file) in new[] { ("carrier", "carrier_robot"), ("mobility", "flying_shoes"),
                          ("sun_shade", "sun_canopy"), ("lighting", "foot_light"), ("heating", "back_heater"),
-                         ("lifting", "box_lifter"), ("sensing", "rear_watch_pack"), ("impact", "phone_bumper"), ("motion_bin", "auto_bin") })
+                         ("lifting", "box_lifter"), ("sensing", "rear_watch_pack"), ("impact", "phone_bumper"), ("motion_bin", "auto_bin"), ("motion_light", "motion_light") })
             {
                 var ta = Resources.Load<TextAsset>("ImpossibleLabSamples/" + file);
                 if (ta != null) samples[cat] = ta.text; else Debug.LogWarning("[ILAB] sample missing: " + file);

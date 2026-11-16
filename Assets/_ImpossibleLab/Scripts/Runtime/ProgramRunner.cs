@@ -43,6 +43,20 @@ namespace ImpossibleLab
         {
             Running = false;
             _view?.ResetJoints();
+            ShowBehaviors(null);
+        }
+
+        /// <summary>機能のオン・オフ（照明など）を、その部品の光る飾りの表示で見せる。null なら全部オン（初期状態）に戻す。</summary>
+        void ShowBehaviors(Dictionary<string, bool> on)
+        {
+            if (_view?.Dna == null) return;
+            foreach (var b in _view.Dna.Behaviors)
+            {
+                if (string.IsNullOrEmpty(b.TargetPart) || !_view.Parts.TryGetValue(b.TargetPart, out var part)) continue;
+                bool show = on == null || !on.TryGetValue(b.Type, out var v) || v;
+                foreach (var r in part.GetComponentsInChildren<Renderer>(true))
+                    if (r.gameObject != part.gameObject && (r.name == "ACC" || r.name == "LensGlow")) r.enabled = show;
+            }
         }
 
         // ---- S03 の「動かしてみる」：条件に関係なく1つのルールを起動し、終わったら初期値に戻す ----
@@ -82,6 +96,7 @@ namespace ImpossibleLab
                 _it.Tick(_sensors);
             }
             foreach (var kv in _it.JointValues) _view.SetJoint(kv.Key, kv.Value);
+            ShowBehaviors(_it.BehaviorOn);
             for (; _shownEvents < _it.Events.Count; _shownEvents++)
             {
                 var e = _it.Events[_shownEvents];

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 3,
+  "id": "inv-motion-light",
+  "name": "近づくと点く足元灯",
+  "purpose": "夜の廊下や玄関で、人が近づいたときだけ足元を照らし、離れると消える置き型のライト。",
+  "tags": ["lighting", "safety", "daily"],
+  "mount": "fixed",
+  "appearance": "lab_white",
+  "mode": "dream",
+  "parts": [
+    { "id": "base", "type": "body", "shape": "box", "material": "plastic", "position": [0, 0.06, 0], "scale": [0.16, 0.12, 0.1] },
+    { "id": "lamp", "type": "light", "shape": "cylinder", "material": "plastic", "position": [0, 0.14, 0.03], "scale": [0.08, 0.06, 0.08] },
+    { "id": "eye", "type": "sensor", "shape": "sphere", "material": "plastic", "position": [0, 0.07, 0.055], "scale": [0.03, 0.03, 0.02] }
+  ],
+  "behaviors": [
+    { "type": "illuminate", "targetPart": "lamp", "parameters": { "lumens": 150, "beamAngleDeg": 90, "tiltDeg": 60 } },
+    { "type": "detect", "targetPart": "eye", "parameters": { "rangeM": 3.0, "fovDeg": 120 } }
+  ],
+  "functionMap": [
+    { "need": "近づいたら点く", "blocks": ["detect", "illuminate"], "status": "demonstrated", "note": "人型モデルが近づく実験で、点いている時間と反応時間を記録する" },
+    { "need": "足元が見える明るさ", "blocks": ["illuminate"], "status": "simulated", "note": "" },
+    { "need": "電気代が安い", "blocks": [], "status": "unverifiable", "note": "使い方と電気料金で変わるため実験しない" }
+  ],
+  "program": {
+    "version": 1,
+    "flags": [],
+    "rules": [
+      { "id": "start_off", "label": "最初は消しておく", "trigger": "rise", "cooldown": 0,
+        "when": { "all": [ { "sensor": "elapsed", "op": ">", "value": 0 } ] },
+        "do": [ { "action": "set_behavior", "behavior": "illuminate", "on": false } ] },
+      { "id": "light_on", "label": "人が近づいたら点ける", "trigger": "rise", "cooldown": 0.5,
+        "when": { "all": [ { "sensor": "target_distance", "op": "<", "value": 1.5 } ] },
+        "do": [
+          { "action": "set_behavior", "behavior": "illuminate", "on": true },
+          { "action": "wait", "seconds": 5 },
+          { "action": "set_behavior", "behavior": "illuminate", "on": false }
+        ] }
+    ]
+  }
+}

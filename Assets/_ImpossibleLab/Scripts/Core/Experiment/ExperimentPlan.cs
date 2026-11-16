@@ -136,7 +136,7 @@ namespace ImpossibleLab.Core
     {
         public const int MaxJsonLength = 8 * 1024;
         static readonly HashSet<string> RootFields = new HashSet<string> { "scenario", "mode", "durationSec", "seed", "modules", "metrics", "criteria", "expect" };
-        static readonly HashSet<string> ExpectFields = new HashSet<string> { "when", "joint", "atLeast", "minRatio" };
+        static readonly HashSet<string> ExpectFields = new HashSet<string> { "when", "joint", "atLeast", "minRatio", "behavior" };
 
         public static PlanReport Parse(string json, InventionDna dna = null)
         {
@@ -205,7 +205,8 @@ namespace ImpossibleLab.Core
             }
             else r.Errors.Add("expect.when（条件）がありません");
             e.Joint = o.Value<string>("joint") ?? "";
-            e.AtLeast = Num(o["atLeast"], "expect.atLeast", r);
+            e.Behavior = o.Value<string>("behavior");
+            e.AtLeast = o["atLeast"] != null ? Num(o["atLeast"], "expect.atLeast", r) : 0f;
             e.MinRatio = o["minRatio"] != null ? Num(o["minRatio"], "expect.minRatio", r) : 0.7f;
             return e;
         }
@@ -255,7 +256,9 @@ namespace ImpossibleLab.Core
                 if (!ExperimentCatalog_Ops.Contains(e.Op)) errors.Add("期待の比較は < <= > >= です");
                 if (e.MinRatio < 0f || e.MinRatio > 1f) errors.Add("期待の minRatio は 0〜1 です");
                 var j = dna?.FindPart(e.Joint)?.Joint;
-                if (dna != null && j == null) errors.Add($"期待の関節 {Short(e.Joint)} がありません");
+                bool byBehavior = string.IsNullOrEmpty(e.Joint) && !string.IsNullOrEmpty(e.Behavior);
+                if (byBehavior && dna != null && dna.FindBehavior(e.Behavior) == null) errors.Add($"期待の機能 {Short(e.Behavior)} がありません");
+                if (!byBehavior && dna != null && j == null) errors.Add($"期待の関節 {Short(e.Joint)} がありません");
                 if (j != null && (e.AtLeast < j.Min || e.AtLeast > j.Max)) errors.Add($"期待の atLeast は関節の範囲 {j.Min}〜{j.Max} の中です");
             }
             foreach (var c in p.Criteria)
@@ -301,6 +304,7 @@ namespace ImpossibleLab.Core
                     ["when"] = new JObject { ["sensor"] = p.Expect.Sensor, ["op"] = p.Expect.Op, ["value"] = Math.Round(p.Expect.Value, 4) },
                     ["joint"] = p.Expect.Joint, ["atLeast"] = Math.Round(p.Expect.AtLeast, 4), ["minRatio"] = Math.Round(p.Expect.MinRatio, 4),
                 };
+            if (p.Expect != null && !string.IsNullOrEmpty(p.Expect.Behavior)) ((JObject)o["expect"])["behavior"] = p.Expect.Behavior;
             return o;
         }
 

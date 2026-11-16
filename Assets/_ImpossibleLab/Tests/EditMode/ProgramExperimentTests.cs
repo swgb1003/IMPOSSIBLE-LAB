@@ -54,14 +54,50 @@ namespace ImpossibleLab.Tests
             Assert.Greater(a.Result.Metric("jointEnergyWh").Value, 0f);
         }
 
-        [Test] public void FasterJoint_ShortensReactionTime()
+        // AT-15：「もっと早く開いて」と改良すると、ルールの値だけが変わり、再実験で反応時間が短くなる。「5秒開けておいて」で期待の達成率が上がる
+        [Test] public void OfflineRevision_FasterOpen_And_HoldLonger()
         {
-            var slow = Bin();
-            var fast = Bin();
-            fast.FindPart("lid").Joint.Speed = 240f;
-            var rs = ScenarioRunner.RunPlan(slow, Approach()).Result.Metric("reactionTime").Value;
-            var rf = ScenarioRunner.RunPlan(fast, Approach()).Result.Metric("reactionTime").Value;
-            Assert.Less(rf, rs);
+            var dna = Bin();
+            var faster = OfflineRevisionRules.Propose(dna, "もっと早く開いて");
+            Assert.AreEqual(1, faster.Operations.Count, string.Join(" / ", faster.Notes));
+            Assert.AreEqual(RevisionOps.UpdateRule, faster.Operations[0].Op);
+            Assert.AreEqual("speed", faster.Operations[0].RuleField);
+            var r1 = RevisionEngine.Apply(dna, faster);
+            Assert.IsTrue(r1.Success, string.Join(",", r1.Errors));
+            StringAssert.Contains("動かす速さ", r1.Changes[0].Label);
+            Assert.AreEqual(dna.FindPart("lid").Joint.Speed, r1.NewDna.FindPart("lid").Joint.Speed, "関節そのものは変えない（ルールの値だけ）");
+            float before = ScenarioRunner.RunPlan(dna, Approach()).Result.Metric("reactionTime").Value;
+            float after = ScenarioRunner.RunPlan(r1.NewDna, Approach()).Result.Metric("reactionTime").Value;
+            Assert.Less(after, before);
+
+            var hold = OfflineRevisionRules.Propose(dna, "5秒開けておいて");
+            Assert.AreEqual("seconds", hold.Operations[0].RuleField);
+            Assert.AreEqual(5f, hold.Operations[0].Value);
+            var r2 = RevisionEngine.Apply(dna, hold);
+            // 近くに5秒留まる実験では、3秒で閉じるより5秒開けておく方が、期待どおりの時間が長い
+            float e1 = ScenarioRunner.RunPlan(dna, Approach(dwell: 5)).Result.Metric("expectationRate").Value;
+            float e2 = ScenarioRunner.RunPlan(r2.NewDna, Approach(dwell: 5)).Result.Metric("expectationRate").Value;
+            Assert.Greater(e2, e1);
+            Assert.AreEqual("もっと早く開いて", OfflineRevisionRules.RequestForMetric(dna, "reactionTime"));
+            CollectionAssert.Contains(OfflineRevisionRules.SuggestedRequestsFor(dna).ToList(), "もっと早く開いて");
+        }
+
+        [Test] public void MotionLight_Sample_LightsWhenApproached()
+        {
+            Assert.AreEqual("motion_light", OfflineDesignService.KindOf("近づくと点くライトが欲しい"));
+            Assert.AreEqual("motion_bin", OfflineDesignService.KindOf("近づくと開くゴミ箱"));
+            var r = DnaJson.Parse(Resources.Load<TextAsset>("ImpossibleLabSamples/motion_light").text);
+            Assert.IsTrue(r.IsValid, r.Summary);
+            var dna = r.Dna;
+            var exp = ProgramExpectation.FromProgram(dna);
+            Assert.AreEqual("illuminate", exp.Behavior, "関節がないので機能のオンを期待にする");
+            var plan = PlanEditor.Clone(PlanCandidates.Standard(dna).First().Plan);
+            Assert.AreEqual(ExperimentCatalog.ApproachDevice, plan.Scenario);
+            var res = ScenarioRunner.RunPlan(dna, plan).Result;
+            Assert.AreEqual(3f, res.Metric("ruleFiredCount").Value + 0f - 1f, "最初に消すルール1回＋近づいた3回");
+            Assert.Less(res.Metric("reactionTime").Value, 0.1f, "照明はすぐ点く");
+            Assert.Greater(res.Metric("expectationRate").Value, 0.9f, "5秒点けておくので、近くにいる間はほぼ点いている");
+            Assert.IsTrue(res.Passed == true, string.Join(" / ", res.Limits));
         }
 
         [Test] public void PlanWithExpect_RoundTripsAndValidates()

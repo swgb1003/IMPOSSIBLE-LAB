@@ -243,6 +243,21 @@ namespace ImpossibleLab.Core
                     a.Target = v;
                     return;
                 }
+                case "speed":
+                {
+                    if (op.Index < 0 || op.Index >= rule.Do.Count || rule.Do[op.Index].Action != ProgramAction.MoveJoint) { r.Errors.Add($"{name} の動作 {op.Index} は関節の動きではありません"); return; }
+                    var a = rule.Do[op.Index];
+                    var j = dna.FindPart(a.Joint)?.Joint;
+                    if (j == null) { r.Errors.Add($"関節 {a.Joint} がありません"); return; }
+                    float min = j.IsHinge ? ProgramCatalog.HingeSpeedMin : ProgramCatalog.SliderSpeedMin;
+                    float before = a.Speed ?? j.Speed;
+                    float v = Clamp(op.Value, min, j.Speed, "動かす速さ");
+                    if (Mathf.Approximately(v, before)) { r.Warnings.Add($"動かす速さはすでに関節の上限（{j.Speed:0.##}）です"); return; }
+                    string unit = j.IsHinge ? "°/秒" : " m/秒";
+                    r.Changes.Add(new ChangeLine { Label = name + "：動かす速さ", Before = $"{before:0.##}{unit}", After = $"{v:0.##}{unit}" });
+                    a.Speed = v;
+                    return;
+                }
                 case "seconds":
                 {
                     if (op.Index < 0 || op.Index >= rule.Do.Count || rule.Do[op.Index].Action != ProgramAction.Wait) { r.Errors.Add($"{name} の動作 {op.Index} は待つ動作ではありません"); return; }

@@ -14,6 +14,8 @@ namespace ImpossibleLab.Core
         public string Joint = "";
         public float AtLeast;
         public float MinRatio = 0.7f;
+        /// <summary>関節の代わりに「この機能がオンになっている」ことを期待する（足元灯など）。Joint が空のときに使う。</summary>
+        public string Behavior;
 
         public ProgramExpectation Clone() => (ProgramExpectation)MemberwiseClone();
 
@@ -30,12 +32,22 @@ namespace ImpossibleLab.Core
                 float home = j.Home;
                 return new ProgramExpectation { Sensor = c.Sensor, Op = c.Op, Value = c.Value, Joint = mv.Joint, AtLeast = home + (mv.Target - home) * 0.8f, MinRatio = 0.7f };
             }
+            // 関節がなければ、距離の条件で機能をオンにするルール
+            foreach (var rule in dna.Program.Rules.Where(r => r.Enabled))
+            {
+                var c = rule.When.FirstOrDefault(w => w.Sensor == "target_distance" && (w.Op == "<" || w.Op == "<="));
+                var on = rule.Do.FirstOrDefault(a => a.Action == ProgramAction.SetBehavior && a.On);
+                if (c != null && on != null)
+                    return new ProgramExpectation { Sensor = c.Sensor, Op = c.Op, Value = c.Value, Joint = "", Behavior = on.Behavior, MinRatio = 0.7f };
+            }
             return null;
         }
 
         public string Describe(InventionDna dna)
         {
             var s = ProgramCatalog.Sensor(Sensor);
+            if (string.IsNullOrEmpty(Joint) && !string.IsNullOrEmpty(Behavior))
+                return $"{s?.LabelJa ?? Sensor} {Op} {Value:0.##}{s?.Unit} の間、{LabCatalog.Behavior(Behavior)?.LabelJa ?? Behavior}がオン（{MinRatio * 100f:0}% 以上の時間）";
             var j = dna?.FindPart(Joint)?.Joint;
             string unit = j != null && !j.IsHinge ? " m" : "°";
             return $"{s?.LabelJa ?? Sensor} {Op} {Value:0.##}{s?.Unit} の間、{Joint} が {AtLeast:0.##}{unit} 以上（{MinRatio * 100f:0}% 以上の時間）";
@@ -150,19 +162,32 @@ namespace ImpossibleLab.Core
                 var e = _it.Events[_seenEvents];
                 if (e.Kind != "start") continue;
                 var rule = ctx.Dna.Program.Rules.Find(r => r.Id == e.RuleId);
-                var mv = rule?.Do.FirstOrDefault(a => a.Action == ProgramAction.MoveJoint);
-                if (mv != null) _pending.Add((rule.Id, e.Time, mv.Joint, mv.Target));
+                var first = rule?.Do.FirstOrDefault(a => a.Action == ProgramAction.MoveJoint || (a.Action == ProgramAction.SetBehavior && a.On));
+                if (first?.Action == ProgramAction.MoveJoint) _pending.Add((rule.Id, e.Time, first.Joint, first.Target));
+                else if (first != null) _pending.Add((rule.Id, e.Time, "behavior:" + first.Behavior, 1f));
             }
             for (int k = _pending.Count - 1; k >= 0; k--)
             {
                 var p = _pending[k];
-                if (System.Math.Abs(_it.JointValues[p.joint] - p.target) <= 0.5f) { _reactions.Add(_it.Time - p.t0); _pending.RemoveAt(k); }
+                bool reached = p.joint.StartsWith("behavior:")
+                    ? _it.BehaviorOn.TryGetValue(p.joint.Substring(9), out var on) && on
+                    : System.Math.Abs(_it.JointValues[p.joint] - p.target) <= 0.5f;
+                if (reached) { _reactions.Add(_it.Time - p.t0); _pending.RemoveAt(k); }
             }
             // 期待：条件が成り立っている時間のうち、関節が基準以上の割合
-            if (_expect != null && _it.JointValues.TryGetValue(_expect.Joint, out var jv) && ExpectCondition(ctx))
+            if (_expect != null && ExpectCondition(ctx))
             {
-                _expectTicks++;
-                if (jv >= _expect.AtLeast - 1e-4f) _expectOk++;
+                if (!string.IsNullOrEmpty(_expect.Joint) && _it.JointValues.TryGetValue(_expect.Joint, out var jv))
+                {
+                    _expectTicks++;
+                    if (jv >= _expect.AtLeast - 1e-4f) _expectOk++;
+                }
+                else if (!string.IsNullOrEmpty(_expect.Behavior))
+                {
+                    _expectTicks++;
+                    // 書かれていない機能はオンのまま（MotionInterpreter の決まり）
+                    if (!_it.BehaviorOn.TryGetValue(_expect.Behavior, out var bon) || bon) _expectOk++;
+                }
             }
             foreach (var id in _jointIds) if (!_it.JointAtTarget(id, 1e-3f)) _movingSec += ScenarioRunner.Dt;
         }

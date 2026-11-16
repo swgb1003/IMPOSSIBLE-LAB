@@ -10,7 +10,7 @@
   "parts": [
     { "id": "bin", "type": "container", "shape": "box", "material": "plastic", "position": [0, 0, 0], "scale": [0.36, 0.6, 0.36] },
     { "id": "lid", "type": "panel", "shape": "box", "material": "plastic", "position": [0, 0.31, 0], "scale": [0.38, 0.025, 0.38],
-      "joint": { "type": "hinge", "parent": "bin", "axis": "x", "pivot": [0, 0, -0.19], "min": 0, "max": 110, "speed": 120, "home": 0 } },
+      "joint": { "type": "hinge", "parent": "bin", "axis": "x", "pivot": [0, 0, -0.19], "min": 0, "max": 110, "speed": 360, "home": 0 } },
     { "id": "eye", "type": "sensor", "shape": "sphere", "material": "plastic", "position": [0, 0.2, 0.19], "scale": [0.04, 0.03, 0.04] },
     { "id": "hinge-motor", "type": "motor", "shape": "cylinder", "material": "steel", "position": [0, 0.31, -0.19], "scale": [0.04, 0.3, 0.04] }
   ],
@@ -28,10 +28,10 @@
       { "id": "open_lid", "label": "人が近づいたらフタを開ける", "trigger": "rise", "cooldown": 1.0,
         "when": { "all": [ { "sensor": "target_distance", "op": "<", "value": 1.0 }, { "flag": "opened", "is": false } ] },
         "do": [
-          { "action": "move_joint", "joint": "lid", "target": 100 },
+          { "action": "move_joint", "joint": "lid", "target": 100, "speed": 120 },
           { "action": "set_flag", "name": "opened", "value": true },
           { "action": "wait", "seconds": 3 },
-          { "action": "move_joint", "joint": "lid", "target": 0 },
+          { "action": "move_joint", "joint": "lid", "target": 0, "speed": 120 },
           { "action": "set_flag", "name": "opened", "value": false }
         ] }
     ]
