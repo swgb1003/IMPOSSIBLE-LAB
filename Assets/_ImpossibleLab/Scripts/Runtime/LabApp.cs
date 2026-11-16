@@ -182,7 +182,7 @@ namespace ImpossibleLab
                 Debug.Log($"[ILAB] align mode={Origin.CurrentTrackingOriginMode} eye={Origin.Camera.transform.position:F2} camLocal={Origin.Camera.transform.localPosition:F2} offset={Origin.CameraYOffset:F2} console={(ConsoleRoot != null ? ConsoleRoot.position : Vector3.zero):F2}");
         }
 
-        public void Notify() => Changed?.Invoke();
+        public void Notify() { SyncPartHighlight(); Changed?.Invoke(); }
 
         void ResetStages() { foreach (var s in DesignStageText.All) Stages[s] = StageStatus.Waiting; }
 
@@ -460,6 +460,79 @@ namespace ImpossibleLab
             Current.Current.Appearance = next.Id;
             RebuildView(Current.Current);
             ShowToast($"外観：{next.LabelJa}（性能には影響しません）");
+        }
+
+        // ---- 部品の形・素材の切り替え（S03 の左パネル）。素材は REALITY の総質量を変えるので、改良の版（Rev.）として記録する ----
+        int _selectedPart;
+        string _selectedFor;
+        /// <summary>S03 で選んでいる部品（Current の Parts の番号）。別の発明を開くと先頭に戻る。</summary>
+        public int SelectedPartIndex
+        {
+            get
+            {
+                if (Current == null || Current.Current.Parts.Count == 0) return -1;
+                if (_selectedFor != Current.Current.Id) { _selectedFor = Current.Current.Id; _selectedPart = 0; }
+                return Mathf.Clamp(_selectedPart, 0, Current.Current.Parts.Count - 1);
+            }
+        }
+        public PartSpec SelectedPart => SelectedPartIndex < 0 ? null : Current.Current.Parts[SelectedPartIndex];
+
+        public void StepSelectedPart(int dir)
+        {
+            if (Current == null || Sm.State != LabState.Editing) return;
+            int n = Current.Current.Parts.Count;
+            if (n == 0) return;
+            _selectedPart = (SelectedPartIndex + dir + n) % n;
+            Notify();
+        }
+
+        public void StepPartShape(int dir)
+        {
+            var part = SelectedPart;
+            if (part == null) return;
+            var list = LabCatalog.Shapes;
+            int i = Array.FindIndex(list, x => x.Id == part.ShapeOrDefault);
+            ApplyPartChange(new RevisionOperation { Op = RevisionOps.UpdatePart, PartId = part.Id, Shape = list[((i < 0 ? 0 : i) + dir + list.Length) % list.Length].Id });
+        }
+
+        public void StepPartMaterial(int dir)
+        {
+            var part = SelectedPart;
+            if (part == null) return;
+            var list = LabCatalog.Materials;
+            int i = Array.FindIndex(list, x => x.Id == part.MaterialOrDefault);
+            ApplyPartChange(new RevisionOperation { Op = RevisionOps.UpdatePart, PartId = part.Id, Material = list[((i < 0 ? 0 : i) + dir + list.Length) % list.Length].Id });
+        }
+
+        void ApplyPartChange(RevisionOperation op)
+        {
+            if (Current == null || Sm.State != LabState.Editing || RevisionBusy) return;
+            var proposal = new RevisionProposal { Source = "manual", Summary = "部品の形・素材の変更" };
+            proposal.Operations.Add(op);
+            float kgBefore = MassModel.TotalKg(Current.Current);
+            var res = RevisionEngine.Apply(Current.Current, proposal);
+            if (!res.Success) { ShowToast(string.Join(" / ", res.Errors.Take(1))); return; }
+            Commit(res.NewDna);
+            var c = res.Changes[0];
+            ShowToast($"Rev.{res.NewDna.Revision}　{c.Label} {c.Before} → {c.After}　総質量 {kgBefore:0.00} → {MassModel.TotalKg(res.NewDna):0.00} kg");
+        }
+
+        // 選んでいる部品を橙の枠で示す（S03 のときだけ。枠は View の子なので組み直しで消える）
+        Transform _partHighlight;
+        string _partHighlightKey;
+        public bool PartHighlightVisible => _partHighlight != null;
+
+        void SyncPartHighlight()
+        {
+            var part = Sm != null && Sm.State == LabState.Editing && View != null ? SelectedPart : null;
+            Transform target = null;
+            if (part != null) View.Parts.TryGetValue(part.Id, out target);
+            string key = target == null ? null : View.GetInstanceID() + "/" + part.Id;
+            if (key == _partHighlightKey && (key == null || _partHighlight != null)) return;
+            if (_partHighlight != null) Destroy(_partHighlight.gameObject);
+            _partHighlight = null; _partHighlightKey = key;
+            if (target == null) return;
+            _partHighlight = PartHighlight.Create(View.transform, target, Assets != null ? Assets.AccentOrange : null).transform;
         }
 
         public bool CanUndo => Current != null && Current.History.Count > 0 && Sm.State == LabState.Editing;

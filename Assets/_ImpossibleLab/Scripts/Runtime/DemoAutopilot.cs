@@ -62,11 +62,17 @@ namespace ImpossibleLab
             yield return null; yield return null;
         }
 
-        IEnumerator Shot(string name, bool rainLab = false, bool overview = false)
+        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null)
         {
             yield return null; // batchmode では WaitForEndOfFrame が呼ばれないため
             Vector3 basePos = rainLab ? _app.RainLab.transform.position : Vector3.zero;
-            if (overview) _cam.transform.SetPositionAndRotation(new Vector3(5.5f, 3.4f, -6.8f), Quaternion.LookRotation(new Vector3(0, 1.2f, 0) - new Vector3(5.5f, 3.4f, -6.8f)));
+            var panel = facePanel != null ? _app.ConsoleRoot.Find(facePanel) : null;
+            if (panel != null)
+            {
+                // 側面のパネルを正面から撮る（文字の読みやすさの確認用）
+                _cam.transform.SetPositionAndRotation(panel.position - panel.forward * 1.15f, Quaternion.LookRotation(panel.forward));
+            }
+            else if (overview) _cam.transform.SetPositionAndRotation(new Vector3(5.5f, 3.4f, -6.8f), Quaternion.LookRotation(new Vector3(0, 1.2f, 0) - new Vector3(5.5f, 3.4f, -6.8f)));
             else
             {
                 var eye = basePos + new Vector3(0, 1.6f, rainLab ? -4.5f : -3.3f);
@@ -356,6 +362,25 @@ namespace ImpossibleLab
                     yield return null;
                     Check(_app.Current.Current.Appearance == "safety_orange" && _app.Current.Current.Revision == rev, "appearance preset changes without a new revision");
                     yield return Shot("S03_appearance_carrier");
+                    // 部品の形・素材の切り替え：改良の版が増え、総質量が変わり、元に戻せる
+                    _app.StepSelectedPart(+1);
+                    yield return null;
+                    var part = _app.SelectedPart;
+                    Check(part != null && _app.SelectedPartIndex == 1 && _app.PartHighlightVisible, "part selection moves and the part is framed");
+                    float kg0 = MassModel.TotalKg(_app.Current.Current);
+                    string mat0 = part.MaterialOrDefault, shape0 = part.ShapeOrDefault;
+                    _app.StepPartMaterial(+1);
+                    _app.StepPartShape(+1);
+                    yield return null;
+                    var edited = _app.Current.Current.FindPart(part.Id);
+                    Check(_app.Current.Current.Revision == rev + 2 && edited.MaterialOrDefault != mat0 && edited.ShapeOrDefault != shape0, "part material and shape change as new revisions");
+                    Check(!Mathf.Approximately(MassModel.TotalKg(_app.Current.Current), kg0), "total mass follows the material/shape change");
+                    Check(_app.PartHighlightVisible, "frame follows the rebuilt part");
+                    yield return Shot("S03_part_edit_carrier");
+                    yield return Shot("S03_part_edit_left_panel", facePanel: "LeftPanel");
+                    _app.Undo(); _app.Undo();
+                    yield return null;
+                    Check(_app.Current.Current.Revision == rev && _app.Current.Current.FindPart(part.Id).MaterialOrDefault == mat0, "undo restores part material");
                 }
                 _app.ToggleDevice();
                 yield return new WaitForSeconds(1.5f);

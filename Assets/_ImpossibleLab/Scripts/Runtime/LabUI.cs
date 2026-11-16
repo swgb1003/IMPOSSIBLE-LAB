@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex);
             return sb.ToString();
         }
 
@@ -584,13 +584,22 @@ namespace ImpossibleLab
             var sp = UiKit.Rect("Sp", a); UiKit.Size(sp, flexW: 1);
             UiKit.Button(a, "実験へ ▶", App.GoToTestSetup, ButtonStyle.Primary, 260, 68);
 
-            SideHeading(_leftBody, "DESIGN STUDIO", "部品一覧（掴む：グリップ／起動：掴んでトリガー）");
-            CappedLines(_leftBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}  <size=80%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>{part.Id} ／ {LabCatalog.Material(part.MaterialOrDefault)?.LabelJa} ／ {part.Scale.x:0.00}×{part.Scale.y:0.00}×{part.Scale.z:0.00} m</color></size>", LabTheme.FontBody, LabTheme.TextPrimary, 40f)).ToList(), 6);
-            var lookRow = UiKit.Row("Appearance", _leftBody, LabTheme.Space1, 52);
-            var lookLabel = UiKit.Text(lookRow, "外観", LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft); UiKit.Size(lookLabel, w: 70);
-            UiKit.Button(lookRow, "◀", () => App.StepAppearance(-1), ButtonStyle.Secondary, 56, 48);
-            var lookName = UiKit.Text(lookRow, LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, LabTheme.FontSmall, LabTheme.AccentLight, bold: true, align: TextAlignmentOptions.Center); UiKit.Size(lookName, flexW: 1);
-            UiKit.Button(lookRow, "▶", () => App.StepAppearance(+1), ButtonStyle.Secondary, 56, 48);
+            SideHeading(_leftBody, "DESIGN STUDIO", "部品の形・素材と外観");
+            var sel = App.SelectedPart;
+            if (sel != null)
+            {
+                StepRow("PartSelect", "部品", $"{LabCatalog.Part(sel.Type)?.LabelJa ?? sel.Type}　<size=80%>{App.SelectedPartIndex + 1} / {dna.Parts.Count}</size>", () => App.StepSelectedPart(-1), () => App.StepSelectedPart(+1), dna.Parts.Count > 1);
+                Para(_leftBody, $"{sel.Id} ／ {sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m（橙の枠）", LabTheme.FontSmall, LabTheme.TextSecondary, 30);
+                StepRow("PartShape", "形", LabCatalog.Shape(sel.ShapeOrDefault)?.LabelJa ?? sel.ShapeOrDefault, () => App.StepPartShape(-1), () => App.StepPartShape(+1), true);
+                var mat = LabCatalog.Material(sel.MaterialOrDefault);
+                StepRow("PartMaterial", "素材", $"{mat?.LabelJa ?? sel.MaterialOrDefault}　<size=80%>{mat?.DensityKgM3:0} kg/m³</size>", () => App.StepPartMaterial(-1), () => App.StepPartMaterial(+1), true);
+                float kg = MassModel.TotalKg(dna), partKg = MassModel.Part(sel).Kg;
+                var limit = MassModel.MountLimitKg(dna.Mount);
+                string limitText = limit.HasValue ? $"／ 体に付ける目安 {limit.Value:0.0} kg" + (kg > limit.Value ? "　<color=#" + LabTheme.ToHex(LabTheme.AccentWarning) + ">超過</color>" : "") : "";
+                Para(_leftBody, $"この部品 {partKg:0.00} kg ／ 総質量（推定）{kg:0.00} kg {limitText}\n<size=85%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>変更は改良の版（Rev.）として記録します</color></size>", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
+            }
+            StepRow("Appearance", "外観", LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, () => App.StepAppearance(-1), () => App.StepAppearance(+1), true);
+            Para(_leftBody, "掴む：グリップ／起動：掴んでトリガー", LabTheme.FontSmall, LabTheme.TextSecondary, 30);
 
             SideHeading(_rightBody, "HISTORY", "改良履歴（元に戻す対象）");
             var hist = App.Current.History.AsEnumerable().Reverse().Take(5).ToList();
@@ -603,6 +612,17 @@ namespace ImpossibleLab
                 UiKit.Heading(_rightBody, "直近の実験", 26);
                 Para(_rightBody, $"Rev.{last.Revision}　{LabModes.Label(last.Config.Mode)}　{(last.Success ? "✓ 成功" : "! 要改良")}\n{ResultSummary(last)}", LabTheme.FontSmall, LabTheme.TextPrimary, 70);
             }
+        }
+
+        /// <summary>左パネルの「名前 ◀ 値 ▶」の行（部品・形・素材・外観で共通）。</summary>
+        void StepRow(string name, string label, string value, UnityEngine.Events.UnityAction prev, UnityEngine.Events.UnityAction next, bool enabled)
+        {
+            var row = UiKit.Row(name, _leftBody, LabTheme.Space1, 52);
+            var l = UiKit.Text(row, label, LabTheme.FontSmall, LabTheme.TextSecondary, align: TextAlignmentOptions.MidlineLeft); UiKit.Size(l, w: 70);
+            var p = UiKit.Button(row, "◀", prev, ButtonStyle.Secondary, 56, 48);
+            var v = UiKit.Text(row, value, LabTheme.FontSmall, LabTheme.AccentLight, bold: true, align: TextAlignmentOptions.Center); UiKit.Size(v, flexW: 1);
+            var n = UiKit.Button(row, "▶", next, ButtonStyle.Secondary, 56, 48);
+            UiKit.SetInteractable(p, enabled); UiKit.SetInteractable(n, enabled);
         }
 
         /// <summary>改良履歴の1行に出す主なパラメータ（カテゴリ別）。</summary>

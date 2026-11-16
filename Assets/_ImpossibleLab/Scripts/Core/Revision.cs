@@ -13,6 +13,8 @@ namespace ImpossibleLab.Core
         public const string UpdateParameter = "update_parameter";
         public const string AddBehavior = "add_behavior";
         public const string RemoveBehavior = "remove_behavior";
+        /// <summary>部品の形・素材の変更（S03 の手動の切り替えだけで使う。AI の改良提案では受け付けない）。</summary>
+        public const string UpdatePart = "update_part";
         public static bool IsValid(string op) => op == AddPart || op == RemovePart || op == UpdateParameter || op == AddBehavior || op == RemoveBehavior;
     }
 
@@ -28,6 +30,9 @@ namespace ImpossibleLab.Core
         /// <summary>add_behavior：対象部品（空なら使える部品を自動で選ぶ）と、パラメータ（指定のないものは既定値）。</summary>
         public string TargetPart;
         public Dictionary<string, float> Parameters = new Dictionary<string, float>();
+        /// <summary>update_part：新しい形・素材（null なら変えない）。</summary>
+        public string Shape;
+        public string Material;
     }
 
     public sealed class RevisionProposal
@@ -76,6 +81,7 @@ namespace ImpossibleLab.Core
                     case RevisionOps.RemovePart: ApplyRemove(next, op, result); break;
                     case RevisionOps.AddBehavior: ApplyAddBehavior(next, op, result); break;
                     case RevisionOps.RemoveBehavior: ApplyRemoveBehavior(next, op, result); break;
+                    case RevisionOps.UpdatePart: ApplyUpdatePart(next, op, result); break;
                     default: result.Errors.Add($"未対応の変更操作: {op.Op}"); break;
                 }
             }
@@ -178,6 +184,25 @@ namespace ImpossibleLab.Core
                 }
             }
             r.Changes.Add(new ChangeLine { Label = "機能削除", Before = info?.LabelJa ?? b.Type, After = "—" });
+        }
+
+        static void ApplyUpdatePart(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            var part = dna.FindPart(op.PartId ?? "");
+            if (part == null) { r.Errors.Add($"変更する部品がありません: {op.PartId}"); return; }
+            if (op.Shape != null && LabCatalog.Shape(op.Shape) == null) { r.Errors.Add($"未対応の形: {op.Shape}"); return; }
+            if (op.Material != null && LabCatalog.Material(op.Material) == null) { r.Errors.Add($"未対応の素材: {op.Material}"); return; }
+            string name = $"{LabCatalog.Part(part.Type)?.LabelJa ?? part.Type}（{part.Id}）";
+            if (op.Shape != null && op.Shape != part.ShapeOrDefault)
+            {
+                r.Changes.Add(new ChangeLine { Label = name + "：形", Before = LabCatalog.Shape(part.ShapeOrDefault)?.LabelJa ?? part.ShapeOrDefault, After = LabCatalog.Shape(op.Shape).LabelJa });
+                part.Shape = op.Shape;
+            }
+            if (op.Material != null && op.Material != part.MaterialOrDefault)
+            {
+                r.Changes.Add(new ChangeLine { Label = name + "：素材", Before = LabCatalog.Material(part.MaterialOrDefault)?.LabelJa ?? part.MaterialOrDefault, After = LabCatalog.Material(op.Material).LabelJa });
+                part.Material = op.Material;
+            }
         }
 
         /// <summary>AIプロキシが返す改良提案JSONを検証して読み込む（データとしてのみ扱う）。</summary>
