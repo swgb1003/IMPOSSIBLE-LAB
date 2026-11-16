@@ -79,7 +79,7 @@ namespace ImpossibleLab.EditorTools
             asset.renderScale = 1f;
             asset.supportsCameraDepthTexture = false;
             asset.supportsCameraOpaqueTexture = false;
-            asset.shadowDistance = 15f;
+            asset.shadowDistance = 8f; // 動かない物の影は焼き込み（シャドウマスク）。実行中の影は近くの動く物だけなので短くして細かくする
             EditorUtility.SetDirty(asset);
             GraphicsSettings.defaultRenderPipeline = asset;
             int current = QualitySettings.GetQualityLevel();
@@ -178,10 +178,12 @@ namespace ImpossibleLab.EditorTools
             if (a == null) { a = ScriptableObject.CreateInstance<LabAssets>(); AssetDatabase.CreateAsset(a, LabAssetsPath); }
             a.Font = CreateFont("NotoSansJP-Regular");
             a.FontBold = CreateFont("NotoSansJP-Bold");
-            a.Concrete = Lit("Concrete", LabTheme.SurfaceLab, 0.25f, 0f);
-            a.MatteMetal = Lit("MatteMetal", new Color(0.62f, 0.66f, 0.70f), 0.45f, 0.7f);
-            a.DarkMetal = Lit("DarkMetal", new Color(0.16f, 0.19f, 0.23f), 0.4f, 0.6f);
-            a.RobotWhite = Lit("RobotWhite", new Color(0.93f, 0.94f, 0.95f), 0.62f, 0.05f); // つやのある白い樹脂（映り込みが乗る）
+            // 質感の画像（ArtSource/textures/make_lab_textures.py で作る。壁は Poly Haven white_plaster_02 CC0）。
+            // UV は 1m = 1（Blender の lab_common.box_uv）。くり返し回数は 1m あたり
+            a.Concrete = Textured(Lit("Concrete", LabTheme.SurfaceLab, 0.25f, 0f), "plaster", bump: 0.6f, tiling: 0.5f, smooth: 0.4f);
+            a.MatteMetal = Textured(Lit("MatteMetal", new Color(0.62f, 0.66f, 0.70f), 0.45f, 0.7f), "brushed", bump: 0.35f, tiling: 4f, smooth: 0.7f);
+            a.DarkMetal = Textured(Lit("DarkMetal", new Color(0.16f, 0.19f, 0.23f), 0.4f, 0.6f), "brushed", bump: 0.3f, tiling: 4f, smooth: 0.6f);
+            a.RobotWhite = Textured(Lit("RobotWhite", new Color(0.93f, 0.94f, 0.95f), 0.62f, 0.05f), "plastic", bump: 0.5f, tiling: 3f, smooth: 0.7f); // つやのある白い樹脂
             a.Glass = Transparent(Lit("Glass", new Color(0.55f, 0.78f, 0.92f, 0.16f), 0.9f, 0f));
             a.AccentBlue = Emissive(Lit("AccentBlue", LabTheme.AccentPrimary, 0.6f, 0f), LabTheme.AccentPrimary * 0.6f);
             a.AccentOrange = Lit("AccentOrange", LabTheme.AccentWarning, 0.5f, 0f);
@@ -195,8 +197,8 @@ namespace ImpossibleLab.EditorTools
             a.Ground = Lit("Ground", new Color(0.30f, 0.34f, 0.36f), 0.35f, 0f);
             a.RainParticle = Particle("RainParticle");
             // 部品の素材（DNA の material）。樹脂は RobotWhite、ガラスは Glass を使う
-            a.PartAluminum = Lit("PartAluminum", new Color(0.80f, 0.82f, 0.85f), 0.62f, 0.85f);
-            a.PartSteel = Lit("PartSteel", new Color(0.42f, 0.44f, 0.47f), 0.5f, 0.9f);
+            a.PartAluminum = Textured(Lit("PartAluminum", new Color(0.80f, 0.82f, 0.85f), 0.62f, 0.85f), "brushed", bump: 0.3f, tiling: 2f, smooth: 0.72f);
+            a.PartSteel = Textured(Lit("PartSteel", new Color(0.42f, 0.44f, 0.47f), 0.5f, 0.9f), "brushed", bump: 0.3f, tiling: 2f, smooth: 0.62f);
             a.PartFabric = Lit("PartFabric", new Color(0.20f, 0.25f, 0.33f), 0.08f, 0f);
             a.PartFoam = Lit("PartFoam", new Color(0.86f, 0.84f, 0.76f), 0.03f, 0f);
             a.PartRubber = Lit("PartRubber", new Color(0.09f, 0.10f, 0.11f), 0.22f, 0f);
@@ -362,6 +364,29 @@ namespace ImpossibleLab.EditorTools
             m.SetFloat("_Smoothness", smooth);
             m.SetFloat("_Metallic", metal);
             m.enableInstancing = true;
+            EditorUtility.SetDirty(m);
+            return m;
+        }
+
+        /// <summary>
+        /// 質感の画像を貼る：色の画像（A＝つやの割合。Smoothness と掛け合わせる）と法線。金属度はマテリアルの値のまま。
+        /// 画像が無ければ何もしない（従来の単色）。
+        /// </summary>
+        static Material Textured(Material m, string set, float bump, float tiling, float smooth)
+        {
+            string dir = Root + "/Art/Textures/Lab";
+            var baseTex = ImportTexture($"{dir}/{set}_base.png", 1024, normal: false);
+            string norPath = File.Exists($"{dir}/{set}_nor_gl.png") ? $"{dir}/{set}_nor_gl.png" : $"{dir}/{set}_nor_gl.jpg";
+            var nor = ImportTexture(norPath, 1024, normal: true);
+            if (baseTex == null || nor == null) return m;
+            m.SetTexture("_BaseMap", baseTex);
+            m.SetTextureScale("_BaseMap", new Vector2(tiling, tiling));
+            m.SetTexture("_BumpMap", nor);
+            m.SetFloat("_BumpScale", bump);
+            m.EnableKeyword("_NORMALMAP");
+            m.SetFloat("_SmoothnessTextureChannel", 1f);
+            m.EnableKeyword("_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A");
+            m.SetFloat("_Smoothness", smooth);
             EditorUtility.SetDirty(m);
             return m;
         }

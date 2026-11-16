@@ -91,6 +91,26 @@ def tube_open(bm, r, z0, z1, seg):
     cyl(bm, r, z0, z1, seg, caps=False)
 
 
+UV_PER_M = 1.0  # 質感の画像：1m で1回くり返す（Unity のマテリアル側でくり返し回数を調整）
+
+
+def box_uv(bm):
+    """面の向きごとに、いちばん近い軸の平面へ投影した UV（1m = 1）。研究室の質感の画像を貼るため。"""
+    uv = bm.loops.layers.uv.verify()
+    for f in bm.faces:
+        n = f.normal
+        ax = max(range(3), key=lambda i: abs(n[i]))
+        for l in f.loops:
+            co = l.vert.co
+            if ax == 0:
+                u, v = co.y, co.z
+            elif ax == 1:
+                u, v = co.x, co.z
+            else:
+                u, v = co.x, co.y
+            l[uv].uv = (u * UV_PER_M, v * UV_PER_M)
+
+
 def obj(name, coll, material, build, bevel=0.0, seg=2, angle=30.0, smooth=True, fix=None):
     """1 オブジェクト＝1 マテリアル。面は平滑、angle より鋭い辺は硬い辺にする。bevel>0 なら角を面取り（法線を硬く）。"""
     bm = bmesh.new()
@@ -99,6 +119,7 @@ def obj(name, coll, material, build, bevel=0.0, seg=2, angle=30.0, smooth=True, 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     if fix is not None:
         fix(bm)          # 閉じていない形（天井板など）の面の向きを直す
+    box_uv(bm)
     lim = math.radians(angle)
     for f in bm.faces:
         f.smooth = smooth

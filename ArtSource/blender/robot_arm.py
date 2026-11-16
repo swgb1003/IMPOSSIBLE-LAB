@@ -77,6 +77,9 @@ fore = join('ARM_Fore', [
                                                                   matrix=Matrix.Translation(WRIST + Vector((0, 0, -0.205))))),
 ], ELBOW)
 
+# 肘（ARM_Fore）は肩（ARM_Upper）の子。Unity の SceneBuilder が ARM_Upper/ARM_Fore の親子を前提に肩を回す
+fore.parent = upper
+fore.matrix_parent_inverse = upper.matrix_world.inverted()
 print('tris', tri_count([base, upper, fore]))
 for o in (base, upper, fore):
     print(o.name, tuple(round(v, 3) for v in o.location))

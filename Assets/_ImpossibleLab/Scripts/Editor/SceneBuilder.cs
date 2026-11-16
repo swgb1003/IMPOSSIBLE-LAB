@@ -112,6 +112,13 @@ namespace ImpossibleLab.EditorTools
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
             EditorSceneManager.SaveScene(scene, ScenePath);
             AddLightProbes(displayPoint);
+            // 雨の実験室は焼き込みに含めない（研究室から離れていて光の基準点が無く、真っ黒になったため）。
+            // 従来どおり実行中の光と影、環境光で照らす
+            foreach (var r in rain.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                GameObjectUtility.SetStaticEditorFlags(r.gameObject, GameObjectUtility.GetStaticEditorFlags(r.gameObject) & ~StaticEditorFlags.ContributeGI);
+                r.lightProbeUsage = LightProbeUsage.Off;
+            }
             BakeLighting();
             BakeDisplayProbe(displayPoint);
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -445,7 +452,8 @@ namespace ImpossibleLab.EditorTools
             if (ls == null) { ls = new LightingSettings { name = "LabHub_Lighting" }; AssetDatabase.CreateAsset(ls, path); }
             ls.bakedGI = true;
             ls.realtimeGI = false;
-            ls.mixedBakeMode = MixedLightingMode.IndirectOnly;
+            // シャドウマスク：動かない物の影も焼き込む（ふちがなめらか）。実行中の影は動く物（試作品・アーム・人型モデル）だけ
+            ls.mixedBakeMode = MixedLightingMode.Shadowmask;
             ls.lightmapper = LightingSettings.Lightmapper.ProgressiveGPU;
             ls.lightmapResolution = 16f;       // 1m あたりの画素数（影の境目を細かく。1枚 1024 まで）
             ls.lightmapPadding = 2;
@@ -460,20 +468,27 @@ namespace ImpossibleLab.EditorTools
             ls.albedoBoost = 1.25f;
             EditorUtility.SetDirty(ls);
             Lightmapping.lightingSettings = ls;
+            int q = QualitySettings.GetQualityLevel();
+            for (int i = 0; i < QualitySettings.names.Length; i++)
+            {
+                QualitySettings.SetQualityLevel(i, false);
+                QualitySettings.shadowmaskMode = ShadowmaskMode.Shadowmask; // 距離に関係なく、動かない物の影は焼き込みを使う
+            }
+            QualitySettings.SetQualityLevel(q, false);
             var t0 = System.DateTime.Now;
             bool ok = Lightmapping.Bake();
             Debug.Log($"ILAB_LIGHTMAP bake={(ok ? "ok" : "failed")} sec={(System.DateTime.Now - t0).TotalSeconds:0} lightmaps={LightmapSettings.lightmaps.Length}");
         }
 
         /// <summary>発明台と作業場所のまわりのライトプローブ（動く物・基本形状が間接光を受けるため）。</summary>
-        static void AddLightProbes(Transform displayPoint)
+        static void AddLightProbes(Transform center, float half = 4f, float step = 2f)
         {
-            var go = new GameObject("LabLightProbes");
+            var go = new GameObject("LightProbes_" + center.name);
             var g = go.AddComponent<LightProbeGroup>();
             var pts = new List<Vector3>();
-            Vector3 c = displayPoint.position;
-            for (float x = -4f; x <= 4.01f; x += 2f)
-                for (float z = -4f; z <= 4.01f; z += 2f)
+            Vector3 c = center.position;
+            for (float x = -half; x <= half + 0.01f; x += step)
+                for (float z = -half; z <= half + 0.01f; z += step)
                     foreach (float y in new[] { 0.3f, 1.3f, 2.5f })
                         pts.Add(new Vector3(c.x + x, y, c.z + z));
             g.probePositions = pts.ToArray();

@@ -22,3 +22,8 @@ Blender 5.2（MCP for Blender 2.0）で、スクリプトから作る。`blender
 | concrete_floor_worn_001（テクスチャ 1K） | Dimitrios Savva, Rico Cilliers | 床。色は明るさ・コントラストを調整した版（`_diff_1k_light.jpg`） |
 | kloofendal_43d_clear（HDRI のトーンマップ済み JPG） | Greg Zaal | 窓の外の空。2048×1024 に縮小してスカイボックスに |
 | potted_plant_02（モデル 1K） | Rico Cilliers | 葉だけ使用（色＋切り抜きを 1 枚に合成）。土・鉢は使わない |
+| white_plaster_02（テクスチャ 1K） | Rob Tuytel | 壁の凹凸とつやむら。色は白に近づけた版（`textures/make_lab_textures.py` で加工） |
+
+## 自作の質感の画像
+
+`textures/make_lab_textures.py`（`python -I` で実行）が `Assets/_ImpossibleLab/Art/Textures/Lab/` に書き出す。金属のヘアライン・樹脂のつやむらは乱数の種を固定した自作。研究室のモデルの UV は `lab_common.box_uv`（面の向きごとの投影、1m = 1）。
