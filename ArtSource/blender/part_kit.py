@@ -81,6 +81,9 @@ def build_all():
         for o in (r if isinstance(r, tuple) else (r,)):
             place(o, x)
         x += 1.6
+    # 第2弾（雨よけ装置以外の部品）
+    exec(open(r"D:/IMPOSSIBLE_LAB/ArtSource/blender/part_kit_more.py", encoding="utf-8").read(), globals())
+    build_more(x)
     objs = list(C.objects)
     print("PartKit:", len(objs), "objects, triangles", tri_count(objs))
     for o in objs:
