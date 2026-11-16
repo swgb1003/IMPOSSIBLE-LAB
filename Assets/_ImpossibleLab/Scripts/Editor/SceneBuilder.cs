@@ -143,6 +143,7 @@ namespace ImpossibleLab.EditorTools
             Box("Wall_Right_Top", lab, new Vector3(8, 4.25f, 0), new Vector3(0.2f, 1.5f, 3f), A.Concrete);
             Box("Wall_Front", lab, new Vector3(0, 2.5f, -8), new Vector3(16, 5, 0.2f), A.Concrete);
             if (A.LabRoom != null) PlaceLabRoom(lab);
+            if (A.LabDetails != null) Place(A.LabDetails, "LabDetails", lab, Vector3.zero, Quaternion.identity);
             else
             {
                 // 窓（ガラス帯）と柱

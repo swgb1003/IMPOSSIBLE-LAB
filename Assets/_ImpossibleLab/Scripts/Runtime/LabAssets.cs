@@ -35,7 +35,8 @@ namespace ImpossibleLab
         public Material GlowOrange;    // 床・台座の橙の光の線
         public Material LightPanel;    // 天井の照明面
         public GameObject CentralDevice; // 中央装置（発明台・ホログラム投影部・天井ユニット・床リング）
-        public GameObject LabRoom;       // 床・壁・窓・天井（見た目のみ。当たり判定はシーンの箱）
+        public GameObject LabRoom;
+        public GameObject LabDetails;    // 小物（配管・通気口・操作パネル・床の点検口・注意帯。ArtSource/blender/lab_details.py）       // 床・壁・窓・天井（見た目のみ。当たり判定はシーンの箱）
         public GameObject RobotArm;      // ARM_Base／ARM_Upper（肩）＞ARM_Fore（肘）
         public GameObject Workbench;
         public GameObject GalleryCase;

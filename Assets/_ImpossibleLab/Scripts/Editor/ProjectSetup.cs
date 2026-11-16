@@ -210,6 +210,7 @@ namespace ImpossibleLab.EditorTools
             a.PlantLeaves = LeavesMaterial();
             a.CentralDevice = ImportModel("CentralDevice", a);
             a.LabRoom = ImportModel("LabRoom", a);
+            a.LabDetails = ImportModel("LabDetails", a);
             a.RobotArm = ImportModel("RobotArm", a);
             a.Workbench = ImportModel("Workbench", a);
             a.GalleryCase = ImportModel("GalleryCase", a);

@@ -12,6 +12,7 @@ FILES = {
     'GalleryCase.fbx': lambda: ['PROP_GalleryCase', 'PROP_GalleryGlass'],
     'Gate.fbx': lambda: ['GATE_Frame', 'GATE_DoorL', 'GATE_DoorR'],
     'Plant.fbx': lambda: ['PLANT_Leaves', 'PLANT_PotWhite', 'PLANT_PotDark'],
+    'LabDetails.fbx': lambda: [o.name for o in bpy.data.collections['LabDetails'].objects],
 }
 
 

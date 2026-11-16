@@ -4,6 +4,8 @@
 #   天井ユニット：下面 3.9 m・上面 4.75 m（天井梁の下）／床リング：半径 2.6 m まで
 # 実行：exec(open(r"D:/IMPOSSIBLE_LAB/ArtSource/blender/central_device.py", encoding="utf-8").read())
 import math
+import bmesh
+from mathutils import Matrix
 exec(open(r"D:/IMPOSSIBLE_LAB/ArtSource/blender/lab_common.py", encoding="utf-8").read())
 
 M = materials()
@@ -36,6 +38,31 @@ def pedestal_vents(bm):
         for k in range(5):
             z = 0.39 + k * 0.045
             ring(bm, 1.485, 1.45, z, z + 0.022, 5, a0, a1)
+
+
+def _radial(bm, r, a, z, rad, depth, seg=8):
+    """半径 r・角度 a・高さ z に、外向きの短い円柱（ネジの頭など）。"""
+    m = Matrix.Translation((r * math.cos(a), r * math.sin(a), z)) @ Matrix.Rotation(a, 4, 'Z') @ Matrix.Rotation(math.pi / 2, 4, 'Y')
+    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=seg, radius1=rad, radius2=rad, depth=depth, matrix=m)
+
+
+def panel_screws(bm):
+    # パネルの四隅のネジ（上下2段 × 12枚 × 4）
+    for i in range(PANELS):
+        a0 = i * STEP + GAP * 0.5 + 0.045
+        a1 = (i + 1) * STEP - GAP * 0.5 - 0.045
+        for (z0, z1) in ((0.12, 0.36), (0.60, 0.80)):
+            for a in (a0, a1):
+                for z in (z0 + 0.03, z1 - 0.03):
+                    _radial(bm, 1.502, a, z, 0.009, 0.006)
+
+
+def panel_leds(bm):
+    # 上段のパネルごとの小さな表示灯（横長）
+    for i in range(PANELS):
+        a = (i + 0.5) * STEP
+        m = Matrix.Translation((1.503 * math.cos(a), 1.503 * math.sin(a), 0.70)) @ Matrix.Rotation(a, 4, 'Z') @ Matrix.Diagonal((0.006, 0.12, 0.012, 1.0))
+        bmesh.ops.create_cube(bm, size=1.0, matrix=m)
 
 
 def plinth(bm):
@@ -71,6 +98,8 @@ made += [
     obj('CL_Deck', C, M['white'], deck, bevel=0.006),
     obj('CL_TableMetal', C, M['metal'], table_metal, bevel=0.004),
     obj('CL_HoloEmitter', C, M['blue'], emitter),
+    obj('CL_PanelScrews', C, M['metal'], panel_screws),
+    obj('CL_PanelLeds', C, M['blue'], panel_leds, smooth=False),
 ]
 
 # ---- ホログラム投影の円筒（ガラス＋縦の光の線＋上端の輪） ----

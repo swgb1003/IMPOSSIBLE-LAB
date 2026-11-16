@@ -11,6 +11,8 @@ Blender 5.2（MCP for Blender 2.0）で、スクリプトから作る。`blender
 | `lab_room.py` | 床・壁・窓・天井・サインの背板 | LabRoom.fbx |
 | `lab_props.py` | 作業台・展示ケース・実験ゲート（扉は別オブジェクト） | Workbench.fbx・GalleryCase.fbx・Gate.fbx |
 | `plant.py` | 観葉植物（葉は Poly Haven、鉢は自作） | Plant.fbx |
+| `lab_details.py` | 小物（配管・ケーブルトレイ・通気口・操作パネル・天井の点検口/スピーカー/ダクト・床の点検口/吹き出し口/注意帯） | LabDetails.fbx |
+| `part_kit.py` | 発明の部品キット（`PartKit.blend`、Unity では bakeAxisConversion で取り込む） | PartKit.fbx |
 
 座標：スクリプトは Unity の値で書き、Blender 座標へ直す（Unity (X,Y,Z) = (−bx, bz, −by)）。
 マテリアル名 `MAT_*` は Unity の `ProjectSetup.ImportModel` で LabAssets のマテリアルに置き換える。

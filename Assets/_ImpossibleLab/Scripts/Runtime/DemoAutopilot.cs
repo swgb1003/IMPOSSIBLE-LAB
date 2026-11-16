@@ -62,14 +62,21 @@ namespace ImpossibleLab
             yield return null; yield return null;
         }
 
-        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null, bool device = false, string devicePart = null)
+        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null, bool device = false, string devicePart = null, Vector3? eyeAt = null, Vector3? lookAt = null)
         {
             yield return null; // batchmode では WaitForEndOfFrame が呼ばれないため
             Vector3 basePos = rainLab ? _app.RainLab.transform.position : Vector3.zero;
             var panel = facePanel != null ? _app.ConsoleRoot.Find(facePanel) : null;
             bool hideConsole = false;
             Transform hiddenFrame = null;
-            if (device && _app.View != null)
+            if (eyeAt.HasValue && lookAt.HasValue)
+            {
+                // 研究室の決まった場所を撮る（小物の見た目の確認用）。パネルは隠す
+                _cam.transform.SetPositionAndRotation(eyeAt.Value, Quaternion.LookRotation(lookAt.Value - eyeAt.Value));
+                hideConsole = _app.ConsoleRoot.gameObject.activeSelf;
+                _app.ConsoleRoot.gameObject.SetActive(false);
+            }
+            else if (device && _app.View != null)
             {
                 // 試作品に寄って撮る（部品の見た目の確認用）。パネルが手前に来るので一時的に隠す
                 // devicePart を指定すると、その部品のまわりに寄る（下から見上げる）
@@ -159,6 +166,11 @@ namespace ImpossibleLab
         {
             yield return new WaitForSeconds(1f);
             yield return Shot("overview_lab", overview: true);
+            yield return Shot("lab_left_wall", eyeAt: new Vector3(-4.0f, 1.7f, 1.0f), lookAt: new Vector3(-8f, 2.0f, -2.5f));
+            yield return Shot("lab_gate", eyeAt: new Vector3(4.5f, 1.6f, -4.5f), lookAt: new Vector3(8f, 1.0f, -1.0f));
+            yield return Shot("lab_arm_pedestal", eyeAt: new Vector3(2.8f, 1.4f, -2.6f), lookAt: new Vector3(1.4f, 1.0f, -0.6f));
+            yield return Shot("lab_ceiling", eyeAt: new Vector3(-1.0f, 1.6f, -3.5f), lookAt: new Vector3(5.5f, 4.6f, 3.0f));
+            yield return Shot("lab_window", eyeAt: new Vector3(-1.5f, 1.6f, 3.0f), lookAt: new Vector3(1.5f, 0.6f, 7.8f));
             var grab = UnityEngine.Object.FindFirstObjectByType<ConsoleGrabHandle>();
             Check(grab != null && grab.Target == _app.ConsoleRoot && grab.isActiveAndEnabled, "panel grab handle exists under console");
             // S01：クイック発明は入力欄に反映するだけ

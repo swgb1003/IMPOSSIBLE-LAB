@@ -52,6 +52,26 @@ def join(name, parts, origin):
     return o
 
 
+def hose(bm, p0, p1, side, r=0.018, lift=0.0):
+    """腕の横にそって走るケーブルの管（両端を少し内側へ）。side は X 方向のずれ。"""
+    off = Vector((side, 0, lift))
+    beam(bm, p0 + off, p1 + off, r * 2, r * 2)
+
+
+def clamps(bm, p0, p1, side, n=2):
+    d = p1 - p0
+    for k in range(1, n + 1):
+        c = p0 + d * (k / (n + 1)) + Vector((side * 0.55, 0, 0))
+        beam(bm, c - d.normalized() * 0.015, c + d.normalized() * 0.015, abs(side) * 1.25 + 0.03, 0.07)
+
+
+def base_bolts(bm):
+    for k in range(10):
+        a = TAU * k / 10
+        bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=8, radius1=0.016, radius2=0.016, depth=0.014,
+                              matrix=Matrix.Translation((0.32 * math.cos(a), 0.32 * math.sin(a), 0.107)))
+
+
 # ---- 台座 ----
 base = join('ARM_Base', [
     obj('b_dark', C, M['dark'], lambda bm: (cyl(bm, 0.34, 0.0, 0.10, 40), ring(bm, 0.23, 0.17, 0.30, 0.34, 32), axle(bm, SHOULDER, 0.15, 0.30)), bevel=0.006),
@@ -59,12 +79,15 @@ base = join('ARM_Base', [
                                               axle(bm, SHOULDER + Vector((0.165, 0, 0)), 0.17, 0.04), axle(bm, SHOULDER - Vector((0.165, 0, 0)), 0.17, 0.04)), bevel=0.008),
     obj('b_metal', C, M['metal'], lambda bm: box(bm, (0.12, 0.16, 0.22), (0, 0, 0.88)), bevel=0.006),
     obj('b_orange', C, M['orange'], lambda bm: ring(bm, 0.345, 0.30, 0.10, 0.112, 40)),
+    obj('b_bolts', C, M['metal'], base_bolts),
 ], Vector((0, 0, 0)))
 
 # ---- 上腕（肩から肘） ----
 upper = join('ARM_Upper', [
     obj('u_white', C, M['white'], lambda bm: beam(bm, SHOULDER, ELBOW, 0.17, 0.20, extend=0.02), bevel=0.02, seg=3),
-    obj('u_dark', C, M['dark'], lambda bm: (axle(bm, ELBOW, 0.11, 0.24), beam(bm, SHOULDER + (ELBOW - SHOULDER) * 0.3, SHOULDER + (ELBOW - SHOULDER) * 0.7, 0.175, 0.06)), bevel=0.004),
+    obj('u_dark', C, M['dark'], lambda bm: (axle(bm, ELBOW, 0.11, 0.24), beam(bm, SHOULDER + (ELBOW - SHOULDER) * 0.3, SHOULDER + (ELBOW - SHOULDER) * 0.7, 0.175, 0.06),
+                                            hose(bm, SHOULDER + (ELBOW - SHOULDER) * 0.08, ELBOW - (ELBOW - SHOULDER) * 0.08, 0.105)), bevel=0.004),
+    obj('u_metal', C, M['metal'], lambda bm: (clamps(bm, SHOULDER, ELBOW, 0.105), axle(bm, ELBOW, 0.07, 0.27)), bevel=0.003),
 ], SHOULDER)
 
 # ---- 前腕・手首・工具 ----
@@ -73,6 +96,8 @@ fore = join('ARM_Fore', [
     obj('f_dark', C, M['dark'], lambda bm: (axle(bm, WRIST, 0.075, 0.17),
                                             bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=24, radius1=0.035, radius2=0.06, depth=0.14,
                                                                   matrix=Matrix.Translation(WRIST + Vector((0, 0, -0.11))))), bevel=0.004),
+    obj('f_hose', C, M['dark'], lambda bm: hose(bm, ELBOW + (WRIST - ELBOW) * 0.1, WRIST - (WRIST - ELBOW) * 0.12, 0.085, r=0.014), bevel=0.003),
+    obj('f_metal', C, M['metal'], lambda bm: clamps(bm, ELBOW, WRIST, 0.085, n=1), bevel=0.003),
     obj('f_blue', C, M['blue'], lambda bm: bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=16, radius1=0.012, radius2=0.034, depth=0.05,
                                                                   matrix=Matrix.Translation(WRIST + Vector((0, 0, -0.205))))),
 ], ELBOW)

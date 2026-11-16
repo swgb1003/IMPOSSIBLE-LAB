@@ -38,6 +38,7 @@ MonoBehaviour:
   LightPanel: {fileID: 2100000, guid: b4a2c6646dcbbc444a1799cf0735e4fa, type: 2}
   CentralDevice: {fileID: 919132149155446097, guid: 8b58c7e02f3a58d4cb968e0787da938c, type: 3}
   LabRoom: {fileID: 919132149155446097, guid: aff467f74e162a14f9bc39140b82c271, type: 3}
+  LabDetails: {fileID: 919132149155446097, guid: 0e2f4c8c2f89d964eb3a21184a1800bc, type: 3}
   RobotArm: {fileID: 919132149155446097, guid: ce5297c026fe59345af8a111bfea097b, type: 3}
   Workbench: {fileID: 919132149155446097, guid: c717169afad5e7c46a14e3437554cb64, type: 3}
   GalleryCase: {fileID: 919132149155446097, guid: 2c19c58e71206494eb308b4e1a13081c, type: 3}
