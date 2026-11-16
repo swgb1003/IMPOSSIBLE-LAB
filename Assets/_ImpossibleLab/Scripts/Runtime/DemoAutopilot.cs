@@ -302,6 +302,23 @@ namespace ImpossibleLab
                 yield return null;
             }
             else Log($"gallery paging not exercised ({_app.GalleryEntries.Count} entries)");
+            // タグで絞り込み：選んだタグの発明だけになり、「すべて」で戻る
+            var tagCounts = GalleryFilter.Counts(_app.GalleryEntries);
+            var pick = tagCounts.Where(x => x.count < _app.GalleryEntries.Count).Select(x => x.tag.Id).FirstOrDefault() ?? tagCounts.Select(x => x.tag.Id).FirstOrDefault();
+            if (pick != null)
+            {
+                gui.SetGalleryTag(pick);
+                yield return null;
+                var shown = GalleryFilter.Apply(_app.GalleryEntries, gui.GalleryTag);
+                Check(gui.GalleryTag == pick && shown.Count == tagCounts.First(x => x.tag.Id == pick).count && shown.All(e => e.Tags.Contains(pick)) && gui.GalleryPage == 0,
+                    $"gallery filters by tag {pick} ({shown.Count}/{_app.GalleryEntries.Count})");
+                yield return Shot("S06_gallery_tag");
+                yield return Shot("S06_gallery_tag_left_panel", facePanel: "LeftPanel");
+                gui.SetGalleryTag(null);
+                yield return null;
+                Check(gui.GalleryTag == null, "gallery tag filter clears");
+            }
+            else Log("gallery tag filter not exercised (no tags)");
             _app.AskDelete(_app.Current.Current.Id);
             yield return null; yield return null;
             yield return Shot("S06_delete_confirm");

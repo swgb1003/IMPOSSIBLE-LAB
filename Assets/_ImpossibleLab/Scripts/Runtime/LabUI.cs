@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag);
             return sb.ToString();
         }
 
@@ -1271,9 +1271,11 @@ namespace ImpossibleLab
                 GallerySide();
                 return;
             }
-            Title("発明品ギャラリー", "共有・公開はこの版では非対応");
-            var entries = App.GalleryEntries;
-            if (_galleryShownFor != App.GalleryOpenCount) { _galleryShownFor = App.GalleryOpenCount; _galleryPage = 0; }
+            if (_galleryShownFor != App.GalleryOpenCount) { _galleryShownFor = App.GalleryOpenCount; _galleryPage = 0; _galleryTag = null; }
+            // 絞り込み中のタグが一覧から消えたら（削除など）全件に戻す
+            if (_galleryTag != null && !App.GalleryEntries.Any(x => x.Tags.Contains(_galleryTag))) _galleryTag = null;
+            var entries = GalleryFilter.Apply(App.GalleryEntries, _galleryTag);
+            Title("発明品ギャラリー", (_galleryTag != null ? $"絞り込み：{LabCatalog.Tag(_galleryTag)?.LabelJa}（{entries.Count} / {App.GalleryEntries.Count} 件）　共有・公開は非対応" : "共有・公開はこの版では非対応"));
             _galleryPage = Mathf.Clamp(_galleryPage, 0, GalleryPages(entries.Count) - 1);
             if (entries.Count == 0)
             {
@@ -1313,7 +1315,17 @@ namespace ImpossibleLab
         static int GalleryPages(int count) => Mathf.Max(1, (count + GalleryPerPage - 1) / GalleryPerPage);
         public void StepGalleryPage(int dir)
         {
-            _galleryPage = Mathf.Clamp(_galleryPage + dir, 0, GalleryPages(App.GalleryEntries.Count) - 1);
+            _galleryPage = Mathf.Clamp(_galleryPage + dir, 0, GalleryPages(GalleryFilter.Apply(App.GalleryEntries, _galleryTag).Count) - 1);
+            Refresh();
+        }
+
+        // ---- タグ絞り込み（null＝すべて）。ギャラリーを開き直すと「すべて」に戻る ----
+        string _galleryTag;
+        public string GalleryTag => _galleryTag;
+        public void SetGalleryTag(string tag)
+        {
+            _galleryTag = string.IsNullOrEmpty(tag) ? null : tag;
+            _galleryPage = 0;
             Refresh();
         }
 
@@ -1336,7 +1348,26 @@ namespace ImpossibleLab
         void GallerySide()
         {
             SideHeading(_leftBody, "INVENTION GALLERY", "発明品展示室");
-            Para(_leftBody, "端末内に保存した発明DNA（設計・改良履歴・実験記録）を読み込み、続きから改良できます。", LabTheme.FontBody, LabTheme.TextPrimary, 160);
+            var counts = GalleryFilter.Counts(App.GalleryEntries);
+            if (App.Sm.State != LabState.Gallery || counts.Count == 0)
+            {
+                Para(_leftBody, "端末内に保存した発明DNA（設計・改良履歴・実験記録）を読み込み、続きから改良できます。", LabTheme.FontBody, LabTheme.TextPrimary, 160);
+            }
+            else
+            {
+                UiKit.Heading(_leftBody, "タグで絞り込む", 26);
+                var tagsRt = UiKit.Rect("TagFilter", _leftBody);
+                var tg = tagsRt.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
+                tg.cellSize = new Vector2(232, 52); tg.spacing = new Vector2(8, 8);
+                int rows = (counts.Count + 2) / 2; // 「すべて」を含めて2列
+                UiKit.Size(tagsRt, h: rows * 52 + (rows - 1) * 8);
+                UiKit.Button(tagsRt, $"すべて（{App.GalleryEntries.Count}）", () => SetGalleryTag(null), _galleryTag == null ? ButtonStyle.Selected : ButtonStyle.Secondary, -1, 52, LabTheme.FontSmall);
+                foreach (var (tag, n) in counts)
+                {
+                    string id = tag.Id;
+                    UiKit.Button(tagsRt, $"{tag.LabelJa}（{n}）", () => SetGalleryTag(id), _galleryTag == id ? ButtonStyle.Selected : ButtonStyle.Secondary, -1, 52, LabTheme.FontSmall);
+                }
+            }
             SideHeading(_rightBody, "DATA", "保存される内容");
             Para(_rightBody, "・発明DNA（部品・機能・パラメータ）\n・改良履歴（最大30版）\n・実験記録（条件・シード・計測値）\n・音声や入力した文章は実験記録に保存しません", LabTheme.FontSmall, LabTheme.TextPrimary, 200);
         }

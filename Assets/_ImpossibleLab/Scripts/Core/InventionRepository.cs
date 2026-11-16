@@ -22,8 +22,25 @@ namespace ImpossibleLab.Core
         public string Id, Name, Category, UpdatedAt;
         /// <summary>分類タグの日本語（例：防護・安全）。</summary>
         public string TagsJa = "";
+        /// <summary>分類タグの ID（S06 の絞り込み用）。</summary>
+        public List<string> Tags = new List<string>();
         public int Revision;
         public bool Tested;
+    }
+
+    /// <summary>S06 ギャラリーのタグ絞り込み。</summary>
+    public static class GalleryFilter
+    {
+        /// <summary>tag が null なら全件。並び（新しい順）は変えない。</summary>
+        public static List<GalleryEntry> Apply(IEnumerable<GalleryEntry> entries, string tag) =>
+            string.IsNullOrEmpty(tag) ? entries.ToList() : entries.Where(e => e.Tags.Contains(tag)).ToList();
+
+        /// <summary>一覧に出てくるタグと件数（カタログの順。0件のタグは出さない）。</summary>
+        public static List<(NamedOption tag, int count)> Counts(IEnumerable<GalleryEntry> entries)
+        {
+            var list = entries.ToList();
+            return LabCatalog.Tags.Select(t => (t, list.Count(e => e.Tags.Contains(t.Id)))).Where(x => x.Item2 > 0).ToList();
+        }
     }
 
     public interface IInventionRepository
@@ -121,7 +138,7 @@ namespace ImpossibleLab.Core
                 if (inv == null) continue;
                 list.Add(new GalleryEntry
                 {
-                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags),
+                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags), Tags = new List<string>(inv.Current.Tags),
                     Revision = inv.Current.Revision, UpdatedAt = inv.UpdatedAt, Tested = inv.Tested,
                 });
             }
