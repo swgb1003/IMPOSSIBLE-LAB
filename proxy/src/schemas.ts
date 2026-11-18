@@ -21,53 +21,9 @@ export function buildSchemas(c: Catalog) {
   const moduleType = enumOf(c.experiments.modules.map((x) => x.id));
   const metric = enumOf(c.experiments.metrics.map((x) => x.key));
   const param = z.object({ name: z.string(), value: z.number() });
-  const P = c.program;
-  const sensor = enumOf(P.sensors.map((s) => s.id));
-  const action = enumOf(P.actions);
-  const op = enumOf(P.ops);
-
-  // 動作プログラム（仕様 28章）。構造化出力では全項目が必須なので、使わない項目は "" / 0 / false にして、変換で落とす
-  const joint = z.object({
-    type: z.enum(["hinge", "slider"]),
-    parent: z.string().describe("part id this joint is attached to, or empty string for the body"),
-    axis: z.enum(["x", "y", "z"]),
-    pivot: z.array(z.number()).describe("[x, y, z] meters, offset of the hinge point from the center of this part"),
-    min: z.number(), max: z.number(),
-    speed: z.number().describe("max speed: degrees/s for hinge, m/s for slider"),
-    home: z.number().describe("value at start"),
-  });
-  const condition = z.object({
-    kind: z.enum(["sensor", "flag"]),
-    sensor: sensor.describe("for kind sensor"),
-    op: op.describe("for numeric sensors"),
-    value: z.number().describe("for numeric sensors"),
-    is: z.boolean().describe("for boolean sensors and flags"),
-    joint: z.string().describe("joint part id for joint_position, else empty string"),
-    flag: z.string().describe("flag name for kind flag, else empty string"),
-  });
-  const step = z.object({
-    action,
-    joint: z.string().describe("move_joint: joint part id"),
-    target: z.number().describe("move_joint: target value"),
-    speed: z.number().describe("move_joint: speed, 0 = the joint's max speed"),
-    behavior: z.string().describe("set_behavior / set_parameter: behavior type"),
-    on: z.boolean().describe("set_behavior"),
-    parameter: z.string().describe("set_parameter: parameter name"),
-    value: z.number().describe("set_parameter: value"),
-    name: z.string().describe("set_flag: flag name"),
-    flagValue: z.boolean().describe("set_flag: new value"),
-    seconds: z.number().describe("wait: seconds"),
-  });
-  const rule = z.object({
-    id: z.string(),
-    label: z.string().describe("Japanese, short"),
-    trigger: z.enum(["rise", "while"]),
-    cooldown: z.number(),
-    match: z.enum(["all", "any"]),
-    conditions: z.array(condition),
-    do: z.array(step),
-  });
-  const program = z.object({ flags: z.array(z.string()), rules: z.array(rule) });
+  // 動作プログラム・関節・期待（仕様 28章）は、構造化出力の文法の大きさの上限に収めるため、アプリの形の JSON を文字列で受け取る。
+  // プロキシは JSON として読むだけ（コードとして実行しない）で、id を整えてからアプリの検証器に渡す
+  const jsonText = (what: string) => z.string().describe(`${what} as JSON text in the app format described in the system prompt, or empty string`);
 
   const part = z.object({
     id: z.string(),
@@ -76,7 +32,6 @@ export function buildSchemas(c: Catalog) {
     material,
     position: z.array(z.number()).describe("[x, y, z] meters, local to the body center"),
     scale: z.array(z.number()).describe("[x, y, z] meters"),
-    joint: joint.nullable().describe("null unless a program moves this part"),
   });
   const behavior = z.object({
     type: behaviorType,
@@ -85,7 +40,8 @@ export function buildSchemas(c: Catalog) {
   });
   const need = z.object({
     need: z.string().describe("Japanese, one user need in a few words"),
-    blocks: z.array(behaviorType).describe("behaviors that realize and test this need; empty when unverifiable"),
+    // 文法の大きさを抑えるため文字列（設計に無い機能は toDna が外す）
+    blocks: z.array(z.string()).describe("behavior types (from the design) that realize and test this need; empty when unverifiable"),
     status,
     note: z.string().describe("Japanese. Required for simplified/unverifiable: what is simplified or why it cannot be tested"),
   });
@@ -97,14 +53,9 @@ export function buildSchemas(c: Catalog) {
     durationSec: z.number(),
     modules: z.array(z.object({ type: moduleType, params: z.array(param) })),
     metrics: z.array(metric),
-    criteria: z.array(z.object({ metric, op: z.enum([">=", "<="]), value: z.number(), reason: z.string() })),
-    expect: z.object({
-      sensor, op, value: z.number(),
-      joint: z.string().describe("joint part id, or empty string when checking a behavior"),
-      atLeast: z.number(),
-      behavior: z.string().describe("behavior type that should be on, used when joint is empty"),
-      minRatio: z.number().describe("0..1"),
-    }).nullable().describe("approach_device only: what should happen while the condition holds; null otherwise"),
+    // metric は文字列（計画の metrics に入っているかはアプリの検証器が確認する）
+    criteria: z.array(z.object({ metric: z.string().describe("one of this plan's metrics"), op: z.enum([">=", "<="]), value: z.number(), reason: z.string() })),
+    expect: jsonText("approach_device only: the expectation"),
   });
 
   const design = z.object({
@@ -121,7 +72,7 @@ export function buildSchemas(c: Catalog) {
         parts: z.array(part),
         behaviors: z.array(behavior),
         functionMap: z.array(need),
-        program: program.nullable().describe("null unless the request needs conditions or an order of movements"),
+        program: jsonText("Motion program (with its joints), only when the request needs conditions or an order of movements;"),
         designPoints: z.array(z.string()).describe("Japanese. 2-4 short reasons for the design choices"),
         plans: z.array(plan).describe("1-3 experiment plans"),
       })
@@ -146,8 +97,8 @@ export function buildSchemas(c: Catalog) {
     ruleId: z.string().describe("rule id for remove_rule / update_rule, else empty string"),
     field: z.string().describe("update_rule: enabled|when|target|speed|seconds; update_joint: speed|min|max; else empty string"),
     index: z.number().describe("update_rule: index of the condition (when) or the step (target/speed/seconds), else 0"),
-    rule: rule.nullable().describe("new rule for add_rule, else null"),
-    joint: joint.nullable().describe("new joint for add_joint (partId names the part), else null"),
+    rule: jsonText("add_rule: the new rule"),
+    joint: jsonText("add_joint: the new joint (partId names the part)"),
   });
   const revise = z.object({
     status: z.enum(["ok", "unsupported"]),
@@ -197,7 +148,6 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     idMap.set(p.id, pid);
     return { id: pid, type: p.type, shape: p.shape, material: p.material, position: vec3(p.position), scale: vec3(p.scale, 0.1) } as Record<string, unknown>;
   });
-  d.parts.slice(0, c.limits.maxParts).forEach((p, i) => { if (p.joint) parts[i].joint = toJoint(p.joint, idMap); });
   if (d.parts.length > c.limits.maxParts) fixes.push(`部品を${c.limits.maxParts}個までに切り詰め`);
   const seenBehavior = new Set<string>();
   const behaviors = d.behaviors.filter((b) => !seenBehavior.has(b.type) && seenBehavior.add(b.type)).slice(0, c.limits.maxBehaviors).map((b) => {
@@ -221,7 +171,13 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     return { need: clip(n.need, c.limits.maxNeedLength) || "（要望）", blocks, status, ...(note ? { note } : {}) };
   });
   const tags = [...new Set(d.tags)].slice(0, c.limits.maxTags);
-  const program = d.program && d.program.rules.length > 0 ? toProgram(d.program, idMap, c) : undefined;
+  const prog = toProgram(d.program, idMap, c, fixes);
+  const program = prog?.program;
+  for (const [pid, j] of Object.entries(prog?.joints ?? {})) {
+    const part = parts.find((p) => p.id === ref(pid, idMap));
+    if (part) part.joint = toJoint(j, idMap);
+    else fixes.push(`関節の部品 ${clip(pid, 20)} が無いので関節を外した`);
+  }
   return {
     dna: {
       schemaVersion: 3,
@@ -257,7 +213,7 @@ export function toPlans(plans: PlanSpec[], c: Catalog) {
       modules: p.modules.slice(0, c.limits.maxModules).map((m) => ({ type: m.type, ...Object.fromEntries(m.params.map((x) => [x.name, x.value])) })),
       metrics: [...new Set(p.metrics)].slice(0, c.limits.maxMetrics),
       criteria: p.criteria.slice(0, c.limits.maxCriteria).map((k) => ({ metric: k.metric, op: k.op, value: k.value, reason: clip(k.reason, c.limits.maxReasonLength) })),
-      ...(p.expect && p.scenario === "approach_device" ? { expect: toExpect(p.expect) } : {}),
+      ...(p.scenario === "approach_device" && toExpect(p.expect) ? { expect: toExpect(p.expect) } : {}),
     },
   }));
 }
@@ -276,8 +232,8 @@ export function toProposal(r: ReviseOutput, c: Catalog) {
     : o.op === "update_parameter" ? o.behavior.trim() !== "" && o.parameter.trim() !== ""
     : o.op === "add_behavior" || o.op === "remove_behavior" ? o.behavior.trim() !== ""
     : o.op === "remove_rule" || o.op === "update_rule" ? o.ruleId.trim() !== ""
-    : o.op === "add_rule" ? o.rule != null
-    : o.op === "add_joint" ? o.joint != null && o.partId.trim() !== ""
+    : o.op === "add_rule" ? parseObject(o.rule) != null
+    : o.op === "add_joint" ? parseObject(o.joint) != null && o.partId.trim() !== ""
     : o.op === "update_joint" ? o.partId.trim() !== ""
     : o.part != null);
   const operations = meaningful.slice(0, 6).map((o) => {
@@ -287,8 +243,8 @@ export function toProposal(r: ReviseOutput, c: Catalog) {
     if (o.op === "remove_rule") return { op: o.op, ruleId: o.ruleId };
     if (o.op === "update_rule")
       return { op: o.op, ruleId: o.ruleId, field: o.field, index: Math.max(0, Math.round(o.index)), value: o.field === "enabled" ? (o.value >= 0.5 ? 1 : 0) : o.value };
-    if (o.op === "add_rule") return { op: o.op, rule: toRule(o.rule!, new Map(), c) };
-    if (o.op === "add_joint") return { op: o.op, partId: o.partId, joint: toJoint(o.joint!, new Map()) };
+    if (o.op === "add_rule") return { op: o.op, rule: toRule(parseObject(o.rule)!, new Map(), c) };
+    if (o.op === "add_joint") return { op: o.op, partId: o.partId, joint: toJoint(parseObject(o.joint)!, new Map()) };
     if (o.op === "update_joint") return { op: o.op, partId: o.partId, field: o.field, value: o.value };
     if (o.op === "add_behavior")
       return { op: o.op, behavior: o.behavior, targetPart: o.targetPart ? sanitizeId(o.targetPart, o.targetPart) : "", parameters: Object.fromEntries(o.parameters.map((p) => [p.name, p.value])) };
@@ -301,58 +257,79 @@ export function toProposal(r: ReviseOutput, c: Catalog) {
   return { summary: clip(r.summary, 120), notes: r.notes.slice(0, 3).map((n) => clip(n, 120)), operations };
 }
 
-type JointOut = NonNullable<NonNullable<DesignOutput["design"]>["parts"][number]["joint"]>;
-type ProgramOut = NonNullable<NonNullable<DesignOutput["design"]>["program"]>;
-type RuleOut = ProgramOut["rules"][number];
-type ExpectOut = NonNullable<PlanSpec["expect"]>;
+type Json = Record<string, unknown>;
 
-const ref = (id: string, idMap: Map<string, string>) => idMap.get(id) ?? sanitizeId(id, id);
-const num = (x: number, fill = 0) => (Number.isFinite(x) ? x : fill);
-
-/** 関節 → アプリの形（parent が空なら付けない）。範囲の確認はアプリの検証器が行う。 */
-export function toJoint(j: JointOut, idMap: Map<string, string>) {
-  return {
-    type: j.type, ...(j.parent.trim() ? { parent: ref(j.parent, idMap) } : {}), axis: j.axis, pivot: vec3(j.pivot),
-    min: num(j.min), max: num(j.max), speed: num(j.speed), home: num(j.home),
-  };
+/** JSON の文字列 → オブジェクト（読めない・オブジェクトでなければ null）。読むだけで、評価はしない。 */
+export function parseObject(text: string): Json | null {
+  if (!text || !text.trim()) return null;
+  try {
+    const v = JSON.parse(text);
+    return v && typeof v === "object" && !Array.isArray(v) ? (v as Json) : null;
+  } catch {
+    return null;
+  }
 }
 
-/** ルール → アプリの形。条件・動作は種類ごとに使う項目だけを残す（アプリは未知の項目を拒否する）。 */
-export function toRule(r: RuleOut, idMap: Map<string, string>, c: Catalog) {
-  const boolSensors = new Set(c.program.sensors.filter((s) => s.isBool).map((s) => s.id));
-  const when = r.conditions.slice(0, c.program.limits.maxConditions).map((k) => {
-    if (k.kind === "flag") return { flag: sanitizeId(k.flag, "flag"), is: k.is };
-    if (boolSensors.has(k.sensor)) return { sensor: k.sensor, is: k.is };
-    return { sensor: k.sensor, op: k.op, value: num(k.value), ...(k.sensor === "joint_position" ? { joint: ref(k.joint, idMap) } : {}) };
-  });
-  const steps = r.do.slice(0, c.program.limits.maxActionsPerRule).map((a) => {
-    switch (a.action) {
-      case "move_joint": return { action: a.action, joint: ref(a.joint, idMap), target: num(a.target), ...(a.speed > 0 ? { speed: a.speed } : {}) };
-      case "set_behavior": return { action: a.action, behavior: a.behavior, on: a.on };
-      case "set_parameter": return { action: a.action, behavior: a.behavior, parameter: a.parameter, value: num(a.value) };
-      case "set_flag": return { action: a.action, name: sanitizeId(a.name, "flag"), value: a.flagValue };
-      default: return { action: a.action, seconds: num(a.seconds, 1) };
-    }
-  });
-  return {
-    id: sanitizeId(r.id, "rule"), label: clip(r.label, c.program.limits.maxLabelLength), trigger: r.trigger, cooldown: Math.max(0, num(r.cooldown)),
-    when: { [r.match]: when }, do: steps,
-  };
+const ref = (id: unknown, idMap: Map<string, string>) => {
+  const s = typeof id === "string" ? id : "";
+  return idMap.get(s) ?? sanitizeId(s, s || "x");
+};
+
+/** 関節：parent の id を設計の id に合わせ、空の parent は付けない。値の確認はアプリの検証器。 */
+export function toJoint(j: Json, idMap: Map<string, string>) {
+  const out: Json = { ...j };
+  if (typeof j.parent === "string" && j.parent.trim()) out.parent = ref(j.parent, idMap); else delete out.parent;
+  return out;
 }
 
-export function toProgram(p: ProgramOut, idMap: Map<string, string>, c: Catalog) {
+/** ルール：id を安全な形にし、関節の参照を設計の id に合わせる。ほかの項目はそのまま（未知の項目はアプリが拒否する）。 */
+export function toRule(r: Json, idMap: Map<string, string>, c: Catalog) {
+  const fix = (x: unknown) => {
+    if (!x || typeof x !== "object" || Array.isArray(x)) return x;
+    const o = { ...(x as Json) };
+    if (typeof o.joint === "string") o.joint = ref(o.joint, idMap);
+    if (typeof o.flag === "string") o.flag = sanitizeId(o.flag, "flag");
+    if (o.action === "set_flag" && typeof o.name === "string") o.name = sanitizeId(o.name, "flag");
+    return o;
+  };
+  const out: Json = { ...r, id: sanitizeId(String(r.id ?? ""), "rule") };
+  if (typeof r.label === "string") out.label = clip(r.label, c.program.limits.maxLabelLength);
+  if (r.when && typeof r.when === "object" && !Array.isArray(r.when))
+    out.when = Object.fromEntries(Object.entries(r.when as Json).map(([k, v]) => [k, Array.isArray(v) ? v.map(fix) : v]));
+  if (Array.isArray(r.do)) out.do = r.do.map(fix);
+  return out;
+}
+
+/**
+ * 設計の program（JSON 文字列。{ flags, rules, joints: { 部品id: 関節 } }）→ アプリの program と、部品に付ける関節。
+ * 読めないときは program なしにして fixes に記録する（評価で数える）。
+ */
+export function toProgram(text: string, idMap: Map<string, string>, c: Catalog, fixes: string[]) {
+  if (!text || !text.trim()) return undefined;
+  const o = parseObject(text);
+  if (!o || !Array.isArray(o.rules) || o.rules.length === 0) { fixes.push("動作プログラムを読めなかったので外した"); return undefined; }
   const used = new Set<string>();
-  const rules = p.rules.slice(0, c.program.limits.maxRules).map((r, i) => {
+  const rules = (o.rules as unknown[]).filter((r): r is Json => !!r && typeof r === "object" && !Array.isArray(r)).map((r, i) => {
     const out = toRule(r, idMap, c);
-    while (used.has(out.id)) out.id = `${out.id.slice(0, 44)}-${i + 1}`;
-    used.add(out.id);
+    let id = String(out.id);
+    while (used.has(id)) id = `${id.slice(0, 44)}-${i + 1}`;
+    used.add(id);
+    out.id = id;
     return out;
   });
-  return { version: 1, flags: [...new Set(p.flags.map((f) => sanitizeId(f, "flag")))].slice(0, c.program.limits.maxFlags), rules };
+  const flags = Array.isArray(o.flags) ? [...new Set((o.flags as unknown[]).map((f) => sanitizeId(String(f), "flag")))] : [];
+  const joints = o.joints && typeof o.joints === "object" && !Array.isArray(o.joints)
+    ? Object.fromEntries(Object.entries(o.joints as Json).filter(([, v]) => v && typeof v === "object" && !Array.isArray(v)).map(([k, v]) => [k, v as Json]))
+    : {};
+  return { program: { version: 1, flags, rules }, joints };
 }
 
-/** 期待 → アプリの形（関節か、オンになっているべき機能のどちらか）。 */
-export function toExpect(e: ExpectOut) {
-  const base = { when: { sensor: e.sensor, op: e.op, value: num(e.value) }, minRatio: Math.min(1, Math.max(0, num(e.minRatio, 0.7))) };
-  return e.joint.trim() ? { ...base, joint: e.joint, atLeast: num(e.atLeast) } : { ...base, joint: "", behavior: e.behavior };
+/** 期待（JSON 文字列）→ アプリの形。when がなければ付けない。 */
+export function toExpect(text: string) {
+  const e = parseObject(text);
+  if (!e || !e.when || typeof e.when !== "object") return undefined;
+  const out: Json = { ...e };
+  if (typeof e.minRatio === "number") out.minRatio = Math.min(1, Math.max(0, e.minRatio));
+  if (!("joint" in out)) out.joint = "";
+  return out;
 }

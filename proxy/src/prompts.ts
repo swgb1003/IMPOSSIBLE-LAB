@@ -69,7 +69,7 @@ Plan rules:
 - A metric is measurable only if the plan uses one of its scenarios, contains its required modules, the invention has one of its required behaviors, and (for reality-only metrics) mode is "reality".
 - Every module must be allowed in the scenario. In this version the rain module can be combined only with wind.
 - At most ${L.maxModules} modules, ${L.maxMetrics} metrics, ${L.maxCriteria} criteria. durationSec ${L.minDurationSec}..${L.maxDurationSec}. Every criterion's metric must be in the plan's metrics, and its value within the metric range. reason: short Japanese (at most ${L.maxReasonLength} characters); mark thresholds you chose yourself with "（目安）".
-- approach_device (a person-sized model walks up to the invention, stays, and walks away) is the basic experiment for "when someone comes near" programs. Give expect (what should happen while the condition holds: a joint at least atLeast, or a behavior on) with metrics ruleFiredCount, reactionTime and expectationRate. Use expect null in every other scenario.
+- approach_device (a person-sized model walks up to the invention, stays, and walks away) is the basic experiment for "when someone comes near" programs. Give expect as JSON text (what should happen while the condition holds: {"when":{"sensor","op","value"},"joint":partId,"atLeast":value,"minRatio":0..1} or {"when":…,"behavior":type,"minRatio":…}) with metrics ruleFiredCount, reactionTime and expectationRate. Use expect "" in every other scenario.
 - Existing demo experiments: rain protection uses stand + rain + wind (metrics wetnessScore, coverageRatio); a following carrier robot uses walk_route + obstacles + payload (collisionCount, arrivalDelay, followError); flying shoes use fly_to_target + target + wind (completionTime, stabilityScore, landingError).`;
 }
 
@@ -85,28 +85,51 @@ export function programText(c: Catalog): string {
     : r === "joint" ? "needs the joint (give its part id in joint)"
     : r;
   const sensors = P.sensors
-    .map((s) => `- ${s.id} (${s.labelJa}): ${s.isBool ? "true/false, use is" : `${s.min}..${s.max}${s.unit ? " " + s.unit : ""}, use op and value`}; ${req(s.requires)}`)
+    .map((s) => `- ${s.id} (${s.labelJa}): ${s.isBool ? `{"sensor":"${s.id}","is":true}` : `{"sensor":"${s.id}","op":"<","value":…} with value ${s.min}..${s.max}${s.unit ? " " + s.unit : ""}`}; ${req(s.requires)}`)
     .join("\n");
+  const bin = {
+    flags: [],
+    joints: { lid: { type: "hinge", parent: "bin", axis: "x", pivot: [0, 0, -0.19], min: 0, max: 110, speed: 360, home: 0 } },
+    rules: [{ id: "open_lid", label: "人が近づいたらフタを開ける", trigger: "rise", cooldown: 1,
+      when: { all: [{ sensor: "target_distance", op: "<", value: 1.0 }] },
+      do: [{ action: "move_joint", joint: "lid", target: 100, speed: 120 }, { action: "wait", seconds: 3 }, { action: "move_joint", joint: "lid", target: 0, speed: 120 }] }],
+  };
+  const light = {
+    flags: [],
+    rules: [
+      { id: "start_off", label: "最初は消しておく", trigger: "rise", cooldown: 0, when: { all: [{ sensor: "elapsed", op: ">", value: 0 }] }, do: [{ action: "set_behavior", behavior: "illuminate", on: false }] },
+      { id: "light_on", label: "人が近づいたら点ける", trigger: "rise", cooldown: 0.5, when: { all: [{ sensor: "target_distance", op: "<", value: 1.5 }] },
+        do: [{ action: "set_behavior", behavior: "illuminate", on: true }, { action: "wait", seconds: 5 }, { action: "set_behavior", behavior: "illuminate", on: false }] },
+    ],
+  };
   return `## Motion program (optional: conditions and an order of movements)
-Use a program only when the request needs "when X happens, do Y" or a sequence (open, wait, close). The app checks it against an allow-list and runs it with a fixed interpreter; it is data, never code.
-Sensors (conditions):
+Use a program only when the request needs "when X happens, do Y" or a sequence (open, wait, close); otherwise program is "". The app checks it against an allow-list and runs it with a fixed interpreter; it is data, never code. Write it as JSON text with exactly these fields (unknown fields are rejected):
+{"flags":[names], "joints":{partId: joint}, "rules":[rule]}
+
+Rule: {"id", "label" (Japanese, at most ${L.maxLabelLength} characters), "trigger":"rise"|"while", "cooldown": 0..${L.maxCooldown}, "when":{"all":[conditions]} or {"any":[conditions]}, "do":[steps]}
+- trigger "rise" starts once each time the conditions become true; "while" repeats every tick while true and may only use set_behavior, set_parameter and set_flag. A running rule does not restart. If two rules move the same joint, the later one wins.
+- at most ${L.maxConditions} conditions, no nesting; at most ${L.maxRules} rules and ${L.maxActionsPerRule} steps per rule. No loops, variables or jumps: repetition happens when a rule starts again.
+
+Conditions (sensors):
 ${sensors}
-- target_distance is at most detect.rangeM of the design.
-- flag conditions use kind "flag", the flag name and is; declare every flag in program.flags (at most ${L.maxFlags}).
+- joint_position also needs "joint": partId. target_distance is at most detect.rangeM of the design.
+- flag: {"flag": name, "is": true|false}; declare every flag in flags (at most ${L.maxFlags}).
 
-Steps (actions), run in order inside a rule:
-- move_joint: joint (part id of a part with a joint), target within the joint's min..max, speed 0 = the joint's max speed.
-- set_behavior: behavior (a behavior in the design), on true/false. Behaviors are on unless a program turns them off.
-- set_parameter: behavior, parameter, value within the catalog range.
-- set_flag: name, flagValue.
-- wait: seconds ${L.minWait}..${L.maxWait}.
+Steps:
+- {"action":"move_joint","joint":partId,"target":value within the joint's min..max,"speed":optional, at most the joint's speed}
+- {"action":"set_behavior","behavior":type,"on":true|false} (behaviors are on unless a program turns them off)
+- {"action":"set_parameter","behavior":type,"parameter":name,"value":number within the catalog range}
+- {"action":"set_flag","name":flag,"value":true|false}
+- {"action":"wait","seconds":${L.minWait}..${L.maxWait}}
 
-Rules: trigger "rise" starts once each time the conditions become true (default); "while" repeats every tick while true and may only use set_behavior, set_parameter and set_flag. match "all" or "any", at most ${L.maxConditions} conditions, no nesting. A running rule does not restart; cooldown 0..${L.maxCooldown} s. If two rules move the same joint, the later one wins. At most ${L.maxRules} rules, ${L.maxActionsPerRule} steps each, label at most ${L.maxLabelLength} characters (Japanese). There are no loops, variables or jumps: repetition happens when a rule starts again.
+Joint (only for parts a program moves): {"type":"hinge"|"slider","parent":partId it rides on (omit for the body),"axis":"x"|"y"|"z","pivot":[x,y,z] offset of the hinge point from the center of this part (a lid hinged at its back edge: [0,0,-half depth]),"min","max","speed","home"}. hinge: degrees, min/max within ±${L.hingeLimit}, speed ${L.hingeSpeedMin}..${L.hingeSpeedMax} deg/s. slider: meters, min/max within ±${L.sliderLimit}, speed ${L.sliderSpeedMin}..${L.sliderSpeedMax} m/s. home within min..max. At most ${L.maxJoints} joints, chains at most ${L.maxJointDepth} deep. A design with any joint needs at least one motor part.
 
-Joints (parts[].joint, null for parts that do not move): type hinge (degrees, min/max within ±${L.hingeLimit}, speed ${L.hingeSpeedMin}..${L.hingeSpeedMax} deg/s) or slider (meters, min/max within ±${L.sliderLimit}, speed ${L.sliderSpeedMin}..${L.sliderSpeedMax} m/s); axis x/y/z; pivot = offset of the hinge point from the center of this part (for a lid hinged at its back edge: [0, 0, -half depth]); home = value at start (within min..max). parent = part id it rides on, or "" for the body. At most ${L.maxJoints} joints, chains at most ${L.maxJointDepth} deep. A design with any joint needs at least one motor part (it drives the joints; REALITY counts its power).
-
-Example 1, a bin whose lid opens when a person comes near (mount fixed): parts bin (container), lid (panel, depth 0.38) with joint {type hinge, parent "bin", axis x, pivot [0, 0, -0.19], min 0, max 110, speed 360, home 0}, hinge-motor (motor), eye (sensor). Behaviors detect (target eye, rangeM 3). Rule open_lid "人が近づいたらフタを開ける", rise, cooldown 1, all [target_distance < 1.0] → move_joint lid 100 speed 120, wait 3, move_joint lid 0 speed 120. Experiment: approach_device with metrics ruleFiredCount, reactionTime, expectationRate and expect {sensor target_distance, op <, value 1.0, joint lid, atLeast 80, minRatio 0.7}.
-Example 2, a foot light that turns on when a person comes near (no joint): parts base (body), lamp (light), eye (sensor). Behaviors illuminate (lamp), detect (eye, rangeM 3). Rules start_off "最初は消しておく" rise all [elapsed > 0] → set_behavior illuminate off; light_on "人が近づいたら点ける" rise cooldown 0.5 all [target_distance < 1.5] → set_behavior illuminate on, wait 5, set_behavior illuminate off. Experiment: approach_device with expect {sensor target_distance, op <, value 1.5, joint "", behavior illuminate, minRatio 0.7}.
+Example 1, a bin whose lid opens when a person comes near (mount fixed; parts bin (container), lid (panel, depth 0.38), hinge-motor (motor), eye (sensor); behavior detect on eye, rangeM 3):
+${JSON.stringify(bin)}
+with an approach_device plan: metrics ruleFiredCount, reactionTime, expectationRate; expect {"when":{"sensor":"target_distance","op":"<","value":1.0},"joint":"lid","atLeast":80,"minRatio":0.7}
+Example 2, a foot light that turns on when a person comes near (no joint; parts base (body), lamp (light), eye (sensor); behaviors illuminate on lamp, detect on eye):
+${JSON.stringify(light)}
+with expect {"when":{"sensor":"target_distance","op":"<","value":1.5},"behavior":"illuminate","minRatio":0.7}
 - In the function map, a need that the program shows moving but no metric checks is "demonstrated"; a need whose expectation is measured in approach_device is "simulated". Mechanisms that are not in the catalog (legs that climb stairs, folding fabric) stay "unverifiable".`;
 }
 
@@ -135,7 +158,7 @@ ${HONESTY}
 - Protection: the canopy with rain_shield blocks rain; make the canopy scale x and z about 2 × radius and its y thin (0.02-0.05). follow_head keeps the device above the head (mount head). skirtLength adds a side cover for windy rain.
 - Carrier (mount ground): follow_user, avoid_obstacle (the robot reacts about 0.3 s late, so detectionRange below about 0.5 m rarely helps), carry_load.capacity at least the payload.
 - Flying shoes (mount foot): hover.lift at least 0.15, move_forward thrust/speedLimit, stabilize against crosswind. In reality mode the power to lift a person is enormous, which is an intended learning point.
-- Program: use program null and joint null unless the request needs conditions or a sequence. When you write one, every sensor needs its required behavior or part, and the first plan should be approach_device when the trigger is a person coming near.
+- Program: use program "" unless the request needs conditions or a sequence. When you write one, every sensor needs its required behavior or part, and the first plan should be approach_device when the trigger is a person coming near.
 - Each experiment plan should check a different important need with metrics the design can actually produce. Prefer dream mode; add a reality plan when power or energy matters.
 
 ## When to refuse
@@ -180,8 +203,8 @@ ${programText(c)}
 - add_behavior: give behavior (a type not yet in the DNA), targetPart (an existing or just-added part of an allowed type, "" if none needed) and parameters. Add the part first if needed.
 - remove_behavior: give behavior of an existing behavior.
 - update_rule: ruleId + field + index + value. field "when" changes the value of condition index (numeric sensors), "target" and "speed" change step index (move_joint; speed is at most the joint's speed), "seconds" changes step index (wait), "enabled" turns the rule on (1) or off (0). Prefer this for "open faster", "keep it open 5 seconds", "react from farther away".
-- add_rule: give the whole rule (new unique id; use only flags already declared in the DNA). remove_rule: ruleId.
-- add_joint: partId of a part without a joint + joint (add a motor part first if the design has none). update_joint: partId + field speed|min|max + value.
+- add_rule: rule = the whole rule as JSON text (new unique id; use only flags already declared in the DNA). remove_rule: ruleId.
+- add_joint: partId of a part without a joint + joint as JSON text (add a motor part first if the design has none). update_joint: partId + field speed|min|max + value.
 - Leave unused fields empty ("" / 0 / null / []). List only the operations you actually perform; never add placeholder operations.
 
 ## Guidance
