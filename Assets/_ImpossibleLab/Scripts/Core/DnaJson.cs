@@ -185,7 +185,9 @@ namespace ImpossibleLab.Core
                     }
                 }
                 if (n.Status == "unverifiable" && n.Note.Length == 0) r.Errors.Add($"{at}：検証できない要望には理由（note）が必要です");
-                if ((n.Status == "simulated" || n.Status == "simplified" || n.Status == "demonstrated") && n.Blocks.Count == 0) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）が必要です");
+                // 「動きを見せる」は動作プログラムの動き（関節など）で見せるので、機能ブロックがなくてもよい（仕様 28.7）。プログラムのない発明では機能が必要
+                bool shownByProgram = n.Status == "demonstrated" && root.TryGetValue("program", out var pg) && pg.Type == JTokenType.Object;
+                if ((n.Status == "simulated" || n.Status == "simplified" || n.Status == "demonstrated") && n.Blocks.Count == 0 && !shownByProgram) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）が必要です");
                 dna.FunctionMap.Add(n);
             }
         }

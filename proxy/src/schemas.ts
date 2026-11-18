@@ -162,7 +162,9 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     if (blocks.length < new Set(n.blocks).size) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、設計に無い機能を外した`);
     let status = n.status;
     let note = clip(n.note, c.limits.maxNoteLength);
-    if ((status === "simulated" || status === "simplified") && blocks.length === 0) {
+    // 「動きを見せる」は動作プログラムがあれば機能なしでよい（アプリの検証器と同じ決まり）
+    const shownByProgram = status === "demonstrated" && parseObject(d.program) != null;
+    if ((status === "simulated" || status === "simplified" || status === "demonstrated") && blocks.length === 0 && !shownByProgram) {
       status = "unverifiable";
       note = note || "対応する機能がないため検証しない";
       fixes.push(`「${clip(n.need, 20)}」を「検証できない」に変更（対応する機能なし）`);

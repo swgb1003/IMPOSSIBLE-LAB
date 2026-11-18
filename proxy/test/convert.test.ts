@@ -141,6 +141,10 @@ test("a design with a motion program converts to the app's program format", () =
   assert.deepEqual((light.plan as Record<string, unknown>).expect, { when: { sensor: "target_distance", op: "<", value: 1.5 }, behavior: "illuminate", minRatio: 1, joint: "" });
   const stand = toPlans([{ ...nightLight.plans[0], expect: autoBin.plans[0].expect }] as never, catalog)[0];
   assert.ok(!("expect" in stand.plan), "期待は approach_device だけ");
+  // 「動きを見せる」要望は、動作プログラムがあれば機能（blocks）なしでよい。プログラムがなければ「検証できない」に直す
+  const shown = { need: "雨で閉じる", blocks: [], status: "demonstrated", note: "" };
+  assert.equal(toDna({ ...out.design!, functionMap: [shown] }, catalog).dna.functionMap[0].status, "demonstrated");
+  assert.equal(toDna({ ...out.design!, functionMap: [shown], program: "" }, catalog).dna.functionMap[0].status, "unverifiable");
   // 読めない JSON（途中で切れた・配列）は program なしにして記録する。JSON として読むだけで、実行はしない
   for (const broken of ['{"rules":[{"id":"a"', "[1,2]", '{"rules":[]}']) {
     const r = toDna({ ...out.design!, program: broken }, catalog, "ai-x");

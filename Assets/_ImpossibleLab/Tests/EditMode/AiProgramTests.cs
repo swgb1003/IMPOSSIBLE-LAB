@@ -53,6 +53,18 @@ namespace ImpossibleLab.Tests
             Assert.IsNotNull(res.Metric("expectationRate"));
         }
 
+        // 評価 m03（雨で閉じるひさし）：動きは関節と手順で見せるので、「動きを見せる」要望に機能ブロックがなくてもよい
+        [Test] public void DemonstratedNeed_WithoutBlocks_NeedsAProgram()
+        {
+            var o = Newtonsoft.Json.Linq.JObject.Parse(ProxyDna);
+            o["functionMap"] = Newtonsoft.Json.Linq.JArray.Parse(@"[{""need"":""近づくと閉じる"",""blocks"":[],""status"":""demonstrated""}]");
+            var withProgram = DnaJson.Parse(o.ToString());
+            Assert.IsTrue(withProgram.IsValid, withProgram.Summary);
+            o.Remove("program");
+            foreach (var p in (Newtonsoft.Json.Linq.JArray)o["parts"]) ((Newtonsoft.Json.Linq.JObject)p).Remove("joint");
+            Assert.IsFalse(DnaJson.Parse(o.ToString()).IsValid, "プログラムがなければ機能が必要");
+        }
+
         [Test] public void ProxyPlan_WithBehaviorExpectation_IsAccepted()
         {
             var light = DnaJson.Parse(Resources.Load<TextAsset>("ImpossibleLabSamples/motion_light").text).Dna;
@@ -141,6 +153,31 @@ namespace ImpossibleLab.Tests
             var narrow = RevisionEngine.Apply(dna, Parse(@"{""op"":""update_joint"",""partId"":""lid"",""field"":""max"",""value"":60}"));
             Assert.IsTrue(narrow.Success, string.Join(",", narrow.Errors));
             Assert.IsTrue(narrow.NewDna.Program.Rules.SelectMany(x => x.Do).Where(a => a.Action == ProgramAction.MoveJoint).All(a => a.Target <= 60f), "範囲の外の目標は補正");
+        }
+
+        [Test] public void EvalAnalyzer_CountsProgramMetrics()
+        {
+            var body = new Newtonsoft.Json.Linq.JObject
+            {
+                ["status"] = "ok", ["model"] = "claude-opus-5-5", ["dna"] = Newtonsoft.Json.Linq.JObject.Parse(ProxyDna), ["fixes"] = new Newtonsoft.Json.Linq.JArray(),
+                ["plans"] = new Newtonsoft.Json.Linq.JArray(new Newtonsoft.Json.Linq.JObject { ["title"] = "近づく", ["plan"] = Newtonsoft.Json.Linq.JObject.Parse(ProxyPlan) }),
+            };
+            var line = new Newtonsoft.Json.Linq.JObject
+            {
+                ["id"] = "m01", ["group"] = "動き", ["request"] = "ゴミ箱", ["expect"] = new Newtonsoft.Json.Linq.JObject { ["kind"] = "design", ["blocks"] = new Newtonsoft.Json.Linq.JArray("detect") },
+                ["httpStatus"] = 200, ["ms"] = 20000, ["transportError"] = "", ["body"] = body.ToString(), ["cost"] = 0.1,
+            };
+            var rows = AiEvalAnalyzer.Analyze(new[] { AiEvalRecord.FromJsonLine(line.ToString(Newtonsoft.Json.Formatting.None)) });
+            var r = rows[0];
+            Assert.AreEqual("設計OK", r.Status, string.Join(" / ", r.Notes));
+            Assert.AreEqual(1, r.Rules);
+            Assert.AreEqual(1, r.Joints);
+            Assert.AreEqual(1, r.ApproachRan);
+            Assert.AreEqual(1, r.ApproachExpectOk, $"期待の達成率 {r.ExpectRate}");
+            Assert.IsFalse(r.ProgramUntestable);
+            string md = AiEvalAnalyzer.Markdown(rows, "t.jsonl");
+            StringAssert.Contains("⑥ 動作プログラムを含む設計 | 1 / 1 件", md);
+            StringAssert.Contains("近づいて離れる実験：実行・期待どおりに動いた | 1 案・1 案（100%）", md);
         }
 
         [Test] public void ProxyCatalog_HasProgramSection()
