@@ -260,7 +260,8 @@ namespace ImpossibleLab.Tests
             Assert.AreEqual(1.5f, dist.NewDna.Program.Rules[0].When[0].Value);
             Assert.IsFalse(UpdateRule(dna, "when", 1, 1f).Success, "フラグの条件は数値ではない");
             Assert.IsFalse(UpdateRule(dna, "target", 2, 10f).Success, "wait は関節の動きではない");
-            Assert.IsFalse(RevisionOps.IsValid(RevisionOps.UpdateRule), "AI の改良提案ではまだ使えない");
+            Assert.IsTrue(RevisionOps.IsValid(RevisionOps.UpdateRule), "G-A3 から AI の改良提案でも使える");
+            Assert.IsFalse(RevisionOps.IsValid(RevisionOps.UpdatePart), "形・素材の切り替えは手動だけ");
         }
 
         [Test] public void Revision_KeepsProgramAndJoints()

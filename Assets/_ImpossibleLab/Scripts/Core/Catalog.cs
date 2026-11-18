@@ -303,6 +303,24 @@ namespace ImpossibleLab.Core
             {
                 ["id"] = c.Id, ["labelJa"] = c.LabelJa, ["experimentAvailable"] = c.ExperimentAvailable,
             }));
+            var program = new Newtonsoft.Json.Linq.JObject
+            {
+                ["sensors"] = new Newtonsoft.Json.Linq.JArray(ProgramCatalog.Sensors.Select(s => new Newtonsoft.Json.Linq.JObject
+                {
+                    ["id"] = s.Id, ["labelJa"] = s.LabelJa, ["unit"] = s.Unit ?? "", ["min"] = s.Min, ["max"] = s.Max, ["isBool"] = s.IsBool, ["requires"] = s.Requires ?? "",
+                })),
+                ["actions"] = Strs(ProgramCatalog.Actions),
+                ["ops"] = Strs(ProgramCatalog.Ops),
+                ["limits"] = new Newtonsoft.Json.Linq.JObject
+                {
+                    ["maxRules"] = ProgramCatalog.MaxRules, ["maxActionsPerRule"] = ProgramCatalog.MaxActionsPerRule, ["maxFlags"] = ProgramCatalog.MaxFlags,
+                    ["maxConditions"] = ProgramCatalog.MaxConditions, ["maxLabelLength"] = ProgramCatalog.MaxLabelLength,
+                    ["maxJoints"] = ProgramCatalog.MaxJoints, ["maxJointDepth"] = ProgramCatalog.MaxJointDepth,
+                    ["maxCooldown"] = ProgramCatalog.MaxCooldown, ["minWait"] = ProgramCatalog.MinWait, ["maxWait"] = ProgramCatalog.MaxWait,
+                    ["hingeLimit"] = ProgramCatalog.HingeLimit, ["hingeSpeedMin"] = ProgramCatalog.HingeSpeedMin, ["hingeSpeedMax"] = ProgramCatalog.HingeSpeedMax,
+                    ["sliderLimit"] = ProgramCatalog.SliderLimit, ["sliderSpeedMin"] = ProgramCatalog.SliderSpeedMin, ["sliderSpeedMax"] = ProgramCatalog.SliderSpeedMax,
+                },
+            };
             var root = new Newtonsoft.Json.Linq.JObject
             {
                 ["generatedBy"] = "ImpossibleLab.Core.LabCatalog.ToProxyJson (Unity で再生成すること。手で編集しない)",
@@ -312,6 +330,7 @@ namespace ImpossibleLab.Core
                 ["materials"] = new Newtonsoft.Json.Linq.JArray(Materials.Select(m => new Newtonsoft.Json.Linq.JObject { ["id"] = m.Id, ["labelJa"] = m.LabelJa, ["densityKgM3"] = m.DensityKgM3 })),
                 ["functionStatuses"] = Strs(FunctionStatuses),
                 ["experiments"] = experiments,
+                ["program"] = program,
                 ["appearances"] = new Newtonsoft.Json.Linq.JArray(Appearances.Select(a => new Newtonsoft.Json.Linq.JObject { ["id"] = a.Id, ["labelJa"] = a.LabelJa })),
                 ["limits"] = new Newtonsoft.Json.Linq.JObject
                 {

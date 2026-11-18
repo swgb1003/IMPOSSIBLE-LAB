@@ -34,10 +34,10 @@ adb reverse tcp:8787 tcp:8787   # Quest を USB 接続した状態で。Quest �
 | POST | `/v1/plan` | `{dna, wish?}` | `{status:"ok", plans, usage}` / `{status:"unsupported", message}` |
 | POST | `/v1/revise` | `{dna, instruction, lastResult?}` | `{status:"ok", proposal, usage}` / `{status:"unsupported", message}` |
 
-- `dna` は発明DNA v2（タグ・取り付け位置・形・素材・機能対応表）。`plans` は実験計画 1〜3 案（`{title, aim, plan}`、plan はアプリの ExperimentPlan と同じ形）。どちらもアプリ側の検証器を必ず通す。
+- `dna` は発明DNA v3（タグ・取り付け位置・形・素材・機能対応表。必要なときだけ動作プログラム `program` と部品の関節 `joint`、仕様 28章）。実験計画の `approach_device` には期待 `expect` が付く。`plans` は実験計画 1〜3 案（`{title, aim, plan}`、plan はアプリの ExperimentPlan と同じ形）。どちらもアプリ側の検証器を必ず通す。
 - `fixes`：プロキシで直した小さな食い違い（機能対応表に設計に無い機能が書かれていた、など）。評価で数える。
 - `usage`：トークン数・所要時間・料金の目安（`src/cost.ts`、claude-opus-5-5 の公開価格。請求額そのものではない）。
-- 改良の操作は `update_parameter` / `add_part` / `remove_part` / `add_behavior` / `remove_behavior`（最大6）。
+- 改良の操作は `update_parameter` / `add_part` / `remove_part` / `add_behavior` / `remove_behavior` と、動作プログラムの `add_rule` / `remove_rule` / `update_rule` / `add_joint` / `update_joint`（最大6）。ルール・関節はアプリの DNA の検証器で検証する。
 - カタログ（部品・機能・実験カタログ）は Unity の `ProjectSetup.ExportProxyCatalog` で `catalog.json` に書き出す。手で編集しない。
 
 エラーは `{status:"error", code, message}`（400/401/413/415/422/429/502/503/504）。

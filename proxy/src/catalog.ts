@@ -20,6 +20,18 @@ export interface MetricInfo {
   /** stand で測るときだけ追加で必要なモジュール（古い catalog.json には無い）。 */
   standModules?: string[];
 }
+/** 動作プログラム（仕様 28章）のセンサー・動作・上限。 */
+export interface SensorInfo { id: string; labelJa: string; unit: string; min: number; max: number; isBool: boolean; requires: string }
+export interface ProgramCatalog {
+  sensors: SensorInfo[];
+  actions: string[];
+  ops: string[];
+  limits: {
+    maxRules: number; maxActionsPerRule: number; maxFlags: number; maxConditions: number; maxLabelLength: number;
+    maxJoints: number; maxJointDepth: number; maxCooldown: number; minWait: number; maxWait: number;
+    hingeLimit: number; hingeSpeedMin: number; hingeSpeedMax: number; sliderLimit: number; sliderSpeedMin: number; sliderSpeedMax: number;
+  };
+}
 export interface Catalog {
   schemaVersion?: number;
   partTypes: PartTypeInfo[];
@@ -33,6 +45,7 @@ export interface Catalog {
   materials: MaterialInfo[];
   functionStatuses: string[];
   experiments: { scenarios: ScenarioInfo[]; modules: ModuleInfo[]; metrics: MetricInfo[] };
+  program: ProgramCatalog;
   limits: {
     maxParts: number; maxBehaviors: number; positionLimitXZ: number; positionMinY: number; positionMaxY: number;
     maxNameLength: number; maxPurposeLength: number; maxRequestLength: number;
@@ -51,6 +64,8 @@ export function loadCatalog(path: string): Catalog {
     if (!Array.isArray(c[k]) || c[k].length === 0) throw new Error(`catalog.json: ${k} がありません（Unity で ExportProxyCatalog を実行してください）`);
   if (!c.experiments || !Array.isArray(c.experiments.scenarios) || !Array.isArray(c.experiments.metrics))
     throw new Error("catalog.json: experiments がありません（Unity で ExportProxyCatalog を実行してください）");
+  if (!c.program || !Array.isArray(c.program.sensors) || c.program.sensors.length === 0)
+    throw new Error("catalog.json: program がありません（Unity で ExportProxyCatalog を実行してください）");
   return c;
 }
 

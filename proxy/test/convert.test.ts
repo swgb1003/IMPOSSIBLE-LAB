@@ -16,8 +16,8 @@ const schemas = buildSchemas(catalog);
 const nightLight = {
   name: "夜道ライトリュック", tags: ["lighting", "safety", "lighting"], mount: "back", appearance: "night_navy", purpose: "暗い帰り道で足元を照らす",
   parts: [
-    { id: "Pack Body", type: "body", shape: "box", material: "fabric", position: [0, 0, 0], scale: [0.3, 0.42, 0.14] },
-    { id: "lamp", type: "light", shape: "cylinder", material: "plastic", position: [0, -0.18, 0.08], scale: [0.05, 0.03, 0.05] },
+    { id: "Pack Body", type: "body", shape: "box", material: "fabric", position: [0, 0, 0], scale: [0.3, 0.42, 0.14], joint: null },
+    { id: "lamp", type: "light", shape: "cylinder", material: "plastic", position: [0, -0.18, 0.08], scale: [0.05, 0.03, 0.05], joint: null },
   ],
   behaviors: [
     { type: "illuminate", targetPart: "lamp", parameters: [{ name: "lumens", value: 150 }, { name: "tiltDeg", value: 50 }] },
@@ -30,17 +30,64 @@ const nightLight = {
     { need: "軽い", blocks: ["stabilize"], status: "simulated", note: "" },
     { need: "かっこいい", blocks: [], status: "unverifiable", note: "" },
   ],
+  program: null,
   designPoints: ["背中の下側から足元へ向ける"],
   plans: [{
     title: "夜道の足元", aim: "足元が見えるか", scenario: "stand", mode: "dream", durationSec: 120,
     modules: [{ type: "darkness", params: [{ name: "lux", value: 2 }] }],
     metrics: ["footIlluminance", "alertRange", "footIlluminance"],
     criteria: [{ metric: "footIlluminance", op: ">=", value: 10, reason: "段差が見える（目安）" }],
+    expect: null,
+  }],
+};
+
+// 動作プログラムつきの見本（自動で開くゴミ箱）。構造化出力では使わない項目も埋まって返る
+const C0 = { kind: "sensor", sensor: "elapsed", op: ">", value: 0, is: false, joint: "", flag: "" };
+const S0 = { action: "wait", joint: "", target: 0, speed: 0, behavior: "", on: false, parameter: "", value: 0, name: "", flagValue: false, seconds: 0 };
+const autoBin = {
+  name: "自動で開くゴミ箱", tags: ["daily"], mount: "fixed", appearance: "lab_white", purpose: "近づくとフタが開く",
+  parts: [
+    { id: "bin", type: "container", shape: "box", material: "plastic", position: [0, 0.3, 0], scale: [0.3, 0.6, 0.38], joint: null },
+    { id: "Lid", type: "panel", shape: "box", material: "plastic", position: [0, 0.61, 0], scale: [0.3, 0.02, 0.38],
+      joint: { type: "hinge", parent: "bin", axis: "x", pivot: [0, 0, -0.19], min: 0, max: 110, speed: 360, home: 0 } },
+    { id: "eye", type: "sensor", shape: "sphere", material: "plastic", position: [0, 0.5, 0.2], scale: [0.03, 0.03, 0.03], joint: null },
+    { id: "hinge-motor", type: "motor", shape: "cylinder", material: "plastic", position: [0, 0.6, -0.18], scale: [0.04, 0.06, 0.04], joint: null },
+  ],
+  behaviors: [{ type: "detect", targetPart: "eye", parameters: [{ name: "rangeM", value: 3 }] }],
+  functionMap: [{ need: "近づくと開く", blocks: ["detect"], status: "simulated", note: "" }],
+  program: {
+    flags: ["Opened", "opened"],
+    rules: [{
+      id: "Open Lid", label: "人が近づいたらフタを開ける", trigger: "rise", cooldown: 1, match: "all",
+      conditions: [
+        { ...C0, sensor: "target_distance", op: "<", value: 1 },
+        { ...C0, sensor: "target_detected", is: true },
+        { ...C0, kind: "flag", flag: "opened", is: false },
+      ],
+      do: [
+        { ...S0, action: "move_joint", joint: "Lid", target: 100, speed: 120 },
+        { ...S0, action: "set_flag", name: "opened", flagValue: true },
+        { ...S0, action: "wait", seconds: 3 },
+        { ...S0, action: "move_joint", joint: "Lid", target: 0 },
+        { ...S0, action: "set_behavior", behavior: "detect", on: true },
+      ],
+    }, {
+      id: "open lid", label: "同じ id", trigger: "rise", cooldown: 0, match: "any",
+      conditions: [{ ...C0 }], do: [{ ...S0, action: "set_flag", name: "opened", flagValue: false }],
+    }],
+  },
+  designPoints: ["フタは後ろの辺で回る"],
+  plans: [{
+    title: "近づいて離れる", aim: "近づくと開くか", scenario: "approach_device", mode: "dream", durationSec: 60,
+    modules: [{ type: "approach", params: [{ name: "count", value: 3 }] }],
+    metrics: ["ruleFiredCount", "reactionTime", "expectationRate"],
+    criteria: [{ metric: "expectationRate", op: ">=", value: 0.7, reason: "近くにいる間は開いている（目安）" }],
+    expect: { sensor: "target_distance", op: "<", value: 1, joint: "lid", atLeast: 80, behavior: "", minRatio: 0.9 },
   }],
 };
 
 test("catalog has every block, experiment catalog and legacy categories", () => {
-  // アプリの DNA は v3（動作プログラム・関節を任意で追加）。AI の設計出力は動作プログラムを加えるまで（G-A3）v2 のまま
+  // アプリの DNA・AI の設計出力とも v3（動作プログラム・関節を任意で追加）
   assert.equal(catalog.schemaVersion, 3);
   for (const t of ["illuminate", "heat", "cool", "sun_shade", "impact_cushion", "grip", "lift_load", "detect", "alert", "rain_shield", "follow_user", "hover"])
     assert.ok(catalog.behaviors.some((b) => b.type === t), t);
@@ -49,10 +96,12 @@ test("catalog has every block, experiment catalog and legacy categories", () => 
   assert.deepEqual(legacyCategories(catalog).map((c) => c.id), ["protection", "carrier", "mobility"]);
 });
 
-test("design output converts to DNA v2 with safe ids and a repaired function map", () => {
+test("design output converts to DNA v3 with safe ids and a repaired function map", () => {
   const out = schemas.design.parse({ status: "ok", message: "", suggestions: [], design: nightLight });
   const { dna, fixes } = toDna(out.design!, catalog, "ai-test");
-  assert.equal(dna.schemaVersion, 2);
+  assert.equal(dna.schemaVersion, 3);
+  assert.ok(!("program" in dna), "プログラムがなければ出さない");
+  assert.ok(!("joint" in dna.parts[0]), "関節がなければ出さない");
   assert.equal(dna.id, "ai-test");
   assert.deepEqual(dna.tags, ["lighting", "safety"], "重複タグは1つに");
   assert.equal(dna.mount, "back");
@@ -81,6 +130,37 @@ test("plans convert to the app's ExperimentPlan JSON", () => {
   assert.equal(p.plan.criteria[0].op, ">=");
 });
 
+test("a design with a motion program converts to the app's program format", () => {
+  const out = schemas.design.parse({ status: "ok", message: "", suggestions: [], design: autoBin });
+  const { dna } = toDna(out.design!, catalog, "ai-bin");
+  const lid = dna.parts[1] as Record<string, unknown>;
+  assert.equal(lid.id, "lid");
+  assert.deepEqual(lid.joint, { type: "hinge", parent: "bin", axis: "x", pivot: [0, 0, -0.19], min: 0, max: 110, speed: 360, home: 0 });
+  const prog = (dna as { program?: { flags: string[]; rules: Record<string, unknown>[] } }).program!;
+  assert.deepEqual(prog.flags, ["opened"], "フラグの名前は安全な形にし、重複は1つに");
+  assert.equal(prog.rules[0].id, "open-lid");
+  assert.equal(prog.rules[1].id, "open-lid-2", "ルールの id は重複させない");
+  assert.deepEqual(prog.rules[0].when, { all: [
+    { sensor: "target_distance", op: "<", value: 1 },
+    { sensor: "target_detected", is: true },
+    { flag: "opened", is: false },
+  ] }, "条件は種類ごとに使う項目だけ");
+  assert.deepEqual(prog.rules[0].do, [
+    { action: "move_joint", joint: "lid", target: 100, speed: 120 },
+    { action: "set_flag", name: "opened", value: true },
+    { action: "wait", seconds: 3 },
+    { action: "move_joint", joint: "lid", target: 0 },
+    { action: "set_behavior", behavior: "detect", on: true },
+  ], "動作は種類ごとに使う項目だけ。speed 0 は関節の速さ");
+  assert.deepEqual(prog.rules[1].when, { any: [{ sensor: "elapsed", op: ">", value: 0 }] });
+  const [p] = toPlans(out.design!.plans, catalog);
+  assert.deepEqual((p.plan as Record<string, unknown>).expect, { when: { sensor: "target_distance", op: "<", value: 1 }, minRatio: 0.9, joint: "lid", atLeast: 80 });
+  const light = toPlans([{ ...autoBin.plans[0], expect: { sensor: "target_distance", op: "<", value: 1.5, joint: "", atLeast: 0, behavior: "illuminate", minRatio: 2 } }] as never, catalog)[0];
+  assert.deepEqual((light.plan as Record<string, unknown>).expect, { when: { sensor: "target_distance", op: "<", value: 1.5 }, minRatio: 1, joint: "", behavior: "illuminate" });
+  const stand = toPlans([{ ...nightLight.plans[0], expect: autoBin.plans[0].expect }] as never, catalog)[0];
+  assert.ok(!("expect" in stand.plan), "期待は approach_device だけ");
+});
+
 test("schema rejects values outside the catalog", () => {
   const bad = (patch: Record<string, unknown>) => () => schemas.design.parse({ status: "ok", message: "", suggestions: [], design: { ...nightLight, ...patch } });
   assert.throws(bad({ parts: [{ id: "a", type: "laser_cannon", shape: "box", material: "steel", position: [0, 0, 0], scale: [1, 1, 1] }] }));
@@ -90,21 +170,25 @@ test("schema rejects values outside the catalog", () => {
   assert.throws(bad({ plans: [{ ...nightLight.plans[0], scenario: "moonwalk" }] }));
   assert.throws(bad({ plans: [{ ...nightLight.plans[0], metrics: ["teleportTime"] }] }));
   assert.throws(bad({ functionMap: [{ need: "x", blocks: [], status: "maybe", note: "" }] }));
+  const badProg = (rule: Record<string, unknown>) => bad({ program: { flags: [], rules: [{ ...autoBin.program.rules[0], ...rule }] } });
+  assert.throws(badProg({ conditions: [{ ...C0, sensor: "mind_reading" }] }), "未登録のセンサー");
+  assert.throws(badProg({ do: [{ ...S0, action: "eval_code" }] }), "未登録の動作");
+  assert.throws(badProg({ trigger: "loop" }));
 });
 
-const emptyOp = { behavior: "", parameter: "", value: 0, partId: "", part: null, targetPart: "", parameters: [] };
+const emptyOp = { behavior: "", parameter: "", value: 0, partId: "", part: null, targetPart: "", parameters: [], ruleId: "", field: "", index: 0, rule: null, joint: null };
 
 test("revise output converts to RevisionProposal JSON, including behavior operations", () => {
   const r = schemas.revise.parse({
     status: "ok", summary: "照明を足す", notes: ["電池の減りが早くなる"],
     operations: [
-      { ...emptyOp, op: "add_part", part: { id: "Lamp 2", type: "light", shape: "sphere", material: "plastic", position: [0, 0, 0.1], scale: [0.04, 0.04, 0.04] } },
+      { ...emptyOp, op: "add_part", part: { id: "Lamp 2", type: "light", shape: "sphere", material: "plastic", position: [0, 0, 0.1], scale: [0.04, 0.04, 0.04], joint: null } },
       { ...emptyOp, op: "add_behavior", behavior: "illuminate", targetPart: "Lamp 2", parameters: [{ name: "lumens", value: 200 }] },
       { ...emptyOp, op: "remove_behavior", behavior: "alert" },
       { ...emptyOp, op: "update_parameter", behavior: "rain_shield", parameter: "skirtLength", value: 0.25 },
     ],
   });
-  const p = toProposal(r);
+  const p = toProposal(r, catalog);
   assert.deepEqual(p.operations, [
     { op: "add_part", part: { id: "lamp-2", type: "light", shape: "sphere", material: "plastic", position: [0, 0, 0.1], scale: [0.04, 0.04, 0.04] } },
     { op: "add_behavior", behavior: "illuminate", targetPart: "lamp-2", parameters: { lumens: 200 } },
@@ -125,10 +209,34 @@ test("empty placeholder operations are dropped from a revision", () => {
     ],
   });
   // 空の操作は捨てる。中身のある操作（存在しない部品 ghost の削除）は残し、アプリ側の検証に任せる
-  assert.deepEqual(toProposal(r).operations, [
+  assert.deepEqual(toProposal(r, catalog).operations, [
     { op: "update_parameter", behavior: "rain_shield", parameter: "radius", value: 0.9 },
     { op: "remove_part", partId: "ghost" },
   ]);
+});
+
+test("revise output converts rule and joint operations", () => {
+  const r = schemas.revise.parse({
+    status: "ok", summary: "早く開く", notes: [],
+    operations: [
+      { ...emptyOp, op: "update_rule", ruleId: "open_lid", field: "speed", index: 0.4, value: 180 },
+      { ...emptyOp, op: "update_rule", ruleId: "open_lid", field: "enabled", value: 0.9 },
+      { ...emptyOp, op: "update_joint", partId: "lid", field: "speed", value: 360 },
+      { ...emptyOp, op: "remove_rule", ruleId: "close" },
+      { ...emptyOp, op: "add_rule", rule: autoBin.program.rules[0] },
+      { ...emptyOp, op: "add_joint", partId: "door", joint: { type: "slider", parent: "", axis: "y", pivot: [0, 0, 0], min: 0, max: 0.3, speed: 0.2, home: 0 } },
+      { ...emptyOp, op: "update_rule" },
+      { ...emptyOp, op: "add_rule" },
+    ],
+  });
+  const ops = toProposal(r, catalog).operations;
+  assert.equal(ops.length, 6, "空の操作は捨てる（最大6）");
+  assert.deepEqual(ops[0], { op: "update_rule", ruleId: "open_lid", field: "speed", index: 0, value: 180 });
+  assert.deepEqual(ops[1], { op: "update_rule", ruleId: "open_lid", field: "enabled", index: 0, value: 1 });
+  assert.deepEqual(ops[2], { op: "update_joint", partId: "lid", field: "speed", value: 360 });
+  assert.deepEqual(ops[3], { op: "remove_rule", ruleId: "close" });
+  assert.equal((ops[4] as { rule: { id: string } }).rule.id, "open-lid");
+  assert.deepEqual((ops[5] as { joint: unknown }).joint, { type: "slider", axis: "y", pivot: [0, 0, 0], min: 0, max: 0.3, speed: 0.2, home: 0 });
 });
 
 test("ids are sanitized", () => {
@@ -176,5 +284,8 @@ test("system prompts include the whole catalog, the experiment rules and the inj
   assert.ok(planSystemPrompt(catalog).includes("Plan rules"));
   const rv = reviseSystemPrompt(catalog);
   assert.ok(rv.includes("add_behavior") && rv.includes("remove_behavior"));
+  for (const op of ["add_rule", "remove_rule", "update_rule", "add_joint", "update_joint"]) assert.ok(rv.includes(op), op);
+  for (const s of catalog.program.sensors) assert.ok(d.includes(s.id), s.id);
+  assert.ok(d.includes("move_joint") && d.includes("approach_device") && d.includes("demonstrated"));
   assert.ok(!d.includes("${"), "テンプレートの埋め込み漏れがない");
 });

@@ -107,7 +107,7 @@ async function handleRevise(body: unknown) {
   const r = await callClaude<ReviseOutput>(REVISE_SYSTEM, user, betaZodOutputFormat(schemas.revise));
   const o = r.output;
   if (o.status !== "ok" || o.operations.length === 0) return { status: "unsupported", message: o.summary || "この指示では改良案を作れませんでした", model: r.model, usage: r.usage };
-  return { status: "ok", proposal: toProposal(o), model: r.model, usage: r.usage };
+  return { status: "ok", proposal: toProposal(o, catalog), model: r.model, usage: r.usage };
 }
 
 function send(res: ServerResponse, status: number, obj: unknown) {

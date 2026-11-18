@@ -15,9 +15,19 @@ namespace ImpossibleLab.Core
         public const string RemoveBehavior = "remove_behavior";
         /// <summary>部品の形・素材の変更（S03 の手動の切り替えだけで使う。AI の改良提案では受け付けない）。</summary>
         public const string UpdatePart = "update_part";
-        /// <summary>動作プログラムのルールの変更（S03 の手動の編集。enabled・when・target・seconds）。AI の改良提案ではまだ受け付けない（G-A3）。</summary>
+        /// <summary>動作プログラムのルールの値の変更（enabled・when・target・speed・seconds）。S03 の手動の編集・オフライン改良・AI の改良で使う。</summary>
         public const string UpdateRule = "update_rule";
-        public static bool IsValid(string op) => op == AddPart || op == RemovePart || op == UpdateParameter || op == AddBehavior || op == RemoveBehavior;
+        /// <summary>ルールの追加・削除（仕様 28.8）。追加するルールは DNA の検証器で検証する。</summary>
+        public const string AddRule = "add_rule";
+        public const string RemoveRule = "remove_rule";
+        /// <summary>関節の追加・変更（speed・min・max）。追加する関節は DNA の検証器で検証する。</summary>
+        public const string AddJoint = "add_joint";
+        public const string UpdateJoint = "update_joint";
+        /// <summary>AI の改良提案で受け付ける操作（update_part は S03 の手動の切り替えだけ）。</summary>
+        public static bool IsValid(string op) => op == AddPart || op == RemovePart || op == UpdateParameter || op == AddBehavior || op == RemoveBehavior
+            || op == UpdateRule || op == AddRule || op == RemoveRule || op == AddJoint || op == UpdateJoint;
+        public static readonly string[] RuleFields = { "enabled", "when", "target", "speed", "seconds" };
+        public static readonly string[] JointFields = { "speed", "min", "max" };
     }
 
     /// <summary>改良の変更操作（仕様6.2、5週目に機能の追加・削除を追加）。</summary>
@@ -39,6 +49,9 @@ namespace ImpossibleLab.Core
         public string RuleId;
         public string RuleField;
         public int Index;
+        /// <summary>add_rule のルール・add_joint の関節（JSON。適用時に DNA 全体と一緒に検証する）。update_joint の項目は RuleField を使う。</summary>
+        public string RuleJson;
+        public string JointJson;
     }
 
     public sealed class RevisionProposal
@@ -89,6 +102,10 @@ namespace ImpossibleLab.Core
                     case RevisionOps.RemoveBehavior: ApplyRemoveBehavior(next, op, result); break;
                     case RevisionOps.UpdatePart: ApplyUpdatePart(next, op, result); break;
                     case RevisionOps.UpdateRule: ApplyUpdateRule(next, op, result); break;
+                    case RevisionOps.AddRule: ApplyAddRule(next, op, result); break;
+                    case RevisionOps.RemoveRule: ApplyRemoveRule(next, op, result); break;
+                    case RevisionOps.AddJoint: ApplyAddJoint(next, op, result); break;
+                    case RevisionOps.UpdateJoint: ApplyUpdateJoint(next, op, result); break;
                     default: result.Errors.Add($"未対応の変更操作: {op.Op}"); break;
                 }
             }
@@ -194,6 +211,114 @@ namespace ImpossibleLab.Core
         }
 
         /// <summary>ルールの変更。範囲の外は範囲内に補正して注意を出す（仕様 28.5：改良では補正して差分に表示）。</summary>
+        /// <summary>DNA を JSON にし、手を加えてから検証器に通す（ルール・関節の参照や上限は DnaJson がまとめて確認する）。</summary>
+        static InventionDna Revalidate(InventionDna dna, System.Action<JObject> change, RevisionResult r, string what)
+        {
+            var o = JObject.Parse(DnaJson.ToJson(dna));
+            change(o);
+            var rep = DnaJson.Parse(o.ToString());
+            if (!rep.IsValid) { r.Errors.Add(what + "：" + rep.Summary); return null; }
+            return rep.Dna;
+        }
+
+        static void ApplyAddRule(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            JObject rule;
+            try { rule = JObject.Parse(op.RuleJson ?? ""); }
+            catch (Newtonsoft.Json.JsonException) { r.Errors.Add("追加するルールが不正です"); return; }
+            string id = rule.Value<string>("id") ?? "";
+            if (dna.Program != null && dna.Program.Rules.Any(x => x.Id == id)) { r.Errors.Add($"ルール {id} はすでにあります"); return; }
+            var next = Revalidate(dna, o =>
+            {
+                if (!(o["program"] is JObject p)) { p = new JObject { ["version"] = 1, ["flags"] = new JArray(), ["rules"] = new JArray() }; o["program"] = p; }
+                ((JArray)p["rules"]).Add(rule);
+            }, r, "追加するルールが不正");
+            if (next == null) return;
+            dna.Program = next.Program;
+            var added = dna.Program.Rules.Last();
+            r.Changes.Add(new ChangeLine { Label = "動きの手順：ルールを追加", Before = "なし", After = ProgramText.Rule(added, dna.Program.Rules.Count - 1, dna) });
+        }
+
+        static void ApplyRemoveRule(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            int i = dna.Program?.Rules.FindIndex(x => x.Id == op.RuleId) ?? -1;
+            if (i < 0) { r.Errors.Add($"ルールがありません: {op.RuleId}"); return; }
+            r.Changes.Add(new ChangeLine { Label = "動きの手順：ルールを削除", Before = ProgramText.Rule(dna.Program.Rules[i], i, dna), After = "削除" });
+            dna.Program.Rules.RemoveAt(i);
+            if (dna.Program.Rules.Count == 0) dna.Program = null; // ルールが無いプログラムは持たない
+        }
+
+        static void ApplyAddJoint(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            var part = dna.FindPart(op.PartId);
+            if (part == null) { r.Errors.Add($"部品がありません: {op.PartId}"); return; }
+            if (part.Joint != null) { r.Errors.Add($"部品 {op.PartId} にはすでに関節があります"); return; }
+            JObject joint;
+            try { joint = JObject.Parse(op.JointJson ?? ""); }
+            catch (Newtonsoft.Json.JsonException) { r.Errors.Add("追加する関節が不正です"); return; }
+            var next = Revalidate(dna, o =>
+            {
+                foreach (var p in (JArray)o["parts"]) if (p.Value<string>("id") == op.PartId) p["joint"] = joint;
+            }, r, "追加する関節が不正");
+            if (next == null) return;
+            part.Joint = next.FindPart(op.PartId).Joint;
+            string kind = part.Joint.IsHinge ? "回転" : "直動";
+            string unit = part.Joint.IsHinge ? "°" : " m";
+            r.Changes.Add(new ChangeLine { Label = $"{ProgramText.PartName(dna, part.Id)}：関節を追加", Before = "なし", After = $"{kind} {part.Joint.Min:0.##}〜{part.Joint.Max:0.##}{unit}" });
+        }
+
+        static void ApplyUpdateJoint(InventionDna dna, RevisionOperation op, RevisionResult r)
+        {
+            var j = dna.FindPart(op.PartId)?.Joint;
+            if (j == null) { r.Errors.Add($"関節がありません: {op.PartId}"); return; }
+            if (float.IsNaN(op.Value) || float.IsInfinity(op.Value)) { r.Errors.Add("不正な数値です"); return; }
+            string name = ProgramText.PartName(dna, op.PartId) + "の関節";
+            string unit = j.IsHinge ? "°" : " m";
+            float lim = j.IsHinge ? ProgramCatalog.HingeLimit : ProgramCatalog.SliderLimit;
+            float Clamp(float v, float min, float max, string what)
+            {
+                float c = Mathf.Clamp(v, min, max);
+                if (!Mathf.Approximately(c, v)) r.Warnings.Add($"{what}は範囲 {min:0.##}〜{max:0.##} に補正しました");
+                return c;
+            }
+            switch (op.RuleField)
+            {
+                case "speed":
+                {
+                    float v = j.IsHinge ? Clamp(op.Value, ProgramCatalog.HingeSpeedMin, ProgramCatalog.HingeSpeedMax, "関節の速さ") : Clamp(op.Value, ProgramCatalog.SliderSpeedMin, ProgramCatalog.SliderSpeedMax, "関節の速さ");
+                    if (Mathf.Approximately(v, j.Speed)) return;
+                    r.Changes.Add(new ChangeLine { Label = name + "：速さの上限", Before = $"{j.Speed:0.##}{unit}/秒", After = $"{v:0.##}{unit}/秒" });
+                    j.Speed = v;
+                    // ルールの「動かす速さ」は関節の上限を超えられない
+                    if (dna.Program != null)
+                        foreach (var a in dna.Program.Rules.SelectMany(x => x.Do))
+                            if (a.Action == ProgramAction.MoveJoint && a.Joint == op.PartId && a.Speed > v) a.Speed = v;
+                    return;
+                }
+                case "min":
+                case "max":
+                {
+                    bool isMin = op.RuleField == "min";
+                    float v = isMin ? Clamp(op.Value, -lim, j.Max, "関節の下限") : Clamp(op.Value, j.Min, lim, "関節の上限");
+                    float before = isMin ? j.Min : j.Max;
+                    if (Mathf.Approximately(v, before)) return;
+                    r.Changes.Add(new ChangeLine { Label = name + (isMin ? "：動く範囲の下限" : "：動く範囲の上限"), Before = $"{before:0.##}{unit}", After = $"{v:0.##}{unit}" });
+                    if (isMin) j.Min = v; else j.Max = v;
+                    j.Home = Mathf.Clamp(j.Home, j.Min, j.Max);
+                    // 範囲の外になった動作の目標は範囲内に補正して知らせる（仕様 28.5：改良では補正）
+                    if (dna.Program != null)
+                        foreach (var a in dna.Program.Rules.SelectMany(x => x.Do))
+                            if (a.Action == ProgramAction.MoveJoint && a.Joint == op.PartId && (a.Target < j.Min || a.Target > j.Max))
+                            {
+                                a.Target = Mathf.Clamp(a.Target, j.Min, j.Max);
+                                r.Warnings.Add($"動作の目標を {a.Target:0.##}{unit} に補正しました");
+                            }
+                    return;
+                }
+                default: r.Errors.Add($"未対応の関節の項目: {op.RuleField}"); return;
+            }
+        }
+
         static void ApplyUpdateRule(InventionDna dna, RevisionOperation op, RevisionResult r)
         {
             var rule = dna.Program?.Rules.Find(x => x.Id == op.RuleId);
@@ -323,6 +448,36 @@ namespace ImpossibleLab.Core
                     else if (jo["parameters"] != null && jo["parameters"].Type != JTokenType.Null) { error = "parameters はオブジェクトです"; return false; }
                 }
                 var val = jo["value"];
+                if (op.Op == RevisionOps.UpdateRule || op.Op == RevisionOps.RemoveRule)
+                {
+                    op.RuleId = Truncate(jo.Value<string>("ruleId"), LabCatalog.MaxIdLength);
+                    if (string.IsNullOrEmpty(op.RuleId)) { error = "ruleId がありません"; return false; }
+                }
+                if (op.Op == RevisionOps.UpdateRule || op.Op == RevisionOps.UpdateJoint)
+                {
+                    op.RuleField = jo.Value<string>("field");
+                    var allowed = op.Op == RevisionOps.UpdateRule ? RevisionOps.RuleFields : RevisionOps.JointFields;
+                    if (!allowed.Contains(op.RuleField)) { error = $"未対応の項目: {Truncate(op.RuleField, 32)}"; return false; }
+                    var idx = jo["index"];
+                    if (idx != null && idx.Type == JTokenType.Integer) op.Index = idx.Value<int>();
+                    else if (op.Op == RevisionOps.UpdateRule && op.RuleField != "enabled") { error = "index（条件・動作の番号）がありません"; return false; }
+                    if (val == null || (val.Type != JTokenType.Float && val.Type != JTokenType.Integer && val.Type != JTokenType.Boolean)) { error = "value がありません"; return false; }
+                    op.Value = val.Type == JTokenType.Boolean ? (val.Value<bool>() ? 1f : 0f) : (float)val.Value<double>();
+                }
+                if (op.Op == RevisionOps.AddRule)
+                {
+                    if (!(jo["rule"] is JObject rule)) { error = "rule がありません"; return false; }
+                    op.RuleJson = rule.ToString(Newtonsoft.Json.Formatting.None);
+                }
+                if (op.Op == RevisionOps.AddJoint || op.Op == RevisionOps.UpdateJoint)
+                {
+                    if (string.IsNullOrEmpty(op.PartId)) { error = "partId がありません"; return false; }
+                    if (op.Op == RevisionOps.AddJoint)
+                    {
+                        if (!(jo["joint"] is JObject joint)) { error = "joint がありません"; return false; }
+                        op.JointJson = joint.ToString(Newtonsoft.Json.Formatting.None);
+                    }
+                }
                 if (op.Op == RevisionOps.UpdateParameter)
                 {
                     if (val == null || (val.Type != JTokenType.Float && val.Type != JTokenType.Integer)) { error = "value は数値です"; return false; }

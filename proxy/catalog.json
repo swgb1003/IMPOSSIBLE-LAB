@@ -1778,6 +1778,140 @@
       }
     ]
   },
+  "program": {
+    "sensors": [
+      {
+        "id": "timer",
+        "labelJa": "ルールが始まってからの時間",
+        "unit": "秒",
+        "min": 0.0,
+        "max": 600.0,
+        "isBool": false,
+        "requires": ""
+      },
+      {
+        "id": "elapsed",
+        "labelJa": "始めてからの時間",
+        "unit": "秒",
+        "min": 0.0,
+        "max": 600.0,
+        "isBool": false,
+        "requires": ""
+      },
+      {
+        "id": "target_distance",
+        "labelJa": "対象までの距離",
+        "unit": "m",
+        "min": 0.0,
+        "max": 30.0,
+        "isBool": false,
+        "requires": "behavior:detect"
+      },
+      {
+        "id": "target_detected",
+        "labelJa": "対象を検知している",
+        "unit": "",
+        "min": 0.0,
+        "max": 0.0,
+        "isBool": true,
+        "requires": "behavior:detect"
+      },
+      {
+        "id": "ambient_light",
+        "labelJa": "周りの明るさ",
+        "unit": "lx",
+        "min": 0.0,
+        "max": 100000.0,
+        "isBool": false,
+        "requires": "part:sensor"
+      },
+      {
+        "id": "rain",
+        "labelJa": "雨が当たっている",
+        "unit": "",
+        "min": 0.0,
+        "max": 0.0,
+        "isBool": true,
+        "requires": "part:sensor"
+      },
+      {
+        "id": "temperature",
+        "labelJa": "気温",
+        "unit": "°C",
+        "min": -20.0,
+        "max": 45.0,
+        "isBool": false,
+        "requires": "part:sensor"
+      },
+      {
+        "id": "user_moving",
+        "labelJa": "利用者が歩いている",
+        "unit": "",
+        "min": 0.0,
+        "max": 0.0,
+        "isBool": true,
+        "requires": "mount:body"
+      },
+      {
+        "id": "holding",
+        "labelJa": "つかんでいる",
+        "unit": "",
+        "min": 0.0,
+        "max": 0.0,
+        "isBool": true,
+        "requires": "behavior:grip"
+      },
+      {
+        "id": "joint_position",
+        "labelJa": "関節の今の値",
+        "unit": "",
+        "min": -180.0,
+        "max": 180.0,
+        "isBool": false,
+        "requires": "joint"
+      },
+      {
+        "id": "battery_percent",
+        "labelJa": "電池の残量",
+        "unit": "%",
+        "min": 0.0,
+        "max": 100.0,
+        "isBool": false,
+        "requires": "part:battery"
+      }
+    ],
+    "actions": [
+      "move_joint",
+      "set_behavior",
+      "set_parameter",
+      "set_flag",
+      "wait"
+    ],
+    "ops": [
+      "<",
+      "<=",
+      ">",
+      ">="
+    ],
+    "limits": {
+      "maxRules": 8,
+      "maxActionsPerRule": 8,
+      "maxFlags": 4,
+      "maxConditions": 4,
+      "maxLabelLength": 40,
+      "maxJoints": 6,
+      "maxJointDepth": 3,
+      "maxCooldown": 60.0,
+      "minWait": 0.1,
+      "maxWait": 60.0,
+      "hingeLimit": 180.0,
+      "hingeSpeedMin": 10.0,
+      "hingeSpeedMax": 360.0,
+      "sliderLimit": 1.0,
+      "sliderSpeedMin": 0.05,
+      "sliderSpeedMax": 1.0
+    }
+  },
   "appearances": [
     {
       "id": "lab_white",
