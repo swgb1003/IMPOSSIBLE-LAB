@@ -80,3 +80,15 @@ node eval/run-eval.ts --only r01,r15        # 一部だけ
 
 集計は Unity の `IMPOSSIBLE LAB/5. AI評価セットを集計`（`AiEvalReport.Run`、API は呼ばない）。最新の結果を、アプリと同じ検証器で数えて
 `docs/eval/<同じ名前>.md`（①設計が通る割合 ②実験計画が通る割合 ③「検証できない」の割合 ④時間・費用）と、人の5段階評価を記入する `-rating.csv` を作る。
+
+## 音声入力（文字起こし、2026-11-18）
+
+Quest の「● 話す」で録音した声（WAV）を `POST /v1/transcribe`（content-type `audio/wav`、2MB・30 秒まで）で受け取り、PC 上の Whisper で文字にして `{status:"ok", text}` を返す。声は外部へ送らず、保存もしない。ログは長さと処理時間だけ（内容は出さない）。
+
+準備（初回だけ）：
+```bash
+cd proxy
+python -m venv stt/.venv
+stt/.venv/Scripts/python.exe -m pip install -r stt/requirements.txt   # Windows（mac/Linux は stt/.venv/bin/python）
+```
+`npm start` で、`stt/.venv` があればプロキシが `stt/stt_server.py`（127.0.0.1:8788）を子プロセスで起動する。初回はモデル（small、約 0.5GB）をダウンロードする。`ILAB_STT=off` で無効、`ILAB_STT_MODEL=large-v3-turbo` でより正確なモデル（CPU では約 4 倍遅い）。

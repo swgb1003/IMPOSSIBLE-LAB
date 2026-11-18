@@ -27,3 +27,4 @@ proxy/node_modules/
 /ArtSource/blender/*.blend
 /ArtSource/blender/*.blend1
 /ArtSource/polyhaven/
+proxy/stt/.venv/

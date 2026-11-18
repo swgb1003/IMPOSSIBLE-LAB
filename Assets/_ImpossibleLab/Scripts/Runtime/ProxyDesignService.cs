@@ -69,6 +69,32 @@ namespace ImpossibleLab
             return ProxyProtocol.ParseRevision(code, body, transport);
         }
 
+        /// <summary>音声（WAV）を文字にする（/v1/transcribe）。成功なら text、失敗なら error。</summary>
+        public async Task<(string text, string error)> TranscribeAsync(byte[] wav, CancellationToken ct)
+        {
+            if (!_cfg.Enabled) return (null, "AI接続が無効のため、音声入力は使えません");
+            using (var req = new UnityWebRequest(_cfg.Url + "/v1/transcribe", UnityWebRequest.kHttpVerbPOST))
+            {
+                req.uploadHandler = new UploadHandlerRaw(wav) { contentType = "audio/wav" };
+                req.downloadHandler = new DownloadHandlerBuffer();
+                req.SetRequestHeader("Content-Type", "audio/wav");
+                if (!string.IsNullOrEmpty(_cfg.Token)) req.SetRequestHeader("x-ilab-token", _cfg.Token);
+                req.timeout = 60;
+                var tcs = new TaskCompletionSource<bool>();
+                req.SendWebRequest().completed += _ => tcs.TrySetResult(true);
+                using (ct.Register(() => { req.Abort(); tcs.TrySetCanceled(); }))
+                    await tcs.Task;
+                if (req.result == UnityWebRequest.Result.ConnectionError) return (null, "音声入力は PC とつないでいるときだけ使えます（プロキシに接続できません）");
+                try
+                {
+                    var o = JObject.Parse(req.downloadHandler?.text ?? "");
+                    if (req.responseCode == 200 && o.Value<string>("status") == "ok") return (o.Value<string>("text") ?? "", null);
+                    return (null, o.Value<string>("message") ?? $"音声を文字にできませんでした（{req.responseCode}）");
+                }
+                catch (Newtonsoft.Json.JsonException) { return (null, $"音声を文字にできませんでした（{req.responseCode}）"); }
+            }
+        }
+
         /// <summary>接続できないときだけ1回再試行する（AIへの再試行2回はプロキシ側SDKが行う）。</summary>
         async Task<(long code, string body, string transportError)> PostAsync(string path, string json, CancellationToken ct, Action onSent = null)
         {

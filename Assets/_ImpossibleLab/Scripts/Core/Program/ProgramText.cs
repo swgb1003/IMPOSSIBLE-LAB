@@ -50,7 +50,13 @@ namespace ImpossibleLab.Core
         {
             switch (a.Action)
             {
-                case ProgramAction.MoveJoint: return $"{PartName(dna, a.Joint)}を {JointValue(dna, a.Joint, a.Target)}へ";
+                case ProgramAction.MoveJoint:
+                {
+                    // 速さを指定したときだけ添える（改良で「動かす速さ」を変えたことが手順の文で分かるように）
+                    var j = dna?.FindPart(a.Joint ?? "")?.Joint;
+                    string speed = a.Speed.HasValue && j != null ? $"（{a.Speed.Value:0.##}{(j.IsHinge ? "°" : " m")}/秒）" : "";
+                    return $"{PartName(dna, a.Joint)}を {JointValue(dna, a.Joint, a.Target)}へ{speed}";
+                }
                 case ProgramAction.SetBehavior: return $"{LabCatalog.Behavior(a.Behavior)?.LabelJa ?? a.Behavior}を{(a.On ? "オン" : "オフ")}";
                 case ProgramAction.SetParameter:
                 {

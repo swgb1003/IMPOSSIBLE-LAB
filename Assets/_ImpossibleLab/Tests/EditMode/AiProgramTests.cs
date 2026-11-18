@@ -180,6 +180,28 @@ namespace ImpossibleLab.Tests
             StringAssert.Contains("近づいて離れる実験：実行・期待どおりに動いた | 1 案・1 案（100%）", md);
         }
 
+        // AT-14（実機確認用の手順と同じ）：保存データの動作プログラムが壊れていても、一覧に出さずに理由を返す（アプリは止まらない）
+        [Test] public void Gallery_SkipsInvalidProgram_WithReason()
+        {
+            string dir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ilab-test-" + System.Guid.NewGuid().ToString("N"));
+            try
+            {
+                var repo = new InventionRepository(dir);
+                var dna = Bin();
+                repo.Save(new SavedInvention { Current = dna, History = { dna.Clone() } });
+                string file = System.IO.Directory.GetFiles(System.IO.Path.Combine(dir, "inventions"), "*.json")[0];
+                string bad = System.IO.File.ReadAllText(file).Replace("\"move_joint\"", "\"run_code\"");
+                System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "inventions", "inv-bad-program.json"), bad.Replace(dna.Id, "inv-bad-program"));
+                var skipped = new System.Collections.Generic.List<string>();
+                var list = repo.List(skipped);
+                Assert.AreEqual(1, list.Count, "壊れた記録は一覧に出さない");
+                Assert.AreEqual(1, skipped.Count);
+                StringAssert.Contains("inv-bad-program", skipped[0]);
+                StringAssert.Contains("run_code", skipped[0], "理由に未知の命令が出る");
+            }
+            finally { if (System.IO.Directory.Exists(dir)) System.IO.Directory.Delete(dir, true); }
+        }
+
         [Test] public void ProxyCatalog_HasProgramSection()
         {
             var o = Newtonsoft.Json.Linq.JObject.Parse(LabCatalog.ToProxyJson());

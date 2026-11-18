@@ -64,6 +64,32 @@ export function readJsonBody(req: IncomingMessage, maxBytes: number): Promise<un
   });
 }
 
+/** 音声（WAV）の本体を読む。content-type と大きさを確かめる。 */
+export function readWavBody(req: IncomingMessage, maxBytes: number): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const type = String(req.headers["content-type"] ?? "");
+    if (!type.startsWith("audio/wav")) return reject(new HttpError(415, "unsupported_media_type", "WAV で送ってください"));
+    let size = 0;
+    const chunks: Buffer[] = [];
+    req.on("data", (c: Buffer) => {
+      size += c.length;
+      if (size > maxBytes) { reject(new HttpError(413, "too_large", "音声が長すぎます")); req.destroy(); return; }
+      chunks.push(c);
+    });
+    req.on("end", () => {
+      const b = Buffer.concat(chunks);
+      if (!isWav(b)) return reject(new HttpError(400, "bad_audio", "WAV の形式が不正です"));
+      resolve(b);
+    });
+    req.on("error", reject);
+  });
+}
+
+/** RIFF/WAVE の見出しがあるか（中身の確認は文字起こしのサーバーが行う）。 */
+export function isWav(b: Buffer): boolean {
+  return b.length > 44 && b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WAVE";
+}
+
 /** 固定時間窓の簡易レート制限（プロキシ全体）。 */
 export class RateLimiter {
   private stamps: number[] = [];

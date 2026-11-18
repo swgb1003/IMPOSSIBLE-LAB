@@ -129,15 +129,18 @@ namespace ImpossibleLab.Core
             return inv;
         }
 
-        public List<GalleryEntry> List()
+        public List<GalleryEntry> List() => List(null);
+
+        /// <summary>一覧。読み込めない記録（壊れた・検証を通らない DNA や動作プログラム）は出さず、skipped に「id：理由」を入れる。</summary>
+        public List<GalleryEntry> List(List<string> skipped)
         {
             var list = new List<GalleryEntry>();
             foreach (var file in Directory.GetFiles(_dir, "*.json"))
             {
                 var id = Path.GetFileNameWithoutExtension(file);
                 if (!DnaJson.IsSafeId(id)) continue;
-                var inv = Load(id, out _);
-                if (inv == null) continue;
+                var inv = Load(id, out var err);
+                if (inv == null) { skipped?.Add($"{id}：{err}"); continue; }
                 list.Add(new GalleryEntry
                 {
                     Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags), Tags = new List<string>(inv.Current.Tags), HasProgram = inv.Current.Program != null,

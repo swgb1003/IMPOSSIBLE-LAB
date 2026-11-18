@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { loadCatalog, legacyCategories } from "../src/catalog.ts";
 import { buildSchemas, sanitizeId, toDna, toPlans, toProposal } from "../src/schemas.ts";
-import { checkRequestText, pickExperiment, RateLimiter, HttpError } from "../src/http-util.ts";
+import { checkRequestText, pickExperiment, RateLimiter, HttpError, isWav } from "../src/http-util.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "../src/prompts.ts";
 import { estimateCostUsd } from "../src/cost.ts";
 
@@ -248,6 +248,14 @@ test("only known experiment fields are forwarded", () => {
     { temperatureGain: 5.43, environment: "ScenarioLab", scenario: "sit_still", passed: false });
   assert.deepEqual(pickExperiment({ environment: "FlightDeck", stabilityScore: 46.4, scenario: "moonwalk" }, keys, ids), { stabilityScore: 46.4, environment: "FlightDeck" });
   assert.equal(pickExperiment({ environment: "Moon" }, keys, ids), null);
+});
+
+test("only RIFF/WAVE audio is forwarded to speech-to-text", () => {
+  const head = Buffer.alloc(64); head.write("RIFF", 0, "ascii"); head.write("WAVE", 8, "ascii");
+  assert.ok(isWav(head));
+  assert.ok(!isWav(Buffer.from("RIFF....WAVE")), "見出しだけで中身のないものは送らない");
+  const mp3 = Buffer.alloc(64); mp3.write("ID3", 0, "ascii");
+  assert.ok(!isWav(mp3));
 });
 
 test("rate limiter", () => {

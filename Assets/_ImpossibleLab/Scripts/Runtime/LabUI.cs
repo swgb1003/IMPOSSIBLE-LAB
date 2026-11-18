@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage).Append('|').Append(App.Voice).Append(App.VoiceTarget);
             return sb.ToString();
         }
 
@@ -292,6 +292,25 @@ namespace ImpossibleLab
             UiKit.Divider(side);
         }
 
+        /// <summary>音声入力のボタン：「話す」→ 録音中は「止める」、文字にしている間は押せない。</summary>
+        void VoiceButton(Transform row, string target, float w, float h)
+        {
+            bool mine = App.VoiceTarget == target;
+            string label = App.Voice == LabApp.VoiceState.Recording && mine ? "■ 止める"
+                : App.Voice == LabApp.VoiceState.Transcribing && mine ? "変換中…" : "● 話す";
+            var b = UiKit.Button(row, label, () => App.ToggleVoice(target),
+                App.Voice == LabApp.VoiceState.Recording && mine ? ButtonStyle.Primary : ButtonStyle.Secondary, w, h);
+            UiKit.SetInteractable(b, App.Voice == LabApp.VoiceState.Idle || (mine && App.Voice == LabApp.VoiceState.Recording));
+        }
+
+        string VoiceHint(string target)
+        {
+            if (App.VoiceTarget != target) return null;
+            if (App.Voice == LabApp.VoiceState.Recording) return $"● 録音中：話し終えたら「止める」を押してください（最大 {VoiceInput.MaxSeconds} 秒）";
+            if (App.Voice == LabApp.VoiceState.Transcribing) return "声を文字にしています…（PC の Whisper、数秒）";
+            return null;
+        }
+
         // ---------------- S01 発明指示 ----------------
         void BuildS01()
         {
@@ -300,10 +319,12 @@ namespace ImpossibleLab
             var row = UiKit.Row("InputRow", _body, LabTheme.Space2, 76);
             _requestInput = UiKit.Input(row, "作りたい道具のアイデアを入力する…（200文字以内）", RequestRules.MaxRequestLength, App.SetRequestText);
             _requestInput.SetTextWithoutNotify(App.RequestText);
+            _requestInput.onSelect.AddListener(_ => App.CancelVoice()); // 録音中はシステムキーボードが開かないため、入力欄を選んだら録音をやめる
             UiKit.Size(_requestInput, flexW: 1, h: 76);
+            VoiceButton(row, "request", 150, 76);
             UiKit.Button(row, "送信 ▶", App.SubmitRequest, ButtonStyle.Primary, 200, 76);
             if (App.InputWarning != null) Para(_body, "⚠ " + App.InputWarning, LabTheme.FontBody, LabTheme.AccentWarning, 36);
-            else Para(_body, "文字入力しにくい場合は下の例を選ぶだけで進められます。声で入れたいときは、Questキーボードのマイクボタンを試してください（実機で確認中）。", LabTheme.FontSmall, h: 32);
+            else Para(_body, VoiceHint("request") ?? "声で入れるときは「話す」→ 話し終えたら「止める」（PC とつないでいるときだけ）。下の例を選ぶだけでも進められます。", LabTheme.FontSmall, h: 32);
 
             // 見出しの行の右にギャラリーへのボタン（9 件のカードを入れるため、操作の行を見出しにまとめる）
             var quickHead = UiKit.Heading(_body, "クイック発明（例から選ぶ → 入力欄に反映）", LabTheme.FontHeading);
@@ -654,8 +675,11 @@ namespace ImpossibleLab
             var inRow = UiKit.Row("RevInput", right, LabTheme.Space1, 64);
             _revisionInput = UiKit.Input(inRow, "例：" + OfflineRevisionRules.SuggestedRequestsFor(dna).First(), RequestRules.MaxRequestLength, s => App.RevisionText = s);
             _revisionInput.SetTextWithoutNotify(App.RevisionText);
+            _revisionInput.onSelect.AddListener(_ => App.CancelVoice());
             UiKit.Size(_revisionInput, flexW: 1, h: 64);
+            VoiceButton(inRow, "revision", 110, 64);
             UiKit.Button(inRow, "依頼", App.RequestRevision, ButtonStyle.Primary, 120, 64);
+            if (VoiceHint("revision") != null) Para(right, VoiceHint("revision"), LabTheme.FontSmall, LabTheme.AccentLight, 30);
             var chips = UiKit.Rect("Chips", right);
             var grid = chips.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
             grid.cellSize = new Vector2(298, 52); grid.spacing = new Vector2(8, 8);

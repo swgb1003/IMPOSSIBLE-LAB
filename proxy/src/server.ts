@@ -1,6 +1,8 @@
 // IMPOSSIBLE LAB AI設計プロキシ。APIキーはこのサーバーの環境変数だけに置き、アプリ（Quest）には渡さない。
 // 起動: npm start（proxy/.env の ANTHROPIC_API_KEY を読む）
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { spawn, type ChildProcess } from "node:child_process";
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
@@ -9,7 +11,7 @@ import { loadCatalog } from "./catalog.ts";
 import { buildSchemas, toDna, toPlans, toProposal } from "./schemas.ts";
 import type { DesignOutput, PlanOutput, ReviseOutput } from "./schemas.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "./prompts.ts";
-import { checkRequestText, pickExperiment, RateLimiter, readJsonBody, HttpError } from "./http-util.ts";
+import { checkRequestText, pickExperiment, RateLimiter, readJsonBody, readWavBody, HttpError } from "./http-util.ts";
 import { estimateCostUsd, type Usage } from "./cost.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +29,34 @@ const PLAN_SYSTEM = planSystemPrompt(catalog);
 const REVISE_SYSTEM = reviseSystemPrompt(catalog);
 const METRIC_KEYS = catalog.experiments.metrics.map((m) => m.key);
 const SCENARIO_IDS = catalog.experiments.scenarios.map((s) => s.id);
+// 音声入力の文字起こし（stt/stt_server.py、PC 上の Whisper）。音声は外部へ送らない
+const STT_PORT = Number(process.env.ILAB_STT_PORT ?? 8788);
+const STT_URL = `http://127.0.0.1:${STT_PORT}/transcribe`;
+let stt: ChildProcess | null = null;
+function startStt() {
+  if (process.env.ILAB_STT === "off") return;
+  const py = path.join(here, "..", "stt", ".venv", process.platform === "win32" ? "Scripts/python.exe" : "bin/python");
+  if (!existsSync(py)) { console.log("  音声入力：stt/.venv がないため使えません（proxy/README.md の「音声入力」を参照）"); return; }
+  stt = spawn(py, [path.join(here, "..", "stt", "stt_server.py")], { stdio: ["ignore", "inherit", "inherit"], env: { ...process.env, ILAB_STT_PORT: String(STT_PORT), PYTHONIOENCODING: "utf-8" } });
+  stt.on("exit", (code) => { console.log(`[stt] stopped (${code})`); stt = null; });
+}
+for (const sig of ["SIGINT", "SIGTERM"] as const) process.on(sig, () => { stt?.kill(); process.exit(0); });
+process.on("exit", () => stt?.kill());
+
+async function handleTranscribe(req: IncomingMessage) {
+  const wav = await readWavBody(req, 2_000_000);
+  let res: Response;
+  try {
+    res = await fetch(STT_URL, { method: "POST", headers: { "content-type": "audio/wav" }, body: new Uint8Array(wav), signal: AbortSignal.timeout(60_000) });
+  } catch {
+    throw new HttpError(503, "stt_unavailable", "音声入力（文字起こし）が起動していません");
+  }
+  const o = (await res.json().catch(() => ({}))) as { text?: string; error?: string; ms?: number };
+  if (!res.ok) throw new HttpError(res.status === 413 ? 413 : 400, "bad_audio", o.error || "音声を文字にできませんでした");
+  const text = (o.text ?? "").trim();
+  return { status: "ok", text: [...text].slice(0, catalog.limits.maxRequestLength).join(""), ms: o.ms ?? 0 };
+}
+
 const limiter = new RateLimiter(Number(process.env.ILAB_RATE_PER_10MIN ?? 40), 10 * 60 * 1000);
 
 const hasKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
@@ -128,9 +158,11 @@ async function route(req: IncomingMessage, res: ServerResponse) {
     return send(res, 200, { ok: true, model: MODEL, effort: EFFORT, apiKey: hasKey, schemaVersion: catalog.schemaVersion ?? 1, behaviors: catalog.behaviors.length });
   }
   const handler = ROUTES[url.pathname];
-  if (req.method !== "POST" || !handler) throw new HttpError(404, "not_found", "not found");
+  const isStt = url.pathname === "/v1/transcribe";
+  if (req.method !== "POST" || (!handler && !isStt)) throw new HttpError(404, "not_found", "not found");
   if (TOKEN && req.headers["x-ilab-token"] !== TOKEN) throw new HttpError(401, "unauthorized", "認証に失敗しました");
   if (!limiter.take()) throw new HttpError(429, "rate_limited", "リクエストが多すぎます。少し待ってから試してください");
+  if (isStt) return send(res, 200, await handleTranscribe(req));
   const body = await readJsonBody(req, 32 * 1024);
   send(res, 200, await handler(body));
 }
@@ -165,4 +197,5 @@ function toHttpError(e: unknown): [number, string, string] {
 server.listen(PORT, HOST, () => {
   console.log(`IMPOSSIBLE LAB proxy listening on http://${HOST}:${PORT} model=${MODEL} effort=${EFFORT} apiKey=${hasKey ? "set" : "MISSING"}`);
   if (!hasKey) console.log("  proxy/.env に ANTHROPIC_API_KEY=... を書いてから再起動してください");
+  startStt();
 });

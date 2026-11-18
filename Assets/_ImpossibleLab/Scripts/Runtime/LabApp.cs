@@ -186,6 +186,60 @@ namespace ImpossibleLab
 
         void ResetStages() { foreach (var s in DesignStageText.All) Stages[s] = StageStatus.Waiting; }
 
+        // ================= 音声入力（S01 の発明の依頼・S03 の改良の依頼） =================
+        public enum VoiceState { Idle, Recording, Transcribing }
+        [NonSerialized] public VoiceState Voice = VoiceState.Idle;
+        /// <summary>どの入力欄へ入れるか（"request" / "revision"）。</summary>
+        [NonSerialized] public string VoiceTarget;
+        readonly VoiceInput _voice = new VoiceInput();
+
+        /// <summary>「話す」→ 録音開始、もう一度押すと止めて文字にする。</summary>
+        public void ToggleVoice(string target)
+        {
+            if (Voice == VoiceState.Transcribing) return;
+            if (Voice == VoiceState.Recording) { StopVoice(); return; }
+            if (!Proxy.Enabled) { ShowToast("AI接続が無効のため、音声入力は使えません"); return; }
+            if (!VoiceInput.HasPermission())
+            {
+                VoiceInput.RequestPermission();
+                ShowToast("マイクの使用を許可してから、もう一度「話す」を押してください");
+                return;
+            }
+            var err = _voice.Start();
+            if (err != null) { ShowToast(err); return; }
+            Voice = VoiceState.Recording; VoiceTarget = target;
+            Debug.Log("[ILAB] voice start target=" + target);
+            Notify();
+        }
+
+        /// <summary>録音をやめる（文字にしない）。入力欄を選んだときなど。</summary>
+        public void CancelVoice()
+        {
+            if (Voice != VoiceState.Recording) return;
+            _voice.Cancel();
+            Voice = VoiceState.Idle;
+            Debug.Log("[ILAB] voice cancel");
+            Notify();
+        }
+
+        async void StopVoice()
+        {
+            var wav = _voice.Stop();
+            // 音の大きさだけを記録する（内容は残さない）。無音に近いときの原因調べに使う
+            Debug.Log($"[ILAB] voice level peak={_voice.LastPeak:0.000} rms={_voice.LastRms:0.0000} gain={_voice.LastGain:0.0} rate={_voice.LastRate} sec={_voice.LastSeconds:0.0}");
+            if (wav == null) { Voice = VoiceState.Idle; ShowToast("声が短すぎるか、聞き取れませんでした"); return; }
+            Voice = VoiceState.Transcribing; Notify();
+            float t0 = Time.realtimeSinceStartup;
+            var (text, error) = await new ProxyDesignService(Proxy).TranscribeAsync(wav, CancellationToken.None);
+            Voice = VoiceState.Idle;
+            // 文字の内容はログに残さない（長さと時間だけ）
+            Debug.Log($"[ILAB] voice done bytes={wav.Length} chars={(text ?? "").Length} sec={Time.realtimeSinceStartup - t0:0.0} err={(error != null)}");
+            if (error != null) { ShowToast(error); return; }
+            if (string.IsNullOrWhiteSpace(text)) { ShowToast("声を聞き取れませんでした。もう一度話してください"); return; }
+            if (VoiceTarget == "revision") RevisionText = text; else SetRequestText(text);
+            Notify();
+        }
+
         // ================= S01 発明指示 =================
         public void SetRequestText(string text)
         {
@@ -1000,7 +1054,13 @@ namespace ImpossibleLab
 
         public void RefreshGallery()
         {
-            try { GalleryEntries = Repo.List(); }
+            var skipped = new List<string>();
+            try
+            {
+                GalleryEntries = Repo.List(skipped);
+                // 検証を通らない記録は出さずに理由を知らせる（AT-14：アプリは止めない）
+                if (skipped.Count > 0) ShowToast($"読み込めない記録が {skipped.Count} 件あります（一覧に出しません）：" + skipped[0]);
+            }
             catch (Exception e) { GalleryEntries = new List<GalleryEntry>(); ShowToast("保存データの一覧を取得できません: " + e.Message); }
             Notify();
         }
@@ -1298,6 +1358,7 @@ namespace ImpossibleLab
         void Update()
         {
             if (Toast != null && Time.time > _toastUntil) { Toast = null; Notify(); }
+            if (Voice == VoiceState.Recording && _voice.Elapsed >= VoiceInput.MaxSeconds) StopVoice();
             KeepConsoleAtEyeLevel();
             // 円環照明はイベント時（生成・組み立て・実験）だけ明るくする
             bool evt = Sm.State == LabState.GeneratingDesign || Sm.State == LabState.Building;
