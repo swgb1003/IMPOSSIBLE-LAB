@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImpossibleLab.Core;
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace ImpossibleLab
@@ -358,6 +359,7 @@ namespace ImpossibleLab
             Stages[DesignStage.Assembly] = StageStatus.Running;
             Notify();
             ClearView();
+            DisplayYaw = 0f;
             var result = _builder.Build(dna, DisplayPoint);
             if (result.View == null)
             {
@@ -393,6 +395,39 @@ namespace ImpossibleLab
             if (result.Warnings.Count > 0) ShowToast(string.Join(" / ", result.Warnings.Take(2)));
         }
 
+        // ================= 発明台の上で試作品を回して眺める =================
+        /// <summary>発明台での向き（度）。作り直しても保ち、新しい発明・ギャラリーから開いたときは 0（正面）に戻す。</summary>
+        [NonSerialized] public float DisplayYaw;
+        UnityEngine.InputSystem.InputAction _turnAction;
+        public const float StickTurnDegPerSec = 120f;
+
+        Quaternion DisplayRotation => DisplayPoint.rotation * Quaternion.Euler(0f, DisplayYaw, 0f);
+
+        /// <summary>発明台の上の試作品を回す。実験中・試用中・掴んでいる間は回さない。</summary>
+        public void TurnDisplay(float deg)
+        {
+            DisplayYaw = Mathf.Repeat(DisplayYaw + deg, 360f);
+            if (!CanTurnDisplay) return;
+            View.transform.rotation = DisplayRotation;
+        }
+
+        bool CanTurnDisplay => View != null && !View.Active && !InRainLab && Sm.State != LabState.RunningTest
+            && !(View.GetComponent<XRGrabInteractable>()?.isSelected ?? false);
+
+        /// <summary>右スティックの左右で回す（PC は Q / E）。</summary>
+        void UpdateStickTurn()
+        {
+            if (_turnAction == null)
+            {
+                _turnAction = new UnityEngine.InputSystem.InputAction("TurnDisplay", UnityEngine.InputSystem.InputActionType.Value);
+                _turnAction.AddBinding("<XRController>{RightHand}/{Primary2DAxis}");
+                _turnAction.AddCompositeBinding("2DVector").With("Left", "<Keyboard>/q").With("Right", "<Keyboard>/e");
+                _turnAction.Enable();
+            }
+            float x = _turnAction.ReadValue<Vector2>().x;
+            if (Mathf.Abs(x) > 0.35f && CanTurnDisplay) TurnDisplay(-x * StickTurnDegPerSec * Time.deltaTime);
+        }
+
         void SetupGrab(InventionView view)
         {
             var rb = view.gameObject.AddComponent<Rigidbody>();
@@ -414,6 +449,7 @@ namespace ImpossibleLab
             View = r.View;
             if (View == null) return;
             View.transform.position = pos;
+            if (!wasRunning) View.transform.rotation = DisplayRotation;
             SetupGrab(View);
             if (wasRunning) ToggleDevice();
         }
@@ -435,7 +471,7 @@ namespace ImpossibleLab
             var program = View.Get<ProgramRunner>();
             if (program != null) { program.Fired -= OnProgramFired; if (on) program.Fired += OnProgramFired; }
             View.SetActive(on);
-            if (!on) View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayPoint.rotation);
+            if (!on) View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayRotation);
             string what = follow != null ? "頭上に追従します" : followUser != null ? "床に降りて、あなたの後ろをついてきます" : View.Get<HoverBehavior>() != null ? "その場で浮き上がります"
                 : program != null ? "動きの手順を試せます（近づく・離れるなどで反応します）" : "動作します";
             ShowToast(on ? $"起動しました：{what}（試用）" : "停止して発明台に戻しました");
@@ -927,7 +963,7 @@ namespace ImpossibleLab
             {
                 LastResult = null;
                 var run = CourseSimulator.Run(dna, cfg, expId, LabClock.NowIso());
-                Course.Begin(run, View);
+                Course.Begin(run, View, dna.Mount);
                 Fx.StartPulse(RainLab.transform.position, Assets != null ? Assets.Canopy : null);
                 Debug.Log($"[ILAB] course run env={cfg.Environment} mode={cfg.Mode} frames={run.Frames.Count} dur={run.Duration:F1}s passed={run.Result.Passed}");
                 Notify();
@@ -1075,6 +1111,7 @@ namespace ImpossibleLab
             BaselineResult = OtherModeResult = null;
             PendingRevision = null; PendingProposal = null;
             ClearView();
+            DisplayYaw = 0f;
             var r = _builder.Build(inv.Current, DisplayPoint);
             View = r.View;
             if (View != null) SetupGrab(View);
@@ -1157,7 +1194,7 @@ namespace ImpossibleLab
             if (!toRainLab && View != null)
             {
                 View.SetActive(false);
-                View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayPoint.rotation);
+                View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayRotation);
             }
             InRainLab = toRainLab;
             RecenterConsole(toRainLab ? RainLab.ConsoleSpot : WorkshopConsoleSpot);
@@ -1359,6 +1396,7 @@ namespace ImpossibleLab
         {
             if (Toast != null && Time.time > _toastUntil) { Toast = null; Notify(); }
             if (Voice == VoiceState.Recording && _voice.Elapsed >= VoiceInput.MaxSeconds) StopVoice();
+            UpdateStickTurn();
             KeepConsoleAtEyeLevel();
             // 円環照明はイベント時（生成・組み立て・実験）だけ明るくする
             bool evt = Sm.State == LabState.GeneratingDesign || Sm.State == LabState.Building;

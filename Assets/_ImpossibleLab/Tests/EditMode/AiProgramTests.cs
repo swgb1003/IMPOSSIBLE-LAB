@@ -202,6 +202,16 @@ namespace ImpossibleLab.Tests
             finally { if (System.IO.Directory.Exists(dir)) System.IO.Directory.Delete(dir, true); }
         }
 
+        // AI が付けた英語の部品名に日本語の呼び名を添える（S03 の「骨組み 7/11」が何か分からなかった）
+        [Test] public void PartNames_GuessJapaneseNames()
+        {
+            Assert.AreEqual("handle（持ち手）", PartNames.WithJa("handle"));
+            Assert.AreEqual("車輪", PartNames.Guess("wheel-fl"));
+            Assert.AreEqual("駆動部", PartNames.Guess("drive-motor"), "motor を wheel や lid より先に見る");
+            Assert.AreEqual("センサー", PartNames.Guess("front-eye"));
+            Assert.AreEqual("xyz", PartNames.WithJa("xyz"), "推測できなければ id だけ");
+        }
+
         [Test] public void ProxyCatalog_HasProgramSection()
         {
             var o = Newtonsoft.Json.Linq.JObject.Parse(LabCatalog.ToProxyJson());

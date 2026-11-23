@@ -448,12 +448,12 @@ namespace ImpossibleLab
                 var notes = (App.LastOutcome?.Report?.Warnings ?? new List<string>()).Where(w => w.Contains("ルール") || w.Contains("フラグ")).Take(2);
                 foreach (var w in notes) Para(_rightBody, "⚠ " + w, LabTheme.FontSmall, LabTheme.AccentWarning, 56);
                 UiKit.Heading(_rightBody, "部品", 24);
-                CappedLines(_rightBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）{(part.Joint != null ? "　↻ 関節" : "")}", LabTheme.FontSmall, LabTheme.TextPrimary, 30f)).ToList(), 3);
+                CappedLines(_rightBody, dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{PartNames.WithJa(part.Id)}）{(part.Joint != null ? "　↻ 関節" : "")}", LabTheme.FontSmall, LabTheme.TextPrimary, 30f)).ToList(), 3);
             }
             else
             {
                 SideHeading(_rightBody, "PARTS", "採用機能と部品");
-                var lines = dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{part.Id}）", LabTheme.FontBody, LabTheme.TextPrimary, 38f))
+                var lines = dna.Parts.Select(part => ($"■ {LabCatalog.Part(part.Type)?.LabelJa}（{PartNames.WithJa(part.Id)}）", LabTheme.FontBody, LabTheme.TextPrimary, 38f))
                     .Concat(dna.Behaviors.Select(b => ($"◆ {LabCatalog.Behavior(b.Type)?.LabelJa} → {b.TargetPart}", LabTheme.FontSmall, LabTheme.AccentLight, 34f))).ToList();
                 CappedLines(_rightBody, lines, 9);
             }
@@ -716,7 +716,7 @@ namespace ImpossibleLab
             if (sel != null)
             {
                 StepRow("PartSelect", "部品", $"{LabCatalog.Part(sel.Type)?.LabelJa ?? sel.Type}　<size=80%>{App.SelectedPartIndex + 1} / {dna.Parts.Count}</size>", () => App.StepSelectedPart(-1), () => App.StepSelectedPart(+1), dna.Parts.Count > 1);
-                Para(_leftBody, $"{sel.Id} ／ {sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m（橙の枠）", LabTheme.FontSmall, LabTheme.TextSecondary, 30);
+                Para(_leftBody, $"{PartNames.WithJa(sel.Id)} ／ {sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m（橙の枠）", LabTheme.FontSmall, LabTheme.TextSecondary, 30);
                 StepRow("PartShape", "形", LabCatalog.Shape(sel.ShapeOrDefault)?.LabelJa ?? sel.ShapeOrDefault, () => App.StepPartShape(-1), () => App.StepPartShape(+1), true);
                 var mat = LabCatalog.Material(sel.MaterialOrDefault);
                 StepRow("PartMaterial", "素材", $"{mat?.LabelJa ?? sel.MaterialOrDefault}　<size=80%>{mat?.DensityKgM3:0} kg/m³</size>", () => App.StepPartMaterial(-1), () => App.StepPartMaterial(+1), true);
@@ -726,7 +726,8 @@ namespace ImpossibleLab
                 Para(_leftBody, $"この部品 {partKg:0.00} kg ／ 総質量（推定）{kg:0.00} kg {limitText}\n<size=85%><color=#{LabTheme.ToHex(LabTheme.TextSecondary)}>変更は改良の版（Rev.）として記録します</color></size>", LabTheme.FontSmall, LabTheme.TextPrimary, 64);
             }
             StepRow("Appearance", "外観", LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, () => App.StepAppearance(-1), () => App.StepAppearance(+1), true);
-            Para(_leftBody, "掴む：グリップ／起動：掴んでトリガー", LabTheme.FontSmall, LabTheme.TextSecondary, 30);
+            // 発明台の上で回して眺める（右スティックでも回せる。角度は表示しない：スティックで回すたびに画面を作り直さないため）
+            StepRow("Turn", "向き", "45°ずつ <size=80%>右スティックでも</size>", () => App.TurnDisplay(-45f), () => App.TurnDisplay(45f), true);
 
             SideHeading(_rightBody, "HISTORY", "改良履歴（元に戻す対象）");
             var hist = App.Current.History.AsEnumerable().Reverse().Take(5).ToList();

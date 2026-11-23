@@ -1,0 +1,277 @@
+{
+  "status": "ok",
+  "dna": {
+    "schemaVersion": 3,
+    "id": "ai-mwr7chvq-ft0",
+    "name": "ついてくるキャリーバッグ",
+    "purpose": "持ち主の後ろを一定の距離で自動でついて走り、荷物を運ぶキャリーバッグ。",
+    "tags": [
+      "carrier",
+      "mobility",
+      "daily"
+    ],
+    "mount": "ground",
+    "appearance": "graphite",
+    "mode": "dream",
+    "parts": [
+      {
+        "id": "case",
+        "type": "container",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.4,
+          0.55,
+          0.25
+        ]
+      },
+      {
+        "id": "wheel-fl",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          0.17,
+          -0.31,
+          0.09
+        ],
+        "scale": [
+          0.08,
+          0.04,
+          0.08
+        ]
+      },
+      {
+        "id": "wheel-fr",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          -0.17,
+          -0.31,
+          0.09
+        ],
+        "scale": [
+          0.08,
+          0.04,
+          0.08
+        ]
+      },
+      {
+        "id": "wheel-rl",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          0.17,
+          -0.31,
+          -0.09
+        ],
+        "scale": [
+          0.08,
+          0.04,
+          0.08
+        ]
+      },
+      {
+        "id": "wheel-rr",
+        "type": "wheel",
+        "shape": "cylinder",
+        "material": "rubber",
+        "position": [
+          -0.17,
+          -0.31,
+          -0.09
+        ],
+        "scale": [
+          0.08,
+          0.04,
+          0.08
+        ]
+      },
+      {
+        "id": "drive-motor",
+        "type": "motor",
+        "shape": "cylinder",
+        "material": "aluminum",
+        "position": [
+          0.0,
+          -0.25,
+          -0.09
+        ],
+        "scale": [
+          0.06,
+          0.3,
+          0.06
+        ]
+      },
+      {
+        "id": "handle",
+        "type": "frame",
+        "shape": "box",
+        "material": "aluminum",
+        "position": [
+          0.0,
+          0.4,
+          -0.1
+        ],
+        "scale": [
+          0.3,
+          0.25,
+          0.02
+        ]
+      },
+      {
+        "id": "front-eye",
+        "type": "sensor",
+        "shape": "box",
+        "material": "glass",
+        "position": [
+          0.0,
+          0.1,
+          0.13
+        ],
+        "scale": [
+          0.12,
+          0.04,
+          0.02
+        ]
+      },
+      {
+        "id": "back-eye",
+        "type": "sensor",
+        "shape": "box",
+        "material": "glass",
+        "position": [
+          0.0,
+          0.1,
+          -0.13
+        ],
+        "scale": [
+          0.12,
+          0.04,
+          0.02
+        ]
+      },
+      {
+        "id": "pack",
+        "type": "battery",
+        "shape": "box",
+        "material": "plastic",
+        "position": [
+          0.0,
+          -0.2,
+          0.0
+        ],
+        "scale": [
+          0.25,
+          0.06,
+          0.15
+        ]
+      },
+      {
+        "id": "bumper",
+        "type": "cushion",
+        "shape": "box",
+        "material": "rubber",
+        "position": [
+          0.0,
+          -0.15,
+          0.135
+        ],
+        "scale": [
+          0.4,
+          0.06,
+          0.02
+        ]
+      }
+    ],
+    "behaviors": [
+      {
+        "type": "follow_user",
+        "parameters": {
+          "followDistance": 1.0,
+          "speed": 1.4
+        }
+      },
+      {
+        "type": "avoid_obstacle",
+        "parameters": {
+          "detectionRange": 1.2
+        }
+      },
+      {
+        "type": "carry_load",
+        "parameters": {
+          "capacity": 15.0
+        }
+      },
+      {
+        "type": "drive",
+        "targetPart": "drive-motor",
+        "parameters": {
+          "maxSlopeDeg": 8.0,
+          "speedLimit": 1.4
+        }
+      }
+    ],
+    "functionMap": [
+      {
+        "need": "後ろから自動でついてくる",
+        "blocks": [
+          "follow_user"
+        ],
+        "status": "simulated"
+      },
+      {
+        "need": "人や物にぶつからない",
+        "blocks": [
+          "avoid_obstacle"
+        ],
+        "status": "simulated"
+      },
+      {
+        "need": "旅行の荷物を運ぶ",
+        "blocks": [
+          "carry_load"
+        ],
+        "status": "simulated"
+      },
+      {
+        "need": "坂やスロープも進む",
+        "blocks": [
+          "drive"
+        ],
+        "status": "simplified",
+        "note": "一定の角度の坂を一定速度で上る簡単なモデルで、段差や路面のでこぼこは扱わない。"
+      },
+      {
+        "need": "階段や段差を越える",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "脚や段差を越える機構はカタログになく、試験できない。"
+      },
+      {
+        "need": "雑踏で持ち主を見失わない",
+        "blocks": [],
+        "status": "unverifiable",
+        "note": "人混みで持ち主を見分ける認識の精度はモデル化されていない。"
+      }
+    ],
+    "constraints": {
+      "maxParts": 24,
+      "maxSpeed": 3.0
+    },
+    "revision": 3,
+    "parentRevision": 2
+  },
+  "plans": [],
+  "designPoints": [
+    "キャリーバッグ（2026-11-22 Quest で設計）"
+  ]
+}

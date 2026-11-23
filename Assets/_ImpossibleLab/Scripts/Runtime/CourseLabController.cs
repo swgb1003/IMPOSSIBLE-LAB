@@ -45,6 +45,8 @@ namespace ImpossibleLab
         {
             Cleanup();
             _run = run; _view = view; _elapsed = 0f; _frame = 0; _collisionsShown = 0;
+            // 地面を走る・置く発明は、発明の中心より下にある部品（車輪など）が床に埋まらないよう、いちばん下を床に合わせる
+            _floorLift = mount == "ground" || mount == "fixed" || (mount == null && run.Result.Environment == LabEnvironments.ObstacleCourse) ? FloorLift(view) : 0f;
             SetMannequin(false);
             _props = new GameObject("CourseProps").transform;
             _props.SetParent(transform, false);
@@ -83,6 +85,18 @@ namespace ImpossibleLab
         /// <summary>
         /// 組み立て式の実験の見た目（プリミティブのみ。明るさ・日差しの見た目は7週目）。計測は開始時に計算済みで、ここでは記録を再生するだけ。
         /// </summary>
+        float _floorLift;
+
+        /// <summary>発明の原点から、いちばん下の見た目までの高さ（下にはみ出していなければ 0）。</summary>
+        static float FloorLift(InventionView view)
+        {
+            if (view == null) return 0f;
+            float min = float.MaxValue;
+            foreach (var r in view.GetComponentsInChildren<Renderer>())
+                if (r.enabled && r.gameObject.activeInHierarchy) min = Mathf.Min(min, r.bounds.min.y);
+            return min == float.MaxValue ? 0f : Mathf.Max(0f, view.transform.position.y - min);
+        }
+
         void BeginScenarioLab(CourseRun run, string mount)
         {
             var plan = run.Result.Plan;
@@ -194,7 +208,7 @@ namespace ImpossibleLab
                     bool onShelf = f.Device.y >= shelf - 1e-3f;
                     _payload.localPosition = new Vector3(onShelf ? 0.9f : 0.35f, f.Device.y + size * 0.5f, onShelf ? 0.6f : 0.35f);
                 }
-                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device + _mountOffset), transform.rotation);
+                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device + _mountOffset + Vector3.up * _floorLift), transform.rotation);
                 if (_leader != null && _run.Result.Scenario == ExperimentCatalog.ApproachDevice)
                 {
                     _leader.localPosition = f.Leader;
@@ -208,7 +222,7 @@ namespace ImpossibleLab
             }
             if (_run.Result.Environment == LabEnvironments.ObstacleCourse)
             {
-                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device), transform.rotation * Quaternion.Euler(0f, f.YawDeg, 0f));
+                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device + Vector3.up * _floorLift), transform.rotation * Quaternion.Euler(0f, f.YawDeg, 0f));
                 if (_leader != null)
                 {
                     var dir = f.Leader - (_leader.localPosition);

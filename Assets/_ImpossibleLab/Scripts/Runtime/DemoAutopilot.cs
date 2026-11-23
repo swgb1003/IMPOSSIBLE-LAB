@@ -235,10 +235,18 @@ namespace ImpossibleLab
             yield return Shot("S03_device_rain", device: true);
             yield return Shot("S03_device_rain_core", device: true, devicePart: "core");
 
+            // 発明台の上で回す（右スティック・「向き ◀ ▶」）。試用を止めても回した向きに戻る
+            _app.TurnDisplay(90f);
+            float want = _app.DisplayPoint.eulerAngles.y + 90f;
+            Check(Mathf.Abs(Mathf.DeltaAngle(_app.View.transform.eulerAngles.y, want)) < 0.5f, "display turns 90 degrees");
+            yield return Shot("S03_device_turned", device: true);
+
             // 試用：起動して追従（Editorではカメラが頭）
             _app.ToggleDevice();
             Check(_app.DeviceRunning, "device activates");
             _app.ToggleDevice();
+            Check(Mathf.Abs(Mathf.DeltaAngle(_app.View.transform.eulerAngles.y, want)) < 0.5f, "display keeps its turn after the trial");
+            _app.TurnDisplay(-90f);
 
             // 実験 Rev.1（DREAM, 風3m/s）
             _app.TestConfig = new RainExperimentConfig { Mode = LabModes.Dream, RainIntensity = 30, WindSpeed = 4, WindDirectionDeg = 90, Seed = 2026, DurationSec = 10 };
@@ -497,6 +505,9 @@ namespace ImpossibleLab
             // 動作プログラム（仕様 28、G-A2）：見本「自動で開くゴミ箱」を研究室で試用する
             yield return MotionBinFlow();
 
+            // 2026-11-22 Quest で AI が設計したキャリーバッグ：薄い骨組み（持ち手）は枠で描き、実験場で車輪が床に埋まらない
+            yield return CarryBagFlow();
+
             // 移動の実験のあとに雨具へ戻ると、風が雨の初期値（90°・3 m/s）に戻る（Quest 実機で 4 m/s が引き継がれた不具合）
             _app.LoadFromGallery(rainId);
             yield return WaitState(LabState.Editing);
@@ -611,6 +622,51 @@ namespace ImpossibleLab
         /// 動作プログラムの試用：依頼文 → オフラインの見本（自動で開くゴミ箱）→ 起動 → 対象が近づくとフタが開き、離れると3秒後に閉じる。
         /// 対象はカメラの代わりの空の物体（ProgramRunner.TargetOverride）で動かす。
         /// </summary>
+        IEnumerator CarryBagFlow()
+        {
+            string path = Path.Combine(Application.dataPath, "_ImpossibleLab/Tests/EditMode/Fixtures/ai_carry_bag.json");
+            if (!File.Exists(path)) { Check(false, "carry bag: fixture exists"); yield break; }
+            var prevDesign = _app.Design;
+            _app.SetDesignServiceForVerify(new FixtureDesignService(File.ReadAllText(path)));
+            if (_app.Sm.State == LabState.Saved) _app.ContinueEditing();
+            _app.NewInvention();
+            _app.SetRequestText("自動で後ろからついてくるキャリーバッグ");
+            float w0 = 0;
+            while (_app.Sm.State == LabState.Drafting && w0 < 10f) { _app.SubmitRequest(); w0 += Time.unscaledDeltaTime; yield return null; }
+            yield return WaitState(LabState.AwaitingApproval);
+            _app.ApprovePreview();
+            yield return WaitState(LabState.Editing);
+            Transform handle = null;
+            bool found = _app.View != null && _app.View.Parts.TryGetValue("handle", out handle);
+            Check(found && handle.childCount == 4 && handle.GetComponent<Renderer>() == null, "carry bag: thin frame (handle) drawn as 4 bars");
+            yield return Shot("S03_device_carry_bag", device: true);
+            _app.TurnDisplay(150f); // 斜め後ろから持ち手を見る
+            yield return null;
+            yield return Shot("S03_device_carry_bag_back", device: true);
+            _app.TurnDisplay(-150f);
+            _app.GoToTestSetup();
+            yield return WaitState(LabState.ConfiguringTest);
+            float tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
+            _app.StartExperiment();
+            yield return WaitState(LabState.RunningTest);
+            yield return new WaitForSeconds(1.5f);
+            float minY = float.MaxValue;
+            if (_app.View != null)
+                foreach (var r in _app.View.GetComponentsInChildren<Renderer>()) if (r.enabled) minY = Mathf.Min(minY, r.bounds.min.y);
+            float floorY = _app.Course != null ? _app.Course.transform.position.y : 0f;
+            Check(minY >= floorY - 0.02f, $"carry bag: nothing sinks below the course floor (lowest {minY - floorY:0.000} m)");
+            yield return Shot("S04_carry_bag_running", rainLab: true);
+            if (_app.View != null)
+            {
+                var at = _app.View.transform.position;
+                yield return Shot("S04_carry_bag_floor", eyeAt: at + new Vector3(0.9f, 0.5f, -0.9f), lookAt: at + Vector3.up * 0.15f);
+            }
+            yield return WaitState(LabState.ReviewingResult, 90f);
+            _app.SetDesignServiceForVerify(prevDesign);
+            _app.Save();
+            yield return WaitState(LabState.Saved, 20f);
+        }
+
         IEnumerator MotionBinFlow()
         {
             _app.NewInvention();

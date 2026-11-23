@@ -98,8 +98,61 @@ namespace ImpossibleLab
             return result;
         }
 
+        /// <summary>骨組みの箱で、1辺がほかより極端に薄いもの（持ち手・枠など）。中の詰まった板ではなく、細い棒4本の枠で描く。</summary>
+        public static bool IsThinFrame(PartSpec part)
+        {
+            if (part.Type != "frame" || part.ShapeOrDefault != "box") return false;
+            var d = new[] { Mathf.Abs(part.Scale.x), Mathf.Abs(part.Scale.y), Mathf.Abs(part.Scale.z) };
+            System.Array.Sort(d);
+            return d[0] <= 0.25f * d[1] && d[1] >= 0.08f;
+        }
+
+        /// <summary>
+        /// 薄い骨組みを枠（棒4本）で作る。見た目だけで、質量などの計算は DNA の箱のまま。
+        /// 部品の大きさは親に掛け（ほかの部品と同じ）、棒は 1 を基準にした大きさで置く。棒の太さは薄い辺の長さ（1.5〜4cm）。
+        /// </summary>
+        GameObject CreateThinFrame(PartSpec part, InventionDna dna)
+        {
+            var go = new GameObject($"Part_{part.Id}_{part.Type}");
+            Vector3 size = new Vector3(Mathf.Abs(part.Scale.x), Mathf.Abs(part.Scale.y), Mathf.Abs(part.Scale.z));
+            go.transform.localScale = part.Scale;
+            int thin = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
+            int a = (thin + 1) % 3, b = (thin + 2) % 3; // 枠の面の2辺
+            float t = Mathf.Clamp(size[thin], 0.015f, 0.04f);
+            t = Mathf.Min(t, 0.3f * Mathf.Min(size[a], size[b]));
+            Material mat = _assets.For(PartLook.Surface(part));
+            int? rgb = PartLook.Tint(part, dna.Appearance);
+            void Bar(string name, int along, float offset)
+            {
+                // along の向きに伸びる棒。もう一方の辺の端に寄せる
+                int across = along == a ? b : a;
+                var scale = Vector3.one;
+                scale[across] = t / Mathf.Max(1e-4f, size[across]);
+                var pos = Vector3.zero;
+                pos[across] = offset * (0.5f - scale[across] * 0.5f);
+                var bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bar.name = name;
+                Object.Destroy(bar.GetComponent<Collider>());
+                bar.transform.SetParent(go.transform, false);
+                bar.transform.localPosition = pos;
+                bar.transform.localScale = scale;
+                var rend = bar.GetComponent<Renderer>();
+                rend.sharedMaterial = mat;
+                if (rgb.HasValue)
+                {
+                    var mpb = new MaterialPropertyBlock();
+                    mpb.SetColor("_BaseColor", RgbColor(rgb.Value));
+                    rend.SetPropertyBlock(mpb);
+                }
+            }
+            Bar("BarA1", a, +1f); Bar("BarA2", a, -1f);
+            Bar("BarB1", b, +1f); Bar("BarB2", b, -1f);
+            return go;
+        }
+
         GameObject CreatePrimitive(PartSpec part, InventionDna dna)
         {
+            if (IsThinFrame(part)) return CreateThinFrame(part, dna);
             var kit = PartKitLibrary.Find(_assets, part.Type, part.ShapeOrDefault);
             if (kit != null) return CreateFromKit(part, dna, kit);
             // 見た目は DNA の素材（機能部品は機能の色）、形は DNA の shape（未指定なら部品タイプの既定）で決める（PartLook）
