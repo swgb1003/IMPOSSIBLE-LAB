@@ -92,3 +92,8 @@ python -m venv stt/.venv
 stt/.venv/Scripts/python.exe -m pip install -r stt/requirements.txt   # Windows（mac/Linux は stt/.venv/bin/python）
 ```
 `npm start` で、`stt/.venv` があればプロキシが `stt/stt_server.py`（127.0.0.1:8788）を子プロセスで起動する。初回はモデル（small、約 0.5GB）をダウンロードする。`ILAB_STT=off` で無効、`ILAB_STT_MODEL=large-v3-turbo` でより正確なモデル（CPU では約 4 倍遅い）。
+
+## まとめて起動（2026-11-23）
+
+リポジトリ直下の `start_lab.cmd` をダブルクリック（または `cd proxy && npm start`）。プロキシ・音声入力の Whisper（`stt/.venv` がある場合）を起動し、USB でつないだ Quest への `adb reverse tcp:8787 tcp:8787` を15秒ごとに張り直す（抜き差ししても自動でつながる）。adb の場所は環境変数 `ADB` で変えられ、`ILAB_ADB_REVERSE=off` で中継をしない。Quest の S01 に「PC とつながっています／つながっていません」が出る。
+

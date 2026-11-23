@@ -69,6 +69,20 @@ namespace ImpossibleLab
             return ProxyProtocol.ParseRevision(code, body, transport);
         }
 
+        /// <summary>プロキシが動いているか（GET /health、3 秒で打ち切り）。</summary>
+        public async Task<bool> PingAsync()
+        {
+            if (!_cfg.Enabled) return false;
+            using (var req = UnityWebRequest.Get(_cfg.Url + "/health"))
+            {
+                req.timeout = 3;
+                var tcs = new TaskCompletionSource<bool>();
+                req.SendWebRequest().completed += _ => tcs.TrySetResult(true);
+                await tcs.Task;
+                return req.result == UnityWebRequest.Result.Success && req.responseCode == 200;
+            }
+        }
+
         /// <summary>音声（WAV）を文字にする（/v1/transcribe）。成功なら text、失敗なら error。</summary>
         public async Task<(string text, string error)> TranscribeAsync(byte[] wav, CancellationToken ct)
         {

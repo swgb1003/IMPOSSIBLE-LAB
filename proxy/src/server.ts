@@ -1,7 +1,7 @@
 // IMPOSSIBLE LAB AI設計プロキシ。APIキーはこのサーバーの環境変数だけに置き、アプリ（Quest）には渡さない。
 // 起動: npm start（proxy/.env の ANTHROPIC_API_KEY を読む）
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn, execFile, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -40,6 +40,22 @@ function startStt() {
   stt = spawn(py, [path.join(here, "..", "stt", "stt_server.py")], { stdio: ["ignore", "inherit", "inherit"], env: { ...process.env, ILAB_STT_PORT: String(STT_PORT), PYTHONIOENCODING: "utf-8" } });
   stt.on("exit", (code) => { console.log(`[stt] stopped (${code})`); stt = null; });
 }
+// USB でつないだ Quest から 127.0.0.1:PORT でプロキシに届くよう、adb reverse を15秒ごとに張り直す（抜き差し・再起動で消えるため）
+const ADB_CANDIDATES = [process.env.ADB, "C:/Program Files/Unity/Hub/Editor/6000.0.61f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb.exe", "adb"].filter(Boolean) as string[];
+let questLinked: boolean | null = null;
+function keepAdbReverse() {
+  if (process.env.ILAB_ADB_REVERSE === "off") return;
+  const adb = ADB_CANDIDATES.find((p) => p === "adb" || existsSync(p));
+  if (!adb) { console.log("  Quest の中継：adb が見つかりません（環境変数 ADB で指定できます）"); return; }
+  const tick = () => execFile(adb, ["reverse", `tcp:${PORT}`, `tcp:${PORT}`], { timeout: 8000 }, (err) => {
+    const ok = !err;
+    if (ok !== questLinked) console.log(ok ? "[adb] Quest とつながりました（USB 中継 OK）" : "[adb] Quest が見つかりません（USB でつなぐと自動で中継します）");
+    questLinked = ok;
+  });
+  tick();
+  setInterval(tick, 15_000).unref();
+}
+
 for (const sig of ["SIGINT", "SIGTERM"] as const) process.on(sig, () => { stt?.kill(); process.exit(0); });
 process.on("exit", () => stt?.kill());
 
@@ -198,4 +214,5 @@ server.listen(PORT, HOST, () => {
   console.log(`IMPOSSIBLE LAB proxy listening on http://${HOST}:${PORT} model=${MODEL} effort=${EFFORT} apiKey=${hasKey ? "set" : "MISSING"}`);
   if (!hasKey) console.log("  proxy/.env に ANTHROPIC_API_KEY=... を書いてから再起動してください");
   startStt();
+  keepAdbReverse();
 });

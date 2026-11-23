@@ -24,6 +24,19 @@ namespace ImpossibleLab
         public event System.Action<ProgramEvent> Fired;
         /// <summary>検証用：カメラの代わりに使う「対象」の位置（null ならメインカメラ）。</summary>
         public Transform TargetOverride;
+        /// <summary>座ったまま試用するための人型モデル。あればカメラ（あなた）と近い方を対象にする。</summary>
+        public Transform ExtraTarget;
+
+        /// <summary>試作品から対象（あなた・人型モデルの近い方）までの水平距離。対象がなければ null。</summary>
+        public float? TargetDistance()
+        {
+            var from = _view != null ? _view.transform.position : transform.position;
+            float best = float.MaxValue;
+            var cam = TargetOverride != null ? TargetOverride : (Camera.main != null ? Camera.main.transform : null);
+            foreach (var t in new[] { cam, ExtraTarget })
+                if (t != null) best = Mathf.Min(best, new Vector2(t.position.x - from.x, t.position.z - from.z).magnitude);
+            return best == float.MaxValue ? (float?)null : best;
+        }
 
         public void Configure(BehaviorSpec spec, InventionView view)
         {
@@ -118,10 +131,9 @@ namespace ImpossibleLab
                     case "target_distance":
                     case "target_detected":
                     {
-                        var target = Runner.TargetOverride != null ? Runner.TargetOverride : (Camera.main != null ? Camera.main.transform : null);
-                        if (target == null) { value = 0; return false; }
-                        var from = Runner._view.transform.position;
-                        var d = new Vector2(target.position.x - from.x, target.position.z - from.z).magnitude;
+                        var dist = Runner.TargetDistance();
+                        if (dist == null) { value = 0; return false; }
+                        float d = dist.Value;
                         if (sensor == "target_distance") { value = d; return true; }
                         value = d <= dna.GetParameter("detect", "rangeM", 0f) ? 1f : 0f; return true;
                     }

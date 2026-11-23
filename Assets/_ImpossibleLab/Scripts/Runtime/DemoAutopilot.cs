@@ -721,6 +721,22 @@ namespace ImpossibleLab
             float closed = _app.View.Joints["lid"].Value;
             Check(closed < 5f, $"motion: lid closes after the wait ({closed:0} deg)");
             _app.ToggleDevice();
+
+            // 座ったまま試用：人型モデルを「近づける」ボタンで 1m 以内に寄せるとフタが開く（あなた＝対象は遠いまま）
+            target.position = p + new Vector3(0, 0, 3.5f);
+            _app.ToggleDevice();
+            Check(_app.TrialHasProgram && Mathf.Abs(_app.TrialPersonDistance - LabApp.TrialPersonMax) < 1e-3f, "seated trial: a person model stands 3 m away");
+            yield return new WaitForSeconds(0.5f);
+            for (int k = 0; k < 5; k++) _app.StepTrialPerson(-1); // 3.0 → 0.5 m
+            yield return new WaitForSeconds(2.5f);
+            float openSeated = _app.View.Joints["lid"].Value;
+            Check(openSeated > 80f, $"seated trial: lid opens when the person model is moved near ({openSeated:0} deg, {_app.TrialPersonDistance:0.0} m)");
+            Check(_app.TrialStatus() != null && _app.TrialStatus().Contains("1m 以内"), $"seated trial: status shows the distance condition ({_app.TrialStatus()})");
+            var dv = _app.View.transform.position;
+            yield return Shot("S03_seated_trial", eyeAt: dv + new Vector3(1.6f, 0.9f, -1.6f), lookAt: dv + new Vector3(0f, 0.3f, 0f));
+            _app.ToggleDevice();
+            yield return null; // Destroy はフレームの終わりに反映される
+            Check(_app.TrialPersonDistance < 0f && GameObject.Find("TrialPerson") == null, "seated trial: the person model is removed when the trial stops");
             Destroy(target.gameObject);
 
             // 実験：近づいて離れる（AT-13）

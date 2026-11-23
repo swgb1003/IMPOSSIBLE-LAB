@@ -395,6 +395,99 @@ namespace ImpossibleLab
             if (result.Warnings.Count > 0) ShowToast(string.Join(" / ", result.Warnings.Take(2)));
         }
 
+        // ================= 座ったまま試用：人型モデルを近づける =================
+        public const float TrialPersonMin = 0.3f, TrialPersonMax = 3.0f, TrialPersonStep = 0.5f;
+        /// <summary>試作品から人型モデルまでの距離（m）。人型モデルがいなければ負。</summary>
+        [NonSerialized] public float TrialPersonDistance = -1f;
+        Transform _trialPerson;
+        float _trialStatusAt;
+
+        public bool TrialHasProgram => DeviceRunning && View != null && View.Get<ProgramRunner>() != null;
+
+        /// <summary>人型モデルを近づける（−1）／遠ざける（+1）。</summary>
+        public void StepTrialPerson(int dir)
+        {
+            if (!TrialHasProgram) return;
+            float d = TrialPersonDistance < 0f ? TrialPersonMax : TrialPersonDistance;
+            TrialPersonDistance = Mathf.Clamp(d + dir * TrialPersonStep, TrialPersonMin, TrialPersonMax);
+            PlaceTrialPerson();
+            Notify();
+        }
+
+        void PlaceTrialPerson()
+        {
+            if (View == null) return;
+            if (_trialPerson == null)
+            {
+                _trialPerson = new GameObject("TrialPerson").transform;
+                var m = Assets != null ? Assets.Mannequin : null;
+                void Prim(PrimitiveType t, Vector3 p, Vector3 s)
+                {
+                    var g = GameObject.CreatePrimitive(t);
+                    Destroy(g.GetComponent<Collider>());
+                    g.transform.SetParent(_trialPerson, false);
+                    g.transform.localPosition = p; g.transform.localScale = s;
+                    if (m != null) g.GetComponent<Renderer>().sharedMaterial = m;
+                }
+                Prim(PrimitiveType.Capsule, new Vector3(0, 1.0f, 0), new Vector3(0.34f, 0.42f, 0.22f));
+                Prim(PrimitiveType.Sphere, new Vector3(0, 1.52f, 0), Vector3.one * 0.2f);
+                Prim(PrimitiveType.Capsule, new Vector3(0, 0.42f, 0), new Vector3(0.28f, 0.4f, 0.18f));
+            }
+            // 試作品からあなたの方へ向かう線の上（少し横にずらし、あなたの視界をふさがない）に、試作品の方を向いて立たせる
+            var dev = View.transform.position;
+            var cam = Origin != null && Origin.Camera != null ? Origin.Camera.transform.position : dev + DisplayPoint.forward * 3f;
+            var dir = new Vector3(cam.x - dev.x, 0f, cam.z - dev.z);
+            dir = dir.sqrMagnitude > 1e-4f ? dir.normalized : -DisplayPoint.forward;
+            var side = Vector3.Cross(Vector3.up, dir) * 0.35f;
+            // 足元は試作品のいちばん下の高さ（発明台の上）。研究室の床に立たせると台の中に隠れてしまうため
+            float floor = float.MaxValue;
+            foreach (var r in View.GetComponentsInChildren<Renderer>()) if (r.enabled) floor = Mathf.Min(floor, r.bounds.min.y);
+            if (floor == float.MaxValue) floor = DisplayPoint.position.y;
+            var pos = new Vector3(dev.x, floor, dev.z) + dir * TrialPersonDistance + side;
+            _trialPerson.SetPositionAndRotation(pos, Quaternion.LookRotation(-dir));
+            var runner = View.Get<ProgramRunner>();
+            if (runner != null) runner.ExtraTarget = _trialPerson;
+        }
+
+        void ClearTrialPerson()
+        {
+            if (_trialPerson != null) Destroy(_trialPerson.gameObject);
+            _trialPerson = null;
+            TrialPersonDistance = -1f;
+            var runner = View != null ? View.Get<ProgramRunner>() : null;
+            if (runner != null) runner.ExtraTarget = null;
+        }
+
+        /// <summary>試用中の状態の行：「近づくと動きます（1m 以内）／人型 2.5m・あなた 3.3m」。</summary>
+        public string TrialStatus()
+        {
+            if (!TrialHasProgram) return null;
+            var dna = View.Dna;
+            var cond = dna.Program.Rules.Where(r => r.Enabled).SelectMany(r => r.When)
+                .FirstOrDefault(c => c.Sensor == "target_distance" && (c.Op == "<" || c.Op == "<="));
+            string need = cond != null ? $"{cond.Value:0.#}m 以内に近づくと動きます" : "条件がそろうと動きます";
+            var dev = View.transform.position;
+            var cam = Origin != null && Origin.Camera != null ? Origin.Camera.transform.position : dev;
+            float you = new Vector2(cam.x - dev.x, cam.z - dev.z).magnitude;
+            string person = TrialPersonDistance >= 0f ? $"人型 {TrialPersonDistance:0.0}m ／ " : "";
+            return $"試用中：{need} ｜ {person}あなた {you:0.0}m";
+        }
+
+        // ================= PC（AI プロキシ）とのつながり =================
+        /// <summary>null は未確認。AI 設計・音声入力が使えるかを画面に出す。</summary>
+        [NonSerialized] public bool? ProxyOnline;
+        float _pingAt;
+        bool _pinging;
+
+        async void PingProxy()
+        {
+            if (_pinging || Proxy == null || !Proxy.Enabled) return;
+            _pinging = true;
+            bool ok = await new ProxyDesignService(Proxy).PingAsync();
+            _pinging = false;
+            if (ProxyOnline != ok) { ProxyOnline = ok; Debug.Log("[ILAB] proxy online=" + ok); Notify(); }
+        }
+
         // ================= 発明台の上で試作品を回して眺める =================
         /// <summary>発明台での向き（度）。作り直しても保ち、新しい発明・ギャラリーから開いたときは 0（正面）に戻す。</summary>
         [NonSerialized] public float DisplayYaw;
@@ -472,8 +565,11 @@ namespace ImpossibleLab
             if (program != null) { program.Fired -= OnProgramFired; if (on) program.Fired += OnProgramFired; }
             View.SetActive(on);
             if (!on) View.transform.SetPositionAndRotation(DisplayPoint.position, DisplayRotation);
+            // 動きの手順がある発明は、座ったままでも試せるよう人型モデルを 3m 先に立たせる（近づける／遠ざけるで動かす）
+            if (on && program != null) { TrialPersonDistance = TrialPersonMax; PlaceTrialPerson(); }
+            if (!on) ClearTrialPerson();
             string what = follow != null ? "頭上に追従します" : followUser != null ? "床に降りて、あなたの後ろをついてきます" : View.Get<HoverBehavior>() != null ? "その場で浮き上がります"
-                : program != null ? "動きの手順を試せます（近づく・離れるなどで反応します）" : "動作します";
+                : program != null ? "動きの手順を試せます（「人を近づける」か、あなたが歩いて近づくと反応します）" : "動作します";
             ShowToast(on ? $"起動しました：{what}（試用）" : "停止して発明台に戻しました");
         }
 
@@ -1397,6 +1493,9 @@ namespace ImpossibleLab
             if (Toast != null && Time.time > _toastUntil) { Toast = null; Notify(); }
             if (Voice == VoiceState.Recording && _voice.Elapsed >= VoiceInput.MaxSeconds) StopVoice();
             UpdateStickTurn();
+            // 試用中は距離の表示を 0.5 秒ごとに更新する（画面の作り直しはしない）
+            if (TrialHasProgram && Time.time > _trialStatusAt) { _trialStatusAt = Time.time + 0.5f; Changed?.Invoke(); }
+            if (Time.time > _pingAt) { _pingAt = Time.time + (ProxyOnline == true ? 15f : 5f); PingProxy(); }
             KeepConsoleAtEyeLevel();
             // 円環照明はイベント時（生成・組み立て・実験）だけ明るくする
             bool evt = Sm.State == LabState.GeneratingDesign || Sm.State == LabState.Building;

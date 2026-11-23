@@ -104,7 +104,7 @@ namespace ImpossibleLab
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage).Append('|').Append(App.Voice).Append(App.VoiceTarget);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage).Append('|').Append(App.Voice).Append(App.VoiceTarget).Append(App.ProxyOnline).Append(App.TrialPersonDistance);
             return sb.ToString();
         }
 
@@ -130,7 +130,7 @@ namespace ImpossibleLab
                 case LabState.GeneratingDesign: return "処理中：他の操作はできません（キャンセル可）";
                 case LabState.Building: return "組み立て中…";
                 case LabState.RunningTest: return "実験中：停止すると記録せず初期状態に戻ります";
-                default: return "状態：" + StateJa(App.Sm.State) + " ｜ 高さ：右手A▼B▲ ／ 移動：下のバーを握る";
+                default: return App.TrialStatus() ?? "状態：" + StateJa(App.Sm.State) + " ｜ 高さ：右手A▼B▲ ／ 移動：下のバーを握る";
             }
         }
 
@@ -324,7 +324,9 @@ namespace ImpossibleLab
             VoiceButton(row, "request", 150, 76);
             UiKit.Button(row, "送信 ▶", App.SubmitRequest, ButtonStyle.Primary, 200, 76);
             if (App.InputWarning != null) Para(_body, "⚠ " + App.InputWarning, LabTheme.FontBody, LabTheme.AccentWarning, 36);
-            else Para(_body, VoiceHint("request") ?? "声で入れるときは「話す」→ 話し終えたら「止める」（PC とつないでいるときだけ）。下の例を選ぶだけでも進められます。", LabTheme.FontSmall, h: 32);
+            else if (VoiceHint("request") != null) Para(_body, VoiceHint("request"), LabTheme.FontSmall, LabTheme.AccentLight, 32);
+            else if (App.ProxyOnline == false) Para(_body, "⚠ PC とつながっていません：AI 設計と音声入力は使えません（入力した言葉から見本の設計を選びます）", LabTheme.FontSmall, LabTheme.AccentWarning, 32);
+            else Para(_body, (App.ProxyOnline == true ? "● PC とつながっています（AI 設計・音声入力が使えます）。" : "") + "声で入れるときは「話す」→ 話し終えたら「止める」。", LabTheme.FontSmall, h: 32);
 
             // 見出しの行の右にギャラリーへのボタン（9 件のカードを入れるため、操作の行を見出しにまとめる）
             var quickHead = UiKit.Heading(_body, "クイック発明（例から選ぶ → 入力欄に反映）", LabTheme.FontHeading);
@@ -705,9 +707,20 @@ namespace ImpossibleLab
             var undo = UiKit.Button(a, "元に戻す", App.Undo, ButtonStyle.Ghost, 170);
             UiKit.SetInteractable(undo, App.CanUndo);
             UiKit.Button(a, App.DeviceRunning ? "■ 停止" : "● 起動（試用）", App.ToggleDevice, App.DeviceRunning ? ButtonStyle.Selected : ButtonStyle.Secondary, 230);
-            UiKit.Button(a, "保存", App.Save, ButtonStyle.Secondary, 130);
-            UiKit.Button(a, "ギャラリー", App.OpenGallery, ButtonStyle.Ghost, 170);
-            UiKit.Button(a, "新しい発明", App.NewInvention, ButtonStyle.Ghost, 180);
+            if (App.TrialHasProgram)
+            {
+                // 試用中だけ：人型モデルを動かして、座ったままでも距離の条件を試す
+                var near = UiKit.Button(a, "◀ 人を近づける", () => App.StepTrialPerson(-1), ButtonStyle.Primary, 250);
+                UiKit.SetInteractable(near, App.TrialPersonDistance > LabApp.TrialPersonMin + 1e-3f);
+                var far = UiKit.Button(a, "遠ざける ▶", () => App.StepTrialPerson(+1), ButtonStyle.Secondary, 190);
+                UiKit.SetInteractable(far, App.TrialPersonDistance < LabApp.TrialPersonMax - 1e-3f);
+            }
+            else
+            {
+                UiKit.Button(a, "保存", App.Save, ButtonStyle.Secondary, 130);
+                UiKit.Button(a, "ギャラリー", App.OpenGallery, ButtonStyle.Ghost, 170);
+                UiKit.Button(a, "新しい発明", App.NewInvention, ButtonStyle.Ghost, 180);
+            }
             var sp = UiKit.Rect("Sp", a); UiKit.Size(sp, flexW: 1);
             UiKit.Button(a, "実験へ ▶", App.GoToTestSetup, ButtonStyle.Primary, 260, 68);
 
