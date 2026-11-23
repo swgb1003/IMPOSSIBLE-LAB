@@ -98,7 +98,9 @@ namespace ImpossibleLab
             else if (panel != null)
             {
                 // 側面のパネルを正面から撮る（文字の読みやすさの確認用）
-                _cam.transform.SetPositionAndRotation(panel.position - panel.forward * 1.15f, Quaternion.LookRotation(panel.forward));
+                // メインのコンソールは画面いっぱいに撮る（設計図 1600×900 と見比べるため）
+                float dist = facePanel == "MainConsole" ? 0.78f : 1.15f;
+                _cam.transform.SetPositionAndRotation(panel.position - panel.forward * dist, Quaternion.LookRotation(panel.forward, panel.up));
             }
             else if (overview) _cam.transform.SetPositionAndRotation(new Vector3(5.5f, 3.4f, -6.8f), Quaternion.LookRotation(new Vector3(0, 1.2f, 0) - new Vector3(5.5f, 3.4f, -6.8f)));
             else
@@ -206,6 +208,7 @@ namespace ImpossibleLab
             }
             else Log("SKIP console height checks (head pose not available in editor)");
             yield return Shot("S01_invention_input");
+            yield return Shot("S01_invention_input_face", facePanel: "MainConsole");
             foreach (var tx in GameObject.Find("MainConsole").GetComponentsInChildren<TMPro.TMP_Text>())
             {
                 var rt = tx.rectTransform;
@@ -221,17 +224,22 @@ namespace ImpossibleLab
             _app.SubmitRequest();
             yield return WaitState(LabState.Error);
             yield return Shot("S02_error_unsupported");
+            yield return Shot("S02_error_unsupported_face", facePanel: "MainConsole");
             _app.UseOfflineSample();
             yield return new WaitForSeconds(0.4f);
             yield return Shot("S02_generating");
+            yield return Shot("S02_generating_face", facePanel: "MainConsole");
             yield return WaitState(LabState.AwaitingApproval);
             Check(_app.Preview != null && _app.Preview.Category == "protection", "preview DNA valid");
             yield return Shot("S02_preview");
+            yield return Shot("S02_preview_face", facePanel: "MainConsole");
             _app.ApprovePreview();
             yield return new WaitForSeconds(0.6f);
             yield return Shot("S02_building");
+            yield return Shot("S02_building_face", facePanel: "MainConsole");
             yield return WaitState(LabState.Editing);
             yield return Shot("S03_edit");
+            yield return Shot("S03_edit_face", facePanel: "MainConsole");
             yield return Shot("S03_device_rain", device: true);
             yield return Shot("S03_device_rain_core", device: true, devicePart: "core");
 
@@ -253,14 +261,17 @@ namespace ImpossibleLab
             _app.GoToTestSetup();
             yield return WaitState(LabState.ConfiguringTest);
             yield return Shot("S04_test_setup");
+            yield return Shot("S04_test_setup_face", facePanel: "MainConsole");
             _app.StartExperiment();
             yield return WaitState(LabState.RunningTest);
             yield return new WaitForSeconds(4f);
             yield return Shot("S05_running", rainLab: true);
+            yield return Shot("S05_running_face", facePanel: "MainConsole");
             yield return WaitState(LabState.ReviewingResult);
             var r1 = _app.LastResult;
             Log($"RESULT rev{r1.Revision} {r1.Config.Mode} wetness={r1.WetnessScore:0.00} coverage={r1.CoverageRatio:0.000} hits={r1.DeviceHits}/{r1.BaselineHits}");
             yield return Shot("S05_result_rev1", rainLab: true);
+            yield return Shot("S05_result_rev1_face", facePanel: "MainConsole");
 
             // 改良：横からの雨 → 範囲
             _app.ImproveAndRetest();
@@ -270,6 +281,7 @@ namespace ImpossibleLab
             float t = 0; while (_app.PendingRevision == null && t < 5f) { t += Time.unscaledDeltaTime; yield return null; }
             Check(_app.PendingRevision != null && _app.PendingRevision.Success, "revision proposal (side rain)");
             yield return Shot("S03_revision_diff");
+            yield return Shot("S03_revision_diff_face", facePanel: "MainConsole");
             _app.Save();
             Check(_app.Sm.State == LabState.Editing && _app.PendingRevision != null && _app.Toast != null && _app.Toast.Contains("未適用"),
                 "save is blocked with a notice while a revision proposal is pending");
@@ -299,6 +311,7 @@ namespace ImpossibleLab
             Check(_app.BaselineResult != null && _app.BaselineResult.Revision == 1, "comparison baseline is rev1 under same conditions");
             Check(r2.WetnessScore < r1.WetnessScore, "improvement reduced wetness");
             yield return Shot("S05_result_compare", rainLab: true);
+            yield return Shot("S05_result_compare_face", facePanel: "MainConsole");
 
             // REALITY で比較
             _app.RerunOtherMode();
@@ -308,6 +321,7 @@ namespace ImpossibleLab
             Check(r3.Config.Mode == LabModes.Reality && r3.EnergyWh.HasValue, "reality result has energy");
             Check(_app.OtherModeResult != null, "dream/reality comparison available");
             yield return Shot("S05_result_reality", rainLab: true);
+            yield return Shot("S05_result_reality_face", facePanel: "MainConsole");
             Check(r3.RuntimeMinutesMin.HasValue && r3.RuntimeMinutesMin <= r3.RuntimeMinutes && r3.RuntimeMinutes <= r3.RuntimeMinutesMax, "reality runtime range brackets nominal");
 
             // REALITY 前提係数と出典
@@ -315,9 +329,11 @@ namespace ImpossibleLab
             yield return WaitState(LabState.ConfiguringTest);
             Check(_app.TestConfig.Mode == LabModes.Reality, "setup keeps reality mode");
             yield return Shot("S04_reality_setup", rainLab: true);
+            yield return Shot("S04_reality_setup_face", facePanel: "MainConsole");
             _app.ShowCoefficients();
             Check(_app.CoefficientPage == 0 && _app.CoefficientPageCount >= 2, "coefficient table opens");
             yield return Shot("S04_coefficients_p1", rainLab: true);
+            yield return Shot("S04_coefficients_p1_face", facePanel: "MainConsole");
             for (int p = 2; p <= _app.CoefficientPageCount; p++)
             {
                 _app.StepCoefficientPage(+1);
@@ -331,10 +347,12 @@ namespace ImpossibleLab
             _app.Save();
             yield return WaitState(LabState.Saved);
             yield return Shot("S06_saved");
+            yield return Shot("S06_saved_face", facePanel: "MainConsole");
             _app.OpenGallery();
             yield return WaitState(LabState.Gallery);
             Check(_app.PendingDeleteId == null, "gallery opens without delete dialog");
             yield return Shot("S06_gallery");
+            yield return Shot("S06_gallery_face", facePanel: "MainConsole");
             // 7件以上ならページ送り（新しい順に6件ずつ）
             var gui = FindFirstObjectByType<LabUI>();
             if (_app.GalleryEntries.Count > LabUI.GalleryPerPage)
@@ -343,6 +361,7 @@ namespace ImpossibleLab
                 yield return null;
                 Check(gui.GalleryPage == 1, $"gallery moves to page 2 ({_app.GalleryEntries.Count} entries)");
                 yield return Shot("S06_gallery_p2");
+                yield return Shot("S06_gallery_p2_face", facePanel: "MainConsole");
                 gui.StepGalleryPage(-1);
                 yield return null;
             }
@@ -358,7 +377,7 @@ namespace ImpossibleLab
                 Check(gui.GalleryTag == pick && shown.Count == tagCounts.First(x => x.tag.Id == pick).count && shown.All(e => e.Tags.Contains(pick)) && gui.GalleryPage == 0,
                     $"gallery filters by tag {pick} ({shown.Count}/{_app.GalleryEntries.Count})");
                 yield return Shot("S06_gallery_tag");
-                yield return Shot("S06_gallery_tag_left_panel", facePanel: "LeftPanel");
+                yield return Shot("S06_gallery_tag_face", facePanel: "MainConsole");
                 gui.SetGalleryTag(null);
                 yield return null;
                 Check(gui.GalleryTag == null, "gallery tag filter clears");
@@ -367,6 +386,7 @@ namespace ImpossibleLab
             _app.AskDelete(_app.Current.Current.Id);
             yield return null; yield return null;
             yield return Shot("S06_delete_confirm");
+            yield return Shot("S06_delete_confirm_face", facePanel: "MainConsole");
             _app.CancelDelete();
 
             // 再起動相当：新しいリポジトリから読み込み、同じDNAか
@@ -440,7 +460,7 @@ namespace ImpossibleLab
                     Check(!Mathf.Approximately(MassModel.TotalKg(_app.Current.Current), kg0), "total mass follows the material/shape change");
                     Check(_app.PartHighlightVisible, "frame follows the rebuilt part");
                     yield return Shot("S03_part_edit_carrier");
-                    yield return Shot("S03_part_edit_left_panel", facePanel: "LeftPanel");
+                    yield return Shot("S03_part_edit_face", facePanel: "MainConsole");
                     _app.Undo(); _app.Undo();
                     yield return null;
                     Check(_app.Current.Current.Revision == rev && _app.Current.Current.FindPart(part.Id).MaterialOrDefault == mat0, "undo restores part material");
@@ -531,6 +551,7 @@ namespace ImpossibleLab
                 while (_app.Sm.State == LabState.Drafting && wait < 10f) { _app.SubmitRequest(); wait += Time.unscaledDeltaTime; yield return null; }
                 yield return WaitState(LabState.AwaitingApproval);
                 yield return Shot("S02_preview_ai");
+                yield return Shot("S02_preview_ai_face", facePanel: "MainConsole");
                 _app.ApprovePreview();
                 yield return WaitState(LabState.Editing);
                 yield return Shot("S03_edit_ai_p1");
@@ -559,17 +580,20 @@ namespace ImpossibleLab
                 Check(mapRows.Count == 5 && !mapDerived && mapRows.Any(r => !r.Verifiable) && mapRows.Where(r => r.Verifiable).All(r => r.PlanTitle != null),
                     $"S02: AI function map ({mapRows.Count} rows, derived={mapDerived}, plans={string.Join(",", mapRows.Select(r => r.PlanTitle ?? "-"))})");
                 yield return Shot("S02_function_map_ai_p1");
+                yield return Shot("S02_function_map_ai_p1_face", facePanel: "MainConsole");
                 var ui2 = FindFirstObjectByType<LabUI>();
                 ui2.StepNeedPage(+1);
                 yield return null;
                 Check(ui2.NeedPage == 1, "S02: function map moves to page 2");
                 yield return Shot("S02_function_map_ai_p2");
+                yield return Shot("S02_function_map_ai_p2_face", facePanel: "MainConsole");
                 _app.ApprovePreview();
                 yield return WaitState(LabState.Editing);
                 _app.GoToTestSetup();
                 yield return WaitState(LabState.ConfiguringTest);
                 Check(_app.PlanOptions.Count(c => c.FromAi) == 3 && _app.SelectedPlan.FromAi, $"S04: AI plans listed first ({_app.PlanOptions.Count(c => c.FromAi)} AI / {_app.PlanOptions.Count})");
                 yield return Shot("S04_plan_ai");
+                yield return Shot("S04_plan_ai_face", facePanel: "MainConsole");
                 _app.SelectPlan(1);
                 yield return null;
                 Check(_app.PlanIndex == 1 && _app.SelectedPlan.FromAi, "S04: second AI plan selected");
@@ -581,6 +605,7 @@ namespace ImpossibleLab
                 Check(ra != null && ra.IsScenarioLab && ra.Metrics.Count > 0, $"S05: AI plan ran ({ra?.Criteria})");
                 Log($"RESULT plan-ai passed={ra?.Passed} {string.Join(" ", ra?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])} | {ra?.Criteria}");
                 yield return Shot("S05_result_plan_ai", rainLab: true);
+                yield return Shot("S05_result_plan_ai_face", facePanel: "MainConsole");
                 _app.BackToEditing();
                 yield return WaitState(LabState.Editing);
             }
@@ -676,6 +701,7 @@ namespace ImpossibleLab
             yield return WaitState(LabState.AwaitingApproval);
             Check(_app.Preview != null && _app.Preview.Program != null, "motion: offline design has a motion program");
             yield return Shot("S02_preview_motion_bin");
+            yield return Shot("S02_preview_motion_bin_face", facePanel: "MainConsole");
             _app.ApprovePreview();
             yield return WaitState(LabState.Editing);
             // S03：動きの手順（オン・オフ、待つ時間の変更、元に戻す、動かしてみる）
@@ -683,6 +709,7 @@ namespace ImpossibleLab
             gui.ProgramTab = true;
             yield return null;
             yield return Shot("S03_program_motion_bin");
+            yield return Shot("S03_program_face", facePanel: "MainConsole");
             int rev0 = _app.Current.Current.Revision;
             _app.ToggleRule("open_lid");
             yield return null;
@@ -744,11 +771,13 @@ namespace ImpossibleLab
             yield return WaitState(LabState.ConfiguringTest);
             Check(_app.EditPlan != null && _app.EditPlan.Scenario == ExperimentCatalog.ApproachDevice, $"motion: first plan is approach_device ({_app.EditPlan?.Scenario})");
             yield return Shot("S04_motion_bin");
+            yield return Shot("S04_motion_bin_face", facePanel: "MainConsole");
             float tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
             _app.StartExperiment();
             yield return WaitState(LabState.RunningTest);
             yield return new WaitForSeconds(3.2f);
             yield return Shot("S05_running_motion_bin", rainLab: true);
+            yield return Shot("S05_running_motion_bin_face", facePanel: "MainConsole");
             yield return WaitState(LabState.ReviewingResult, 90f);
             var res = _app.LastResult;
             Check(res != null && res.Metric("ruleFiredCount") != null && res.Metric("reactionTime") != null && res.Metric("expectationRate") != null,
@@ -756,6 +785,7 @@ namespace ImpossibleLab
             Check(res != null && res.Passed == true, $"motion: experiment passed ({string.Join(" / ", res?.Limits ?? new System.Collections.Generic.List<string>())})");
             Log($"RESULT motion-bin fired={res?.Metric("ruleFiredCount")?.Value} reaction={res?.Metric("reactionTime")?.Value:0.00} expectation={res?.Metric("expectationRate")?.Value:0.00}");
             yield return Shot("S05_result_motion_bin", rainLab: true);
+            yield return Shot("S05_result_motion_bin_face", facePanel: "MainConsole");
             _app.Save();
             yield return WaitState(LabState.Saved, 20f); // 次の検証は保存完了の画面から新しい発明を始める
         }
@@ -890,9 +920,20 @@ namespace ImpossibleLab
             Check(r != null && PlanCandidates.ConditionKey(r.Plan) == key, $"plan-{tag}: result keeps the edited plan");
             Log($"RESULT plan-{tag} {r?.Plan?.Mode} passed={r?.Passed} {string.Join(" ", r?.Metrics.Select(m => m.Key + "=" + m.Display) ?? new string[0])} | {r?.Criteria}");
             yield return Shot($"S05_result_plan_{tag}", rainLab: true);
+            // 判定は左の板、要望の確認は右の板の2つ目の切り替えにある
             var texts = FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None).Select(t => t.text).ToList();
-            Check(texts.Any(t => t.StartsWith("合格条件ごとの判定", StringComparison.Ordinal)) && texts.Any(t => t == "✓ 達成" || t == "× 未達")
-                && texts.Any(t => t.StartsWith("✓ この実験で確かめた", StringComparison.Ordinal)), $"plan-{tag}: S05 shows per-criterion verdicts and request coverage");
+            bool verdicts = texts.Any(t => t == "達成" || t == "未達");
+            var resultUi = FindFirstObjectByType<LabUI>();
+            resultUi.SetConsoleTabs(0, 1);
+            yield return null;
+            bool coverage = FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None).Any(t => t.text.StartsWith("この実験で確かめた", StringComparison.Ordinal));
+            CheckFits($"S05_result_plan_{tag}_requests");
+            resultUi.SetConsoleTabs(1, 0);
+            yield return null;
+            CheckFits($"S05_result_plan_{tag}_method");
+            resultUi.SetConsoleTabs(0, 0);
+            yield return null;
+            Check(verdicts && coverage, $"plan-{tag}: S05 shows per-criterion verdicts and request coverage");
             _app.RerunOtherMode();
             yield return WaitState(LabState.ReviewingResult, 60f);
             var r2 = _app.LastResult;

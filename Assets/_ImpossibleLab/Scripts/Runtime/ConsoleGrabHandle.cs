@@ -70,8 +70,9 @@ namespace ImpossibleLab
 
         void Refresh()
         {
-            Color c = Dragging ? LabTheme.AccentLight : isHovered ? LabTheme.AccentPrimary : LabTheme.TextSecondary;
+            Color c = Dragging ? LabTheme.ConCy : isHovered ? LabTheme.ConCyDim : LabTheme.ConEdgeHi;
             if (Visual != null) Visual.color = c;
+            if (Label != null) Label.color = Dragging ? LabTheme.ConOnCy : LabTheme.ConInk;
             if (Label != null) Label.text = Dragging ? "離すと固定" : isHovered ? "グリップを握って移動" : "パネルを移動";
         }
 

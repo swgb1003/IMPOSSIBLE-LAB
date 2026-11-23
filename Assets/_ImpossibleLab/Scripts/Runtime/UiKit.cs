@@ -161,33 +161,32 @@ namespace ImpossibleLab
 
         public static void ApplyStyle(UnityEngine.UI.Button btn, ButtonStyle style)
         {
+            // コンソールと同じ色（黒い金属の地。シアン＝主役・選択中）
             Color baseC;
             switch (style)
             {
-                case ButtonStyle.Primary: baseC = LabTheme.AccentPrimary; break;
-                case ButtonStyle.Danger: baseC = LabTheme.StateError; break;
-                case ButtonStyle.Selected: baseC = LabTheme.AccentLight; break;
-                case ButtonStyle.Ghost: baseC = LabTheme.BgDeep; break;
-                default: baseC = LabTheme.BgPanel; break;
+                case ButtonStyle.Primary: baseC = LabTheme.ConCy; break;
+                case ButtonStyle.Selected: baseC = LabTheme.ConCyDeep; break;
+                default: baseC = LabTheme.ConPlate2; break;
             }
             var cb = btn.colors;
             cb.normalColor = baseC;
-            cb.highlightedColor = Color.Lerp(baseC, LabTheme.AccentLight, style == ButtonStyle.Primary ? 0.45f : 0.30f);
-            cb.pressedColor = Color.Lerp(baseC, LabTheme.BgDeep, 0.35f);
+            cb.highlightedColor = Color.Lerp(baseC, LabTheme.ConCy, style == ButtonStyle.Primary ? 0f : 0.22f);
+            cb.pressedColor = Color.Lerp(baseC, LabTheme.ConBg, 0.35f);
             cb.selectedColor = cb.highlightedColor;
-            cb.disabledColor = new Color(LabTheme.BgPanel.r, LabTheme.BgPanel.g, LabTheme.BgPanel.b, 0.5f);
+            cb.disabledColor = new Color(LabTheme.ConPlate2.r, LabTheme.ConPlate2.g, LabTheme.ConPlate2.b, 0.5f);
             cb.colorMultiplier = 1f; cb.fadeDuration = 0.08f;
             btn.colors = cb;
             var outline = btn.GetComponent<UnityEngine.UI.Outline>();
             if (outline == null) outline = btn.gameObject.AddComponent<UnityEngine.UI.Outline>();
             outline.effectDistance = new Vector2(2, -2);
-            outline.effectColor = style == ButtonStyle.Secondary ? new Color(LabTheme.AccentLight.r, LabTheme.AccentLight.g, LabTheme.AccentLight.b, 0.45f)
-                : style == ButtonStyle.Selected ? LabTheme.TextPrimary : new Color(0, 0, 0, 0);
+            outline.effectColor = style == ButtonStyle.Primary || style == ButtonStyle.Selected ? LabTheme.ConCy
+                : style == ButtonStyle.Danger ? LabTheme.ConOr : style == ButtonStyle.Ghost ? LabTheme.ConEdgeHi : LabTheme.ConCyDim;
             var label = btn.GetComponentInChildren<TextMeshProUGUI>();
             if (label != null) label.color = TextColor(style);
         }
 
-        static Color TextColor(ButtonStyle s) => s == ButtonStyle.Primary || s == ButtonStyle.Selected ? LabTheme.BgDeep : LabTheme.TextPrimary;
+        static Color TextColor(ButtonStyle s) => s == ButtonStyle.Primary ? LabTheme.ConOnCy : s == ButtonStyle.Ghost ? LabTheme.ConMut : LabTheme.ConInk;
 
         public static void SetInteractable(UnityEngine.UI.Button b, bool on)
         {
@@ -245,7 +244,10 @@ namespace ImpossibleLab
             }
         }
 
-        static string Sanitize(string s)
+        /// <summary>ボタンを押した合図（効果音）。UiKit 以外で作ったボタンから呼ぶ。</summary>
+        public static void NotifyClick() => Clicked?.Invoke();
+
+        public static string Sanitize(string s)
         {
             var sb = new System.Text.StringBuilder();
             foreach (var ch in s) if (!char.IsWhiteSpace(ch) && ch != '/') sb.Append(ch);

@@ -34,7 +34,7 @@ namespace ImpossibleLab
             if (_hand == null) { Debug.Log("[ILAB] hand menu: Left Controller not found, disabled"); enabled = false; return; }
             _canvas = UiKit.CreateCanvas("HandMenu", null, new Vector2(520, 410), _app.Origin.Camera);
             _canvas.transform.localScale = Vector3.one * Scale;
-            var bg = UiKit.Image("Bg", _canvas.transform, LabTheme.BgPanel);
+            var bg = UiKit.Image("Bg", _canvas.transform, LabTheme.ConPlate);
             UiKit.Stretch(bg.rectTransform);
             _body = UiKit.Rect("Body", _canvas.transform);
             UiKit.Stretch(_body, 16, 16, 12, 12);
@@ -50,7 +50,7 @@ namespace ImpossibleLab
         {
             if (_body == null) return;
             for (int i = _body.childCount - 1; i >= 0; i--) Destroy(_body.GetChild(i).gameObject);
-            var head = UiKit.Text(_body, "手元メニュー", LabTheme.FontSmall, LabTheme.AccentLight, bold: true, align: TextAlignmentOptions.MidlineLeft);
+            var head = UiKit.Text(_body, "手元メニュー", LabTheme.FontSmall, LabTheme.ConInk, bold: true, align: TextAlignmentOptions.MidlineLeft);
             UiKit.Size(head, h: 34);
             var r1 = UiKit.Row("R1", _body, 10, 72);
             UiKit.Button(r1, "パネルを正面へ", _app.RecenterToHead, ButtonStyle.Primary, -1, 72, LabTheme.FontSmall);

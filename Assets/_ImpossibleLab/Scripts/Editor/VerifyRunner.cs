@@ -38,7 +38,7 @@ namespace ImpossibleLab.EditorTools
         static void OnPlayMode(PlayModeStateChange s)
         {
             if (s != PlayModeStateChange.EnteredPlayMode) return;
-            _deadline = EditorApplication.timeSinceStartup + 360; // 検証の流れが増えたため（2026-11-23：キャリーバッグ・座ったまま試用を追加）
+            _deadline = EditorApplication.timeSinceStartup + 480; // 検証の流れが増えたため（2026-11-23：キャリーバッグ・座ったまま試用、コンソールを正面から撮る画像を追加）
             var go = new GameObject("DemoAutopilot");
             var ap = go.AddComponent<DemoAutopilot>();
             ap.OutputDir = OutDir;

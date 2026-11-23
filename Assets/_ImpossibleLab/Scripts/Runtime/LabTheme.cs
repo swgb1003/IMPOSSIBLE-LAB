@@ -23,6 +23,18 @@ namespace ImpossibleLab
         public static readonly Color Disabled = new Color(TextSecondary.r, TextSecondary.g, TextSecondary.b, 0.35f);
         public static readonly Color Success = AccentLight;
 
+        // 輪の計器コンソール（2026-11-23 に決めた形。docs/design/console6.html と同じ値）。
+        // シアン＝測った値・今の値、オレンジ＝選んでいる所と改良案。それ以外の意味では使わない。
+        public static readonly Color ConBg = Hex(0x020405), ConPlate = Hex(0x0A0F12), ConPlate2 = Hex(0x0E1519), ConWell = Hex(0x04080A);
+        public static readonly Color ConMetalTop = Hex(0x0F161A), ConMetalBottom = Hex(0x070B0D), ConDial = Hex(0x080D10);
+        public static readonly Color ConEdge = Hex(0x1C2A31), ConEdgeHi = Hex(0x2F434D);
+        public static readonly Color ConCy = Hex(0x2FE3E6), ConCyDim = Hex(0x116168), ConCyDeep = Hex(0x0A3338);
+        public static readonly Color ConOr = Hex(0xFF6A26), ConOrDim = Hex(0x6B2C10);
+        public static readonly Color ConInk = Hex(0xE9FBFC), ConMut = Hex(0x86A5AA), ConOnCy = Hex(0x021012);
+        public static readonly Color ConBody = Hex(0x2A353B), ConBody2 = Hex(0x3D4B52);
+        /// <summary>コンソールの文字の下限（mm）。これより小さい指定は切り上げる。</summary>
+        public const float ConMinFont = 16f;
+
         // 文字サイズ（Canvas 1px = 1mm 基準。視距離1.0〜1.5mでの初期値。実機で要調整）
         public const float FontTitle = 40f, FontHeading = 30f, FontBody = 26f, FontSmall = 22f, FontButton = 26f;
         // 余白：8px 単位
