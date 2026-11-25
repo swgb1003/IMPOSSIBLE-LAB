@@ -5,7 +5,36 @@ import { createHash, randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { HttpError } from "../http-util.ts";
-import type { Publication, Role } from "./schema.ts";
+import type { Invention, Publication, Role } from "./schema.ts";
+
+/** 一覧に出す実験の要約：同じ実験（DREAM を優先）の最初の版と最後の版の主な計測と合否。 */
+export interface ResultSummary {
+  title: string; mode: "dream" | "reality"; label: string; unit: string; lowerIsBetter: boolean;
+  before: { revision: number; display: string; passed: boolean | null } | null;
+  after: { revision: number; display: string; passed: boolean | null };
+}
+
+export function resultSummary(inv: Invention): ResultSummary | null {
+  for (const mode of ["dream", "reality"] as const) {
+    const runs = inv.experiments.filter((e) => e.mode === mode && e.metrics.some((m) => m.primary));
+    if (runs.length === 0) continue;
+    // いちばん多くの版で測った実験を選ぶ（改良の前後を比べられる）
+    const byTitle = new Map<string, typeof runs>();
+    for (const r of runs) byTitle.set(r.title, [...(byTitle.get(r.title) ?? []), r]);
+    const group = [...byTitle.values()].sort((a, b) => new Set(b.map((x) => x.revision)).size - new Set(a.map((x) => x.revision)).size)[0];
+    const sorted = [...group].sort((a, b) => a.revision - b.revision);
+    const last = sorted[sorted.length - 1];
+    const m = last.metrics.find((x) => x.primary)!;
+    const first = sorted.find((r) => r.revision < last.revision && r.metrics.some((x) => x.key === m.key));
+    const fm = first?.metrics.find((x) => x.key === m.key);
+    return {
+      title: last.title, mode, label: m.label, unit: m.unit, lowerIsBetter: m.lowerIsBetter,
+      before: first && fm ? { revision: first.revision, display: fm.display, passed: first.passed } : null,
+      after: { revision: last.revision, display: m.display, passed: last.passed },
+    };
+  }
+  return null;
+}
 
 export const LIMITS = {
   maxPublications: 500,
@@ -209,6 +238,7 @@ export class LibraryStore {
         wants: { vr: rec.wantsVr.length, site: rec.wantsSite.length }, tried: rec.tried.length,
         adoptions: rec.adoptions.length, considering: rec.considering.length,
         publishedAt: rec.publishedAt, updatedAt: rec.updatedAt, sample: rec.sample,
+        result: resultSummary(inv),
       })),
     };
   }

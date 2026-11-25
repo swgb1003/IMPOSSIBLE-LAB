@@ -1,0 +1,83 @@
+{
+  "sort": "new",
+  "note": "見本：研究所の通し確認（2026-11-25）で作った7件の記録。依頼文は AI の評価に使った依頼の原文（雨よけは研究所の見本の依頼）。ほしい・採用の数は 0。",
+  "items": [
+    {
+      "id": "sample-rain", "page": "invention.html", "thumb": "sample/thumbs/rain.jpg",
+      "name": "ハンズフリー雨よけ装置", "summary": "荷物で両手がふさがっている人の頭上に浮かび、傘を持たなくても雨を防ぐ装置。",
+      "request": "手を使わず雨を防ぐ装置を作って",
+      "tags": [{ "id": "protection", "label": "防護" }], "sceneTags": [], "status": "open", "revision": 3,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:01:52.000Z", "updatedAt": "2026-11-25T09:01:52.000Z", "sample": true,
+      "result": { "title": "横風の雨", "mode": "dream", "label": "雨を防いだ割合", "unit": "%", "lowerIsBetter": false,
+        "before": { "revision": 1, "display": "40.9", "passed": false }, "after": { "revision": 3, "display": "66.4", "passed": false } }
+    },
+    {
+      "id": "sample-r03", "page": null, "thumb": "sample/thumbs/r03.jpg",
+      "name": "ついてくる日陰キャノピー", "summary": "夏の通学路で頭の上に浮かび、強い日差しをさえぎって体に日陰を作る道具。",
+      "request": "夏の通学路で日差しがきついので、頭の上で日陰を作ってくれる道具",
+      "tags": [{ "id": "outdoor", "label": "屋外" }, { "id": "daily", "label": "生活" }, { "id": "protection", "label": "防護" }], "sceneTags": [], "status": "open", "revision": 2,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:03:54.000Z", "updatedAt": "2026-11-25T09:03:54.000Z", "sample": true,
+      "result": { "title": "真夏の昼の日陰テスト", "mode": "dream", "label": "日陰率", "unit": "%", "lowerIsBetter": false,
+        "before": { "revision": 1, "display": "58.2", "passed": false }, "after": { "revision": 2, "display": "76.7", "passed": true } }
+    },
+    {
+      "id": "sample-r15", "page": null, "thumb": "sample/thumbs/r15.jpg",
+      "name": "夜道あんしん足元ライト", "summary": "夜道を歩くとき、腰に付けたライトが足元を斜め下に照らして暗さの不安を減らす道具。",
+      "request": "夜道で足元が暗くて怖いので、自動で足元を照らしてくれる道具",
+      "tags": [{ "id": "lighting", "label": "照明" }, { "id": "safety", "label": "安全" }, { "id": "daily", "label": "生活" }], "sceneTags": [], "status": "open", "revision": 2,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:04:05.000Z", "updatedAt": "2026-11-25T09:04:05.000Z", "sample": true,
+      "result": { "title": "夜道の足元照度テスト", "mode": "dream", "label": "足元の照度", "unit": "lx", "lowerIsBetter": false,
+        "before": { "revision": 1, "display": "44.1", "passed": true }, "after": { "revision": 2, "display": "65.2", "passed": true } }
+    },
+    {
+      "id": "sample-r18", "page": null, "thumb": "sample/thumbs/r18.jpg",
+      "name": "バス停ぬくぬく背中ヒーター", "summary": "冬のバス停で待つ間、背中に当てた加熱パッドで体を温める背負い型の道具。",
+      "request": "冬のバス停で待つ間、背中を温めてくれる道具",
+      "tags": [{ "id": "thermal", "label": "温度" }, { "id": "daily", "label": "生活" }, { "id": "outdoor", "label": "屋外" }], "sceneTags": [], "status": "open", "revision": 2,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:04:17.000Z", "updatedAt": "2026-11-25T09:04:17.000Z", "sample": true,
+      "result": { "title": "バス停待ちの温まり実験", "mode": "dream", "label": "狙った向きの温度変化", "unit": "°C", "lowerIsBetter": false,
+        "before": { "revision": 1, "display": "13.4", "passed": true }, "after": { "revision": 2, "display": "16.1", "passed": true } }
+    },
+    {
+      "id": "sample-r22", "page": null, "thumb": "sample/thumbs/r22.jpg",
+      "name": "うしろ見守りリュック", "summary": "背中側のセンサーで後ろから近づく自転車などを検知し、音と光で背負っている人に知らせるリュック。",
+      "request": "後ろから自転車が近づいてきたら教えてくれるリュック",
+      "tags": [{ "id": "safety", "label": "安全" }, { "id": "sensing", "label": "検知・通知" }, { "id": "daily", "label": "生活" }], "sceneTags": [], "status": "open", "revision": 2,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:04:31.000Z", "updatedAt": "2026-11-25T09:04:31.000Z", "sample": true,
+      "result": { "title": "後方検知テスト", "mode": "dream", "label": "検知率", "unit": "%", "lowerIsBetter": false,
+        "before": { "revision": 1, "display": "33.3", "passed": false }, "after": { "revision": 2, "display": "66.7", "passed": false } }
+    },
+    {
+      "id": "sample-r09", "page": null, "thumb": "sample/thumbs/r09.jpg",
+      "name": "だんボール持ち上げリフト「アゲルくん」", "summary": "床に置いた段ボールを左右からはさみ、柱に沿って棚の高さまで持ち上げて置く道具。",
+      "request": "床に置いた段ボールを棚の上まで持ち上げてくれる道具",
+      "tags": [{ "id": "assist", "label": "身体補助" }, { "id": "carrier", "label": "運搬" }, { "id": "daily", "label": "生活" }], "sceneTags": [], "status": "open", "revision": 2,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:04:46.000Z", "updatedAt": "2026-11-25T09:04:46.000Z", "sample": true,
+      "result": { "title": "段ボール持ち上げテスト", "mode": "dream", "label": "落とした回数", "unit": "回", "lowerIsBetter": true,
+        "before": { "revision": 1, "display": "0", "passed": true }, "after": { "revision": 2, "display": "0", "passed": true } }
+    },
+    {
+      "id": "sample-r05", "page": null, "thumb": "sample/thumbs/r05.jpg",
+      "name": "エアバンパー・スマホガード", "summary": "スマホの角とふちを厚めの緩衝材で囲み、落としたときに画面へ伝わる衝撃を小さくするケース。",
+      "request": "スマホを落としても画面が割れないようにする道具",
+      "tags": [{ "id": "safety", "label": "安全" }, { "id": "daily", "label": "生活" }], "sceneTags": [], "status": "open", "revision": 2,
+      "creator": { "name": "発案者", "publicId": null }, "creatorAdoptions": 0,
+      "wants": { "vr": 0, "site": 0 }, "tried": 0, "adoptions": 0, "considering": 0,
+      "publishedAt": "2026-11-25T09:04:54.000Z", "updatedAt": "2026-11-25T09:04:54.000Z", "sample": true,
+      "result": { "title": "ポケットの高さから落とす", "mode": "dream", "label": "最大の衝撃", "unit": "G", "lowerIsBetter": true,
+        "before": { "revision": 1, "display": "74", "passed": false }, "after": { "revision": 2, "display": "94", "passed": true } }
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>発明のページ | IMPOSSIBLE LIBRARY</title>
+<meta name="description" content="VR の研究所で試して直した発明を、依頼の原文・回せる試作品・実験の数値・改良の履歴とともに読む">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script type="importmap">
+{ "imports": {
+  "three": "../vendor/three/build/three.module.js",
+  "three/addons/": "../vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="bar">
+  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
+    <b>IMPOSSIBLE LIBRARY</b>
+  </a>
+  <nav aria-label="サイト">
+    <a href="./">発明品一覧</a>
+    <a href="accounts.html">研究者と開発者</a>
+    <a href="terms.html">利用規約</a>
+  </nav>
+</header>
+
+<main>
+  <section class="board first" aria-labelledby="inv-name">
+    <div class="t name">
+      <h1 id="inv-name" data-slot="name">発明</h1>
+      <p class="lead" data-slot="summary"></p>
+      <p class="meta" data-slot="meta"></p>
+    </div>
+
+    <figure class="t w6 h2 ask">
+      <blockquote data-slot="request"></blockquote>
+      <figcaption>発案者が研究所で頼んだ言葉。原文のまま載せています</figcaption>
+    </figure>
+
+    <div class="t stage">
+      <canvas data-slot="canvas" aria-label="試作品の立体。押したまま動かすと回せます" role="img"></canvas>
+      <p class="fallback" data-slot="fallback" hidden>この画面では 3D を表示できません</p>
+      <div class="over top"><h2>試作品 <span class="rev num" data-slot="rev"></span></h2><p class="pick" data-slot="pick" aria-live="polite"></p></div>
+      <div class="over foot"><p>押したまま動かすと回せます。部品を押すと光ります</p><p class="num size" data-slot="size"></p></div>
+    </div>
+
+    <div class="t w3 h2 fig">
+      <p class="v num" data-slot="dream"></p>
+      <p data-slot="dream-note"></p>
+    </div>
+    <div class="t w3 h2 fig alt">
+      <p class="v num" data-slot="reality"></p>
+      <p data-slot="reality-note"></p>
+    </div>
+
+    <div class="t w3 h2 revs alt">
+      <h2>改良の履歴</h2>
+      <ol data-slot="revisions"></ol>
+    </div>
+
+    <div class="t w3 h2 act">
+      <h2>研究や製品化に使う</h2>
+      <p>登録した研究者と開発者が、理由を書いて採用できます。採用すると発案者に知らせが届きます。</p>
+      <button class="btn" type="button" data-slot="adopt">採用する</button>
+    </div>
+  </section>
+
+  <section class="board" aria-labelledby="how-h">
+    <div class="t w6 h4 how">
+      <h2 id="how-h">しくみ</h2>
+      <ol data-slot="needs"></ol>
+    </div>
+    <div class="t w3 h4 parts">
+      <h2>部品<span class="num" data-slot="part-count"></span></h2>
+      <ul data-slot="parts"></ul>
+    </div>
+    <figure class="t w3 h2 pic shutter">
+      <img src="sample/rain/rain-rev1.jpg" width="720" height="400" loading="lazy" alt="研究所の雨の実験場。横風の雨の中で、人型の頭上に小さな覆いが浮かんでいる">
+      <figcaption>Rev.1 の実験。横風 4 m/s、雨量 30 mm/h の中で人型の頭が濡れた</figcaption>
+    </figure>
+    <figure class="t w3 h2 pic">
+      <img src="sample/rain/rain-reality.jpg" width="720" height="400" loading="lazy" alt="同じ雨の実験場。覆いが風で右へ流され、人型の頭から外れている">
+      <figcaption>Rev.3 を REALITY で測ると、覆いが風で流されて頭から外れた</figcaption>
+    </figure>
+  </section>
+
+  <section class="board" aria-labelledby="real-h">
+    <div class="t w6 h2 pair">
+      <div class="fig"><p class="v num" data-slot="power"></p><p data-slot="power-note"></p></div>
+      <div class="fig"><p class="v num" data-slot="runtime"></p><p data-slot="runtime-note"></p></div>
+      <p class="pair-note">REALITY の計算による推定</p>
+    </div>
+    <div class="t w6 h2 notes">
+      <h2 id="real-h">現実にするための課題</h2>
+      <ul data-slot="challenges"></ul>
+    </div>
+    <figure class="t w3 h2 pic">
+      <img src="sample/rain/result-panel.jpg" width="520" height="485" loading="lazy" alt="研究所の操作パネルの結果の画面。雨を防いだ割合 40.9 パーセント">
+      <figcaption>研究所の操作パネルで見た Rev.1 の結果</figcaption>
+    </figure>
+    <div class="t w6 h2 notes alt assume">
+      <h2>計算の前提</h2>
+      <ul data-slot="assumptions"></ul>
+    </div>
+    <figure class="t w3 h2 pic">
+      <img src="sample/rain/stage.jpg" width="1000" height="700" loading="lazy" alt="研究所の発明台の上のガラスの筒の中に置かれた、円盤の形の雨よけ装置">
+      <figcaption>研究所の発明台に置いた Rev.3</figcaption>
+    </figure>
+  </section>
+
+  <footer class="board end-board">
+    <div class="t w6 h2 end">
+      <p class="big" lang="en">IMPOSSIBLE LIBRARY</p>
+      <p>研究所で試して直した発明を、研究と製品化につなぐ図書館です。この PC の中だけで動いています。</p>
+    </div>
+    <div class="t w6 h2 end alt">
+      <nav aria-label="サイトの終わりのリンク">
+        <a href="./">発明品一覧</a><a href="accounts.html">研究者と開発者の登録</a><a href="terms.html">利用規約</a><a href="admin.html">運営</a>
+      </nav>
+      <p data-slot="sample-note"></p>
+    </div>
+  </footer>
+  <div class="page-end"></div>
+</main>
+<noscript><p style="padding:24px">このページを読むには JavaScript を有効にしてください。</p></noscript>
+<script type="module" src="invention.js"></script>
+</body>
+</html>

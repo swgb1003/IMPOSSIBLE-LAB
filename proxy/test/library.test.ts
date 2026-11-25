@@ -6,7 +6,7 @@ import type { AddressInfo } from "node:net";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { LibraryStore, checkGlb, creatorHashOf, publicCreatorId } from "../src/library/store.ts";
+import { LibraryStore, checkGlb, creatorHashOf, publicCreatorId, resultSummary } from "../src/library/store.ts";
 import { createLibraryRoutes, sendJson } from "../src/library/routes.ts";
 import { Publication, CONSENT_VERSION } from "../src/library/schema.ts";
 import { HttpError } from "../src/http-util.ts";
@@ -343,4 +343,25 @@ test("http: with a token set, Quest calls need it", async () => {
     // サイトの読み出し（この PC の中から）はトークン無しでよい
     assert.equal((await fetch(base + "/library")).status, 200);
   }, "secret");
+});
+
+test("list: each item carries the first and last tested revision of its main experiment", () => {
+  const { store } = freshStore();
+  const p = publication();
+  p.invention.experiments.push({ ...p.invention.experiments[0], revision: 3, passed: true,
+    metrics: [{ ...p.invention.experiments[0].metrics[0], value: 0.664, display: "66.4" }] });
+  p.invention.experiments.push({ ...p.invention.experiments[0], revision: 3, mode: "reality", title: "横風の雨",
+    metrics: [{ ...p.invention.experiments[0].metrics[0], value: 0.307, display: "30.7" }] });
+  const { id } = store.publish(KEY_A, Publication.parse(p), tinyGlb());
+  const r = store.list().items.find((x) => x.id === id)!.result!;
+  assert.equal(r.mode, "dream", "DREAM を先に見る");
+  assert.deepEqual(r.before, { revision: 1, display: "40.9%", passed: false });
+  assert.deepEqual(r.after, { revision: 3, display: "66.4", passed: true });
+  assert.equal(r.label, "防護率");
+  // 実験が1回だけなら、前は無い
+  const one = Publication.parse(publication());
+  assert.equal(resultSummary(one.invention)!.before, null);
+  // 実験が無ければ要約も無い
+  const none = Publication.parse(publication()); none.invention.experiments = [];
+  assert.equal(resultSummary(none.invention), null);
 });
