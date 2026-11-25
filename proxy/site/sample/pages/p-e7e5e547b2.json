@@ -1,0 +1,383 @@
+{
+ "id": "p-e7e5e547b2",
+ "status": "open",
+ "sample": true,
+ "publishedAt": "2026-11-25T11:14:25.664Z",
+ "updatedAt": "2026-11-25T11:22:16.368Z",
+ "consentVersion": "2026-11-25",
+ "creator": {
+  "name": "発案者",
+  "publicId": null
+ },
+ "wants": {
+  "vr": 0,
+  "site": 0
+ },
+ "tried": 0,
+ "adoptions": [],
+ "considering": [],
+ "images": [
+  {
+   "kind": "stage",
+   "caption": "研究所の発明台に置いた Rev.2",
+   "revision": 2,
+   "url": "sample/images/p-e7e5e547b2-0.jpg"
+  }
+ ],
+ "invention": {
+  "id": "ai-mw9951tq-jz7",
+  "revision": 2,
+  "name": "エアバンパー・スマホガード",
+  "summary": "スマホの角とふちを厚めの緩衝材で囲み、落としたときに画面へ伝わる衝撃を小さくするケース。",
+  "purpose": "スマホの角とふちを厚めの緩衝材で囲み、落としたときに画面へ伝わる衝撃を小さくするケース。",
+  "tags": [
+   {
+    "id": "safety",
+    "label": "安全"
+   },
+   {
+    "id": "daily",
+    "label": "生活"
+   }
+  ],
+  "sceneTags": [],
+  "mount": {
+   "id": "hand",
+   "label": "手"
+  },
+  "request": "スマホを落としても画面が割れないようにする道具",
+  "designSource": "ai",
+  "needs": [
+   {
+    "need": "落としたときの衝撃を減らす",
+    "status": "simulated",
+    "blocks": [
+     {
+      "id": "impact_cushion",
+      "label": "衝撃吸収"
+     }
+    ],
+    "how": "緩衝材（bumper-bottom）が衝撃吸収を受け持つ",
+    "note": "ばね・ダンパーの落下モデルで最大の衝撃（G）と緩衝材のつぶれを測ります。"
+   },
+   {
+    "need": "画面が割れない",
+    "status": "simplified",
+    "blocks": [
+     {
+      "id": "impact_cushion",
+      "label": "衝撃吸収"
+     }
+    ],
+    "how": "緩衝材（bumper-bottom）が衝撃吸収を受け持つ",
+    "note": "ガラスが割れるかどうかは計算せず、最大の衝撃Gが小さいほど割れにくいと考える目安で判定します。落ちる向きや床の角への当たり方も扱いません。"
+   },
+   {
+    "need": "手から滑り落ちにくい",
+    "status": "unverifiable",
+    "blocks": [],
+    "how": "対応する機能がない",
+    "note": "手との摩擦や持ちやすさはシミュレーターのモデルにないため確かめられません。"
+   },
+   {
+    "need": "ポケットに入る薄さ・見た目",
+    "status": "unverifiable",
+    "blocks": [],
+    "how": "対応する機能がない",
+    "note": "かさばり具合や使い心地は人の感じ方によるため確かめられません。"
+   }
+  ],
+  "parts": [
+   {
+    "id": "phone-shell",
+    "type": "body",
+    "label": "本体",
+    "role": "部品をまとめて支える本体",
+    "shape": "箱",
+    "material": "樹脂",
+    "sizeM": [
+     0.08,
+     0.16,
+     0.03
+    ],
+    "massKg": 0.084
+   },
+   {
+    "id": "screen-guard",
+    "type": "panel",
+    "label": "板",
+    "role": "面をふさいだり、物を載せたりする板",
+    "shape": "箱",
+    "material": "ガラス",
+    "sizeM": [
+     0.072,
+     0.15,
+     0.005
+    ],
+    "massKg": 0.119
+   },
+   {
+    "id": "bumper-top",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "カプセル",
+    "material": "発泡材",
+    "sizeM": [
+     0.02,
+     0.09,
+     0.02
+    ],
+    "massKg": 0.001
+   },
+   {
+    "id": "bumper-bottom",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "衝撃吸収の機能を受け持つ。ぶつかったときの衝撃をやわらげる",
+    "shape": "カプセル",
+    "material": "発泡材",
+    "sizeM": [
+     0.02,
+     0.09,
+     0.02
+    ],
+    "massKg": 0.001
+   },
+   {
+    "id": "corner-tl",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "球",
+    "material": "ゴム",
+    "sizeM": [
+     0.025,
+     0.025,
+     0.025
+    ],
+    "massKg": 0.004
+   },
+   {
+    "id": "corner-tr",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "球",
+    "material": "ゴム",
+    "sizeM": [
+     0.025,
+     0.025,
+     0.025
+    ],
+    "massKg": 0.004
+   },
+   {
+    "id": "corner-bl",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "球",
+    "material": "ゴム",
+    "sizeM": [
+     0.025,
+     0.025,
+     0.025
+    ],
+    "massKg": 0.004
+   },
+   {
+    "id": "corner-br",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "球",
+    "material": "ゴム",
+    "sizeM": [
+     0.025,
+     0.025,
+     0.025
+    ],
+    "massKg": 0.004
+   },
+   {
+    "id": "side-left",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "箱",
+    "material": "発泡材",
+    "sizeM": [
+     0.012,
+     0.14,
+     0.016
+    ],
+    "massKg": 0.001
+   },
+   {
+    "id": "side-right",
+    "type": "cushion",
+    "label": "緩衝材",
+    "role": "ぶつかったときの衝撃をやわらげる",
+    "shape": "箱",
+    "material": "発泡材",
+    "sizeM": [
+     0.012,
+     0.14,
+     0.016
+    ],
+    "massKg": 0.001
+   },
+   {
+    "id": "hand-strap",
+    "type": "strap",
+    "label": "ベルト・取り付け具",
+    "role": "体や物に取り付ける",
+    "shape": "箱",
+    "material": "布",
+    "sizeM": [
+     0.06,
+     0.02,
+     0.005
+    ],
+    "massKg": 0
+   }
+  ],
+  "experiments": [
+   {
+    "revision": 1,
+    "title": "落とす（落下）",
+    "mode": "dream",
+    "conditions": [
+     {
+      "label": "落下",
+      "value": "1.0 m・0.2 kg"
+     }
+    ],
+    "metrics": [
+     {
+      "key": "peakImpactG",
+      "label": "最大の衝撃",
+      "value": 73.9809,
+      "unit": "G",
+      "display": "74",
+      "lowerIsBetter": true,
+      "primary": true
+     },
+     {
+      "key": "cushionCompression",
+      "label": "緩衝材のつぶれ",
+      "value": 0.015,
+      "unit": "m",
+      "display": "0.015",
+      "lowerIsBetter": true,
+      "primary": false
+     }
+    ],
+    "passed": false,
+    "criteria": "最大の衝撃≤100G・緩衝材のつぶれ≤0.012m",
+    "seed": 2026,
+    "notes": [
+     "緩衝材の厚みを使い切った（つぶれ切って硬い床に近づいた）",
+     "合格条件を満たさない：緩衝材のつぶれ 0.015 m（緩衝材のつぶれ≤0.012m、厚さ1.5cmを使い切らずに受け止める（目安））",
+     "0.2 kg の物を 1.00 m から硬い床へまっすぐ落とす（空気抵抗・回転は扱わない）",
+     "衝撃吸収：厚み 15 mm・硬さ 8000 N/m の緩衝材（減衰比 0.3）。緩衝材なしなら約 1258 G",
+     "床に当たる速さ 4.4 m/s、止まるまで 6.7 ms（ばね・ダンパーの落下モデル）"
+    ],
+    "at": "2026-11-25T20:21:53"
+   },
+   {
+    "revision": 2,
+    "title": "落とす（落下）",
+    "mode": "dream",
+    "conditions": [
+     {
+      "label": "落下",
+      "value": "1.0 m・0.2 kg"
+     }
+    ],
+    "metrics": [
+     {
+      "key": "peakImpactG",
+      "label": "最大の衝撃",
+      "value": 94.1647,
+      "unit": "G",
+      "display": "94",
+      "lowerIsBetter": true,
+      "primary": true
+     },
+     {
+      "key": "cushionCompression",
+      "label": "緩衝材のつぶれ",
+      "value": 0.0118,
+      "unit": "m",
+      "display": "0.012",
+      "lowerIsBetter": true,
+      "primary": false
+     }
+    ],
+    "passed": true,
+    "criteria": "最大の衝撃≤100G・緩衝材のつぶれ≤0.012m",
+    "seed": 2026,
+    "notes": [
+     "0.2 kg の物を 1.00 m から硬い床へまっすぐ落とす（空気抵抗・回転は扱わない）",
+     "衝撃吸収：厚み 15 mm・硬さ 13000 N/m の緩衝材（減衰比 0.3）。緩衝材なしなら約 1258 G",
+     "床に当たる速さ 4.4 m/s、止まるまで 5.2 ms（ばね・ダンパーの落下モデル）"
+    ],
+    "at": "2026-11-25T20:21:56"
+   }
+  ],
+  "revisions": [
+   {
+    "revision": 2,
+    "parent": 1,
+    "source": "offline",
+    "request": "緩衝材がつぶれ切らないように硬くして",
+    "summary": "緩衝材を硬くして、つぶれ切らないようにする",
+    "changes": [
+     {
+      "label": "衝撃吸収：緩衝材の硬さ",
+      "before": "8000 N/m",
+      "after": "13000 N/m"
+     }
+    ],
+    "resultChanged": true
+   }
+  ],
+  "research": {
+   "unverifiable": [
+    {
+     "need": "手から滑り落ちにくい",
+     "reason": "手との摩擦や持ちやすさはシミュレーターのモデルにないため確かめられません。"
+    },
+    {
+     "need": "ポケットに入る薄さ・見た目",
+     "reason": "かさばり具合や使い心地は人の感じ方によるため確かめられません。"
+    }
+   ],
+   "assumptions": [
+    "衝撃吸収：ばね・ダンパーの落下モデル（厚みを使い切ると硬くなる）",
+    "0.2 kg の物を 1.00 m から硬い床へまっすぐ落とす（空気抵抗・回転は扱わない）",
+    "衝撃吸収：厚み 15 mm・硬さ 8000 N/m の緩衝材（減衰比 0.3）。緩衝材なしなら約 1258 G",
+    "床に当たる速さ 4.4 m/s、止まるまで 6.7 ms（ばね・ダンパーの落下モデル）",
+    "緩衝材の厚みを使い切った（つぶれ切って硬い床に近づいた）",
+    "合格条件を満たさない：緩衝材のつぶれ 0.015 m（緩衝材のつぶれ≤0.012m、厚さ1.5cmを使い切らずに受け止める（目安））",
+    "衝撃吸収：厚み 15 mm・硬さ 13000 N/m の緩衝材（減衰比 0.3）。緩衝材なしなら約 1258 G",
+    "床に当たる速さ 4.4 m/s、止まるまで 5.2 ms（ばね・ダンパーの落下モデル）"
+   ],
+   "simplified": [
+    "画面が割れない：ガラスが割れるかどうかは計算せず、最大の衝撃Gが小さいほど割れにくいと考える目安で判定します。落ちる向きや床の角への当たり方も扱いません。"
+   ]
+  },
+  "developer": {
+   "totalMassKg": 0.224,
+   "tipAngleDeg": null,
+   "powerW": null,
+   "runtimeMin": null,
+   "challenges": [
+    "手から滑り落ちにくい：手との摩擦や持ちやすさはシミュレーターのモデルにないため確かめられません。",
+    "ポケットに入る薄さ・見た目：かさばり具合や使い心地は人の感じ方によるため確かめられません。"
+   ]
+  }
+ }
+}

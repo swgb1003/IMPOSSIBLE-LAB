@@ -365,3 +365,57 @@ test("list: each item carries the first and last tested revision of its main exp
   const none = Publication.parse(publication()); none.invention.experiments = [];
   assert.equal(resultSummary(none.invention), null);
 });
+
+// ---------------- 写真 ----------------
+const tinyJpeg = () => Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(60, 1), Buffer.from([0xff, 0xd9])]);
+
+test("images: stored with the publication, listed with urls, replaced on republish, and checked", () => {
+  const { store } = freshStore();
+  const { id } = store.publish(KEY_A, pub(), tinyGlb(), [
+    { kind: "stage", caption: "発明台に置いた Rev.3", revision: 3, jpg: tinyJpeg() },
+    { kind: "experiment", caption: "Rev.1 の実験", revision: 1, jpg: tinyJpeg() },
+  ]);
+  const page = store.get(id);
+  assert.deepEqual(page.images.map((m) => [m.kind, m.url]), [["stage", `/library/${id}/images/0.jpg`], ["experiment", `/library/${id}/images/1.jpg`]]);
+  assert.equal(store.list().items[0].thumb, `/library/${id}/images/0.jpg`, "一覧には発明台の写真");
+  assert.equal(store.image(id, 1)[0], 0xff);
+  store.publish(KEY_A, pub(), tinyGlb(), []);
+  assert.equal(store.get(id).images.length, 0, "公開し直すと入れ替わる");
+  assert.equal(code(() => store.image(id, 0)), "404 not_found");
+  assert.equal(code(() => store.publish(KEY_A, pub(), tinyGlb(), [{ kind: "stage", caption: "", revision: 1, jpg: Buffer.from("PNG.....") }])), "400 bad_image");
+  assert.equal(code(() => store.publish(KEY_A, pub(), tinyGlb(), [{ kind: "stage", caption: "", revision: 1, jpg: Buffer.concat([tinyJpeg(), Buffer.alloc(400 * 1024)]) }])), "400 bad_image");
+});
+
+test("http: photos come with the publish request and are served as JPEG", async () => {
+  await withServer(async (base) => {
+    const r = await post(base, "/library", {
+      publication: publication(), glbBase64: tinyGlb().toString("base64"),
+      images: [{ kind: "stage", caption: "発明台", revision: 3, jpgBase64: tinyJpeg().toString("base64") }],
+    }, { "x-ilab-creator": KEY_A });
+    assert.equal(r.status, 201);
+    const { id } = await r.json() as { id: string };
+    const img = await fetch(`${base}/library/${id}/images/0.jpg`);
+    assert.equal(img.headers.get("content-type"), "image/jpeg");
+    assert.equal((await fetch(`${base}/library/${id}/images/3.jpg`)).status, 404);
+    const bad = await post(base, "/library", {
+      publication: publication(), glbBase64: tinyGlb().toString("base64"),
+      images: [{ kind: "selfie", caption: "", revision: 1, jpgBase64: "" }],
+    }, { "x-ilab-creator": KEY_A });
+    assert.equal(bad.status, 400, "知らない種類の写真は受け付けない");
+  });
+});
+
+// ---------------- Unity（C# の PublicationBuilder）が作った公開データ ----------------
+test("contract: a publication built by the app passes the library schema", () => {
+  const raw = JSON.parse(readFileSync(path.join(import.meta.dirname, "fixtures", "publication-rain.json"), "utf8"));
+  const r = Publication.safeParse(raw);
+  assert.ok(r.success, r.success ? "" : JSON.stringify(r.error.issues.slice(0, 3)));
+  const inv = r.data!.invention;
+  assert.equal(inv.request, "手を使わず雨を防ぐ装置を作って");
+  assert.ok(inv.experiments.some((e) => e.mode === "reality"));
+  assert.ok(inv.revisions.every((x) => x.revision > x.parent));
+  // 一覧の要約も作れる（DREAM の Rev.1 → Rev.3）
+  const s = resultSummary(inv)!;
+  assert.equal(s.before?.revision, 1);
+  assert.equal(s.after.revision, 3);
+});

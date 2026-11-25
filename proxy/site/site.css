@@ -116,7 +116,7 @@ button { font: inherit; color: inherit; }
 
 /* 部品 */
 .parts h2, .revs h2, .how h2, .notes h2 { font: 500 var(--s3)/1.2 var(--jp); margin-bottom: 14px; }
-.parts h2 .num { color: var(--mut); font-size: var(--s2); margin-left: 8px; }
+.parts h2 .num { color: var(--mut); font-size: var(--s2); margin-left: 10px; }
 .parts ul { display: grid; gap: 4px; margin: 0 calc(var(--pad) * -1); }
 .parts button {
   display: block; width: 100%; text-align: left; background: none; border: 0; cursor: pointer;
@@ -165,8 +165,12 @@ button { font: inherit; color: inherit; }
 .how .what { grid-column: 2; grid-row: 1 / span 2; }
 .how .what span { display: block; font-size: var(--s1); color: var(--mut); margin-top: 4px; }
 
+/* 写真の無い枠のデータの板 */
+.fact h2 { font: 500 var(--s3)/1.25 var(--jp); margin-bottom: 12px; }
+.fact ul { display: grid; gap: 6px; font-size: var(--s1); }
+
 /* 計算の前提 */
-.notes ul { display: grid; gap: 8px; font-size: var(--s1); max-width: 46em; }
+.notes ul, .notes ol { display: grid; gap: 8px; font-size: var(--s1); max-width: 46em; }
 .notes li { color: var(--ink); }
 
 /* 終わり */
@@ -188,6 +192,7 @@ button { font: inherit; color: inherit; }
 .index .controls .ctl { grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; }
 .index .controls .ctl-l { padding-top: 0; }
 .index h1 { font-size: clamp(44px, 6.7vw, 96px); line-height: 1; }
+.index .lead { max-width: 60ch; }
 .controls { display: grid; gap: 12px; align-content: start; }
 .ctl { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 10px; align-items: start; }
 .ctl-l { font-size: var(--s1); color: var(--mut); padding-top: 9px; }

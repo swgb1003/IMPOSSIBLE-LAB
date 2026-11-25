@@ -15,7 +15,8 @@ const int = (min: number, max: number) => z.number().int().min(min).max(max);
 export const safeId = z.string().regex(/^[A-Za-z0-9_-]{1,64}$/, "ID に使えない文字があります");
 const labeled = z.object({ id: line(32), label: line(40) });
 
-export const FunctionStatus = z.enum(["simulated", "simplified", "unverifiable"]);
+/** 要望の確かめ方（アプリの FunctionNeed.Status と同じ。demonstrated は動作プログラムの動きで見せる）。 */
+export const FunctionStatus = z.enum(["simulated", "simplified", "demonstrated", "unverifiable"]);
 
 const need = z.object({
   need: line(120),
@@ -119,10 +120,20 @@ export const Publication = z.object({
 });
 export type Publication = z.infer<typeof Publication>;
 
+/** 公開ページに載せる写真の種類：発明台に置いた試作品・実験の様子・研究所の結果の画面。 */
+export const ImageKind = z.enum(["stage", "experiment", "result"]);
+
 export const PublishBody = z.object({
   publication: Publication,
   /** 試作品の 3D（GLB）を base64 で。 */
   glbBase64: z.string().max(1_400_000),
+  /** 写真（JPEG を base64 で、1枚 300KB まで、4枚まで）。無くてもよい。 */
+  images: z.array(z.object({
+    kind: ImageKind,
+    caption: line(80),
+    revision: int(1, 100000),
+    jpgBase64: z.string().max(410_000),
+  })).max(4).default([]),
 });
 
 export const Role = z.enum(["researcher", "developer"]);

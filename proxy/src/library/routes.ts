@@ -20,7 +20,7 @@ export interface LibraryRouteOptions {
 const ID = "[a-z0-9-]{3,40}";
 const CREATOR_KEY = /^[A-Za-z0-9_-]{16,64}$/;
 const SMALL_BODY = 32 * 1024;
-const PUBLISH_BODY = 2 * 1024 * 1024;
+const PUBLISH_BODY = 4 * 1024 * 1024;
 
 export function sendJson(res: ServerResponse, status: number, obj: unknown) {
   res.writeHead(status, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
@@ -80,12 +80,20 @@ export function createLibraryRoutes(store: LibraryStore, opts: LibraryRouteOptio
     return undefined;
   });
 
+  add("GET", `/library/(${ID})/images/([0-3])\.jpg`, "read", ({ res, params }) => {
+    const jpg = store.image(params[0], Number(params[1]));
+    res.writeHead(200, { "content-type": "image/jpeg", "content-length": jpg.length, "cache-control": "no-store" });
+    res.end(jpg);
+    return undefined;
+  });
+
   // ---- Quest：公開・取り下げ・試した・ほしい ----
   add("POST", "/library", "quest", async (ctx) => {
     const key = creatorKey(ctx.req);
     const b = parse(PublishBody, await json(ctx, PUBLISH_BODY));
     const glb = Buffer.from(b.glbBase64, "base64");
-    const r = store.publish(key, b.publication, glb);
+    const images = b.images.map((im) => ({ kind: im.kind, caption: im.caption, revision: im.revision, jpg: Buffer.from(im.jpgBase64, "base64") }));
+    const r = store.publish(key, b.publication, glb, images);
     ctx.res.statusCode = r.created ? 201 : 200;
     return { status: "ok", ...r };
   });

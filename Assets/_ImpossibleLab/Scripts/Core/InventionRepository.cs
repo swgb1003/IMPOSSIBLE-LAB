@@ -411,10 +411,13 @@ namespace ImpossibleLab.Core
                             Format = fmt, LowerIsBetter = it.Value<bool?>("lowerIsBetter") ?? true, Primary = it.Value<bool?>("primary") ?? true,
                         });
                     }
-                // notes の先頭 limitCount 件が「制限」（改善案の判定に使う）。前提は読み込み時に表示しない
+                // notes の先頭 limitCount 件が「制限」（改善案の判定に使う）、残りが「計算の前提」（結果の画面と公開ページに出す）
                 int limits = o.Value<int?>("limitCount") ?? 0;
                 if (o["notes"] is JArray notes)
+                {
                     foreach (var n in notes.Take(limits)) { var t = n.Value<string>(); if (!string.IsNullOrEmpty(t)) res.Limits.Add(Trunc(t, 160)); }
+                    foreach (var n in notes.Skip(limits)) { var t = n.Type == JTokenType.String ? n.Value<string>() : null; if (!string.IsNullOrEmpty(t)) res.Assumptions.Add(Trunc(t, 160)); }
+                }
                 if (o["timeline"] is JArray tl)
                     foreach (var n in tl.Take(120)) if (n.Type == JTokenType.String) res.Timeline.Add(Trunc(n.Value<string>(), 120));
                 return res;

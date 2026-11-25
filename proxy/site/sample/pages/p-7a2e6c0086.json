@@ -1,0 +1,410 @@
+{
+ "id": "p-7a2e6c0086",
+ "status": "open",
+ "sample": true,
+ "publishedAt": "2026-11-25T11:14:25.690Z",
+ "updatedAt": "2026-11-25T11:22:16.480Z",
+ "consentVersion": "2026-11-25",
+ "creator": {
+  "name": "発案者",
+  "publicId": null
+ },
+ "wants": {
+  "vr": 0,
+  "site": 0
+ },
+ "tried": 0,
+ "adoptions": [],
+ "considering": [],
+ "images": [
+  {
+   "kind": "stage",
+   "caption": "研究所の発明台に置いた Rev.2",
+   "revision": 2,
+   "url": "sample/images/p-7a2e6c0086-0.jpg"
+  }
+ ],
+ "invention": {
+  "id": "ai-mw9967ly-ijq",
+  "revision": 2,
+  "name": "だんボール持ち上げリフト「アゲルくん」",
+  "summary": "床に置いた段ボールを左右からはさみ、柱に沿って棚の高さまで持ち上げて置く道具。",
+  "purpose": "床に置いた段ボールを左右からはさみ、柱に沿って棚の高さまで持ち上げて置く道具。",
+  "tags": [
+   {
+    "id": "assist",
+    "label": "身体補助"
+   },
+   {
+    "id": "carrier",
+    "label": "運搬"
+   },
+   {
+    "id": "daily",
+    "label": "生活"
+   }
+  ],
+  "sceneTags": [],
+  "mount": {
+   "id": "ground",
+   "label": "床（自走）"
+  },
+  "request": "床に置いた段ボールを棚の上まで持ち上げてくれる道具",
+  "designSource": "ai",
+  "needs": [
+   {
+    "need": "段ボールを棚の高さまで持ち上げる",
+    "status": "simulated",
+    "blocks": [
+     {
+      "id": "lift_load",
+      "label": "持ち上げ"
+     }
+    ],
+    "how": "駆動部（lift-motor）が持ち上げを受け持つ",
+    "note": "一定の速さで持ち上げるモデルで、時間と電力を計算します。"
+   },
+   {
+    "need": "段ボールを落とさずつかむ",
+    "status": "simplified",
+    "blocks": [
+     {
+      "id": "grip",
+      "label": "つかむ"
+     }
+    ],
+    "how": "つかみ具（gripper-l）がつかむを受け持つ",
+    "note": "2面ではさむ摩擦の式だけで判定し、段ボールのへこみや中身の偏りは考えません。"
+   },
+   {
+    "need": "棚の上に置く",
+    "status": "simplified",
+    "blocks": [
+     {
+      "id": "lift_load",
+      "label": "持ち上げ"
+     }
+    ],
+    "how": "駆動部（lift-motor）が持ち上げを受け持つ",
+    "note": "棚の高さまで届くかだけを見て、棚の奥へ押し込む動きは再現しません。"
+   },
+   {
+    "need": "持ち上げ中に倒れない",
+    "status": "unverifiable",
+    "blocks": [
+     {
+      "id": "stabilize",
+      "label": "姿勢安定"
+     }
+    ],
+    "how": "対応する機能がない",
+    "note": "持ち上げ実験では重心の移動による転倒を計算しないため確かめられません。"
+   }
+  ],
+  "parts": [
+   {
+    "id": "base",
+    "type": "body",
+    "label": "本体",
+    "role": "姿勢安定の機能を受け持つ。部品をまとめて支える本体",
+    "shape": "箱",
+    "material": "アルミ",
+    "sizeM": [
+     0.5,
+     0.15,
+     0.6
+    ],
+    "massKg": 5.022
+   },
+   {
+    "id": "wheel-fl",
+    "type": "wheel",
+    "label": "車輪",
+    "role": "床の上を走って移動するための車輪",
+    "shape": "円柱",
+    "material": "ゴム",
+    "sizeM": [
+     0.12,
+     0.04,
+     0.12
+    ],
+    "massKg": 0.083
+   },
+   {
+    "id": "wheel-fr",
+    "type": "wheel",
+    "label": "車輪",
+    "role": "床の上を走って移動するための車輪",
+    "shape": "円柱",
+    "material": "ゴム",
+    "sizeM": [
+     0.12,
+     0.04,
+     0.12
+    ],
+    "massKg": 0.083
+   },
+   {
+    "id": "wheel-bl",
+    "type": "wheel",
+    "label": "車輪",
+    "role": "床の上を走って移動するための車輪",
+    "shape": "円柱",
+    "material": "ゴム",
+    "sizeM": [
+     0.12,
+     0.04,
+     0.12
+    ],
+    "massKg": 0.083
+   },
+   {
+    "id": "wheel-br",
+    "type": "wheel",
+    "label": "車輪",
+    "role": "床の上を走って移動するための車輪",
+    "shape": "円柱",
+    "material": "ゴム",
+    "sizeM": [
+     0.12,
+     0.04,
+     0.12
+    ],
+    "massKg": 0.083
+   },
+   {
+    "id": "mast",
+    "type": "frame",
+    "label": "骨組み",
+    "role": "形を支える骨組み",
+    "shape": "箱",
+    "material": "アルミ",
+    "sizeM": [
+     0.08,
+     1.65,
+     0.08
+    ],
+    "massKg": 2.92
+   },
+   {
+    "id": "lift-motor",
+    "type": "motor",
+    "label": "駆動部（モーター）",
+    "role": "持ち上げの機能を受け持つ。関節や部品を動かすモーター",
+    "shape": "円柱",
+    "material": "鉄",
+    "sizeM": [
+     0.12,
+     0.12,
+     0.12
+    ],
+    "massKg": 1.065
+   },
+   {
+    "id": "lift-arm",
+    "type": "arm",
+    "label": "アーム",
+    "role": "物に手を伸ばして動かすアーム",
+    "shape": "箱",
+    "material": "アルミ",
+    "sizeM": [
+     0.5,
+     0.04,
+     0.45
+    ],
+    "massKg": 2.84
+   },
+   {
+    "id": "gripper-l",
+    "type": "gripper",
+    "label": "つかみ具",
+    "role": "つかむの機能を受け持つ。物をつかんで持つ",
+    "shape": "箱",
+    "material": "ゴム",
+    "sizeM": [
+     0.04,
+     0.3,
+     0.35
+    ],
+    "massKg": 0.576
+   },
+   {
+    "id": "gripper-r",
+    "type": "gripper",
+    "label": "つかみ具",
+    "role": "物をつかんで持つ",
+    "shape": "箱",
+    "material": "ゴム",
+    "sizeM": [
+     0.04,
+     0.3,
+     0.35
+    ],
+    "massKg": 0.576
+   },
+   {
+    "id": "battery",
+    "type": "battery",
+    "label": "電池",
+    "role": "電気をためて各部に送る",
+    "shape": "箱",
+    "material": "樹脂",
+    "sizeM": [
+     0.25,
+     0.08,
+     0.2
+    ],
+    "massKg": 8
+   },
+   {
+    "id": "top-sensor",
+    "type": "sensor",
+    "label": "センサー",
+    "role": "まわりの様子や人の位置を感じ取る",
+    "shape": "球",
+    "material": "樹脂",
+    "sizeM": [
+     0.06,
+     0.06,
+     0.06
+    ],
+    "massKg": 0.024
+   }
+  ],
+  "experiments": [
+   {
+    "revision": 1,
+    "title": "持ち上げて置く（積荷）",
+    "mode": "dream",
+    "conditions": [
+     {
+      "label": "積荷",
+      "value": "5 kg・0.40 m"
+     },
+     {
+      "label": "棚",
+      "value": "1.2 m"
+     }
+    ],
+    "metrics": [
+     {
+      "key": "dropCount",
+      "label": "落とした回数",
+      "value": 0,
+      "unit": "回",
+      "display": "0",
+      "lowerIsBetter": true,
+      "primary": true
+     },
+     {
+      "key": "liftTime",
+      "label": "持ち上げ時間",
+      "value": 6,
+      "unit": "秒",
+      "display": "6.0",
+      "lowerIsBetter": true,
+      "primary": true
+     }
+    ],
+    "passed": true,
+    "criteria": "落とした回数≤0回・持ち上げ時間≤10.0秒",
+    "seed": 2026,
+    "notes": [
+     "5.0 kg・幅 0.40 m の荷物を、床から棚（1.20 m）まで持ち上げる",
+     "持ち上げ機構：0.20 m/s で持ち上げる（効率 0.6、加速・減速の時間は数えない）",
+     "つかむ：2面ではさむ（摩擦係数 0.5）。持ち上げ始めの上向きの加速 0.8 m/s² でも支えられるか"
+    ],
+    "at": "2026-11-25T20:21:41"
+   },
+   {
+    "revision": 2,
+    "title": "持ち上げて置く（積荷）",
+    "mode": "dream",
+    "conditions": [
+     {
+      "label": "積荷",
+      "value": "5 kg・0.40 m"
+     },
+     {
+      "label": "棚",
+      "value": "1.2 m"
+     }
+    ],
+    "metrics": [
+     {
+      "key": "dropCount",
+      "label": "落とした回数",
+      "value": 0,
+      "unit": "回",
+      "display": "0",
+      "lowerIsBetter": true,
+      "primary": true
+     },
+     {
+      "key": "liftTime",
+      "label": "持ち上げ時間",
+      "value": 6,
+      "unit": "秒",
+      "display": "6.0",
+      "lowerIsBetter": true,
+      "primary": true
+     }
+    ],
+    "passed": true,
+    "criteria": "落とした回数≤0回・持ち上げ時間≤10.0秒",
+    "seed": 2026,
+    "notes": [
+     "5.0 kg・幅 0.40 m の荷物を、床から棚（1.20 m）まで持ち上げる",
+     "持ち上げ機構：0.20 m/s で持ち上げる（効率 0.6、加速・減速の時間は数えない）",
+     "つかむ：2面ではさむ（摩擦係数 0.5）。持ち上げ始めの上向きの加速 0.8 m/s² でも支えられるか"
+    ],
+    "at": "2026-11-25T20:21:45"
+   }
+  ],
+  "revisions": [
+   {
+    "revision": 2,
+    "parent": 1,
+    "source": "offline",
+    "request": "落とさないようにしっかりつかんで",
+    "summary": "つかむ力を強める",
+    "changes": [
+     {
+      "label": "つかむ：つかむ力",
+      "before": "150 N",
+      "after": "170 N"
+     }
+    ],
+    "resultChanged": false
+   }
+  ],
+  "research": {
+   "unverifiable": [
+    {
+     "need": "持ち上げ中に倒れない",
+     "reason": "持ち上げ実験では重心の移動による転倒を計算しないため確かめられません。"
+    }
+   ],
+   "assumptions": [
+    "持ち上げ：一定の速さで持ち上げる：電力 = m g v ÷ 効率",
+    "つかむ：2面ではさむ：2μF ≥ m(g + 揺れの加速度)",
+    "5.0 kg・幅 0.40 m の荷物を、床から棚（1.20 m）まで持ち上げる",
+    "持ち上げ機構：0.20 m/s で持ち上げる（効率 0.6、加速・減速の時間は数えない）",
+    "つかむ：2面ではさむ（摩擦係数 0.5）。持ち上げ始めの上向きの加速 0.8 m/s² でも支えられるか"
+   ],
+   "simplified": [
+    "段ボールを落とさずつかむ：2面ではさむ摩擦の式だけで判定し、段ボールのへこみや中身の偏りは考えません。",
+    "棚の上に置く：棚の高さまで届くかだけを見て、棚の奥へ押し込む動きは再現しません。"
+   ]
+  },
+  "developer": {
+   "totalMassKg": 21.356,
+   "tipAngleDeg": 26,
+   "powerW": null,
+   "runtimeMin": null,
+   "challenges": [
+    "持ち上げ中に倒れない：持ち上げ実験では重心の移動による転倒を計算しないため確かめられません。"
+   ]
+  }
+ }
+}

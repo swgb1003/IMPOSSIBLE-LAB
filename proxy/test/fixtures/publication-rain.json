@@ -1,0 +1,387 @@
+{
+  "format": 1,
+  "creator": {
+    "displayName": "",
+    "anonymous": true
+  },
+  "consent": {
+    "version": "2026-11-25",
+    "agreed": true,
+    "agreedAt": "2026-11-25T20:18:22"
+  },
+  "invention": {
+    "id": "inv-handsfree-rain",
+    "revision": 3,
+    "name": "ハンズフリー雨よけ装置",
+    "summary": "荷物で両手がふさがっている人の頭上に浮かび、傘を持たなくても雨を防ぐ装置。",
+    "purpose": "両手がふさがっていても、傘を持たずに頭上の雨を防ぐ",
+    "tags": [
+      {
+        "id": "protection",
+        "label": "防護"
+      }
+    ],
+    "sceneTags": [],
+    "mount": {
+      "id": "head",
+      "label": "頭"
+    },
+    "request": "手を使わず雨を防ぐ装置を作って",
+    "designSource": "offline",
+    "needs": [
+      {
+        "need": "頭上追従",
+        "status": "simulated",
+        "blocks": [
+          {
+            "id": "follow_head",
+            "label": "頭上追従"
+          }
+        ],
+        "how": "本体（core）が頭上追従を受け持つ",
+        "note": ""
+      },
+      {
+        "need": "雨よけ判定",
+        "status": "simulated",
+        "blocks": [
+          {
+            "id": "rain_shield",
+            "label": "雨よけ判定"
+          }
+        ],
+        "how": "キャノピー（shield）が雨よけ判定を受け持つ",
+        "note": ""
+      },
+      {
+        "need": "姿勢安定",
+        "status": "simulated",
+        "blocks": [
+          {
+            "id": "stabilize",
+            "label": "姿勢安定"
+          }
+        ],
+        "how": "姿勢安定ユニット（gyro）が姿勢安定を受け持つ",
+        "note": ""
+      }
+    ],
+    "parts": [
+      {
+        "id": "core",
+        "type": "body",
+        "label": "本体",
+        "role": "頭上の位置を保ち、ほかの部品をまとめる本体",
+        "shape": "円柱",
+        "material": "樹脂",
+        "sizeM": [
+          0.22,
+          0.08,
+          0.22
+        ],
+        "massKg": 0.276
+      },
+      {
+        "id": "shield",
+        "type": "canopy",
+        "label": "キャノピー（覆い）",
+        "role": "頭の上に広がって雨を受け止める覆い",
+        "shape": "円柱",
+        "material": "布",
+        "sizeM": [
+          1.2,
+          0.03,
+          1.2
+        ],
+        "massKg": 0.178
+      },
+      {
+        "id": "eye",
+        "type": "sensor",
+        "label": "センサー",
+        "role": "頭の位置を見て、ついていく向きを決める",
+        "shape": "球",
+        "material": "樹脂",
+        "sizeM": [
+          0.05,
+          0.03,
+          0.05
+        ],
+        "massKg": 0.012
+      },
+      {
+        "id": "gyro",
+        "type": "stabilizer",
+        "label": "姿勢安定ユニット",
+        "role": "風で傾いたときに姿勢を戻す",
+        "shape": "箱",
+        "material": "樹脂",
+        "sizeM": [
+          0.08,
+          0.04,
+          0.08
+        ],
+        "massKg": 0.054
+      }
+    ],
+    "experiments": [
+      {
+        "revision": 1,
+        "title": "雨の実験場",
+        "mode": "dream",
+        "conditions": [
+          {
+            "label": "雨量",
+            "value": "30 mm/h"
+          },
+          {
+            "label": "風速",
+            "value": "4.0 m/s"
+          },
+          {
+            "label": "風向",
+            "value": "90°"
+          },
+          {
+            "label": "時間",
+            "value": "10 秒"
+          }
+        ],
+        "metrics": [
+          {
+            "key": "coverageRatio",
+            "label": "雨を防いだ割合",
+            "value": 0.4088,
+            "unit": "%",
+            "display": "40.9",
+            "lowerIsBetter": false,
+            "primary": true
+          },
+          {
+            "key": "wetnessScore",
+            "label": "体に当たった雨粒",
+            "value": 30.8,
+            "unit": "粒/秒",
+            "display": "30.8",
+            "lowerIsBetter": true,
+            "primary": false
+          }
+        ],
+        "passed": false,
+        "criteria": "雨を防いだ割合 80 % 以上",
+        "seed": 2026,
+        "notes": [
+          "空想シミュレーション：装置は風の影響を受けず、電力・重量の制約なし",
+          "雨粒の衝突判定のみで評価（実際の流体解析ではない）"
+        ],
+        "at": "2026-11-25T20:18:03"
+      },
+      {
+        "revision": 3,
+        "title": "雨の実験場",
+        "mode": "dream",
+        "conditions": [
+          {
+            "label": "雨量",
+            "value": "30 mm/h"
+          },
+          {
+            "label": "風速",
+            "value": "4.0 m/s"
+          },
+          {
+            "label": "風向",
+            "value": "90°"
+          },
+          {
+            "label": "時間",
+            "value": "10 秒"
+          }
+        ],
+        "metrics": [
+          {
+            "key": "coverageRatio",
+            "label": "雨を防いだ割合",
+            "value": 0.6641,
+            "unit": "%",
+            "display": "66.4",
+            "lowerIsBetter": false,
+            "primary": true
+          },
+          {
+            "key": "wetnessScore",
+            "label": "体に当たった雨粒",
+            "value": 17.5,
+            "unit": "粒/秒",
+            "display": "17.5",
+            "lowerIsBetter": true,
+            "primary": false
+          }
+        ],
+        "passed": false,
+        "criteria": "雨を防いだ割合 80 % 以上",
+        "seed": 2026,
+        "notes": [
+          "空想シミュレーション：装置は風の影響を受けず、電力・重量の制約なし",
+          "雨粒の衝突判定のみで評価（実際の流体解析ではない）"
+        ],
+        "at": "2026-11-25T20:18:10"
+      },
+      {
+        "revision": 3,
+        "title": "雨の実験場",
+        "mode": "reality",
+        "conditions": [
+          {
+            "label": "雨量",
+            "value": "30 mm/h"
+          },
+          {
+            "label": "風速",
+            "value": "4.0 m/s"
+          },
+          {
+            "label": "風向",
+            "value": "90°"
+          },
+          {
+            "label": "時間",
+            "value": "10 秒"
+          }
+        ],
+        "metrics": [
+          {
+            "key": "coverageRatio",
+            "label": "雨を防いだ割合",
+            "value": 0.3071,
+            "unit": "%",
+            "display": "30.7",
+            "lowerIsBetter": false,
+            "primary": true
+          },
+          {
+            "key": "wetnessScore",
+            "label": "体に当たった雨粒",
+            "value": 36.1,
+            "unit": "粒/秒",
+            "display": "36.1",
+            "lowerIsBetter": true,
+            "primary": false
+          },
+          {
+            "key": "driftM",
+            "label": "風で流された距離",
+            "value": 0.465,
+            "unit": "m",
+            "display": "0.47",
+            "lowerIsBetter": true,
+            "primary": false
+          },
+          {
+            "key": "powerW",
+            "label": "浮かび続ける電力",
+            "value": 376.53,
+            "unit": "W",
+            "display": "377",
+            "lowerIsBetter": true,
+            "primary": false
+          },
+          {
+            "key": "runtimeMin",
+            "label": "電池で使える時間",
+            "value": 8.48,
+            "unit": "分",
+            "display": "8.5",
+            "lowerIsBetter": false,
+            "primary": false
+          },
+          {
+            "key": "massKg",
+            "label": "電池を含む重さ",
+            "value": 2.306,
+            "unit": "kg",
+            "display": "2.31",
+            "lowerIsBetter": true,
+            "primary": false
+          },
+          {
+            "key": "energyWh",
+            "label": "使った電力量",
+            "value": 1.0459,
+            "unit": "Wh",
+            "display": "1.046",
+            "lowerIsBetter": true,
+            "primary": false
+          }
+        ],
+        "passed": false,
+        "criteria": "雨を防いだ割合 80 % 以上",
+        "seed": 2026,
+        "notes": [
+          "総重量 約 2.31 kg（本体・キャノピー・側面カバー・電池の面積比例モデル）",
+          "ホバー電力は運動量理論 P = T^1.5 / √(2ρA) を効率で割って算出 → 約 377 W",
+          "風荷重 F = ½ρ Cd A v² = 7.1 N。位置ずれ = F ÷ 位置保持の強さ（調整用の仮定）",
+          "電池 0.35 kg × エネルギー密度 × 使用可能割合 = 約 53 Wh",
+          "係数 17 件のうち「要調査」2 件・調整用 3 件。幅は各係数の上下限で計算",
+          "簡易モデルによる参考値。現実の性能・安全性は保証しない"
+        ],
+        "at": "2026-11-25T20:18:14"
+      }
+    ],
+    "revisions": [
+      {
+        "revision": 2,
+        "parent": 1,
+        "source": "offline",
+        "request": "横からの雨も防いで",
+        "summary": "側面カバーを伸ばして横からの雨を防ぐ",
+        "changes": [
+          {
+            "label": "雨よけ判定：側面カバーの長さ",
+            "before": "0.00 m",
+            "after": "0.25 m"
+          }
+        ],
+        "resultChanged": false
+      },
+      {
+        "revision": 3,
+        "parent": 2,
+        "source": "offline",
+        "request": "防ぐ範囲を広げて",
+        "summary": "防護半径を広げる",
+        "changes": [
+          {
+            "label": "雨よけ判定：防護半径",
+            "before": "0.60 m",
+            "after": "0.80 m"
+          }
+        ],
+        "resultChanged": true
+      }
+    ],
+    "research": {
+      "unverifiable": [],
+      "assumptions": [
+        "空想シミュレーション：装置は風の影響を受けず、電力・重量の制約なし",
+        "雨粒の衝突判定のみで評価（実際の流体解析ではない）",
+        "総重量 約 2.31 kg（本体・キャノピー・側面カバー・電池の面積比例モデル）",
+        "ホバー電力は運動量理論 P = T^1.5 / √(2ρA) を効率で割って算出 → 約 377 W",
+        "風荷重 F = ½ρ Cd A v² = 7.1 N。位置ずれ = F ÷ 位置保持の強さ（調整用の仮定）",
+        "電池 0.35 kg × エネルギー密度 × 使用可能割合 = 約 53 Wh",
+        "係数 17 件のうち「要調査」2 件・調整用 3 件。幅は各係数の上下限で計算",
+        "簡易モデルによる参考値。現実の性能・安全性は保証しない"
+      ],
+      "simplified": []
+    },
+    "developer": {
+      "totalMassKg": 0.52,
+      "tipAngleDeg": null,
+      "powerW": 376.5,
+      "runtimeMin": 8.5,
+      "challenges": [
+        "REALITY では雨を防いだ割合が 30.7 % で、合格の目安に届かない"
+      ]
+    }
+  }
+}

@@ -43,12 +43,16 @@ export const LIMITS = {
   maxThreads: 500,
   maxMessagesPerThread: 200,
   maxGlbBytes: 1024 * 1024,
+  maxImageBytes: 300 * 1024,
+  maxImages: 4,
 };
 
 export type PubStatus = "open" | "considering" | "adopted";
 export type SortKey = "wants" | "new" | "adoptions" | "name";
 
 interface Adoption { id: string; accountId: string; reason: string; at: string; threadId: string }
+export interface ImageInput { kind: "stage" | "experiment" | "result"; caption: string; revision: number; jpg: Buffer }
+interface ImageMeta { kind: ImageInput["kind"]; caption: string; revision: number }
 interface Considering { accountId: string; at: string }
 interface PubRecord {
   id: string;
@@ -72,6 +76,8 @@ interface PubRecord {
   adoptions: Adoption[];
   /** 見本（見本と明記して出す）。 */
   sample: boolean;
+  /** 写真（pubs/<公開ID>.img<番号>.jpg）。 */
+  images?: ImageMeta[];
 }
 export interface AccountRecord {
   id: string; name: string; affiliation: string; role: Role; field: string; intro: string;
@@ -94,6 +100,13 @@ const hash = (s: string) => createHash("sha256").update(s, "utf8").digest("hex")
 /** 端末の鍵から、公開してよい発案者の ID を作る（鍵は戻せない）。 */
 export const publicCreatorId = (creatorHash: string) => "c-" + hash("public:" + creatorHash).slice(0, 12);
 export const creatorHashOf = (creatorKey: string) => hash("creator:" + creatorKey);
+
+/** JPEG の見出しと大きさを確かめる（中身までは見ない）。 */
+export function checkJpeg(b: Buffer): string | null {
+  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8 || b[2] !== 0xff) return "写真は JPEG で送ってください";
+  if (b.length > LIMITS.maxImageBytes) return `写真が大きすぎます（1枚 ${LIMITS.maxImageBytes / 1024} KB まで）`;
+  return null;
+}
 
 /** GLB の見出しと JSON の区切りを確かめる（中身の三角形までは見ない）。 */
 export function checkGlb(b: Buffer): string | null {
@@ -151,9 +164,11 @@ export class LibraryStore {
 
   // ---------------- 公開（Quest から） ----------------
   /** 公開する。同じ端末の同じ発明はページを更新する（ほしい・採用の数は残し、取り下げていたら戻す）。 */
-  publish(creatorKey: string, publication: Publication, glb: Buffer): { id: string; created: boolean } {
+  publish(creatorKey: string, publication: Publication, glb: Buffer, images: ImageInput[] = []): { id: string; created: boolean } {
     const err = checkGlb(glb);
     if (err) throw new HttpError(400, "bad_glb", err);
+    if (images.length > LIMITS.maxImages) throw new HttpError(400, "bad_image", `写真は ${LIMITS.maxImages} 枚までです`);
+    for (const im of images) { const e = checkJpeg(im.jpg); if (e) throw new HttpError(400, "bad_image", e); }
     const creatorHash = creatorHashOf(creatorKey);
     const inv = publication.invention;
     const partIds = new Set(inv.parts.map((p) => p.id));
@@ -179,6 +194,10 @@ export class LibraryStore {
     rec.updatedAt = now;
     rec.withdrawn = false; rec.withdrawnBy = null; rec.withdrawReason = "";
     this.writeAtomic(this.pubPath(rec.id, ".glb"), glb);
+    // 写真は公開し直すたびに入れ替える
+    for (let i = 0; i < LIMITS.maxImages; i++) rmSync(this.pubPath(rec.id, `.img${i}.jpg`), { force: true });
+    images.forEach((im, i) => this.writeAtomic(this.pubPath(rec.id, `.img${i}.jpg`), im.jpg));
+    rec.images = images.map((im) => ({ kind: im.kind, caption: im.caption, revision: im.revision }));
     this.writeAtomic(this.pubPath(rec.id, ".json"), JSON.stringify(publication));
     this.pubData.set(rec.id, publication);
     if (created) this.db.pubs.push(rec);
@@ -239,6 +258,7 @@ export class LibraryStore {
         adoptions: rec.adoptions.length, considering: rec.considering.length,
         publishedAt: rec.publishedAt, updatedAt: rec.updatedAt, sample: rec.sample,
         result: resultSummary(inv),
+        thumb: this.imagesOf(rec).find((m) => m.kind === "stage")?.url ?? null,
       })),
     };
   }
@@ -252,6 +272,7 @@ export class LibraryStore {
       wants: { vr: rec.wantsVr.length, site: rec.wantsSite.length }, tried: rec.tried.length,
       adoptions: rec.adoptions.map((a) => ({ at: a.at, reason: a.reason, adopter: this.accountPublic(a.accountId) })),
       considering: rec.considering.map((c) => ({ at: c.at, account: this.accountPublic(c.accountId) })),
+      images: this.imagesOf(rec),
       invention: this.pubData.get(rec.id)!.invention,
     };
   }
@@ -259,6 +280,16 @@ export class LibraryStore {
   model(id: string): Buffer {
     const rec = this.pubOrThrow(id);
     return readFileSync(this.pubPath(rec.id, ".glb"));
+  }
+
+  image(id: string, n: number): Buffer {
+    const rec = this.pubOrThrow(id);
+    if (!Number.isInteger(n) || n < 0 || n >= (rec.images?.length ?? 0)) throw new HttpError(404, "not_found", "写真が見つかりません");
+    return readFileSync(this.pubPath(rec.id, `.img${n}.jpg`));
+  }
+
+  private imagesOf(rec: PubRecord) {
+    return (rec.images ?? []).map((m, i) => ({ ...m, url: `/library/${rec.id}/images/${i}.jpg` }));
   }
 
   // ---------------- ほしい・試した ----------------

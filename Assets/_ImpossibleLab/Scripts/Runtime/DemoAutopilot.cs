@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ImpossibleLab.Core;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace ImpossibleLab
@@ -24,6 +25,9 @@ namespace ImpossibleLab
         RenderTexture _rt;
         readonly StringBuilder _log = new StringBuilder();
         int _shot;
+        /// <summary>直前に撮った画面写真のファイル（見本の写真を切り出すため）。</summary>
+        string _lastShot;
+        string _rainRunningShot, _rainResultShot, _rainRealityShot;
 
         IEnumerator Start()
         {
@@ -129,6 +133,7 @@ namespace ImpossibleLab
             string file = Path.Combine(OutputDir, $"{++_shot:00}_{name}.png");
             File.WriteAllBytes(file, tex.EncodeToPNG());
             Destroy(tex);
+            _lastShot = file;
             Log("SHOT " + file);
             if (hiddenFrame != null) hiddenFrame.gameObject.SetActive(true);
             if (hideConsole) { _app.ConsoleRoot.gameObject.SetActive(true); yield break; }
@@ -312,11 +317,13 @@ namespace ImpossibleLab
             yield return WaitState(LabState.RunningTest);
             yield return new WaitForSeconds(4f);
             yield return Shot("S05_running", rainLab: true);
+            _rainRunningShot = _lastShot;
             yield return Shot("S05_running_face", facePanel: "MainConsole");
             yield return WaitState(LabState.ReviewingResult);
             var r1 = _app.LastResult;
             Log($"RESULT rev{r1.Revision} {r1.Config.Mode} wetness={r1.WetnessScore:0.00} coverage={r1.CoverageRatio:0.000} hits={r1.DeviceHits}/{r1.BaselineHits}");
             yield return Shot("S05_result_rev1", rainLab: true);
+            _rainResultShot = _lastShot;
             yield return Shot("S05_result_rev1_face", facePanel: "MainConsole");
 
             // 改良：横からの雨 → 範囲
@@ -387,6 +394,7 @@ namespace ImpossibleLab
             Check(r3.Config.Mode == LabModes.Reality && r3.EnergyWh.HasValue, "reality result has energy");
             Check(_app.OtherModeResult != null, "dream/reality comparison available");
             yield return Shot("S05_result_reality", rainLab: true);
+            _rainRealityShot = _lastShot;
             yield return Shot("S05_result_reality_face", facePanel: "MainConsole");
             Check(r3.RuntimeMinutesMin.HasValue && r3.RuntimeMinutesMin <= r3.RuntimeMinutes && r3.RuntimeMinutes <= r3.RuntimeMinutesMax, "reality runtime range brackets nominal");
 
@@ -421,6 +429,19 @@ namespace ImpossibleLab
                 Check(n3 != null && n3.Request == "防ぐ範囲を広げて" && saved.RevisionNotes.Count == 2, "saved: rev3 note after undo and redo");
             }
             ExportGlb("rain_rev" + _app.Current.Current.Revision, _app.Current.Current);
+            // 発明ライブラリの見本：公開データ・3D・写真（発明台に置いた最後の版、実験の様子、研究所の結果の画面）
+            yield return Shot("S06_product_final_rain", device: true, productView: true);
+            {
+                var saved = _app.Repo.Load(_app.Current.Current.Id, out _);
+                int rev = saved.Current.Revision;
+                WriteSample(saved, new[]
+                {
+                    ("stage", $"研究所の発明台に置いた Rev.{rev}", rev, CropJpg(_lastShot, 300, 60, 1000, 700)),
+                    ("experiment", "Rev.1 の実験。横風 4 m/s、雨量 30 mm/h の中で人型の頭が濡れた", 1, CropJpg(_rainRunningShot, 440, 0, 720, 400)),
+                    ("experiment", $"Rev.{rev} を REALITY で測ると、覆いが風で流されて頭から外れた", rev, CropJpg(_rainRealityShot, 440, 0, 720, 400)),
+                    ("result", "研究所の操作パネルで見た Rev.1 の結果", 1, CropJpg(_rainResultShot, 540, 415, 520, 485)),
+                });
+            }
             yield return Shot("S06_saved");
             yield return Shot("S06_saved_face", facePanel: "MainConsole");
             if (exUi != null)
@@ -882,6 +903,73 @@ namespace ImpossibleLab
             yield return WaitState(LabState.Saved, 20f); // 次の検証は保存完了の画面から新しい発明を始める
         }
 
+        /// <summary>AI の評価セットの依頼の原文（無ければ null）。</summary>
+        static string EvalRequest(string id)
+        {
+            try
+            {
+                var path = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "proxy", "eval", "requests.json"));
+                var token = JToken.Parse(File.ReadAllText(path));
+                var list = token is JArray a ? a : (JArray)token["requests"];
+                return list.OfType<JObject>().FirstOrDefault(o => (string)o["id"] == id)?.Value<string>("request");
+            }
+            catch (Exception) { return null; }
+        }
+
+        /// <summary>画面写真（1600×900 の PNG）の一部を切り出し、幅 720 px までの JPEG にする。y は画像の上から。</summary>
+        static byte[] CropJpg(string pngFile, int x, int yTop, int w, int h)
+        {
+            if (pngFile == null || !File.Exists(pngFile)) return null;
+            var src = new Texture2D(2, 2);
+            src.LoadImage(File.ReadAllBytes(pngFile));
+            x = Mathf.Clamp(x, 0, src.width - 1); w = Mathf.Min(w, src.width - x);
+            int y = Mathf.Clamp(src.height - yTop - h, 0, src.height - 1); h = Mathf.Min(h, src.height - y);
+            var crop = new Texture2D(w, h, TextureFormat.RGB24, false);
+            crop.SetPixels(src.GetPixels(x, y, w, h));
+            crop.Apply();
+            Texture2D outTex = crop;
+            if (w > 720)
+            {
+                int ow = 720, oh = Mathf.RoundToInt(h * 720f / w);
+                var rt = RenderTexture.GetTemporary(ow, oh);
+                Graphics.Blit(crop, rt);
+                var prev = RenderTexture.active; RenderTexture.active = rt;
+                outTex = new Texture2D(ow, oh, TextureFormat.RGB24, false);
+                outTex.ReadPixels(new Rect(0, 0, ow, oh), 0, 0); outTex.Apply();
+                RenderTexture.active = prev; RenderTexture.ReleaseTemporary(rt);
+                Destroy(crop);
+            }
+            var jpg = outTex.EncodeToJPG(84);
+            Destroy(outTex); Destroy(src);
+            return jpg;
+        }
+
+        /// <summary>
+        /// 発明ライブラリの見本を書き出す：OutputDir/library/&lt;発明 ID&gt;/ に公開データ（publication.json）・3D（model.glb）・写真（imageN.jpg と images.json）。
+        /// PC 側の proxy/tools/load-samples.ts がこれをライブラリに入れる。
+        /// </summary>
+        void WriteSample(SavedInvention inv, (string kind, string caption, int revision, byte[] jpg)[] images)
+        {
+            var pub = PublicationBuilder.Build(inv, new PublishOptions { Anonymous = true, AgreedAt = LabClock.NowIso() });
+            var glb = ProductExport.Export(inv.Current, _app.Assets);
+            string dir = Path.Combine(OutputDir, "library", inv.Current.Id);
+            Directory.CreateDirectory(dir);
+            File.WriteAllText(Path.Combine(dir, "publication.json"), pub.ToString(), new UTF8Encoding(false));
+            if (glb.Glb != null) File.WriteAllBytes(Path.Combine(dir, "model.glb"), glb.Glb);
+            var meta = new JArray();
+            foreach (var im in images.Where(i => i.jpg != null))
+            {
+                string file = $"image{meta.Count}.jpg";
+                File.WriteAllBytes(Path.Combine(dir, file), im.jpg);
+                meta.Add(new JObject { ["file"] = file, ["kind"] = im.kind, ["caption"] = im.caption, ["revision"] = im.revision });
+            }
+            File.WriteAllText(Path.Combine(dir, "images.json"), meta.ToString(), new UTF8Encoding(false));
+            var invj = pub["invention"];
+            Log($"SAMPLE {inv.Current.Id} rev={invj["revision"]} experiments={((JArray)invj["experiments"]).Count} revisions={((JArray)invj["revisions"]).Count} images={meta.Count} glb={glb.Glb?.Length ?? 0}");
+            Check(glb.Glb != null && meta.Count == images.Length && !string.IsNullOrEmpty((string)invj["request"]) && ((JArray)invj["experiments"]).Count > 0,
+                $"sample-{inv.Current.Id}: publication, 3D and {meta.Count} photo(s) written");
+        }
+
         /// <summary>
         /// 公開用の 3D（GLB）を書き出し、形が正しいこと・部品がすべてノードにあること・大きさの目安に収まることを確かめる。
         /// 書き出したファイルは OutputDir/glb/ に残す（ブラウザ・Blender で開いて見た目を確かめる）。
@@ -937,7 +1025,8 @@ namespace ImpossibleLab
             _app.SetDesignServiceForVerify(new FixtureDesignService(File.ReadAllText(path)));
             if (_app.Sm.State == LabState.Saved) _app.ContinueEditing();
             _app.NewInvention();
-            _app.SetRequestText("代表 " + id);
+            // 見本として公開するので、AI の評価で実際に使った依頼の原文を入れる（proxy/eval/requests.json）
+            _app.SetRequestText(EvalRequest(id) ?? "代表 " + id);
             float w = 0;
             while (_app.Sm.State == LabState.Drafting && w < 10f) { _app.SubmitRequest(); w += Time.unscaledDeltaTime; yield return null; }
             yield return WaitState(LabState.AwaitingApproval);
@@ -1004,8 +1093,13 @@ namespace ImpossibleLab
             bool savedOk = saved != null && saved.Experiments.Count(e => e.IsScenarioLab) >= 2 && saved.Current.Revision == r2?.Revision;
             Check(savedOk, $"rep-{id}: saved Rev.{saved?.Current.Revision} with {saved?.Experiments.Count} experiments {err}");
             var note = saved?.NoteFor(saved.Current.Revision);
-            Check(saved != null && saved.RequestText == "代表 " + id && saved.DesignSource == "ai" && note != null && note.Request == req && note.Changes.Count > 0,
+            Check(saved != null && saved.RequestText == (EvalRequest(id) ?? "代表 " + id) && saved.DesignSource == "ai" && note != null && note.Request == req && note.Changes.Count > 0,
                 $"rep-{id}: saved the design request and the revision request");
+            if (saved != null)
+            {
+                yield return Shot($"S06_product_final_rep_{id}", device: true, productView: true);
+                WriteSample(saved, new[] { ("stage", $"研究所の発明台に置いた Rev.{saved.Current.Revision}", saved.Current.Revision, CropJpg(_lastShot, 300, 60, 1000, 700)) });
+            }
             _app.ContinueEditing();
             yield return WaitState(LabState.Editing);
             done(revised && better && savedOk);

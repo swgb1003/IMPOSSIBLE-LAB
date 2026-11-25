@@ -1,0 +1,293 @@
+{
+ "id": "p-9099caee0c",
+ "status": "open",
+ "sample": true,
+ "publishedAt": "2026-11-25T11:14:25.751Z",
+ "updatedAt": "2026-11-25T11:22:16.740Z",
+ "consentVersion": "2026-11-25",
+ "creator": {
+  "name": "発案者",
+  "publicId": null
+ },
+ "wants": {
+  "vr": 0,
+  "site": 0
+ },
+ "tried": 0,
+ "adoptions": [],
+ "considering": [],
+ "images": [
+  {
+   "kind": "stage",
+   "caption": "研究所の発明台に置いた Rev.2",
+   "revision": 2,
+   "url": "sample/images/p-9099caee0c-0.jpg"
+  }
+ ],
+ "invention": {
+  "id": "ai-mwbequnj-rip",
+  "revision": 2,
+  "name": "夜道あんしん足元ライト",
+  "summary": "夜道を歩くとき、腰に付けたライトが足元を斜め下に照らして暗さの不安を減らす道具です。",
+  "purpose": "夜道を歩くとき、腰に付けたライトが足元を斜め下に照らして暗さの不安を減らす道具です。",
+  "tags": [
+   {
+    "id": "lighting",
+    "label": "照明"
+   },
+   {
+    "id": "safety",
+    "label": "安全"
+   },
+   {
+    "id": "daily",
+    "label": "生活"
+   }
+  ],
+  "sceneTags": [],
+  "mount": {
+   "id": "waist",
+   "label": "腰"
+  },
+  "request": "夜道で足元が暗くて怖いので、自動で足元を照らしてくれる道具",
+  "designSource": "ai",
+  "needs": [
+   {
+    "need": "足元を明るく照らす",
+    "status": "simulated",
+    "blocks": [
+     {
+      "id": "illuminate",
+      "label": "照明"
+     }
+    ],
+    "how": "発光部（main-light）が照明を受け持つ",
+    "note": "光束・広がり・下向き角度から床の照度を計算して確かめます。"
+   },
+   {
+    "need": "暗くなると自動で点灯",
+    "status": "unverifiable",
+    "blocks": [],
+    "how": "対応する機能がない",
+    "note": "周りの明るさで自動点灯する仕組みのモデルがないため、実験では常に点灯している状態として扱います。"
+   },
+   {
+    "need": "夜道の怖さを減らす",
+    "status": "unverifiable",
+    "blocks": [],
+    "how": "対応する機能がない",
+    "note": "安心感などの気持ちはシミュレーションでは測れません。"
+   },
+   {
+    "need": "歩いても邪魔にならない",
+    "status": "unverifiable",
+    "blocks": [],
+    "how": "対応する機能がない",
+    "note": "付け心地や重さの感じ方は実験の対象外です。"
+   }
+  ],
+  "parts": [
+   {
+    "id": "body",
+    "type": "body",
+    "label": "本体",
+    "role": "部品をまとめて支える本体",
+    "shape": "箱",
+    "material": "樹脂",
+    "sizeM": [
+     0.12,
+     0.07,
+     0.04
+    ],
+    "massKg": 0.067
+   },
+   {
+    "id": "belt",
+    "type": "strap",
+    "label": "ベルト・取り付け具",
+    "role": "体や物に取り付ける",
+    "shape": "箱",
+    "material": "布",
+    "sizeM": [
+     0.36,
+     0.04,
+     0.01
+    ],
+    "massKg": 0.003
+   },
+   {
+    "id": "main-light",
+    "type": "light",
+    "label": "発光部",
+    "role": "照明の機能を受け持つ。光を出して照らす・知らせる",
+    "shape": "円柱",
+    "material": "ガラス",
+    "sizeM": [
+     0.05,
+     0.02,
+     0.05
+    ],
+    "massKg": 0.035
+   },
+   {
+    "id": "battery",
+    "type": "battery",
+    "label": "電池",
+    "role": "電気をためて各部に送る",
+    "shape": "箱",
+    "material": "樹脂",
+    "sizeM": [
+     0.08,
+     0.02,
+     0.03
+    ],
+    "massKg": 0.096
+   },
+   {
+    "id": "dark-sensor",
+    "type": "sensor",
+    "label": "センサー",
+    "role": "まわりの様子や人の位置を感じ取る",
+    "shape": "球",
+    "material": "ガラス",
+    "sizeM": [
+     0.012,
+     0.012,
+     0.012
+    ],
+    "massKg": 0.002
+   }
+  ],
+  "experiments": [
+   {
+    "revision": 1,
+    "title": "その場に立つ（暗さ）",
+    "mode": "dream",
+    "conditions": [
+     {
+      "label": "暗さ",
+      "value": "2 lx"
+     }
+    ],
+    "metrics": [
+     {
+      "key": "footIlluminance",
+      "label": "足元の照度",
+      "value": 44.1189,
+      "unit": "lx",
+      "display": "44.1",
+      "lowerIsBetter": false,
+      "primary": true
+     },
+     {
+      "key": "illuminanceMin",
+      "label": "照度の最小",
+      "value": 10.3507,
+      "unit": "lx",
+      "display": "10.4",
+      "lowerIsBetter": false,
+      "primary": false
+     }
+    ],
+    "passed": true,
+    "criteria": "足元の照度≥10.0lx・照度の最小≥3.0lx",
+    "seed": 2026,
+    "notes": [
+     "人型モデル（身長 1.75 m）がその場に立ち、装置は腰（高さ 1.00 m）に付く",
+     "照明：高さ 1.00 m から 300 lm・広がり 90°・下向き 60° → 光度 163 cd。前方 0.5〜2.5 m の床の平均照度（周りの明るさ 2 lx を含む）"
+    ],
+    "at": "2026-11-25T20:20:51"
+   },
+   {
+    "revision": 2,
+    "title": "その場に立つ（暗さ）",
+    "mode": "dream",
+    "conditions": [
+     {
+      "label": "暗さ",
+      "value": "2 lx"
+     }
+    ],
+    "metrics": [
+     {
+      "key": "footIlluminance",
+      "label": "足元の照度",
+      "value": 65.1783,
+      "unit": "lx",
+      "display": "65.2",
+      "lowerIsBetter": false,
+      "primary": true
+     },
+     {
+      "key": "illuminanceMin",
+      "label": "照度の最小",
+      "value": 14.5261,
+      "unit": "lx",
+      "display": "14.5",
+      "lowerIsBetter": false,
+      "primary": false
+     }
+    ],
+    "passed": true,
+    "criteria": "足元の照度≥10.0lx・照度の最小≥3.0lx",
+    "seed": 2026,
+    "notes": [
+     "人型モデル（身長 1.75 m）がその場に立ち、装置は腰（高さ 1.00 m）に付く",
+     "照明：高さ 1.00 m から 450 lm・広がり 90°・下向き 60° → 光度 245 cd。前方 0.5〜2.5 m の床の平均照度（周りの明るさ 2 lx を含む）"
+    ],
+    "at": "2026-11-25T20:20:56"
+   }
+  ],
+  "revisions": [
+   {
+    "revision": 2,
+    "parent": 1,
+    "source": "offline",
+    "request": "もっと明るくして",
+    "summary": "照明を明るくする",
+    "changes": [
+     {
+      "label": "照明：明るさ（光束）",
+      "before": "300 lm",
+      "after": "450 lm"
+     }
+    ],
+    "resultChanged": true
+   }
+  ],
+  "research": {
+   "unverifiable": [
+    {
+     "need": "暗くなると自動で点灯",
+     "reason": "周りの明るさで自動点灯する仕組みのモデルがないため、実験では常に点灯している状態として扱います。"
+    },
+    {
+     "need": "夜道の怖さを減らす",
+     "reason": "安心感などの気持ちはシミュレーションでは測れません。"
+    },
+    {
+     "need": "歩いても邪魔にならない",
+     "reason": "付け心地や重さの感じ方は実験の対象外です。"
+    }
+   ],
+   "assumptions": [
+    "照明：光度 I = lm ÷ (2π(1−cos(θ/2)))、床の照度 E = I cosα ÷ d²",
+    "人型モデル（身長 1.75 m）がその場に立ち、装置は腰（高さ 1.00 m）に付く",
+    "照明：高さ 1.00 m から 300 lm・広がり 90°・下向き 60° → 光度 163 cd。前方 0.5〜2.5 m の床の平均照度（周りの明るさ 2 lx を含む）",
+    "照明：高さ 1.00 m から 450 lm・広がり 90°・下向き 60° → 光度 245 cd。前方 0.5〜2.5 m の床の平均照度（周りの明るさ 2 lx を含む）"
+   ],
+   "simplified": []
+  },
+  "developer": {
+   "totalMassKg": 0.204,
+   "tipAngleDeg": null,
+   "powerW": null,
+   "runtimeMin": null,
+   "challenges": [
+    "暗くなると自動で点灯：周りの明るさで自動点灯する仕組みのモデルがないため、実験では常に点灯している状態として扱います。",
+    "夜道の怖さを減らす：安心感などの気持ちはシミュレーションでは測れません。",
+    "歩いても邪魔にならない：付け心地や重さの感じ方は実験の対象外です。"
+   ]
+  }
+ }
+}

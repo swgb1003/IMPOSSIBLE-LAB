@@ -57,13 +57,13 @@ Quest で公開した発明を PC の中のサイトに載せ、研究者・開�
 
 | メソッド | パス | だれが | 内容 |
 |---|---|---|---|
-| POST | `/library` | Quest | 公開・更新（`{publication, glbBase64}`、2MB まで）。同じ端末の同じ発明はページを更新 |
+| POST | `/library` | Quest | 公開・更新（`{publication, glbBase64, images?}`、4MB まで。写真は JPEG 4 枚・1 枚 300KB まで）。同じ端末の同じ発明はページを更新 |
 | GET | `/library/mine` | Quest | 自分の公開の状態・ほしい・採用の知らせ・やりとりの数 |
 | POST | `/library/:id/withdraw` | Quest | 取り下げ（公開した端末だけ） |
 | POST | `/library/:id/tried` | Quest | VR で呼び出して試した |
 | POST | `/library/:id/want` | Quest・サイト | ほしい。Quest は試した端末だけ、サイトは `{voter}`（ブラウザごと）。別々に数える |
 | GET | `/library?sort=&tag=&scene=&status=` | だれでも | 一覧（並び：wants・new・adoptions・name） |
-| GET | `/library/:id`・`/library/:id/model.glb` | だれでも | 1件の公開データと 3D |
+| GET | `/library/:id`・`/library/:id/model.glb`・`/library/:id/images/<0〜3>.jpg` | だれでも | 1件の公開データと 3D と写真 |
 | POST | `/library/:id/consider`・`/adopt` | サイト | 検討中・採用（`{accountId}`・`{accountId, reason}`。理由は必須） |
 | GET・POST | `/accounts`、GET `/accounts/:id` | サイト | 研究者・開発者の登録と一覧 |
 | GET | `/creators/:publicId` | サイト | 発案者のページ（表示名で公開したものだけ） |
@@ -75,6 +75,8 @@ Quest で公開した発明を PC の中のサイトに載せ、研究者・開�
 - 公開データの形は `src/library/schema.ts`（知らない欄は捨てる、文字数と数の上限、同意の版 `2026-11-25`）。GLB は見出しと JSON の区切りを確かめ、1MB まで。
 - URL には ID だけを入れる（ログに URL が出るため）。依頼文・やりとりの本文はログに書かない。
 - 書き込みは 10 分あたり 600 回まで（AI の回数制限とは別）。
+- サイトの画面は `http://127.0.0.1:8787/`（`site/`。three.js は `node_modules/three` から出す）。
+- **見本を入れる**：Unity の通し検証が `Logs/verify/library/<発明ID>/` に公開データ・3D・写真を書き出す。`npm run samples` でそれを形を確かめてからライブラリに公開し（見本の印つき、何度入れても増えない）、サイトがライブラリにつながらないときに読む見本のファイル（`site/sample/`）も作り直す。
 
 ## アプリ側の接続先を変える
 
