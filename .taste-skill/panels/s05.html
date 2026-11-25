@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S05 実験の結果</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+<style>
+.revbar { display: grid; grid-template-columns: 64px 1fr 72px; align-items: center; gap: 12px; height: 40px; }
+.revbar .track { position: relative; height: 16px; background: var(--raised); border-radius: 3px; }
+.revbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
+.goalwrap { position: relative; margin: 30px 0 0; }
+.goalline { position: absolute; left: calc(76px + (100% - 160px) * 0.8); top: -6px; bottom: 26px; width: 2px; background: var(--text); }
+.goaltext { position: absolute; left: calc(76px + (100% - 160px) * 0.8); top: -30px; transform: translateX(-50%); font-size: var(--fs-small); white-space: nowrap; }
+.axis { display: flex; justify-content: space-between; margin: 4px 84px 0 76px; font-size: var(--fs-small); color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li>指示</li><li>設計</li><li>編集</li><li>実験</li><li aria-current="step">結果</li><li>保存</li>
+    </ol>
+  </header>
+
+  <div class="body">
+    <div class="title-row">
+      <h1>防護率は 62.3%。合格まであと 17.7 ポイントです</h1>
+      <span class="small muted">横なぐりの雨、DREAM、雨 30 mm/h、風 4 m/s 右から</span>
+    </div>
+
+    <section class="card" aria-labelledby="cp-h">
+      <div class="card-head"><h2 id="cp-h">版ごとの防護率</h2><span class="small muted">同じ条件で比べています</span></div>
+      <div class="goalwrap" role="img" aria-label="防護率。Rev.1 は 40.9%、Rev.2 は 62.3%。合格は 80% 以上">
+        <span class="goaltext">合格 80%</span>
+        <span class="goalline"></span>
+        <div class="revbar"><span class="muted num">Rev.1</span><span class="track"><span class="fill" style="width: 40.9%; background: #b9c0cb"></span></span><span class="num" style="text-align: right">40.9%</span></div>
+        <div class="revbar"><span class="num" style="font-weight: 500">Rev.2</span><span class="track"><span class="fill" style="width: 62.3%; background: var(--data)"></span></span><span class="num" style="text-align: right; font-weight: 700; color: var(--data)">62.3%</span></div>
+        <div class="axis num"><span>0%</span><span>100%</span></div>
+      </div>
+      <p style="margin: 16px 0 0">防ぐ半径を 0.45 m から 0.60 m に広げた結果、Rev.1 より 21.4 ポイント上がりました</p>
+    </section>
+
+    <div class="cols">
+      <section class="card" aria-labelledby="wt-h">
+        <div class="card-head"><h2 id="wt-h">雨が当たった場所</h2><span class="small muted">10 秒間の合計</span></div>
+        <table>
+          <thead><tr><th>場所</th><th class="num">当たった粒</th><th class="num">全体に占める割合</th></tr></thead>
+          <tbody>
+            <tr><td>頭</td><td class="num muted">0</td><td class="num muted">0%</td></tr>
+            <tr><td>上半身</td><td class="num">109</td><td class="num">37%</td></tr>
+            <tr><td>下半身</td><td class="num" style="font-weight: 700">185</td><td class="num" style="font-weight: 700">63%</td></tr>
+            <tr class="sum"><td>合計</td><td class="num">294</td><td class="num">100%</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" aria-labelledby="nx-h">
+        <div class="card-head"><h2 id="nx-h">次に変えるところ</h2></div>
+        <p style="margin: 0 0 16px">濡れの 63% は下半身です。風で横から吹き込んだ雨が、キャノピーの下をくぐっています</p>
+        <button class="btn primary" style="width: 100%; justify-content: center">側面カバーを伸ばして再実験</button>
+        <div class="actions" style="margin-top: 16px; gap: 8px">
+          <button class="btn" style="padding: 0 14px">同じ条件でもう一度</button>
+          <button class="btn" style="padding: 0 14px">REALITY で見る</button>
+          <span class="grow"></span>
+          <button class="btn quiet" style="padding: 0 6px">保存して終わる</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+</body>
+</html>

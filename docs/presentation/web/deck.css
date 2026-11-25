@@ -1,0 +1,295 @@
+/* IMPOSSIBLE LAB 卒業制作発表 — スタイル
+   舞台は 1920×1080 px 固定（1pt = 2px）。文字サイズの下限：注釈 26px（13pt）／本文 40px（20pt）
+   色や文字サイズを変えるときは、下の :root の値を書き換える。 */
+
+@font-face { font-family: "NSJP"; font-weight: 400; src: local("Noto Sans JP Regular"), local("NotoSansJP-Regular"), url("fonts/NotoSansJP-Regular.ttf") format("truetype"); font-display: block; }
+@font-face { font-family: "NSJP"; font-weight: 700; src: local("Noto Sans JP Bold"), local("NotoSansJP-Bold"), url("fonts/NotoSansJP-Bold.ttf") format("truetype"); font-display: block; }
+
+:root {
+  /* 夜の研究室 */
+  --ground: #0a0e12;
+  --surface: #141a20;
+  --surface2: #1f2830;
+  --ink: #eef2f4;
+  --ink2: #9ba8b2;
+  --accent: #f0a35e;      /* 発明台の足元の灯り */
+  --accent-ink: #0a0e12;
+  --cool: #9fdcf2;        /* ガラスの筒の光 */
+
+  --fs-note: 26px;
+  --fs-body: 40px;
+  --fs-title: 48px;
+  --fs-msg: 64px;
+
+  --mx: 120px;            /* 左右の余白 */
+  --ease: cubic-bezier(.2, .7, .1, 1);
+}
+
+.slide.light {
+  /* 昼の研究室 */
+  --ground: #e9edf0;
+  --surface: #dbe1e6;
+  --surface2: #c9d2d9;
+  --ink: #0d1216;
+  --ink2: #52606b;
+  --cool: #1d6fa8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #000; overflow: hidden; }
+body {
+  font-family: "NSJP", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;
+  font-weight: 400; color: var(--ink);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+ul, ol { list-style: none; }
+img { display: block; }
+b, strong { font-weight: 700; }
+
+/* ---------- 舞台 ---------- */
+#stage {
+  position: absolute; left: 50%; top: 50%;
+  width: 1920px; height: 1080px;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  overflow: hidden; background: var(--ground);
+}
+.slide {
+  position: absolute; inset: 0; overflow: hidden;
+  background: var(--ground); color: var(--ink);
+  visibility: hidden; opacity: 0;
+  transition: opacity .45s ease, visibility 0s linear .45s;
+  font-size: var(--fs-body); line-height: 1.5; letter-spacing: .02em;
+}
+.slide.active { visibility: visible; opacity: 1; transition: opacity .45s ease; z-index: 2; }
+
+/* ---------- 見出し ---------- */
+.head { position: absolute; left: var(--mx); right: var(--mx); top: 84px; }
+.ttl { font-size: var(--fs-title); font-weight: 400; color: var(--ink2); line-height: 1.3; font-feature-settings: "palt"; }
+.msg { font-size: var(--fs-msg); font-weight: 700; line-height: 1.3; margin-top: 10px; letter-spacing: .01em; font-feature-settings: "palt"; }
+.note { font-size: var(--fs-note); color: var(--ink2); line-height: 1.55; }
+.body { font-size: var(--fs-body); line-height: 1.5; }
+.free { position: absolute; left: 760px; top: 500px; font-size: var(--fs-body); }
+
+/* ---------- 入場の動き ---------- */
+@keyframes in-up   { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
+@keyframes in-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes in-rise { from { transform: translateY(102%); } to { transform: none; } }
+@keyframes in-grow { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes in-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+.slide:not(.active) [data-in] { opacity: 0; }
+.slide.active [data-in] {
+  animation: in-up .8s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 90ms + 200ms);
+}
+.slide.active [data-in="fade"] { animation-name: in-fade; animation-duration: 1.1s; }
+.slide.active [data-in="rise"] { animation-name: in-rise; animation-duration: 1s; }
+.slide.active [data-in="grow"] { animation-name: in-grow; transform-origin: bottom; animation-duration: .9s; }
+.slide.active [data-in="wipe"] { animation-name: in-wipe; animation-duration: 1s; }
+.slide:not(.active) [data-in="rise"], .slide:not(.active) [data-in="grow"] { opacity: 1; }
+
+/* ---------- 写真を全面に敷くページ（表紙・結び） ---------- */
+.bg { position: absolute; inset: -40px; overflow: hidden; }
+.bg img { width: 100%; height: 100%; object-fit: cover; translate: calc(var(--px, 0) * -18px) calc(var(--py, 0) * -10px); }
+.slide.active .bg img { animation: drift 40s ease-in-out infinite alternate; }
+@keyframes drift { from { scale: 1.02; } to { scale: 1.1; } }
+.scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(6, 9, 12, .92) 0%, rgba(6, 9, 12, .72) 34%, rgba(6, 9, 12, .18) 68%, rgba(6, 9, 12, .34) 100%); }
+.scene { position: absolute; inset: 0; pointer-events: none; }
+.scene canvas { width: 100%; height: 100%; display: block; }
+
+.mark { position: absolute; left: var(--mx); top: 84px; font-size: 34px; font-weight: 700; letter-spacing: .12em; }
+.cover-copy { position: absolute; left: var(--mx); right: var(--mx); bottom: 112px; }
+.cover-copy h1 { font-size: 136px; font-weight: 700; line-height: 1.16; letter-spacing: -.01em; font-feature-settings: "palt"; }
+.cover-copy .sub { font-size: 48px; margin-top: 36px; font-weight: 400; }
+.cover-meta { position: absolute; right: var(--mx); bottom: 112px; text-align: right; color: var(--ink); }
+.cover-ask { margin-top: 28px; color: var(--accent); font-size: 34px; }
+
+/* ---------- 2 開発の入り口 ---------- */
+.s2 .head { right: auto; width: 760px; }
+.s2 .lead { position: absolute; left: var(--mx); width: 720px; bottom: 150px; }
+.gate { position: absolute; left: 900px; top: 0; right: 0; bottom: 0; overflow: hidden; }
+.gate > img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.door { position: absolute; bottom: 0; width: 324px; height: 74%; background: var(--surface); padding: 44px 36px; }
+.door:nth-of-type(1) { left: 0; }
+.door:nth-of-type(2) { left: 348px; background: var(--surface2); }
+.door:nth-of-type(3) { left: 696px; }
+.door b { display: block; font-size: 48px; white-space: nowrap; line-height: 1.25; font-feature-settings: "palt"; }
+.door span { display: block; margin-top: 16px; font-size: 30px; color: var(--ink2); line-height: 1.5; }
+
+/* ---------- 3 体験の流れ ---------- */
+.flow { position: absolute; left: var(--mx); top: 322px; width: 560px; }
+.flow li { position: relative; padding: 17px 0 17px 40px; opacity: .36; transition: opacity .5s ease; }
+.flow li::before { content: ""; position: absolute; left: 0; top: 24px; bottom: 24px; width: 10px; background: var(--accent); transform: scaleY(0); transform-origin: top; transition: transform .5s var(--ease); }
+.flow b { display: block; font-size: 44px; line-height: 1.35; }
+.flow span { display: block; font-size: var(--fs-note); color: var(--ink2); line-height: 1.5; margin-top: 4px; }
+.shots { position: absolute; right: var(--mx); top: 322px; width: 1100px; height: 619px; overflow: hidden; background: var(--surface); }
+.shots img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; scale: 1.05; transition: opacity .7s ease, scale 1.6s var(--ease); }
+.s3:not([data-step]) .flow li:nth-child(1), .s3[data-step="0"] .flow li:nth-child(1),
+.s3[data-step="1"] .flow li:nth-child(2), .s3[data-step="2"] .flow li:nth-child(3), .s3[data-step="3"] .flow li:nth-child(4) { opacity: 1; }
+.s3:not([data-step]) .flow li:nth-child(1)::before, .s3[data-step="0"] .flow li:nth-child(1)::before,
+.s3[data-step="1"] .flow li:nth-child(2)::before, .s3[data-step="2"] .flow li:nth-child(3)::before, .s3[data-step="3"] .flow li:nth-child(4)::before { transform: none; }
+.s3:not([data-step]) .shots img:nth-child(1), .s3[data-step="0"] .shots img:nth-child(1),
+.s3[data-step="1"] .shots img:nth-child(2), .s3[data-step="2"] .shots img:nth-child(3), .s3[data-step="3"] .shots img:nth-child(4) { opacity: 1; scale: 1; }
+
+/* ---------- 4 改良の効果 ---------- */
+.rain { position: absolute; top: 312px; width: 820px; height: 500px; background: var(--surface); overflow: hidden; }
+.rain.before { left: var(--mx); }
+.rain.after { right: var(--mx); }
+.rain .tag { position: absolute; left: 32px; top: 26px; font-size: 34px; font-weight: 700; padding: 4px 18px; background: var(--ground); }
+.rain.after .tag { background: var(--accent); color: var(--accent-ink); }
+.rain .num { position: absolute; left: 32px; bottom: 14px; font-size: 150px; font-weight: 700; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.rain .num small { font-size: 64px; margin-left: 6px; letter-spacing: 0; }
+.s4 .body { position: absolute; left: var(--mx); right: var(--mx); top: 838px; }
+.s4 .note { position: absolute; left: var(--mx); right: var(--mx); top: 912px; }
+
+/* ---------- 5 広がり ---------- */
+.works { position: absolute; left: var(--mx); right: var(--mx); top: 312px; display: flex; gap: 24px; }
+.works figure { flex: none; }
+.works .pic { height: 372px; overflow: hidden; background: var(--surface); }
+.works .pic img { width: 100%; height: 100%; object-fit: cover; transition: scale 6s linear; }
+.slide.active .works .pic img { scale: 1.06; }
+.works figure:nth-child(1) { width: 736px; }
+.works figure:nth-child(2), .works figure:nth-child(3) { width: 448px; }
+.works figcaption { font-size: 30px; margin-top: 14px; line-height: 1.4; }
+.stats { position: absolute; left: var(--mx); right: var(--mx); top: 800px; display: flex; gap: 150px; align-items: baseline; }
+.stat { display: flex; align-items: baseline; gap: 18px; }
+.stat b { font-size: 132px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 34px; color: var(--ink2); }
+
+/* ---------- 6 技術構成 ---------- */
+.arch { position: absolute; left: var(--mx); right: var(--mx); top: 306px; height: 560px; display: grid; grid-template-columns: 350px 104px 730px 104px 392px; }
+.zone { background: var(--surface); padding: 30px 32px; position: relative; }
+.zone h3 { font-size: 34px; font-weight: 700; line-height: 1.3; }
+.zone h3 small { display: block; font-size: var(--fs-note); font-weight: 400; color: var(--ink2); }
+.tech { margin-top: 22px; display: grid; gap: 16px; }
+.tech.two { grid-template-columns: 1fr 1fr; column-gap: 20px; }
+.tech li { display: flex; align-items: center; gap: 16px; font-size: 30px; line-height: 1.25; white-space: nowrap; }
+.ic { flex: none; width: 52px; height: 52px; background: var(--surface2); display: grid; place-items: center; font-size: 20px; font-weight: 700; color: var(--cool); }
+.ic svg { width: 30px; height: 30px; fill: var(--ink); }
+.pipe { position: absolute; left: 32px; right: 32px; bottom: 30px; display: flex; align-items: stretch; gap: 10px; }
+.pipe span { flex: 1; background: var(--surface2); font-size: var(--fs-note); padding: 14px 8px; text-align: center; line-height: 1.35; display: grid; place-items: center; }
+.pipe .check { background: var(--accent); color: var(--accent-ink); font-weight: 700; flex: 1.25; }
+.link { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 62px; }
+.wire { position: relative; height: 8px; background: var(--surface2); }
+.wire::after { content: ""; position: absolute; top: -8px; width: 0; height: 0; border: 12px solid transparent; }
+.wire.r::after { right: -4px; border-left-color: var(--surface2); border-right-width: 0; }
+.wire.l::after { left: -4px; border-right-color: var(--surface2); border-left-width: 0; }
+.wire i { position: absolute; top: -3px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); }
+.slide.active .wire.r i { animation: run-r 1.8s linear infinite; }
+.slide.active .wire.l i { animation: run-l 1.8s linear infinite; }
+.wire i:nth-child(2) { animation-delay: -.9s !important; }
+@keyframes run-r { from { left: -6%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { left: 92%; opacity: 0; } }
+@keyframes run-l { from { left: 92%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } to { left: -6%; opacity: 0; } }
+.wire em { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-style: normal; font-size: 26px; color: var(--ink2); white-space: nowrap; }
+.safe { position: absolute; left: var(--mx); right: var(--mx); top: 900px; display: flex; gap: 56px; font-size: 30px; }
+.safe li { display: flex; align-items: center; gap: 16px; }
+.safe li::before { content: ""; width: 16px; height: 16px; background: var(--accent); flex: none; }
+
+/* ---------- 7 評価 ---------- */
+.big { position: absolute; left: var(--mx); top: 318px; width: 900px; }
+.big b { display: block; font-size: 300px; line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; margin-left: -12px; }
+.big p { margin-top: 14px; }
+.big b + p { margin-top: 66px; }
+.side { position: absolute; left: 1120px; right: var(--mx); top: 338px; display: grid; gap: 54px; }
+.side b { display: block; font-size: 136px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.side b small { font-size: 56px; letter-spacing: 0; margin-left: 10px; }
+.side p { font-size: 34px; margin-top: 10px; }
+.s7 .warn { position: absolute; left: var(--mx); top: 920px; font-size: 30px; color: var(--accent); }
+
+/* ---------- 8 事業のしくみ ---------- */
+.loop { position: absolute; left: var(--mx); top: 312px; width: 1010px; height: 600px; }
+.loop svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.loop .track { fill: none; stroke: var(--surface2); stroke-width: 10; }
+.loop .dot { fill: var(--accent); }
+.loop .head-tri { fill: var(--surface2); }
+.node { position: absolute; width: 420px; height: 176px; background: var(--surface); padding: 26px 30px; }
+.node b { display: block; font-size: 40px; line-height: 1.3; }
+.node span { display: block; font-size: var(--fs-note); color: var(--ink2); line-height: 1.45; margin-top: 6px; }
+.node.n1 { left: 0; top: 0; }
+.node.n2 { right: 0; top: 0; background: var(--accent); }
+.node.n2 span { color: var(--accent-ink); }
+.node.n3 { right: 0; bottom: 0; }
+.node.n4 { left: 0; bottom: 0; }
+.money { position: absolute; left: 1230px; right: var(--mx); top: 318px; }
+.money h3 { font-size: 34px; font-weight: 400; color: var(--ink2); }
+.money .eq { font-size: 50px; font-weight: 700; line-height: 1.3; margin-top: 30px; font-feature-settings: "palt"; white-space: nowrap; }
+.money .eq + .note { margin-top: 4px; }
+.money .caveat { margin-top: 56px; }
+
+/* ---------- 9 事業の道筋 ---------- */
+.stairs { position: absolute; left: var(--mx); right: var(--mx); top: 400px; height: 470px; display: flex; gap: 20px; align-items: flex-end; }
+.stair { flex: 1; background: var(--surface); padding: 24px 24px; overflow: hidden; }
+.stair b { display: block; font-size: 30px; line-height: 1.35; font-feature-settings: "palt"; white-space: nowrap; }
+.stair span { display: block; font-size: 24px; color: var(--ink2); line-height: 1.45; margin-top: 8px; }
+.stair:nth-child(1) { height: 26%; }
+.stair:nth-child(2) { height: 44%; background: var(--accent); color: var(--accent-ink); }
+.stair:nth-child(2) span { color: var(--accent-ink); }
+.stair:nth-child(3) { height: 62%; }
+.stair:nth-child(4) { height: 81%; background: var(--surface2); }
+.stair:nth-child(5) { height: 100%; background: var(--surface2); }
+.s9 .body { position: absolute; left: var(--mx); right: var(--mx); top: 906px; }
+
+/* ---------- 10 結び ---------- */
+.s10 .cover-copy { bottom: 104px; }
+.s10 .next { margin-top: 34px; font-size: var(--fs-body); }
+.s10 .next b { color: var(--accent); }
+
+/* ---------- ページ番号・進み具合（スクリプトが作る） ---------- */
+.chrome { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; z-index: 5; pointer-events: none; color: #9ba8b2; font-size: 22px; transition: color .4s; }
+.chrome.on-light { color: #52606b; }
+.chrome .wm { position: absolute; left: var(--mx); bottom: 28px; font-weight: 700; letter-spacing: .1em; }
+.chrome .pg { position: absolute; right: var(--mx); bottom: 28px; font-variant-numeric: tabular-nums; }
+.chrome .bar { position: absolute; left: 0; bottom: 0; height: 6px; background: var(--accent); transition: width .5s var(--ease); }
+.chrome.bare .wm, .chrome.bare .pg, .chrome.bare .bar { opacity: 0; }
+
+/* ---------- 発表者メモ（N キー） ---------- */
+#notes { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: #11161b; color: #eef2f4; font: 400 18px/1.7 "NSJP", sans-serif; padding: 16px 28px 20px; display: none; max-height: 34vh; overflow: auto; }
+body.show-notes #notes { display: block; }
+#notes b { color: #f0a35e; margin-right: 12px; }
+.notes { display: none; }
+
+/* ---------- 編集モード（E キー） ---------- */
+body.editing .slide [data-in], body.editing .slide * { animation: none !important; transition: none !important; }
+body.editing .slide [data-in] { opacity: 1 !important; }
+body.editing .bg img { scale: 1.05; }
+body.editing .scene { visibility: hidden; }
+body.editing .rain .scene { visibility: visible; }
+body.editing [data-el] { cursor: move; }
+body.editing [data-el]:hover { outline: 2px dashed rgba(240, 163, 94, .55); outline-offset: 2px; }
+body.editing .sel { outline: 3px solid #f0a35e !important; outline-offset: 2px; }
+body.editing [contenteditable="true"] { cursor: text; outline: 3px solid #9fdcf2 !important; }
+#bar { position: fixed; left: 0; right: 0; top: 0; z-index: 60; background: #11161b; color: #eef2f4; font: 400 14px/1 "NSJP", sans-serif; display: none; gap: 6px; padding: 8px 12px; align-items: center; flex-wrap: wrap; }
+body.editing #bar { display: flex; }
+#bar button { font: inherit; color: inherit; background: #252e37; border: 0; padding: 9px 12px; cursor: pointer; }
+#bar button:hover { background: #33404c; }
+#bar button.go { background: #f0a35e; color: #0a0e12; font-weight: 700; }
+#bar span { margin: 0 8px; color: #9ba8b2; }
+#bar .sp { flex: 1; }
+#grip { position: fixed; width: 18px; height: 18px; background: #f0a35e; z-index: 61; cursor: nwse-resize; display: none; }
+#help { position: fixed; right: 16px; bottom: 16px; z-index: 40; font: 400 13px/1.6 "NSJP", sans-serif; color: #9ba8b2; background: #11161b; padding: 10px 14px; opacity: 0; transition: opacity .4s; pointer-events: none; }
+#help.on { opacity: 1; }
+
+/* ---------- 印刷・PDF（Ctrl+P → 用紙の向き：横、余白：なし、背景のグラフィック：オン） ---------- */
+@page { size: 1920px 1080px; margin: 0; }
+@media print {
+  html, body { height: auto; overflow: visible; background: #fff; }
+  #stage { position: static; transform: none !important; height: auto; overflow: visible; }
+  .slide { position: relative; height: 1080px; visibility: visible !important; opacity: 1 !important; page-break-after: always; break-after: page; }
+  .slide [data-in] { opacity: 1 !important; animation: none !important; }
+  .chrome, #bar, #notes, #grip, #help { display: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide.active [data-in] { animation-duration: .01s; animation-delay: 0s; }
+  .slide.active .bg img { animation: none; }
+}
+
+/* ---------- 動きを止めた表示（確認用：index.html?still） ---------- */
+.still .slide [data-in] { animation: none !important; opacity: 1 !important; }
+.still .slide * { transition: none !important; }
+
+/* 編集モードで動かした要素は、ほかの要素より手前に出す */
+.slide [data-el][style*="translate"] { z-index: 3; }
+.slide .free { z-index: 3; }

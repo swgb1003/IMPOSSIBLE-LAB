@@ -1,0 +1,60 @@
+/* S05 実験の結果：図を主役にした案。A = 白い計測器、B = 黒い管制モニター（data-theme="dark"） */
+:root {
+  --ground: #eef1f5; --surface: #ffffff; --ink: #0b0d10; --muted: #5c6370; --line: #c3c9d3;
+  --data: #1d5fbf; --accent: #b4500b; --body-fill: #d3d8e0; --zone: rgba(29, 95, 191, 0.09);
+  --primary: #0b0d10; --primary-ink: #ffffff; --control: #c3c9d3; --track: #e3e7ed; --prev: #9aa3b0;
+  --font: "Noto Sans JP", system-ui, sans-serif;
+  --fig: "Barlow Semi Condensed", "Noto Sans JP", sans-serif;
+}
+:root[data-theme="dark"] {
+  --ground: #000000; --surface: #111111; --ink: #ffffff; --muted: #b4b4b4; --line: #444444;
+  --data: #6aa9ff; --accent: #ffa94d; --body-fill: #303030; --zone: rgba(106, 169, 255, 0.16);
+  --primary: #ffffff; --primary-ink: #000000; --control: #4c4c4c; --track: #262626; --prev: #8a8a8a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #8d939c; font-family: var(--font); color: var(--ink); font-size: 16px; line-height: 1.55; word-break: auto-phrase; line-break: strict; }
+:root[data-theme="dark"] body { background: #5a5f66; }
+.panel { width: 100%; max-width: 1280px; margin: 0 auto; background: var(--ground); display: flex; flex-direction: column; }
+.top { display: flex; align-items: center; gap: 16px; height: 60px; padding: 0 28px; }
+.mark { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.crumb { color: var(--muted); font-size: 15px; white-space: nowrap; }
+.flow { display: flex; gap: 4px; margin: 0 0 0 auto; list-style: none; padding: 0; flex-wrap: wrap; }
+.flow li { height: 36px; padding: 0 14px; display: flex; align-items: center; border-radius: 6px; color: var(--muted); font-size: 15px; }
+.flow li[aria-current] { background: var(--surface); color: var(--ink); font-weight: 500; }
+.stage { display: grid; grid-template-columns: 772px minmax(0, 1fr); gap: 16px; padding: 4px 28px 28px; }
+.view { background: var(--surface); border-radius: 8px; padding: 18px 20px 12px; display: flex; flex-direction: column; }
+.cond { display: flex; flex-wrap: wrap; gap: 6px 28px; margin: 0 0 6px; padding: 0; }
+.cond div { display: flex; align-items: baseline; gap: 8px; }
+.cond dt { color: var(--muted); font-size: 14px; }
+.cond dd { margin: 0; font-family: var(--fig); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cond dd small { font-family: var(--font); font-size: 14px; font-weight: 400; margin-left: 2px; }
+svg.side { display: block; width: 100%; height: auto; }
+.read { display: flex; flex-direction: column; background: var(--surface); border-radius: 8px; padding: 24px 28px; }
+h1 { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.3; display: flex; flex-direction: column; }
+h1 .big { font-family: var(--fig); font-weight: 600; font-size: 132px; line-height: 0.95; letter-spacing: -0.01em; color: var(--data); font-variant-numeric: tabular-nums; margin-top: 6px; }
+h1 .big small { font-size: 48px; font-weight: 500; margin-left: 4px; }
+.gauge { margin: 22px 0 0; }
+.gauge svg { display: block; width: 100%; height: auto; }
+.delta { margin: 14px 0 0; color: var(--muted); font-size: 15px; }
+.delta b { color: var(--ink); font-family: var(--fig); font-size: 20px; font-weight: 600; }
+.find { margin: auto 0 18px; padding-top: 24px; font-size: 17px; }
+.btn { font: inherit; font-size: 16px; font-weight: 500; height: 52px; padding: 0 20px; border-radius: 6px; border: 1px solid var(--control); background: transparent; color: var(--ink); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; transition: opacity 150ms; }
+.btn:hover { opacity: 0.8; }
+.btn:focus-visible { outline: 3px solid var(--data); outline-offset: 2px; }
+.btn.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); width: 100%; height: 60px; font-size: 18px; }
+.btn.quiet { border-color: transparent; color: var(--muted); padding: 0 4px; }
+.more .btn { padding: 0 14px; font-size: 15px; }
+.more { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.more .grow { flex: 1; }
+.t { font-family: var(--font); fill: var(--ink); }
+.tm { font-family: var(--font); fill: var(--muted); }
+.n { font-family: var(--fig); font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+@keyframes land { from { opacity: 0; } to { opacity: 1; } }
+.dot { animation: land 240ms both; }
+@media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+@media (max-width: 900px) {
+  .stage { grid-template-columns: 1fr; padding: 4px 16px 16px; }
+  .top { height: auto; padding: 12px 16px; flex-wrap: wrap; }
+  .flow { margin-left: 0; }
+  h1 .big { font-size: 96px; }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S06 保存した発明</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+<style>
+td.name { font-weight: 500; }
+.rowact { display: inline-flex; gap: 8px; }
+.rowact .btn { height: 40px; padding: 0 16px; }
+.wrap { overflow-x: auto; }
+.wrap table { min-width: 860px; }
+</style>
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li>指示</li><li>設計</li><li>編集</li><li>実験</li><li>結果</li><li aria-current="step">保存</li>
+    </ol>
+  </header>
+
+  <div class="body">
+    <div class="title-row">
+      <h1>ハンズフリー雨よけ装置 Rev.3 を保存しました</h1>
+      <button class="btn">新しい発明を始める</button>
+    </div>
+
+    <section class="card" aria-labelledby="gl-h" style="flex: 1">
+      <div class="card-head">
+        <h2 id="gl-h">保存した発明</h2>
+        <span class="small muted num">15 件のうち 1 〜 6 件目</span>
+      </div>
+      <div class="tabs" role="tablist" aria-label="分類で絞り込む">
+        <button role="tab" aria-selected="true">すべて</button>
+        <button role="tab" aria-selected="false">防護</button>
+        <button role="tab" aria-selected="false">運搬</button>
+        <button role="tab" aria-selected="false">移動</button>
+        <button role="tab" aria-selected="false">照明</button>
+        <button role="tab" aria-selected="false">動きつき</button>
+      </div>
+      <div class="wrap">
+      <table>
+        <thead><tr><th>発明</th><th>分類</th><th class="num">版</th><th>最後の実験</th><th class="num">結果</th><th class="num">更新</th><th class="num">操作</th></tr></thead>
+        <tbody>
+          <tr class="sel"><td class="name">ハンズフリー雨よけ装置</td><td>防護</td><td class="num">Rev.3</td><td>横なぐりの雨</td><td class="num" style="color: var(--data); font-weight: 700">防護 84.1%　合格</td><td class="num">今日 14:20</td><td class="num"><span class="rowact"><button class="btn">複製</button><button class="btn primary">開く</button></span></td></tr>
+          <tr><td class="name">自動で開くゴミ箱</td><td>動きつき</td><td class="num">Rev.2</td><td>近づいて離れる</td><td class="num">期待 78%　合格</td><td class="num">11/22</td><td class="num"><button class="btn" style="height: 40px; padding: 0 16px">開く</button></td></tr>
+          <tr><td class="name">ついてくるキャリーバッグ</td><td>運搬</td><td class="num">Rev.3</td><td class="muted">まだ実験していません</td><td class="num muted">—</td><td class="num">11/22</td><td class="num"><button class="btn" style="height: 40px; padding: 0 16px">開く</button></td></tr>
+          <tr><td class="name">近づくと点く足元灯</td><td>照明、動きつき</td><td class="num">Rev.1</td><td>近づいて離れる</td><td class="num">期待 100%　合格</td><td class="num">11/18</td><td class="num"><button class="btn" style="height: 40px; padding: 0 16px">開く</button></td></tr>
+          <tr><td class="name">バス停ぬくぬくヒーター</td><td>加温</td><td class="num">Rev.2</td><td>冬のバス停</td><td class="num">昇温 6.2℃　合格</td><td class="num">11/11</td><td class="num"><button class="btn" style="height: 40px; padding: 0 16px">開く</button></td></tr>
+          <tr><td class="name">空を飛べる靴</td><td>移動</td><td class="num">Rev.4</td><td>飛行デッキ</td><td class="num">安定度 60 点　要改良</td><td class="num">11/09</td><td class="num"><button class="btn" style="height: 40px; padding: 0 16px">開く</button></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="actions" style="margin-top: 16px">
+        <span class="grow"></span>
+        <button class="btn" disabled>前の 6 件</button>
+        <button class="btn">次の 6 件</button>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

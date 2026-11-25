@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S02 設計の確認</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li>指示</li><li aria-current="step">設計</li><li>編集</li><li>実験</li><li>結果</li><li>保存</li>
+    </ol>
+  </header>
+
+  <div class="body">
+    <div class="title-row">
+      <h1>自動で開くゴミ箱を、この設計で組み立てますか</h1>
+      <span class="small muted">依頼：近づくと自動で開くゴミ箱が欲しい</span>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <section class="card" aria-labelledby="mv-h">
+          <div class="card-head"><h2 id="mv-h">動きの手順</h2><span class="small muted">発明台の上で動きを確かめられます</span></div>
+          <table>
+            <thead><tr><th>きっかけ</th><th>動き</th><th class="num">値</th></tr></thead>
+            <tbody>
+              <tr><td>人が 1.0 m 以内に来る</td><td>フタを開く</td><td class="num">100°、毎秒 120°</td></tr>
+              <tr><td class="muted">開いたあと</td><td>待つ</td><td class="num">3 秒</td></tr>
+              <tr><td class="muted">待ったあと</td><td>フタを閉じる</td><td class="num">0°、毎秒 120°</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="card" aria-labelledby="pt-h">
+          <div class="card-head"><h2 id="pt-h">部品</h2><span class="small muted num">4 点、推定 3.69 kg</span></div>
+          <table>
+            <thead><tr><th>部品</th><th>役目</th><th>素材</th><th class="num">大きさ（m）</th></tr></thead>
+            <tbody>
+              <tr><td>格納部</td><td class="muted">ゴミを入れる本体</td><td>樹脂</td><td class="num">0.36 × 0.60 × 0.36</td></tr>
+              <tr><td>フタ</td><td class="muted">後ろの辺で回って開く</td><td>樹脂</td><td class="num">0.36 × 0.02 × 0.38</td></tr>
+              <tr><td>センサー</td><td class="muted">前から来る人を見つける</td><td>樹脂</td><td class="num">0.03 × 0.03 × 0.03</td></tr>
+              <tr><td>駆動部</td><td class="muted">フタを動かす</td><td>アルミ</td><td class="num">0.04 × 0.06 × 0.04</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <section class="card" aria-labelledby="nd-h">
+        <div class="card-head"><h2 id="nd-h">要望をどう確かめるか</h2></div>
+        <table>
+          <thead><tr><th>要望</th><th>確かめ方</th></tr></thead>
+          <tbody>
+            <tr><td>近づいたら開く</td><td>実験で測る</td></tr>
+            <tr><td>手を触れずに使える</td><td>実験で測る</td></tr>
+            <tr><td>少したったら閉じる</td><td>動きを見て確かめる</td></tr>
+            <tr><td>においが漏れない</td><td class="muted">確かめられない</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted" style="margin: 16px 0 0">においの漏れは、フタのすき間や素材で決まります。このアプリの実験には含まれていません</p>
+      </section>
+    </div>
+
+    <div class="actions">
+      <button class="btn quiet">指示に戻る</button>
+      <button class="btn">作り直す</button>
+      <span class="grow"></span>
+      <span class="small muted">AI が設計し、アプリの検証を通過しました</span>
+      <button class="btn primary">承認して組み立てる</button>
+    </div>
+  </div>
+</main>
+</body>
+</html>

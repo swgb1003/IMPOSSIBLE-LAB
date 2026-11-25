@@ -1,0 +1,1402 @@
+{
+ "url": ".taste-skill/panels/s05a.html",
+ "at": "2026-11-23T05:43:37.344Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 1,
+   "filled": [
+    0.79
+   ],
+   "motion": {
+    "elements": 294,
+    "css": 294,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 900,
+     "screens": 1,
+     "words": 75,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 2,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "chars": 9,
+     "lines": 2,
+     "size": 132,
+     "vw": 9.2,
+     "font": "Barlow Semi Condensed",
+     "weight": 600,
+     "tracking": -0.01,
+     "leading": 0.95,
+     "top": 88,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "lines": 3,
+     "size": 20,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "62.3%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 132,
+      "vw": 9.2,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.26,
+      "top": 120,
+      "tag": "span",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Barlow Semi Condensed",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      22,
+      48,
+      132
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 132,
+      "vw": 9.2,
+      "font": "Barlow Semi Condensed",
+      "text": "62.3"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0.19,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#8d939c",
+     "bodyBgHsl": {
+      "h": 216,
+      "s": 0.07,
+      "l": 0.58
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#eef1f5",
+       "top": 0,
+       "hsl": {
+        "h": 214,
+        "s": 0.26,
+        "l": 0.95
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 64,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#0b0d10",
+       "share": 0.52
+      },
+      {
+       "color": "#5c6370",
+       "share": 0.4
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#1d5fbf",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#0b0d10",
+      "hsl": {
+       "h": 216,
+       "s": 0.19,
+       "l": 0.05
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 4,
+     "inHero": 4,
+     "radius": 6,
+     "height": 52,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "側面カバーを伸ばして再実験",
+      "同じ条件でもう一度",
+      "REALITY で見る",
+      "保存して終わる"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 2,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "svg",
+      "ratio": 0.33
+     }
+    ],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 60,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "barlow semi condensed",
+     "noto sans jp"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 900,
+    "margins": {
+     "left": 128,
+     "right": 136
+    },
+    "sections": [],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "防護率 62.3%",
+      "size": 20,
+      "top": 88,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 924,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.2,
+    "voidBox": {
+     "x": 0,
+     "y": 720,
+     "w": 1440,
+     "h": 180
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": false,
+    "ground": "#8d939c",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 108,
+     "right": 122
+    },
+    "hero": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "chars": 9,
+     "lines": 2,
+     "size": 132,
+     "vw": 9.2,
+     "font": "Barlow Semi Condensed",
+     "weight": 600,
+     "tracking": -0.01,
+     "leading": 0.95,
+     "top": 88,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 2,
+    "layout": {
+     "panels": 1,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 3,
+     "radii": [
+      [
+       8,
+       2
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 20
+    },
+    "rows": null,
+    "chartHues": 2,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      22,
+      24,
+      38,
+      132
+     ]
+    },
+    "title": {
+     "text": "防護率\n62.3%",
+     "size": 20,
+     "top": 88
+    },
+    "colourShare": 0.016
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 294,
+    "css": 294,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1390,
+     "screens": 1.4,
+     "words": 75,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 2,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "chars": 9,
+     "lines": 2,
+     "size": 96,
+     "vw": 12.5,
+     "font": "Barlow Semi Condensed",
+     "weight": 600,
+     "tracking": -0.01,
+     "leading": 0.95,
+     "top": 776,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "lines": 3,
+     "size": 20,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "62.3%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 96,
+      "vw": 12.5,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.89,
+      "top": 808,
+      "tag": "span",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Barlow Semi Condensed",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      22,
+      48,
+      96
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 96,
+      "vw": 12.5,
+      "font": "Barlow Semi Condensed",
+      "text": "62.3"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0.19,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#8d939c",
+     "bodyBgHsl": {
+      "h": 216,
+      "s": 0.07,
+      "l": 0.58
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#eef1f5",
+       "top": 0,
+       "hsl": {
+        "h": 214,
+        "s": 0.26,
+        "l": 0.95
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 105,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#0b0d10",
+       "share": 0.52
+      },
+      {
+       "color": "#5c6370",
+       "share": 0.4
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#1d5fbf",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#0b0d10",
+      "hsl": {
+       "h": 216,
+       "s": 0.19,
+       "l": 0.05
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 4,
+     "inHero": 0,
+     "radius": 6,
+     "height": 52,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 2,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "svg",
+      "ratio": 0.5
+     },
+     {
+      "type": "svg",
+      "ratio": 0.09
+     }
+    ],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 101,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "barlow semi condensed",
+     "noto sans jp"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1390,
+    "margins": {
+     "left": 30,
+     "right": 44
+    },
+    "sections": [
+     {
+      "sel": "section.view",
+      "tag": "section",
+      "top": 105,
+      "height": 631,
+      "words": 8,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": 36,
+      "right": 36,
+      "textLeft": 58,
+      "textRight": 285,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.read",
+      "tag": "section",
+      "top": 752,
+      "height": 622,
+      "words": 20,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "62.3",
+       "size": 96,
+       "tag": "h1"
+      },
+      "left": 44,
+      "right": 44,
+      "textLeft": 44,
+      "textRight": 59,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "防護率 62.3%",
+      "size": 20,
+      "top": 776,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 44,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": false,
+    "ground": "#8d939c",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 36
+    },
+    "hero": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "chars": 9,
+     "lines": 2,
+     "size": 96,
+     "vw": 12.5,
+     "font": "Barlow Semi Condensed",
+     "weight": 600,
+     "tracking": -0.01,
+     "leading": 0.95,
+     "top": 776,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 2,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 2,
+     "radii": [
+      [
+       8,
+       2
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 20
+    },
+    "rows": null,
+    "chartHues": 2,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      22,
+      24,
+      38,
+      96
+     ]
+    },
+    "title": {
+     "text": "防護率\n62.3%",
+     "size": 20,
+     "top": 776
+    },
+    "colourShare": 0.035
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 294,
+    "css": 294,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 1182,
+     "screens": 1.4,
+     "words": 75,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 2,
+     "sections": 2,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "chars": 9,
+     "lines": 2,
+     "size": 96,
+     "vw": 24.6,
+     "font": "Barlow Semi Condensed",
+     "weight": 600,
+     "tracking": -0.01,
+     "leading": 0.95,
+     "top": 551,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "lines": 3,
+     "size": 20,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "30mm/h",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.55,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.16,
+      "top": 163,
+      "mixedFonts": [
+       "Barlow Semi Condensed",
+       "Noto Sans JP"
+      ],
+      "tag": "dd",
+      "kind": "statement"
+     },
+     {
+      "text": "4m/s 右から",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.55,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.21,
+      "top": 163,
+      "mixedFonts": [
+       "Barlow Semi Condensed",
+       "Noto Sans JP"
+      ],
+      "tag": "dd",
+      "kind": "statement"
+     },
+     {
+      "text": "10秒",
+      "words": 1,
+      "chars": 3,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.55,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.1,
+      "top": 203,
+      "mixedFonts": [
+       "Barlow Semi Condensed",
+       "Noto Sans JP"
+      ],
+      "tag": "dd",
+      "kind": "statement"
+     },
+     {
+      "text": "DREAM",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1.55,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.16,
+      "top": 203,
+      "tag": "dd",
+      "kind": "statement"
+     },
+     {
+      "text": "62.3%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 96,
+      "vw": 24.6,
+      "font": "Barlow Semi Condensed",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.95,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.77,
+      "top": 583,
+      "tag": "span",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 4,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 3
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.91,
+       "mono": false
+      },
+      {
+       "family": "Barlow Semi Condensed",
+       "share": 0.09,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      22,
+      48,
+      96
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 96,
+      "vw": 24.6,
+      "font": "Barlow Semi Condensed",
+      "text": "62.3"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0.19,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#8d939c",
+     "bodyBgHsl": {
+      "h": 216,
+      "s": 0.07,
+      "l": 0.58
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#eef1f5",
+       "top": 0,
+       "hsl": {
+        "h": 214,
+        "s": 0.26,
+        "l": 0.95
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 145,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#0b0d10",
+       "share": 0.52
+      },
+      {
+       "color": "#5c6370",
+       "share": 0.4
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#1d5fbf",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#0b0d10",
+      "hsl": {
+       "h": 216,
+       "s": 0.19,
+       "l": 0.05
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 4,
+     "inHero": 0,
+     "radius": 6,
+     "height": 52,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": []
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 2,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "svg",
+      "ratio": 0.25
+     }
+    ],
+    "nav": {
+     "links": 0,
+     "fixed": false,
+     "height": 141,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "barlow semi condensed",
+     "noto sans jp"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 1182,
+    "margins": {
+     "left": 30,
+     "right": 36
+    },
+    "sections": [
+     {
+      "sel": "header.top",
+      "tag": "header",
+      "top": 0,
+      "height": 141,
+      "words": 10,
+      "media": 0,
+      "middle": 7,
+      "heading": null,
+      "left": 16,
+      "right": 22,
+      "textLeft": 16,
+      "textRight": 22,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.stage",
+      "tag": "div",
+      "top": 141,
+      "height": 1041,
+      "words": 28,
+      "media": 2,
+      "middle": 0,
+      "heading": {
+       "text": "62.3",
+       "size": 96,
+       "tag": "h1"
+      },
+      "left": 36,
+      "right": 36,
+      "textLeft": 36,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "防護率 62.3%",
+      "size": 20,
+      "top": 551,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 44,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": false,
+    "ground": "#8d939c",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 22
+    },
+    "hero": {
+     "text": "防護率 62.3%",
+     "words": 2,
+     "chars": 9,
+     "lines": 2,
+     "size": 96,
+     "vw": 24.6,
+     "font": "Barlow Semi Condensed",
+     "weight": 600,
+     "tracking": -0.01,
+     "leading": 0.95,
+     "top": 551,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 1,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 2,
+     "radii": [
+      [
+       8,
+       2
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 20
+    },
+    "rows": null,
+    "chartHues": 2,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      20,
+      22,
+      24,
+      38,
+      96
+     ]
+    },
+    "title": {
+     "text": "防護率\n62.3%",
+     "size": 20,
+     "top": 551
+    },
+    "colourShare": 0.028
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "mixed-font-headline",
+   "width": 390,
+   "message": "3 headline(s) switch typeface or to italic mid-line (the \"one italic serif word\" move).",
+   "fix": "Set the whole headline in one face. Emphasis comes from the words."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\s05a\\desktop-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\s05a\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\s05a\\tablet-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\s05a\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\s05a\\mobile-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\s05a\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

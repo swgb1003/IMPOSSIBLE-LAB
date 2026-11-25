@@ -51,6 +51,31 @@ adb reverse tcp:8787 tcp:8787   # Quest を USB 接続した状態で。Quest �
 - 利用者の指示文はログに残さない（記録するのはモデル名・トークン数・所要時間・HTTPステータスのみ）
 - 拒否（refusal）時は `fallbacks: "default"`（beta `server-side-fallback-2026-07-01`）でサーバー側の推奨モデルに自動切替
 
+## 発明ライブラリ（IMPOSSIBLE LIBRARY、2026-11-25）
+
+Quest で公開した発明を PC の中のサイトに載せ、研究者・開発者が採用する流れ（設計は `docs/PUBLISH_LIBRARY.md`）。AI は呼ばない。データは `proxy/library/`（`ILAB_LIBRARY_DIR` で変更、git に入れない）に保存し、PC の外には出さない。
+
+| メソッド | パス | だれが | 内容 |
+|---|---|---|---|
+| POST | `/library` | Quest | 公開・更新（`{publication, glbBase64}`、2MB まで）。同じ端末の同じ発明はページを更新 |
+| GET | `/library/mine` | Quest | 自分の公開の状態・ほしい・採用の知らせ・やりとりの数 |
+| POST | `/library/:id/withdraw` | Quest | 取り下げ（公開した端末だけ） |
+| POST | `/library/:id/tried` | Quest | VR で呼び出して試した |
+| POST | `/library/:id/want` | Quest・サイト | ほしい。Quest は試した端末だけ、サイトは `{voter}`（ブラウザごと）。別々に数える |
+| GET | `/library?sort=&tag=&scene=&status=` | だれでも | 一覧（並び：wants・new・adoptions・name） |
+| GET | `/library/:id`・`/library/:id/model.glb` | だれでも | 1件の公開データと 3D |
+| POST | `/library/:id/consider`・`/adopt` | サイト | 検討中・採用（`{accountId}`・`{accountId, reason}`。理由は必須） |
+| GET・POST | `/accounts`、GET `/accounts/:id` | サイト | 研究者・開発者の登録と一覧 |
+| GET | `/creators/:publicId` | サイト | 発案者のページ（表示名で公開したものだけ） |
+| GET | `/threads`・`/threads/:id`、POST `/threads/:id/messages` | Quest・サイト | 採用した人と発案者のやりとり（2人だけ） |
+| GET | `/admin/library`、POST `/admin/accounts/:id/verify`・`/admin/library/:id/takedown` | サイト | 運営（確認済みの印・取り下げ） |
+
+- **Quest** は端末ごとの発案者キーを `x-ilab-creator` で送る（16〜64 文字の英数字・`-`・`_`）。サーバーはキーを保存せずハッシュだけ持つ。`ILAB_PROXY_TOKEN` を設定したときは `x-ilab-token` も要る。
+- **サイトと運営**の入口は、この PC の中（127.0.0.1）からだけ受け付ける。サイトでの名乗りは `x-ilab-as: account:<ID>` か `creator:<発案者の公開 ID>`（ログインは形だけ）。
+- 公開データの形は `src/library/schema.ts`（知らない欄は捨てる、文字数と数の上限、同意の版 `2026-11-25`）。GLB は見出しと JSON の区切りを確かめ、1MB まで。
+- URL には ID だけを入れる（ログに URL が出るため）。依頼文・やりとりの本文はログに書かない。
+- 書き込みは 10 分あたり 600 回まで（AI の回数制限とは別）。
+
 ## アプリ側の接続先を変える
 
 Quest の `persistentDataPath/proxy.json`（`/sdcard/Android/data/jp.impossiblelab.vr/files/proxy.json`）：
@@ -64,7 +89,7 @@ Quest の `persistentDataPath/proxy.json`（`/sdcard/Android/data/jp.impossiblel
 ## テスト
 
 ```bash
-npm test          # API を呼ばない単体テスト（スキーマ・変換・入力検証）
+npm test          # API を呼ばない単体テスト（スキーマ・変換・入力検証・発明ライブラリ）
 npm run typecheck # TypeScript 型チェック
 ```
 

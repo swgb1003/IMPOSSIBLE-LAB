@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S01 何を発明する</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+<style>
+.s01 { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: var(--gap); flex: 1; align-items: stretch; }
+.pick { width: 100%; text-align: left; font: inherit; background: transparent; border: 0; padding: 0; cursor: pointer; color: var(--text); font-size: 17px; height: 100%; }
+tr.row:hover td { background: var(--raised); }
+.pick:focus-visible { outline: 3px solid var(--data); outline-offset: 2px; }
+.examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+.recent td.name { font-weight: 500; }
+.rate { color: var(--data); font-weight: 700; }
+</style>
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li aria-current="step">指示</li><li>設計</li><li>編集</li><li>実験</li><li>結果</li><li>保存</li>
+    </ol>
+  </header>
+
+  <div class="body">
+    <div class="title-row">
+      <h1>何を発明しますか</h1>
+      <span class="small muted">PC とつながっています。AI 設計と音声入力が使えます</span>
+    </div>
+
+    <form class="field" onsubmit="return false">
+      <label for="req" class="sr">作りたい道具</label>
+      <input id="req" placeholder="両手がふさがらない雨よけが欲しい" autocomplete="off">
+      <button type="button" class="btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        話す
+      </button>
+      <button type="submit" class="btn primary">送信</button>
+    </form>
+
+    <div class="s01 stack-on-phone">
+      <section class="card" aria-labelledby="ex-h">
+        <div class="card-head"><h2 id="ex-h">例から選ぶ</h2></div>
+        <div class="examples stack-on-phone">
+          <table>
+            <thead><tr><th>発明</th><th>確かめる実験</th></tr></thead>
+            <tbody>
+              <tr class="row"><td><button class="pick">手を使わない傘</button></td><td class="muted">雨と風</td></tr>
+              <tr class="row"><td><button class="pick">空を飛べる靴</button></td><td class="muted">飛行デッキ</td></tr>
+              <tr class="row"><td><button class="pick">ついてくる運搬ロボット</button></td><td class="muted">障害物コース</td></tr>
+              <tr class="row"><td><button class="pick">頭の上の日よけ</button></td><td class="muted">真夏の日差し</td></tr>
+              <tr class="row"><td><button class="pick">夜道の足元ライト</button></td><td class="muted">足元の明るさ</td></tr>
+            </tbody>
+          </table>
+          <table>
+            <thead><tr><th>発明</th><th>確かめる実験</th></tr></thead>
+            <tbody>
+              <tr class="row"><td><button class="pick">背中を温めるヒーター</button></td><td class="muted">冬のバス停</td></tr>
+              <tr class="row"><td><button class="pick">段ボール持ち上げ機</button></td><td class="muted">棚へ上げる</td></tr>
+              <tr class="row"><td><button class="pick">後ろを見守るリュック</button></td><td class="muted">近づく自転車</td></tr>
+              <tr class="row"><td><button class="pick">割れないスマホケース</button></td><td class="muted">落下テスト</td></tr>
+              <tr class="row"><td><button class="pick">近づくと開くゴミ箱</button></td><td class="muted">人が近づく</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card recent" aria-labelledby="rc-h">
+        <div class="card-head">
+          <h2 id="rc-h">続きから</h2>
+          <button class="btn quiet" style="height: 40px; padding: 0 8px">すべて見る</button>
+        </div>
+        <table>
+          <thead><tr><th>発明</th><th class="num">版</th><th class="num">最後の結果</th></tr></thead>
+          <tbody>
+            <tr><td class="name">ハンズフリー雨よけ装置</td><td class="num">Rev.2</td><td class="num rate">防護 62.3%</td></tr>
+            <tr><td class="name">自動で開くゴミ箱</td><td class="num">Rev.2</td><td class="num">期待 78%</td></tr>
+            <tr><td class="name">ついてくるキャリーバッグ</td><td class="num">Rev.3</td><td class="num muted">未実験</td></tr>
+            <tr><td class="name">近づくと点く足元灯</td><td class="num">Rev.1</td><td class="num">期待 100%</td></tr>
+            <tr><td class="name">バス停ぬくぬくヒーター</td><td class="num">Rev.2</td><td class="num">昇温 6.2℃</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+</main>
+</body>
+</html>

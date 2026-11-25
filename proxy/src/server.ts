@@ -13,6 +13,8 @@ import type { DesignOutput, PlanOutput, ReviseOutput } from "./schemas.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "./prompts.ts";
 import { checkRequestText, pickExperiment, RateLimiter, readJsonBody, readWavBody, HttpError } from "./http-util.ts";
 import { estimateCostUsd, type Usage } from "./cost.ts";
+import { LibraryStore } from "./library/store.ts";
+import { createLibraryRoutes } from "./library/routes.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const HOST = process.env.ILAB_HOST ?? "127.0.0.1";
@@ -74,6 +76,10 @@ async function handleTranscribe(req: IncomingMessage) {
 }
 
 const limiter = new RateLimiter(Number(process.env.ILAB_RATE_PER_10MIN ?? 40), 10 * 60 * 1000);
+
+// 発明ライブラリ（IMPOSSIBLE LIBRARY）：公開データは proxy/library/ に保存する（git に入れない。PC の外へは出さない）
+const LIBRARY_DIR = process.env.ILAB_LIBRARY_DIR ?? path.join(here, "..", "library");
+const library = createLibraryRoutes(new LibraryStore({ dir: LIBRARY_DIR }), { token: TOKEN });
 
 const hasKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 // 1回あたり120秒、SDK既定の再試行2回（429/5xx/接続エラー）
@@ -173,6 +179,8 @@ async function route(req: IncomingMessage, res: ServerResponse) {
   if (req.method === "GET" && url.pathname === "/health") {
     return send(res, 200, { ok: true, model: MODEL, effort: EFFORT, apiKey: hasKey, schemaVersion: catalog.schemaVersion ?? 1, behaviors: catalog.behaviors.length });
   }
+  // 発明ライブラリの入口（AI を呼ばないので、AI の回数制限とは別に数える）
+  if (await library(req, res, url)) return;
   const handler = ROUTES[url.pathname];
   const isStt = url.pathname === "/v1/transcribe";
   if (req.method !== "POST" || (!handler && !isStt)) throw new HttpError(404, "not_found", "not found");

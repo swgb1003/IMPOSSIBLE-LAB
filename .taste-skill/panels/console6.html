@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMPOSSIBLE LAB コンソール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020405; --plate: #0a0f12; --plate-2: #0e1519; --edge: #1c2a31; --edge-hi: #2f434d;
+  --cy: #2fe3e6; --cy-dim: #116168; --cy-deep: #0a3338; --or: #ff6a26; --or-dim: #6b2c10; --red: #ff3b30;
+  --ink: #e9fbfc; --mut: #86a5aa; --body: #2a353b; --body-2: #3d4b52;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+.wrap { max-width: 1600px; margin: 0 auto; }
+svg { display: block; width: 100%; height: auto; }
+.jp { font-family: "Noto Sans JP", system-ui, sans-serif; }
+.nu { font-family: "Oxanium", "Noto Sans JP", sans-serif; font-variant-numeric: tabular-nums; }
+.halo { paint-order: stroke; stroke: #05090b; stroke-width: 5px; stroke-linejoin: round; }
+.hit { cursor: pointer; }
+.hit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.tri { fill: var(--plate-2); stroke: var(--cy); stroke-width: 2; transition: fill 120ms; }
+.hit:hover .tri, .hit:focus-visible .tri { fill: var(--cy-deep); }
+.hit:active .tri { fill: var(--cy); }
+.sel .tri { stroke: var(--or); }
+.sel.hit:hover .tri { fill: var(--or-dim); }
+.btn rect, .btn polygon { transition: fill 120ms, stroke 120ms; }
+.btn:hover .face, .btn:focus-visible .face { fill: var(--cy-deep); }
+.btn.primary:hover .face { fill: #7ff3f4; }
+.btn.warm:hover .face { fill: #ff8a52; }
+.row-bg { fill: transparent; }
+.rowhit:hover .row-bg { fill: rgba(47, 227, 230, 0.05); }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ghost { animation: pulse 1.6s ease-in-out infinite; }
+.orbit { transform-box: fill-box; transform-origin: center; animation: spin 90s linear infinite; }
+@keyframes meter { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+@keyframes fall { 0% { opacity: 0; } 30% { opacity: 0.8; } 100% { opacity: 0.25; } }
+@keyframes flow { to { stroke-dashoffset: -44; } }
+@keyframes land { from { opacity: 0; } to { opacity: 1; } }
+.meter { animation: meter 600ms ease-in-out infinite; }
+.drop { animation: fall 1.8s linear infinite; }
+.flow { animation: flow 1.2s linear infinite; }
+.dot { animation: land 240ms both; }
+.stage:hover polygon { stroke: var(--cy); }
+@media (prefers-reduced-motion: reduce) { .ghost, .orbit, .meter, .drop, .flow, .dot { animation: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">IMPOSSIBLE LAB の操作コンソール</h1>
+  <svg id="c" viewBox="0 0 1600 900" role="group" aria-label="操作コンソール"></svg>
+</main>
+<script src="console6.js"></script>
+</body>
+</html>

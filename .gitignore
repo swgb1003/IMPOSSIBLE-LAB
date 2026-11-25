@@ -18,6 +18,8 @@
 .env
 proxy/.env
 proxy/node_modules/
+# 発明ライブラリの公開データ（PC の中だけ。依頼文などを含む）
+proxy/library/
 
 # Unity一時ファイル・テスト結果
 /.utmp/

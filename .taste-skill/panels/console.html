@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMPOSSIBLE LAB 編集コンソール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020405; --plate: #0a0f12; --plate-2: #0e1519; --edge: #1c2a31; --edge-hi: #2f434d;
+  --cy: #2fe3e6; --cy-dim: #116168; --cy-deep: #0a3338; --or: #ff6a26; --or-dim: #6b2c10; --red: #ff3b30;
+  --ink: #e9fbfc; --mut: #86a5aa; --body: #2a353b; --body-2: #3d4b52;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+.wrap { max-width: 1600px; margin: 0 auto; }
+svg { display: block; width: 100%; height: auto; }
+.jp { font-family: "Noto Sans JP", system-ui, sans-serif; }
+.nu { font-family: "Oxanium", "Noto Sans JP", sans-serif; font-variant-numeric: tabular-nums; }
+.halo { paint-order: stroke; stroke: #05090b; stroke-width: 5px; stroke-linejoin: round; }
+.hit { cursor: pointer; }
+.hit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.tri { fill: var(--plate-2); stroke: var(--cy); stroke-width: 2; transition: fill 120ms; }
+.hit:hover .tri, .hit:focus-visible .tri { fill: var(--cy-deep); }
+.hit:active .tri { fill: var(--cy); }
+.sel .tri { stroke: var(--or); }
+.sel.hit:hover .tri { fill: var(--or-dim); }
+.btn rect, .btn polygon { transition: fill 120ms, stroke 120ms; }
+.btn:hover .face, .btn:focus-visible .face { fill: var(--cy-deep); }
+.btn.primary:hover .face { fill: #7ff3f4; }
+.btn.warm:hover .face { fill: #ff8a52; }
+.row-bg { fill: transparent; }
+.rowhit:hover .row-bg { fill: rgba(47, 227, 230, 0.05); }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ghost { animation: pulse 1.6s ease-in-out infinite; }
+.orbit { transform-box: fill-box; transform-origin: center; animation: spin 90s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ghost, .orbit { animation: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">ハンズフリー雨よけ装置 Rev.2 の編集</h1>
+  <svg id="c" viewBox="0 0 1600 900" role="group" aria-label="編集コンソール"></svg>
+</main>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("c");
+const state = {
+  name: "ハンズフリー雨よけ装置", rev: 2,
+  values: [
+    { key: "radius", label: "防ぐ半径", unit: " m", min: 0.20, max: 1.50, step: 0.05, v: 0.60, dec: 2 },
+    { key: "height", label: "頭上からの高さ", unit: " m", min: 0.15, max: 0.80, step: 0.05, v: 0.35, dec: 2 },
+    { key: "skirt", label: "側面カバーの長さ", unit: " m", min: 0.00, max: 0.60, step: 0.05, v: 0.00, dec: 2 },
+    { key: "seal", label: "遮水の効き", unit: "", min: 0.10, max: 1.00, step: 0.05, v: 0.90, dec: 2 },
+    { key: "steady", label: "揺れにくさ", unit: "", min: 0.00, max: 1.00, step: 0.05, v: 0.30, dec: 2 },
+  ],
+  selected: "skirt",
+  proposal: { key: "skirt", to: 0.25, text: "側面カバーを伸ばし、横から吹き込む雨を防ぐ" },
+  parts: [
+    { id: "canopy", name: "キャノピー", shape: "円柱", material: "樹脂" },
+    { id: "core", name: "本体", shape: "円柱", material: "樹脂" },
+    { id: "eye", name: "センサー", shape: "球", material: "樹脂" },
+    { id: "cell", name: "電池", shape: "箱", material: "樹脂" },
+  ],
+  part: "canopy", look: "研究所ホワイト",
+  rate: 62.3, prevRate: 40.9, pass: 80, wind: 4,
+  mass: 0.52, massLimit: 0.50,
+};
+
+const el = (name, attrs = {}, text) => {
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+};
+const pol = (cx, cy, r, deg) => [cx + r * Math.cos(deg * Math.PI / 180), cy + r * Math.sin(deg * Math.PI / 180)];
+const arc = (cx, cy, r, a0, a1) => {
+  const [x0, y0] = pol(cx, cy, r, a0), [x1, y1] = pol(cx, cy, r, a1);
+  return `M${x0},${y0} A${r},${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1},${y1}`;
+};
+const fmt = (d, v) => v.toFixed(d.dec) + d.unit;
+
+function button(g, { x, y, w, h, label, kind = "", onClick, size = 20, aria }) {
+  const b = el("g", { class: `btn hit ${kind}`, role: "button", tabindex: 0, "aria-label": aria || label });
+  const sl = 12;
+  const pts = `${x + sl},${y} ${x + w},${y} ${x + w - sl},${y + h} ${x},${y + h}`;
+  const fill = kind === "primary" ? "var(--cy)" : kind === "warm" ? "var(--or)" : "var(--plate-2)";
+  const stroke = kind === "primary" ? "var(--cy)" : kind === "warm" ? "var(--or)" : kind === "quiet" ? "var(--edge-hi)" : "var(--cy-dim)";
+  b.appendChild(el("polygon", { class: "face", points: pts, fill, stroke, "stroke-width": 2, filter: kind === "primary" ? "url(#glow)" : "" }));
+  b.appendChild(el("text", { x: x + w / 2, y: y + h / 2 + size * 0.36, "text-anchor": "middle", "font-size": size, "font-weight": 700, class: "jp", fill: kind === "primary" || kind === "warm" ? "#021012" : kind === "quiet" ? "var(--mut)" : "var(--ink)" }, label));
+  if (onClick) { b.addEventListener("click", onClick); b.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }); }
+  g.appendChild(b);
+  return b;
+}
+function tri(g, { x, y, dir, sel, onClick, aria }) {
+  const b = el("g", { class: `hit ${sel ? "sel" : ""}`, role: "button", tabindex: 0, "aria-label": aria });
+  b.appendChild(el("rect", { x, y, width: 48, height: 48, fill: "transparent" }));
+  const p = dir < 0 ? `${x + 36},${y + 8} ${x + 36},${y + 40} ${x + 10},${y + 24}` : `${x + 12},${y + 8} ${x + 12},${y + 40} ${x + 38},${y + 24}`;
+  b.appendChild(el("polygon", { class: "tri", points: p, "stroke-linejoin": "round" }));
+  b.addEventListener("click", (e) => { e.stopPropagation(); onClick(); });
+  b.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } });
+  g.appendChild(b);
+}
+function plate(g, x, y, w, h) {
+  g.appendChild(el("rect", { x, y, width: w, height: h, rx: 4, fill: "url(#metal)", stroke: "var(--edge)", "stroke-width": 1 }));
+  g.appendChild(el("rect", { x, y, width: w, height: h, rx: 4, fill: "url(#brush)" }));
+  g.appendChild(el("line", { x1: x + 4, y1: y + 0.5, x2: x + w - 4, y2: y + 0.5, stroke: "var(--edge-hi)", "stroke-width": 1 }));
+}
+
+function render() {
+  svg.replaceChildren();
+  const defs = el("defs");
+  defs.innerHTML = `
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f161a"/><stop offset="1" stop-color="#070b0d"/></linearGradient>
+    <pattern id="brush" width="6" height="3" patternUnits="userSpaceOnUse"><rect width="6" height="1" fill="#ffffff" opacity="0.022"/></pattern>
+    <radialGradient id="dial" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#0d1418"/><stop offset="1" stop-color="#030506"/></radialGradient>`;
+  svg.appendChild(defs);
+  svg.appendChild(el("rect", { width: 1600, height: 900, fill: "var(--bg)" }));
+  const add = (name, attrs, text) => svg.appendChild(el(name, attrs, text));
+  const T = (x, y, text, o = {}) => add("text", { x, y, class: (o.nu ? "nu" : "jp") + (o.halo ? " halo" : ""), "font-size": o.size || 18, "font-weight": o.w || 400, fill: o.fill || "var(--ink)", "text-anchor": o.anchor || "start" }, text);
+
+  // ---- 上：発明の名前と状態 ----
+  T(40, 46, "IMPOSSIBLE LAB", { nu: true, size: 22, w: 700 });
+  T(248, 46, state.name, { size: 20, w: 500 });
+  T(248 + state.name.length * 20 + 14, 46, `Rev.${state.rev}`, { nu: true, size: 20, w: 600, fill: "var(--cy)" });
+  add("circle", { cx: 1392, cy: 39, r: 6, fill: "var(--cy)", filter: "url(#glow)" });
+  T(1408, 46, "PC 接続中", { size: 17, fill: "var(--mut)" });
+  T(1560, 46, "AI 待機", { size: 17, fill: "var(--mut)", anchor: "end" });
+
+  // ---- 中央：発明台を上から見た計器 ----
+  const cx = 800, cy = 372, M = 140; // 1 m = 140
+  add("circle", { cx, cy, r: 304, fill: "none", stroke: "#0b1013", "stroke-width": 10 });
+  add("circle", { cx, cy, r: 309, fill: "none", stroke: "var(--edge-hi)", "stroke-width": 1 });
+  add("circle", { cx, cy, r: 296, fill: "url(#dial)", stroke: "var(--edge)", "stroke-width": 1.5 });
+  add("circle", { cx, cy, r: 296, fill: "url(#brush)" });
+  for (const m of [0.5, 1.0, 1.5]) {
+    add("circle", { cx, cy, r: m * M, fill: "none", stroke: "var(--cy-deep)", "stroke-width": 1.5 });
+    if (m === 0.5) continue;
+    const [lx, ly] = pol(cx, cy, m * M, 58);
+    T(lx + 8, ly + 4, `${m.toFixed(1)} m`, { nu: true, size: 15, fill: "var(--mut)", halo: true });
+  }
+  // 方位の目盛り（ゆっくり回る点線の輪は、試作品が回せることを示す）
+  const ticks = el("g", {});
+  for (let a = 0; a < 360; a += 5) {
+    const long = a % 30 === 0, [x0, y0] = pol(cx, cy, 228, a), [x1, y1] = pol(cx, cy, long ? 214 : 221, a);
+    ticks.appendChild(el("line", { x1: x0, y1: y0, x2: x1, y2: y1, stroke: long ? "var(--cy)" : "var(--cy-dim)", "stroke-width": long ? 2 : 1.5 }));
+  }
+  svg.appendChild(ticks);
+  add("circle", { cx, cy, r: 236, fill: "none", stroke: "var(--cy-dim)", "stroke-width": 2, "stroke-dasharray": "2 10", class: "orbit" });
+  for (const [a, name] of [[270, "前"], [0, "右"], [90, "後"], [180, "左"]]) { const [x, y] = pol(cx, cy, 247, a); T(x, y + 6, name, { size: 15, fill: "var(--mut)", anchor: "middle" }); }
+
+  // 前回の実験の風（右から）
+  add("line", { x1: cx + 205, y1: cy, x2: cx + 150, y2: cy, stroke: "var(--ink)", "stroke-width": 2.5 });
+  add("polygon", { points: `${cx + 138},${cy} ${cx + 152},${cy - 8} ${cx + 152},${cy + 8}`, fill: "var(--ink)" });
+  T(cx + 205, cy - 14, `前回の風 ${state.wind} m/s`, { size: 15, fill: "var(--ink)", anchor: "end", halo: true });
+
+  // 人（上から）と装置
+  add("ellipse", { cx, cy, rx: 0.22 * M, ry: 0.12 * M, fill: "var(--body)" });
+  add("circle", { cx, cy, r: 0.10 * M, fill: "var(--body-2)" });
+  const R = state.values[0].v * M;
+  add("circle", { cx, cy, r: R, fill: "rgba(47,227,230,0.08)", stroke: "var(--cy)", "stroke-width": 3, filter: "url(#glow)" });
+  add("rect", { x: cx - 13, y: cy - 13, width: 26, height: 26, fill: "none", stroke: "var(--ink)", "stroke-width": 2, transform: `rotate(45 ${cx} ${cy})` });
+  // 半径の寸法
+  const [ex, ey] = pol(cx, cy, R, -138), [tx, ty] = pol(cx, cy, R + 16, -138);
+  add("line", { x1: cx, y1: cy, x2: ex, y2: ey, stroke: "var(--cy)", "stroke-width": 1.5 });
+  add("circle", { cx: ex, cy: ey, r: 4, fill: "var(--cy)" });
+  T(tx - 4, ty, fmt(state.values[0], state.values[0].v), { nu: true, size: 20, w: 600, fill: "var(--cy)", anchor: "end", halo: true });
+  // 選んでいる部品の印（キャノピーなら外周に、ほかは中心に）
+  const pr = state.part === "canopy" ? R + 10 : 26;
+  for (const a of [45, 135, 225, 315]) add("path", { d: arc(cx, cy, pr, a - 9, a + 9), fill: "none", stroke: "var(--or)", "stroke-width": 3 });
+
+  // 外周：防護率のゲージ（前回の実験）
+  const ang = (v) => 150 + 240 * v / 100;
+  add("path", { d: arc(cx, cy, 270, 150, 390), fill: "none", stroke: "var(--cy-deep)", "stroke-width": 16 });
+  add("path", { d: arc(cx, cy, 270, 150, ang(state.rate)), fill: "none", stroke: "var(--cy)", "stroke-width": 16, filter: "url(#glow)" });
+  for (let v = 0; v <= 100; v += 10) { const [x0, y0] = pol(cx, cy, 282, ang(v)), [x1, y1] = pol(cx, cy, 290, ang(v)); add("line", { x1: x0, y1: y0, x2: x1, y2: y1, stroke: "var(--mut)", "stroke-width": 1.5 }); }
+  { const [x0, y0] = pol(cx, cy, 240, ang(state.pass)), [x1, y1] = pol(cx, cy, 296, ang(state.pass)); add("line", { x1: x0, y1: y0, x2: x1, y2: y1, stroke: "var(--ink)", "stroke-width": 4 });
+    const [lx, ly] = pol(cx, cy, 196, ang(state.pass)); T(lx + 14, ly - 6, `合格 ${state.pass}%`, { size: 17, w: 500, anchor: "end", halo: true }); }
+  { const [x0, y0] = pol(cx, cy, 258, ang(state.prevRate)), [x1, y1] = pol(cx, cy, 284, ang(state.prevRate)); add("line", { x1: x0, y1: y0, x2: x1, y2: y1, stroke: "var(--mut)", "stroke-width": 3 });
+    const [lx, ly] = pol(cx, cy, 312, ang(state.prevRate)); T(lx, ly, `Rev.1 ${state.prevRate}`, { nu: true, size: 15, fill: "var(--mut)", anchor: "middle" }); }
+  { const [x, y] = pol(cx, cy, 270, 150); T(x - 16, y + 26, "0", { nu: true, size: 15, fill: "var(--mut)", anchor: "middle" }); const [x2, y2] = pol(cx, cy, 270, 390); T(x2 + 16, y2 + 26, "100", { nu: true, size: 15, fill: "var(--mut)", anchor: "middle" }); }
+  // ゲージの切れ目に、前回の値
+  T(cx - 8, 688, state.rate.toFixed(1), { nu: true, size: 76, w: 600, fill: "var(--cy)", anchor: "middle" });
+  T(cx + 76, 688, "%", { nu: true, size: 32, w: 500, fill: "var(--cy)" });
+  T(cx, 716, "前回の実験の防護率", { size: 16, fill: "var(--mut)", anchor: "middle" });
+
+  // ---- 左：性能の値 ----
+  plate(svg, 28, 78, 454, 468);
+  T(48, 112, "性能の値", { size: 20, w: 700 });
+  T(48 + 110, 112, "動きの手順", { size: 18, fill: "var(--mut)" });
+  add("rect", { x: 48, y: 122, width: 80, height: 3, fill: "var(--cy)" });
+  const sel = state.values.find((d) => d.key === state.selected);
+  state.values.forEach((d, i) => {
+    const y = 136 + i * 80, isSel = d.key === state.selected, col = isSel ? "var(--or)" : "var(--cy)";
+    const g = el("g", { class: "rowhit hit", role: "button", tabindex: 0, "aria-label": `${d.label} ${fmt(d, d.v)}。選ぶ` });
+    g.appendChild(el("rect", { class: "row-bg", x: 36, y, width: 438, height: 76, rx: 3 }));
+    if (isSel) g.appendChild(el("rect", { x: 36.5, y: y + 0.5, width: 437, height: 75, rx: 3, fill: "rgba(255,106,38,0.07)", stroke: "var(--or)", "stroke-width": 1.5 }));
+    g.addEventListener("click", () => { state.selected = d.key; render(); });
+    svg.appendChild(g);
+    T(52, y + 27, d.label, { size: 18, w: isSel ? 700 : 400, fill: isSel ? "var(--or)" : "var(--ink)" });
+    const prop = state.proposal && state.proposal.key === d.key ? state.proposal : null;
+    T(460, y + 28, prop ? `${d.v.toFixed(d.dec)} → ${fmt(d, prop.to)}` : fmt(d, d.v), { nu: true, size: 24, w: 600, fill: col, anchor: "end" });
+    // 1刻み = 1区画のバー
+    const n = Math.round((d.max - d.min) / d.step), on = Math.round((d.v - d.min) / d.step), bx = 100, bw = 310, sw = bw / n;
+    const pOn = prop ? Math.round((prop.to - d.min) / d.step) : on;
+    for (let k = 0; k < n; k++) {
+      const x = bx + k * sw, filled = k < on, ghost = !filled && k < pOn;
+      const p = `${x + 5},${y + 40} ${x + sw - 2},${y + 40} ${x + sw - 7},${y + 62} ${x},${y + 62}`;
+      svg.appendChild(el("polygon", { points: p, fill: filled ? col : "none", stroke: filled ? col : ghost ? "var(--or)" : "var(--cy-deep)", "stroke-width": ghost ? 2 : 1.5, class: ghost ? "ghost" : "", filter: filled && isSel ? "url(#glow)" : "" }));
+    }
+    const stepBy = (s) => { d.v = Math.min(d.max, Math.max(d.min, Math.round((d.v + s * d.step) * 100) / 100)); state.selected = d.key; render(); };
+    tri(svg, { x: 44, y: y + 27, dir: -1, sel: isSel, onClick: () => stepBy(-1), aria: `${d.label}を減らす` });
+    tri(svg, { x: 418, y: y + 27, dir: +1, sel: isSel, onClick: () => stepBy(+1), aria: `${d.label}を増やす` });
+  });
+  // 選んだ値が、図のどこを変えるかを結ぶ線
+  if (sel) {
+    const i = state.values.indexOf(sel), y = 136 + i * 80 + 38;
+    const target = sel.key === "radius" || sel.key === "skirt" ? [cx - R, cy] : sel.key === "seal" ? [cx - R / 2, cy + 10] : [cx - 20, cy];
+    add("polyline", { points: `474,${y} 520,${y} ${target[0] - 40},${target[1]} ${target[0]},${target[1]}`, fill: "none", stroke: "var(--or)", "stroke-width": 1.5 });
+    add("circle", { cx: target[0], cy: target[1], r: 5, fill: "var(--or)", filter: "url(#glow)" });
+  }
+
+  // ---- 左下：改良を頼む ----
+  plate(svg, 28, 558, 454, 190);
+  T(48, 592, "AI に改良を頼む", { size: 20, w: 700 });
+  add("rect", { x: 48, y: 606, width: 250, height: 52, rx: 3, fill: "#04080a", stroke: "var(--cy-dim)", "stroke-width": 1.5 });
+  T(62, 639, "横からの雨も防いで", { size: 18 });
+  button(svg, { x: 306, y: 606, w: 78, h: 52, label: "話す", size: 18 });
+  button(svg, { x: 388, y: 606, w: 82, h: 52, label: "依頼", size: 18 });
+  if (state.proposal) {
+    T(48, 690, `案：${state.proposal.text}`, { size: 15, fill: "var(--or)" });
+    button(svg, { x: 48, y: 700, w: 120, h: 40, label: "やめる", kind: "quiet", size: 17, onClick: () => { state.proposal = null; render(); } });
+    button(svg, { x: 176, y: 700, w: 294, h: 40, label: "この案を使う", kind: "warm", size: 18, onClick: () => { const d = state.values.find((v) => v.key === state.proposal.key); d.v = state.proposal.to; state.selected = d.key; state.proposal = null; render(); } });
+  } else {
+    T(48, 700, "値を変えたら、実験で確かめましょう", { size: 16, fill: "var(--mut)" });
+  }
+
+  // ---- 右：部品 ----
+  plate(svg, 1118, 78, 454, 468);
+  T(1138, 112, "部品", { size: 20, w: 700 });
+  T(1552, 112, `${state.parts.length} 点`, { nu: true, size: 18, fill: "var(--mut)", anchor: "end" });
+  state.parts.forEach((p, i) => {
+    const y = 128 + i * 58, isSel = p.id === state.part;
+    const g = el("g", { class: "rowhit hit", role: "button", tabindex: 0, "aria-label": `${p.name}を選ぶ` });
+    g.appendChild(el("rect", { class: "row-bg", x: 1126, y, width: 438, height: 54, rx: 3 }));
+    if (isSel) g.appendChild(el("rect", { x: 1126.5, y: y + 0.5, width: 437, height: 53, rx: 3, fill: "rgba(255,106,38,0.07)", stroke: "var(--or)", "stroke-width": 1.5 }));
+    g.addEventListener("click", () => { state.part = p.id; render(); });
+    svg.appendChild(g);
+    T(1142, y + 34, p.name, { size: 19, w: isSel ? 700 : 400, fill: isSel ? "var(--or)" : "var(--ink)" });
+    T(1552, y + 34, `${p.shape}・${p.material}`, { size: 16, fill: "var(--mut)", anchor: "end" });
+  });
+  const cur = state.parts.find((p) => p.id === state.part);
+  [["形", cur.shape], ["素材", cur.material], ["外観", state.look]].forEach(([k, v], i) => {
+    const y = 372 + i * 56;
+    T(1142, y + 32, k, { size: 17, fill: "var(--mut)" });
+    tri(svg, { x: 1262, y: y + 4, dir: -1, onClick: () => {}, aria: `${k}を前へ` });
+    T(1410, y + 32, v, { size: 19, w: 500, anchor: "middle" });
+    tri(svg, { x: 1512, y: y + 4, dir: +1, onClick: () => {}, aria: `${k}を次へ` });
+  });
+
+  // ---- 右下：重さ ----
+  plate(svg, 1118, 558, 454, 190);
+  T(1138, 592, "総質量（推定）", { size: 20, w: 700 });
+  const over = state.mass > state.massLimit;
+  T(1518, 602, state.mass.toFixed(2), { nu: true, size: 44, w: 600, fill: over ? "var(--or)" : "var(--cy)", anchor: "end" });
+  T(1526, 602, "kg", { nu: true, size: 20, w: 500, fill: over ? "var(--or)" : "var(--cy)" });
+  const mw = 414, mMax = 0.75, mx = (v) => 1138 + (v / mMax) * mw;
+  add("rect", { x: 1138, y: 624, width: mw, height: 14, fill: "var(--cy-deep)" });
+  add("rect", { x: 1138, y: 624, width: mx(Math.min(state.mass, state.massLimit)) - 1138, height: 14, fill: "var(--cy)" });
+  if (over) add("rect", { x: mx(state.massLimit), y: 624, width: mx(state.mass) - mx(state.massLimit), height: 14, fill: "var(--or)", filter: "url(#glow)" });
+  add("line", { x1: mx(state.massLimit), y1: 616, x2: mx(state.massLimit), y2: 648, stroke: "var(--ink)", "stroke-width": 3 });
+  T(mx(state.massLimit), 670, `頭に付ける目安 ${state.massLimit.toFixed(2)} kg`, { size: 15, fill: "var(--mut)", anchor: "middle" });
+  T(1138, 716, over ? `目安を ${(state.mass - state.massLimit).toFixed(2)} kg 超えています` : "目安の範囲内です", { size: 17, fill: over ? "var(--or)" : "var(--ink)" });
+
+  // ---- 下：6つの段階と操作 ----
+  const stages = ["指示", "設計", "編集", "実験", "結果", "保存"], sw = 104, sx = 800 - (sw * 6) / 2;
+  stages.forEach((name, i) => {
+    const x = sx + i * sw, now = i === 2, done = i < 2;
+    const p = `${x + 14},806 ${x + sw - 4},806 ${x + sw - 18},850 ${x},850`;
+    add("polygon", { points: p, fill: now ? "var(--cy)" : done ? "var(--cy-deep)" : "none", stroke: now ? "var(--cy)" : "var(--cy-dim)", "stroke-width": 1.5, filter: now ? "url(#glow)" : "" });
+    T(x + sw / 2 - 2, 835, name, { size: 18, w: now ? 700 : 400, fill: now ? "#021012" : done ? "var(--ink)" : "var(--mut)", anchor: "middle" });
+  });
+  button(svg, { x: 40, y: 800, w: 132, h: 56, label: "元に戻す", kind: "quiet" });
+  button(svg, { x: 180, y: 800, w: 132, h: 56, label: "試用する" });
+  button(svg, { x: 320, y: 800, w: 100, h: 56, label: "保存" });
+  button(svg, { x: 1300, y: 794, w: 260, h: 68, label: "実験へ進む", kind: state.proposal ? "" : "primary", size: 24 });
+}
+render();
+</script>
+</body>
+</html>

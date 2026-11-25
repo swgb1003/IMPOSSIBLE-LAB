@@ -412,6 +412,15 @@ namespace ImpossibleLab
             // 保存 → ギャラリー
             _app.Save();
             yield return WaitState(LabState.Saved);
+            // 依頼文と、版ごとに改良を頼んだ文が保存されている（元に戻して頼み直した Rev.3 は、頼み直した方）
+            {
+                var saved = _app.Repo.Load(_app.Current.Current.Id, out var loadErr);
+                var n2 = saved?.NoteFor(2); var n3 = saved?.NoteFor(3);
+                Check(saved != null && saved.RequestText == LabApp.DefaultRainRequest && saved.DesignSource == "offline", "saved: request text and design source " + loadErr);
+                Check(n2 != null && n2.Request == "横からの雨も防いで" && n2.Source == "offline" && n2.Changes.Count > 0, "saved: rev2 note keeps the revision request");
+                Check(n3 != null && n3.Request == "防ぐ範囲を広げて" && saved.RevisionNotes.Count == 2, "saved: rev3 note after undo and redo");
+            }
+            ExportGlb("rain_rev" + _app.Current.Current.Revision, _app.Current.Current);
             yield return Shot("S06_saved");
             yield return Shot("S06_saved_face", facePanel: "MainConsole");
             if (exUi != null)
@@ -873,6 +882,24 @@ namespace ImpossibleLab
             yield return WaitState(LabState.Saved, 20f); // 次の検証は保存完了の画面から新しい発明を始める
         }
 
+        /// <summary>
+        /// 公開用の 3D（GLB）を書き出し、形が正しいこと・部品がすべてノードにあること・大きさの目安に収まることを確かめる。
+        /// 書き出したファイルは OutputDir/glb/ に残す（ブラウザ・Blender で開いて見た目を確かめる）。
+        /// </summary>
+        void ExportGlb(string name, InventionDna dna)
+        {
+            var r = ProductExport.Export(dna, _app.Assets);
+            var s = r.Glb != null ? GlbWriter.Inspect(r.Glb, out var err) : null;
+            if (s == null) { Check(false, $"glb-{name}: readable ({r.Warnings.FirstOrDefault()})"); return; }
+            string dir = Path.Combine(OutputDir, "glb");
+            Directory.CreateDirectory(dir);
+            File.WriteAllBytes(Path.Combine(dir, name + ".glb"), r.Glb);
+            var missing = dna.Parts.Where(p => !s.NodeNames.Contains(p.Id)).Select(p => p.Id).ToList();
+            Log($"GLB {name} bytes={r.Glb.Length} parts={r.Parts} placed={r.Instances} meshes={s.Meshes} prims={r.Primitives} verts={r.Vertices} tris={r.Triangles} mats={r.Materials} warnings={r.Warnings.Count}");
+            Check(missing.Count == 0 && r.Warnings.Count == 0 && r.Triangles > 0, $"glb-{name}: every part is a node ({string.Join(",", missing)}{r.Warnings.FirstOrDefault()})");
+            Check(r.Glb.Length <= ProductExport.TargetBytes, $"glb-{name}: {r.Glb.Length / 1024} KB <= {ProductExport.TargetBytes / 1024} KB");
+        }
+
         /// <summary>見比べ用：記録した AI の応答を1件ずつ設計させ、製品の説明のページと試作品を撮る（通しの検証はしない）。</summary>
         IEnumerator Showcase(string dir)
         {
@@ -919,6 +946,7 @@ namespace ImpossibleLab
             _app.ApprovePreview();
             yield return WaitState(LabState.Editing);
             var dna = _app.Current.Current;
+            ExportGlb("rep_" + id, dna);
             yield return Shot($"S03_device_rep_{id}", device: true);
             yield return Shot($"S03_product_rep_{id}", device: true, productView: true);
             _app.TestConfig.Mode = LabModes.Dream;
@@ -975,6 +1003,9 @@ namespace ImpossibleLab
             var saved = _app.Repo.Load(dna.Id, out var err);
             bool savedOk = saved != null && saved.Experiments.Count(e => e.IsScenarioLab) >= 2 && saved.Current.Revision == r2?.Revision;
             Check(savedOk, $"rep-{id}: saved Rev.{saved?.Current.Revision} with {saved?.Experiments.Count} experiments {err}");
+            var note = saved?.NoteFor(saved.Current.Revision);
+            Check(saved != null && saved.RequestText == "代表 " + id && saved.DesignSource == "ai" && note != null && note.Request == req && note.Changes.Count > 0,
+                $"rep-{id}: saved the design request and the revision request");
             _app.ContinueEditing();
             yield return WaitState(LabState.Editing);
             done(revised && better && savedOk);

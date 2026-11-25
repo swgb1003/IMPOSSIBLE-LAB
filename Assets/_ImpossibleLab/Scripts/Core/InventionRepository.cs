@@ -14,7 +14,66 @@ namespace ImpossibleLab.Core
         public List<InventionDna> History = new List<InventionDna>();
         public List<RainExperimentResult> Experiments = new List<RainExperimentResult>();
         public string UpdatedAt = "";
+        /// <summary>設計を作った依頼の文（原文のまま）。依頼文を保存する前の発明では空（公開ページでは「記録なし」）。</summary>
+        public string RequestText = "";
+        /// <summary>最初の設計を作ったところ（ai / offline）。空は記録なし。</summary>
+        public string DesignSource = "";
+        /// <summary>版ごとの改良の記録（Rev.2 以降。何を頼み、何を変えたか）。</summary>
+        public List<RevisionNote> RevisionNotes = new List<RevisionNote>();
         public bool Tested => Experiments.Count > 0;
+
+        public RevisionNote NoteFor(int revision) => RevisionNotes.Find(n => n.Revision == revision);
+
+        /// <summary>
+        /// res.NewDna の版を作った改良を記録する。request は利用者が頼んだ文（手動の調整では空）。
+        /// 元に戻してから作り直した同じ番号の版は、前の記録を置き換える。
+        /// </summary>
+        public void RecordRevision(RevisionResult res, RevisionProposal proposal, string request, string at)
+        {
+            if (res?.NewDna == null) return;
+            int rev = res.NewDna.Revision;
+            RevisionNotes.RemoveAll(n => n.Revision >= rev);
+            var note = new RevisionNote
+            {
+                Revision = rev,
+                ParentRevision = res.NewDna.ParentRevision ?? rev - 1,
+                Source = RevisionNote.NormalizeSource(proposal?.Source),
+                Request = RevisionNote.Trunc((request ?? "").Trim(), RevisionNote.MaxRequestLength),
+                Summary = RevisionNote.Trunc(proposal?.Summary, RevisionNote.MaxSummaryLength),
+                At = at ?? "",
+            };
+            foreach (var c in res.Changes.Take(RevisionNote.MaxChanges))
+                note.Changes.Add(new ChangeLine
+                {
+                    Label = RevisionNote.Trunc(c.Label, RevisionNote.MaxChangeText),
+                    Before = RevisionNote.Trunc(c.Before, RevisionNote.MaxChangeText),
+                    After = RevisionNote.Trunc(c.After, RevisionNote.MaxChangeText),
+                });
+            RevisionNotes.Add(note);
+        }
+
+        /// <summary>元に戻した版（とそれより後）の記録を消す。</summary>
+        public void ForgetRevision(int revision) => RevisionNotes.RemoveAll(n => n.Revision >= revision);
+    }
+
+    /// <summary>1つの版を作った改良の記録（公開ページの改良の履歴に使う）。音声そのものは残さない。</summary>
+    public sealed class RevisionNote
+    {
+        public const int MaxRequestLength = 400, MaxSummaryLength = 120, MaxChanges = 12, MaxChangeText = 80;
+        public static readonly string[] Sources = { "ai", "offline", "manual" };
+
+        public int Revision;
+        public int ParentRevision;
+        /// <summary>ai（AI の改良案）/ offline（AI につながらないときの見本の改良）/ manual（画面で値・形・素材・手順を変えた）。</summary>
+        public string Source = "manual";
+        /// <summary>改良を頼んだ文。手動の調整では空。</summary>
+        public string Request = "";
+        public string Summary = "";
+        public List<ChangeLine> Changes = new List<ChangeLine>();
+        public string At = "";
+
+        public static string NormalizeSource(string s) => Array.IndexOf(Sources, s) >= 0 ? s : "manual";
+        public static string Trunc(string s, int max) => string.IsNullOrEmpty(s) ? "" : s.Length > max ? s.Substring(0, max) : s;
     }
 
     public sealed class GalleryEntry
@@ -98,6 +157,9 @@ namespace ImpossibleLab.Core
                 ["current"] = DnaJson.ToJObject(inv.Current),
                 ["history"] = hist,
                 ["experiments"] = exps,
+                ["requestText"] = RevisionNote.Trunc(inv.RequestText, RevisionNote.MaxRequestLength),
+                ["designSource"] = inv.DesignSource ?? "",
+                ["revisionNotes"] = new JArray(inv.RevisionNotes.Skip(Math.Max(0, inv.RevisionNotes.Count - MaxRevisionNotes)).Select(NoteToJson)),
             };
             string path = PathFor(inv.Current.Id);
             string tmp = path + ".tmp";
@@ -114,12 +176,27 @@ namespace ImpossibleLab.Core
             try { path = PathFor(id); } catch (ArgumentException e) { error = e.Message; return null; }
             if (!File.Exists(path)) { error = "保存データが見つかりません"; return null; }
             JObject root;
-            try { root = JObject.Parse(File.ReadAllText(path)); }
+            // 日時の文字列（実験の開始・改良の時刻）を日付に変えず、書いたままの文字列で読む
+            try
+            {
+                using (var reader = new JsonTextReader(new StringReader(File.ReadAllText(path))) { DateParseHandling = DateParseHandling.None })
+                    root = JObject.Load(reader);
+            }
             catch (Exception e) when (e is JsonException || e is IOException) { error = "保存データを読み込めません"; return null; }
             if (root.Value<int?>("format") != FileFormatVersion) { error = "保存データの形式が非対応です"; return null; }
             var cur = DnaJson.Parse(root["current"]?.ToString() ?? "");
             if (!cur.IsValid) { error = "保存データの検証に失敗: " + cur.Summary; return null; }
             var inv = new SavedInvention { Current = cur.Dna, UpdatedAt = root.Value<string>("updatedAt") ?? "" };
+            // 依頼文と改良の記録は後から足した欄（無い・壊れている記録は空のまま読む。発明そのものは読める）
+            inv.RequestText = RevisionNote.Trunc(StringOrEmpty(root["requestText"]), RevisionNote.MaxRequestLength);
+            string src = StringOrEmpty(root["designSource"]);
+            inv.DesignSource = src == "ai" || src == "offline" ? src : "";
+            if (root["revisionNotes"] is JArray notes)
+                foreach (var n in notes.OfType<JObject>().Take(MaxRevisionNotes))
+                {
+                    var note = NoteFromJson(n);
+                    if (note != null && note.Revision <= inv.Current.Revision && inv.NoteFor(note.Revision) == null) inv.RevisionNotes.Add(note);
+                }
             if (root["history"] is JArray hist)
                 foreach (var h in hist)
                 {
@@ -238,6 +315,44 @@ namespace ImpossibleLab.Core
         }
 
         static string Trunc(string s, int max) => string.IsNullOrEmpty(s) ? "" : s.Length > max ? s.Substring(0, max) : s;
+
+        static string StringOrEmpty(JToken t) => t != null && t.Type == JTokenType.String ? t.Value<string>() : "";
+
+        public const int MaxRevisionNotes = 40;
+
+        static JObject NoteToJson(RevisionNote n) => new JObject
+        {
+            ["revision"] = n.Revision, ["parentRevision"] = n.ParentRevision, ["source"] = n.Source,
+            ["request"] = n.Request ?? "", ["summary"] = n.Summary ?? "", ["at"] = n.At ?? "",
+            ["changes"] = new JArray(n.Changes.Take(RevisionNote.MaxChanges).Select(c => new JObject { ["label"] = c.Label ?? "", ["before"] = c.Before ?? "", ["after"] = c.After ?? "" })),
+        };
+
+        /// <summary>形が合わない記録は null（その版の記録なしとして扱う）。</summary>
+        static RevisionNote NoteFromJson(JObject o)
+        {
+            if (o["revision"]?.Type != JTokenType.Integer) return null;
+            int rev = o.Value<int>("revision");
+            if (rev < 2 || rev > 100000) return null;
+            string src = StringOrEmpty(o["source"]);
+            if (Array.IndexOf(RevisionNote.Sources, src) < 0) return null;
+            int parent = o["parentRevision"]?.Type == JTokenType.Integer ? o.Value<int>("parentRevision") : rev - 1;
+            var note = new RevisionNote
+            {
+                Revision = rev, ParentRevision = parent > 0 && parent < rev ? parent : rev - 1, Source = src,
+                Request = RevisionNote.Trunc(StringOrEmpty(o["request"]), RevisionNote.MaxRequestLength),
+                Summary = RevisionNote.Trunc(StringOrEmpty(o["summary"]), RevisionNote.MaxSummaryLength),
+                At = Trunc(StringOrEmpty(o["at"]), 32),
+            };
+            if (o["changes"] is JArray changes)
+                foreach (var c in changes.OfType<JObject>().Take(RevisionNote.MaxChanges))
+                    note.Changes.Add(new ChangeLine
+                    {
+                        Label = RevisionNote.Trunc(StringOrEmpty(c["label"]), RevisionNote.MaxChangeText),
+                        Before = RevisionNote.Trunc(StringOrEmpty(c["before"]), RevisionNote.MaxChangeText),
+                        After = RevisionNote.Trunc(StringOrEmpty(c["after"]), RevisionNote.MaxChangeText),
+                    });
+            return note;
+        }
 
         static JToken Opt(float? v, int digits) => v.HasValue ? new JValue(Math.Round(v.Value, digits)) : JValue.CreateNull();
 

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S04 実験の条件</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+<style>
+tr.plan { cursor: pointer; }
+tr.plan td:first-child { padding-left: 12px; }
+</style>
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li>指示</li><li>設計</li><li>編集</li><li aria-current="step">実験</li><li>結果</li><li>保存</li>
+    </ol>
+  </header>
+
+  <div class="body">
+    <div class="title-row">
+      <h1>どの条件で確かめますか</h1>
+      <span class="small muted">ハンズフリー雨よけ装置 Rev.3</span>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <section class="card" aria-labelledby="pl-h">
+          <div class="card-head"><h2 id="pl-h">実験を選ぶ</h2><span class="small muted">AI が要望に合わせて用意した 3 案</span></div>
+          <table>
+            <thead><tr><th>実験</th><th>確かめる要望</th><th>測るもの</th></tr></thead>
+            <tbody>
+              <tr class="plan sel"><td><span class="radio"></span>横なぐりの雨</td><td>横からの雨も防ぐ</td><td>防護率、濡れた粒の数</td></tr>
+              <tr class="plan"><td><span class="radio"></span>歩きながらの雨</td><td>歩いても頭上についてくる</td><td>防護率、位置のずれ</td></tr>
+              <tr class="plan"><td><span class="radio"></span>電池のもち</td><td>通学の 30 分もつ</td><td>消費エネルギー</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="card" aria-labelledby="md-h">
+          <div class="card-head">
+            <h2 id="md-h">物理の決まり</h2>
+            <div class="seg" role="group" aria-label="物理の決まり">
+              <button aria-pressed="true">DREAM</button>
+              <button aria-pressed="false">REALITY</button>
+            </div>
+          </div>
+          <p style="margin: 0">DREAM は重さと電力の制限なしで試します。REALITY に切り替えると、電池の容量と装置の重さが結果に入ります</p>
+        </section>
+      </div>
+
+      <section class="card" aria-labelledby="cd-h">
+        <div class="card-head"><h2 id="cd-h">環境</h2></div>
+        <table>
+          <thead><tr><th>条件</th><th class="num">値</th><th class="num">変える</th></tr></thead>
+          <tbody>
+            <tr><td>雨の強さ</td><td class="num">30 mm/h</td><td class="num"><span class="step"><button class="btn" aria-label="雨を弱める">−</button><button class="btn" aria-label="雨を強める">+</button></span></td></tr>
+            <tr><td>風の強さ</td><td class="num">4 m/s</td><td class="num"><span class="step"><button class="btn" aria-label="風を弱める">−</button><button class="btn" aria-label="風を強める">+</button></span></td></tr>
+            <tr><td>風の向き</td><td class="num">右から</td><td class="num"><span class="step"><button class="btn" aria-label="風向を左へ回す">‹</button><button class="btn" aria-label="風向を右へ回す">›</button></span></td></tr>
+            <tr><td>時間</td><td class="num">10 秒</td><td class="num muted small">固定</td></tr>
+          </tbody>
+        </table>
+        <p style="margin: 20px 0 0">防護率が <strong class="num">80%</strong> 以上なら合格です</p>
+      </section>
+    </div>
+
+    <div class="actions">
+      <button class="btn quiet">編集に戻る</button>
+      <span class="grow"></span>
+      <button class="btn primary">実験を始める</button>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -321,9 +321,15 @@ namespace ImpossibleLab
             // 設計が終わった時点で、組み立てより前の段階はすべて完了（遅れて届く進み具合の通知は無視するため、ここで揃える）
             foreach (var st in DesignStageText.All) if (st < DesignStage.Assembly) Stages[st] = StageStatus.Done;
             Preview = outcome.Dna;
+            // 承認したら発明の記録に残す（その後に入力欄を書き換えても、設計を作った文が残るように）
+            _previewRequest = (text ?? "").Trim();
+            _previewSource = outcome.Source;
             SetHologram(false, null);
             Sm.Transition(LabState.AwaitingApproval);
         }
+
+        /// <summary>承認待ちの設計を作った依頼の文と、作ったところ（ai / offline）。</summary>
+        string _previewRequest, _previewSource;
 
         public void CancelGeneration() { if (Sm.State == LabState.GeneratingDesign) _cts?.Cancel(); }
 
@@ -388,7 +394,7 @@ namespace ImpossibleLab
             View.SetVisiblePartCount(int.MaxValue);
             Stages[DesignStage.Assembly] = StageStatus.Done;
             Stages[DesignStage.Complete] = StageStatus.Done;
-            Current = new SavedInvention { Current = dna };
+            Current = new SavedInvention { Current = dna, RequestText = _previewRequest ?? "", DesignSource = _previewSource == "ai" || _previewSource == "offline" ? _previewSource : "" };
             _planKey = null; // 新しい発明では実験計画の候補を作り直す
             Preview = null;
             LastResult = BaselineResult = OtherModeResult = null;
@@ -619,7 +625,7 @@ namespace ImpossibleLab
             proposal.Operations.Add(op);
             var res = RevisionEngine.Apply(Current.Current, proposal);
             if (!res.Success) { ShowToast(string.Join(" / ", res.Errors.Concat(res.Warnings).Take(1).DefaultIfEmpty("変更できません"))); return; }
-            Commit(res.NewDna);
+            Commit(res, proposal, null);
             var c = res.Changes[0];
             ShowToast($"Rev.{res.NewDna.Revision}　{c.Label}：{c.Before} → {c.After}");
         }
@@ -652,7 +658,7 @@ namespace ImpossibleLab
             proposal.Operations.Add(new RevisionOperation { Op = RevisionOps.UpdateParameter, BehaviorType = behavior, Parameter = param, Value = now + step * direction });
             var res = RevisionEngine.Apply(Current.Current, proposal);
             if (!res.Success) { ShowToast(string.Join(" / ", res.Errors.Take(1))); return; }
-            Commit(res.NewDna);
+            Commit(res, proposal, null);
             ShowToast($"{info.LabelJa}：{res.Changes[0].Before} → {res.Changes[0].After}");
         }
 
@@ -683,6 +689,7 @@ namespace ImpossibleLab
             if (!res.Success) { RevisionMessage = "改良案を適用できません: " + string.Join(" / ", res.Errors.Take(2)); Notify(); return; }
             PendingProposal = outcome.Proposal;
             PendingRevision = res;
+            _pendingRevisionRequest = text;
             RevisionMessage = null;
             Notify();
         }
@@ -690,20 +697,26 @@ namespace ImpossibleLab
         public void ApproveRevision()
         {
             if (PendingRevision == null || !PendingRevision.Success) return;
-            var dna = PendingRevision.NewDna;
-            var summary = PendingProposal?.Summary;
-            PendingRevision = null; PendingProposal = null; RevisionText = "";
-            Commit(dna);
-            ShowToast("改良を適用しました（Rev." + dna.Revision + "）：" + summary);
+            var res = PendingRevision;
+            var proposal = PendingProposal;
+            var request = _pendingRevisionRequest;
+            PendingRevision = null; PendingProposal = null; _pendingRevisionRequest = null; RevisionText = "";
+            Commit(res, proposal, request);
+            ShowToast("改良を適用しました（Rev." + res.NewDna.Revision + "）：" + proposal?.Summary);
         }
 
-        public void RejectRevision() { PendingRevision = null; PendingProposal = null; RevisionMessage = "改良案を却下しました"; Notify(); }
+        public void RejectRevision() { PendingRevision = null; PendingProposal = null; _pendingRevisionRequest = null; RevisionMessage = "改良案を却下しました"; Notify(); }
 
-        void Commit(InventionDna next)
+        /// <summary>承認待ちの改良案を頼んだ文（承認したら版の記録に残す）。</summary>
+        string _pendingRevisionRequest;
+
+        /// <summary>新しい版にする。何を頼み、何を変えたかを版の記録に残す（request は手動の調整では null）。</summary>
+        void Commit(RevisionResult res, RevisionProposal proposal, string request)
         {
             Current.History.Add(Current.Current);
-            Current.Current = next;
-            RebuildView(next);
+            Current.Current = res.NewDna;
+            Current.RecordRevision(res, proposal, request, LabClock.NowIso());
+            RebuildView(res.NewDna);
             Notify();
         }
 
@@ -769,7 +782,7 @@ namespace ImpossibleLab
             float kgBefore = MassModel.TotalKg(Current.Current);
             var res = RevisionEngine.Apply(Current.Current, proposal);
             if (!res.Success) { ShowToast(string.Join(" / ", res.Errors.Take(1))); return; }
-            Commit(res.NewDna);
+            Commit(res, proposal, null);
             var c = res.Changes[0];
             ShowToast($"Rev.{res.NewDna.Revision}　{c.Label} {c.Before} → {c.After}　総質量 {kgBefore:0.00} → {MassModel.TotalKg(res.NewDna):0.00} kg");
         }
@@ -799,8 +812,9 @@ namespace ImpossibleLab
             if (!CanUndo) return;
             var prev = Current.History[Current.History.Count - 1];
             Current.History.RemoveAt(Current.History.Count - 1);
+            Current.ForgetRevision(Current.Current.Revision);
             Current.Current = prev;
-            PendingRevision = null; PendingProposal = null;
+            PendingRevision = null; PendingProposal = null; _pendingRevisionRequest = null;
             RebuildView(prev);
             ShowToast("元に戻しました（Rev." + prev.Revision + "）");
         }
@@ -1227,7 +1241,7 @@ namespace ImpossibleLab
             var copy = inv.Current.Clone();
             copy.Id = Repo.NewCopyId(inv.Current.Id);
             copy.Name = (inv.Current.Name.Length > 34 ? inv.Current.Name.Substring(0, 34) : inv.Current.Name) + "（複製）";
-            Repo.Save(new SavedInvention { Current = copy });
+            Repo.Save(new SavedInvention { Current = copy, RequestText = inv.RequestText, DesignSource = inv.DesignSource });
             RefreshGallery();
             ShowToast("複製しました");
         }

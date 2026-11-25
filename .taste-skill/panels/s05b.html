@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S05 実験の結果（B 黒い管制モニター）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="s05x.css">
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <span class="crumb">ハンズフリー雨よけ装置 Rev.2</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li>指示</li><li>設計</li><li>編集</li><li>実験</li><li aria-current="step">結果</li><li>保存</li>
+    </ol>
+  </header>
+
+  <div class="stage">
+    <section class="view" aria-labelledby="v-h">
+      <h2 id="v-h" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">雨が当たった場所</h2>
+      <dl class="cond">
+        <div><dt>雨</dt><dd>30<small>mm/h</small></dd></div>
+        <div><dt>風</dt><dd>4<small>m/s 右から</small></dd></div>
+        <div><dt>時間</dt><dd>10<small>秒</small></dd></div>
+        <div><dt>物理</dt><dd>DREAM</dd></div>
+      </dl>
+      <svg id="side" class="side" role="img" aria-label="横から見た図。雨は風で斜めに入り、キャノピーの影が足元から外れている。頭は 0 粒、上半身は 109 粒、下半身は 185 粒。側面カバーを 0.25 m 下げる案を点線で示す"></svg>
+    </section>
+
+    <section class="read">
+      <h1>防護率<span class="big">62.3<small>%</small></span></h1>
+      <div class="gauge">
+        <svg id="gauge" role="img" aria-label="防護率 62.3%。前の版 Rev.1 は 40.9%。合格は 80% で、あと 17.7 ポイント"></svg>
+      </div>
+      <p class="delta">Rev.1 から <b>+21.4</b> ポイント。防ぐ半径を 0.45 m から 0.60 m に広げた分です</p>
+      <p class="find">風で雨が斜めに入り、キャノピーの影が足元から外れています。濡れの 63% は下半身です</p>
+      <button class="btn primary">側面カバーを伸ばして再実験</button>
+      <div class="more">
+        <button class="btn">同じ条件でもう一度</button>
+        <button class="btn">REALITY で見る</button>
+        <span class="grow"></span>
+        <button class="btn quiet">保存して終わる</button>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="s05x.js"></script>
+</body>
+</html>

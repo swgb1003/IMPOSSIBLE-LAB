@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S03 編集と改良</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="panel.css">
+<style>
+#vals td { height: 60px; }
+#vals .step .btn { width: 48px; height: 44px; }
+td.changed { color: var(--data); font-weight: 700; }
+.proposal { background: var(--raised); border-radius: var(--radius-control); padding: 16px 18px; margin-top: 16px; }
+.proposal p { margin: 0 0 12px; }
+.proposal .actions { margin-top: 0; }
+</style>
+</head>
+<body>
+<main class="panel">
+  <header class="top">
+    <span class="mark">IMPOSSIBLE LAB</span>
+    <ol class="flow" aria-label="発明の流れ">
+      <li>指示</li><li>設計</li><li aria-current="step">編集</li><li>実験</li><li>結果</li><li>保存</li>
+    </ol>
+  </header>
+
+  <div class="body">
+    <div class="title-row">
+      <h1>ハンズフリー雨よけ装置<span class="rev num">Rev.2</span></h1>
+      <span class="small muted">発明台の試作品は右スティックで回せます</span>
+    </div>
+
+    <div class="cols">
+      <section class="card" aria-labelledby="tb-h">
+        <h2 id="tb-h" class="sr">設計の中身</h2>
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true">性能の値</button>
+          <button role="tab" aria-selected="false">部品と素材</button>
+          <button role="tab" aria-selected="false">動きの手順</button>
+        </div>
+        <table id="vals">
+          <thead><tr><th>値</th><th class="num">いま</th><th class="num">変えられる範囲</th><th class="num">変える</th></tr></thead>
+          <tbody>
+            <tr><td>防ぐ半径</td><td class="num">0.60 m</td><td class="num muted">0.20 〜 1.50 m</td><td class="num"><span class="step"><button class="btn" aria-label="防ぐ半径を減らす">−</button><button class="btn" aria-label="防ぐ半径を増やす">+</button></span></td></tr>
+            <tr><td>頭上からの高さ</td><td class="num">0.35 m</td><td class="num muted">0.15 〜 0.80 m</td><td class="num"><span class="step"><button class="btn" aria-label="高さを減らす">−</button><button class="btn" aria-label="高さを増やす">+</button></span></td></tr>
+            <tr><td>側面カバーの長さ</td><td class="num changed">0.00 → 0.25 m</td><td class="num muted">0.00 〜 0.60 m</td><td class="num"><span class="step"><button class="btn" aria-label="側面カバーを短くする">−</button><button class="btn" aria-label="側面カバーを長くする">+</button></span></td></tr>
+            <tr><td>遮水の効き</td><td class="num">0.90</td><td class="num muted">0.10 〜 1.00</td><td class="num"><span class="step"><button class="btn" aria-label="遮水を弱める">−</button><button class="btn" aria-label="遮水を強める">+</button></span></td></tr>
+            <tr><td>揺れにくさ</td><td class="num">0.30</td><td class="num muted">0.00 〜 1.00</td><td class="num"><span class="step"><button class="btn" aria-label="揺れにくさを下げる">−</button><button class="btn" aria-label="揺れにくさを上げる">+</button></span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin: 16px 0 0">総質量は推定 <span class="num">0.52 kg</span>。頭に付ける目安の <span class="num">0.50 kg</span> を <span class="num">0.02 kg</span> 超えています</p>
+      </section>
+
+      <div class="col">
+        <section class="card" aria-labelledby="ls-h">
+          <div class="card-head"><h2 id="ls-h">前回の実験</h2><span class="small muted">雨 30 mm/h、風 4 m/s</span></div>
+          <div class="kpi data num">防護率 62.3%</div>
+          <div class="bar" role="img" aria-label="防護率 62.3%。合格は 80% 以上">
+            <div class="now" style="width: 62.3%"></div>
+            <div class="goal" style="left: 80%"></div>
+            <span class="goal-label" style="left: 80%">合格 80%</span>
+          </div>
+          <div class="scale num"><span>0%</span><span>100%</span></div>
+        </section>
+
+        <section class="card" aria-labelledby="rq-h">
+          <div class="card-head"><h2 id="rq-h">改良を頼む</h2></div>
+          <form class="field" style="height: 56px" onsubmit="return false">
+            <label for="rv" class="sr">改良の依頼</label>
+            <input id="rv" value="横からの雨も防いで" style="font-size: 17px">
+            <button type="button" class="btn" style="height: 40px; padding: 0 14px">話す</button>
+            <button type="submit" class="btn" style="height: 40px; padding: 0 14px">依頼</button>
+          </form>
+          <div class="proposal">
+            <p>側面カバーを 0.25 m に伸ばす案です。横から吹き込む雨を防ぎます</p>
+            <div class="actions">
+              <button class="btn">やめる</button>
+              <button class="btn primary">この案を使う</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn quiet">元に戻す</button>
+      <button class="btn">試用する</button>
+      <button class="btn">保存</button>
+      <span class="grow"></span>
+      <button class="btn">実験へ進む</button>
+    </div>
+  </div>
+</main>
+</body>
+</html>
