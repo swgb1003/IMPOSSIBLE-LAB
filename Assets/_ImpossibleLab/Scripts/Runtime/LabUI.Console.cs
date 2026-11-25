@@ -458,6 +458,14 @@ namespace ImpossibleLab
             }
             else
             {
+                var st = StabilityModel.Evaluate(dna);
+                if (st.Valid)
+                {
+                    // 地面を走る・置く道具：重さの目安の代わりに、重心から計算した倒れる角度を出す
+                    bool falls = st.TipBackDeg < 0.5f;
+                    c.T(1138f, 652f, falls ? "重心が後ろの接地より後ろにあり、平らな床でも倒れます" : $"後ろに倒れずに上れる坂　{st.TipBackDeg:0} °", 17f, falls ? LabTheme.ConOr : LabTheme.ConInk);
+                }
+                else
                 c.T(1138f, 652f, MassModel.FloatsOverHead(dna) ? "頭の上に浮いて体に触れないので、目安はありません" : "体に付けない道具なので、重さの目安はありません", 16f, LabTheme.ConMut);
                 var heavy = dna.Parts.OrderByDescending(p => MassModel.Part(p).Kg).FirstOrDefault();
                 if (heavy != null) c.T(1138f, 700f, $"いちばん重い部品　{LabCatalog.Part(heavy.Type)?.LabelJa ?? heavy.Type} {MassModel.Part(heavy).Kg:0.00} kg", 17f);

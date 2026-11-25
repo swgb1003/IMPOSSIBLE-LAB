@@ -29,6 +29,32 @@ namespace ImpossibleLab.Tests
             Assert.AreEqual(0, LayoutFixer.Apply(dna), "2回目は何も動かさない");
         }
 
+        [Test] public void GroundProduct_PartsBelowWheels_AreLiftedOffTheFloor()
+        {
+            // 保存してあったキャリーバッグ：縦長のモーターが車輪の接地より 5 cm 下へ突き出ていた
+            var dna = Dna(
+                P("case", "container", Vector3.zero, new Vector3(0.4f, 0.55f, 0.25f), "box"),
+                P("wfl", "wheel", new Vector3(0.17f, -0.31f, 0.09f), new Vector3(0.08f, 0.04f, 0.08f), "cylinder"),
+                P("wfr", "wheel", new Vector3(-0.17f, -0.31f, 0.09f), new Vector3(0.08f, 0.04f, 0.08f), "cylinder"),
+                P("motor", "motor", new Vector3(0f, -0.25f, -0.09f), new Vector3(0.06f, 0.3f, 0.06f), "cylinder"),
+                P("pack", "battery", new Vector3(0f, -0.2f, 0f), new Vector3(0.25f, 0.06f, 0.15f), "box"));
+            dna.Mount = "ground";
+            float floor = -0.31f - 0.04f;
+            Assert.AreEqual(1, LayoutFixer.LiftAboveFloor(dna), "モーターだけを持ち上げる");
+            var m = dna.FindPart("motor");
+            Assert.AreEqual(floor + LayoutFixer.Clearance, m.Position.y - 0.15f, 1e-4f, "モーターの底は床から 1 cm 上");
+            Assert.AreEqual(-0.31f, dna.FindPart("wfl").Position.y, 1e-6f, "車輪は動かさない");
+            Assert.AreEqual(0, LayoutFixer.LiftAboveFloor(dna), "2回目は何も動かさない");
+
+            m.Position = new Vector3(0f, -0.25f, -0.09f);
+            LayoutFixer.Apply(dna);
+            Assert.GreaterOrEqual(m.Position.y - 0.15f, floor + LayoutFixer.Clearance - 1e-4f, "AI の設計を受け取ったときも持ち上げる");
+
+            m.Position = new Vector3(0f, -0.25f, -0.09f);
+            dna.Mount = "back";
+            Assert.AreEqual(0, LayoutFixer.LiftAboveFloor(dna), "地面を走らない製品は対象外");
+        }
+
         [Test] public void Canopy_JointParts_AndFarParts_AreKept()
         {
             var lid = P("lid", "panel", new Vector3(0, 0.5f, 0), new Vector3(0.3f, 0.02f, 0.3f), "box");

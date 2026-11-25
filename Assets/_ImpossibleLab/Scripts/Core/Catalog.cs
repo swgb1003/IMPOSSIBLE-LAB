@@ -106,7 +106,7 @@ namespace ImpossibleLab.Core
             new PartTypeInfo { Type = "light", LabelJa = "発光部", MinScale = 0.01f, MaxScale = 0.3f },
             new PartTypeInfo { Type = "heater", LabelJa = "加熱部", MinScale = 0.003f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
             new PartTypeInfo { Type = "cooler", LabelJa = "冷却部", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
-            new PartTypeInfo { Type = "motor", LabelJa = "駆動部（関節）", MinScale = 0.02f, MaxScale = 0.3f, DefaultMaterial = "steel" },
+            new PartTypeInfo { Type = "motor", LabelJa = "駆動部（モーター）", MinScale = 0.02f, MaxScale = 0.3f, DefaultMaterial = "steel" },
             new PartTypeInfo { Type = "gripper", LabelJa = "つかみ具", MinScale = 0.02f, MaxScale = 0.4f, DefaultShape = "box" },
             new PartTypeInfo { Type = "cushion", LabelJa = "緩衝材", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "foam" },
             new PartTypeInfo { Type = "battery", LabelJa = "電池", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box" },

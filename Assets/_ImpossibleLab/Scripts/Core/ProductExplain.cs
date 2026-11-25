@@ -34,7 +34,7 @@ namespace ImpossibleLab.Core
             ["light"] = "光を出して照らす・知らせる",
             ["heater"] = "熱を出して温める",
             ["cooler"] = "熱を逃がして冷やす",
-            ["motor"] = "関節や部品を動かす",
+            ["motor"] = "関節や部品を動かすモーター",
             ["gripper"] = "物をつかんで持つ",
             ["cushion"] = "ぶつかったときの衝撃をやわらげる",
             ["battery"] = "電気をためて各部に送る",
@@ -58,6 +58,9 @@ namespace ImpossibleLab.Core
             if (!string.IsNullOrEmpty(part.Role)) return new Text(part.Role, false);
             var blocks = BehaviorsOf(dna, part);
             string typeRole = TypeRole.TryGetValue(part.Type, out var t) ? t : (LabCatalog.Part(part.Type)?.LabelJa ?? part.Type);
+            // 走る機能を受け持つモーターは車輪を回す（関節のモーターと区別する）
+            if (part.Type == "motor" && part.Joint == null && dna.Behaviors.Any(b => b.Type == "drive" && b.TargetPart == part.Id))
+                typeRole = "車輪を回すモーター";
             if (part.Joint != null) typeRole += "（関節で動く）";
             return new Text(blocks.Count > 0 ? $"{string.Join("・", blocks)}の機能を受け持つ。{typeRole}" : typeRole, true);
         }

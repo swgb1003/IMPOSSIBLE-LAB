@@ -12,6 +12,8 @@ namespace ImpossibleLab.Core
         public float Time;
         public Vector3 Device;
         public float YawDeg;
+        /// <summary>後ろへ倒れた角度（度。climb_slope で倒れたとき）。支点は CourseRun.TipPivot。</summary>
+        public float TipDeg;
         public Vector3 Leader;
         public bool Collision;
         /// <summary>シナリオごとの追加の値（sit_still：温度 °C、drop_test：衝撃 G、lift_task：落としたら 1）。</summary>
@@ -37,6 +39,10 @@ namespace ImpossibleLab.Core
         public RainExperimentResult Result;
         public CourseLayout Layout;
         public readonly List<CourseFrame> Frames = new List<CourseFrame>();
+        /// <summary>後ろへ倒れるときの支点（発明の座標）。</summary>
+        public Vector3 TipPivot;
+        /// <summary>荷物の中心（発明の座標。荷物が無ければ null）。</summary>
+        public Vector3? PayloadAt;
         public float Duration => Frames.Count == 0 ? 0f : Frames[Frames.Count - 1].Time;
     }
 
@@ -179,14 +185,18 @@ namespace ImpossibleLab.Core
             {
                 // 組み立て式の実験：満たさなかった合格条件・制限をそのまま改良の手がかりにする
                 // 合格条件の不足は判定の行に出ているため、ここでは「何を改良するか」と依頼文だけを短く出す
-                foreach (var c in ResultCriteria.Evaluate(r).Where(c => c.Measured && !c.Passed).Take(3))
+                // 後ろに倒れたときは、上れる角度を上げても上れないので、重心の直し方を出す
+                bool tipped = r.Limits.Any(l => l.StartsWith("後ろに倒れる", System.StringComparison.Ordinal));
+                foreach (var c in ResultCriteria.Evaluate(r).Where(c => c.Measured && !c.Passed && !(tipped && c.Metric == "climbedRatio")).Take(3))
                 {
                     string label = ExperimentCatalog.Metric(c.Metric)?.LabelJa ?? c.Metric;
                     string req = dna != null ? OfflineRevisionRules.RequestForMetric(dna, c.Metric) : null;
-                    h.Add($"「{label}」が目標に届かない → " + (req != null ? $"「{req}」" : "S03 で改良を依頼"));
+                    h.Add($"「{label}」が目標に届かない → " + (req != null ? $"「{req}」" : "編集の画面で改良を依頼"));
                 }
                 foreach (var l in r.Limits.Where(l => !l.StartsWith("合格条件", System.StringComparison.Ordinal)).Take(3 - h.Count))
-                    h.Add(l + " → S03 で改良を依頼");
+                    h.Add(l.StartsWith("後ろに倒れる", System.StringComparison.Ordinal)
+                        ? "後ろに倒れる → 編集の画面で、重い部品を低くするか、後ろの車輪を後ろへ出す"
+                        : l + " → 編集の画面で改良を依頼");
                 if (h.Count == 0) h.Add("合格条件をすべて満たしました。条件を厳しくして試してください");
                 return h;
             }

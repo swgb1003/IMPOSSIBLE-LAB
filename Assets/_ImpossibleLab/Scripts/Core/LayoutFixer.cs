@@ -9,6 +9,7 @@ namespace ImpossibleLab.Core
     /// 1. 左右の対になる部品をきっちり対称にする。
     /// 2. 箱どうしで半分以上めり込んだ部品を、3割だけ食い込む位置まで押し出す（中に完全に入った部品は内蔵部品として残す）。
     /// 3. どこにも触れていない部品（のまとまり）を、いちばん近い部品の面に付ける。
+    /// 4. 地面を走る製品（車輪あり）で、車輪が床に着く高さより下に出た部品を、床から浮く高さまで持ち上げる。
     /// 部品の位置は実験の計算に使っていない（質量・寸法・機能だけ）ので、実験の結果は変わらない。
     /// キャノピー（頭上に浮かぶ覆いは設計どおり）と、関節で動く部品・その親は動かさない。
     /// </summary>
@@ -21,6 +22,8 @@ namespace ImpossibleLab.Core
         /// <summary>これより遠くに離れた部品は、意図して離したものとして動かさない（m）。</summary>
         public const float MaxMove = 0.3f;
         const float Pair = 0.03f;
+        /// <summary>地面を走る製品で、車輪以外の部品の底と床のあいだに空ける隙間（m）。</summary>
+        public const float Clearance = 0.01f;
 
         /// <summary>部品の半分の大きさ（発明の座標の向き）。車輪の円柱は横倒しなので x と y を入れ替える。</summary>
         public static Vector3 Half(PartSpec p)
@@ -56,6 +59,7 @@ namespace ImpossibleLab.Core
             PushOut(dna, CanMove, main);
             Attach(dna, CanMove, main);
             Symmetrize(dna, CanMove);
+            LiftAboveFloor(dna, CanMove);
 
             int moved = 0;
             foreach (var p in dna.Parts)
@@ -67,6 +71,35 @@ namespace ImpossibleLab.Core
                 if ((p.Position - before[p]).sqrMagnitude > 1e-6f) moved++;
             }
             return moved;
+        }
+
+        /// <summary>
+        /// 地面を走る製品（取り付け位置が地面で、車輪がある）で、車輪が床に着く高さから Clearance より下に出た部品を持ち上げる。
+        /// 床に当たって走れなくなる部品（車輪の下に突き出たモーターなど）をなくす。持ち上げた部品の数を返す。
+        /// canMove を省くと、キャノピーと関節で動く部品・その親以外を動かす（保存してある設計を開くとき）。
+        /// </summary>
+        public static int LiftAboveFloor(InventionDna dna, System.Func<PartSpec, bool> canMove = null)
+        {
+            if (dna?.Parts == null || dna.Mount != "ground") return 0;
+            var wheels = dna.Parts.Where(p => p.Type == "wheel").ToList();
+            if (wheels.Count == 0) return 0;
+            if (canMove == null)
+            {
+                var jointed = new HashSet<string>(dna.Parts.Where(p => p.Joint != null).Select(p => p.Id));
+                foreach (var p in dna.Parts) if (p.Joint != null && !string.IsNullOrEmpty(p.Joint.Parent)) jointed.Add(p.Joint.Parent);
+                canMove = p => p.Type != "canopy" && !jointed.Contains(p.Id);
+            }
+            float floor = wheels.Min(w => w.Position.y - Half(w).y), limit = floor + Clearance;
+            int lifted = 0;
+            foreach (var p in dna.Parts)
+            {
+                if (p.Type == "wheel" || !canMove(p)) continue;
+                float bottom = p.Position.y - Half(p).y;
+                if (bottom >= limit - 1e-5f) continue;
+                p.Position += Vector3.up * (limit - bottom);
+                lifted++;
+            }
+            return lifted;
         }
 
         static bool SameSize(PartSpec a, PartSpec b)

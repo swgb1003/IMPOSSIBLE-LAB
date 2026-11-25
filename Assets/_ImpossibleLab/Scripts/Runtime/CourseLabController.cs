@@ -29,6 +29,8 @@ namespace ImpossibleLab
         public int CollisionsSoFar => _collisionsShown;
         public CourseFrame? CurrentFrame => _run != null && _run.Frames.Count > 0 ? _run.Frames[Mathf.Min(_frame, _run.Frames.Count - 1)] : (CourseFrame?)null;
         public event Action<RainExperimentResult> Completed;
+        /// <summary>実験場で動かしている発明品（確認用）。</summary>
+        public Transform DeviceView => _view != null ? _view.transform : null;
         public event Action Collided;
 
         public void Init(LabAssets assets, RainLabController rain)
@@ -190,7 +192,7 @@ namespace ImpossibleLab
                 joints = new float[a.Joints.Length];
                 for (int i = 0; i < joints.Length; i++) joints[i] = Mathf.Lerp(a.Joints[i], b.Joints[i], k);
             }
-            return new CourseFrame { Time = _elapsed, Device = Vector3.Lerp(a.Device, b.Device, k), Leader = Vector3.Lerp(a.Leader, b.Leader, k), YawDeg = Mathf.LerpAngle(a.YawDeg, b.YawDeg, k), Joints = joints };
+            return new CourseFrame { Time = _elapsed, Device = Vector3.Lerp(a.Device, b.Device, k), Leader = Vector3.Lerp(a.Leader, b.Leader, k), YawDeg = Mathf.LerpAngle(a.YawDeg, b.YawDeg, k), TipDeg = Mathf.Lerp(a.TipDeg, b.TipDeg, k), Joints = joints };
         }
 
         void Apply(CourseFrame f)
@@ -198,8 +200,27 @@ namespace ImpossibleLab
             if (_run == null) return;
             if (_run.Result.IsScenarioLab)
             {
-                if (_payload != null && _run.Result.Scenario == ExperimentCatalog.ClimbSlope)
-                    _payload.localPosition = f.Device + Vector3.up * (0.25f + _payload.localScale.y * 0.5f); // 発明品の上に載せる
+                bool slope = _run.Result.Scenario == ExperimentCatalog.ClimbSlope;
+                var tilt = slope ? SlopeTilt(_run.Result.Plan) : Quaternion.identity;
+                // 坂は +x へ上るので、前（+Z：車輪の転がる向き）を坂の上へ向け、坂の傾きに合わせる
+                var face = slope ? tilt * Quaternion.Euler(0f, 90f, 0f) : Quaternion.identity;
+                var origin = f.Device + _mountOffset + tilt * Vector3.up * _floorLift; // 発明の原点
+                var rot = face;
+                if (slope && f.TipDeg > 0f)
+                {
+                    // 後ろに倒れる：後ろの接地を支点に、前を上げる向きに回す
+                    var pivot = origin + face * _run.TipPivot;
+                    rot = face * Quaternion.Euler(-f.TipDeg, 0f, 0f);
+                    origin = pivot - rot * _run.TipPivot;
+                }
+                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(origin), transform.rotation * rot);
+                if (_payload != null && slope)
+                {
+                    // 荷物は計算と同じ場所（格納部の中、または上）に置き、発明と一緒に傾ける
+                    var at = _run.PayloadAt ?? new Vector3(0f, 0.25f + _payload.localScale.y * 0.5f, 0f);
+                    _payload.localPosition = origin + rot * at;
+                    _payload.localRotation = rot;
+                }
                 else if (_payload != null)
                 {
                     // 持ち上げ：荷物は記録した高さ（床から棚の高さまで）。棚の前で持ち上げ、上がりきったら棚に載せる
@@ -208,7 +229,6 @@ namespace ImpossibleLab
                     bool onShelf = f.Device.y >= shelf - 1e-3f;
                     _payload.localPosition = new Vector3(onShelf ? 0.9f : 0.35f, f.Device.y + size * 0.5f, onShelf ? 0.6f : 0.35f);
                 }
-                if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device + _mountOffset + Vector3.up * _floorLift), transform.rotation);
                 if (_leader != null && _run.Result.Scenario == ExperimentCatalog.ApproachDevice)
                 {
                     _leader.localPosition = f.Leader;
@@ -239,6 +259,9 @@ namespace ImpossibleLab
                 if (_view != null) _view.transform.SetPositionAndRotation(transform.TransformPoint(f.Device), rot);
             }
         }
+
+        /// <summary>坂の板と同じ傾き（z 軸まわり。+x の端が上がる）。</summary>
+        static Quaternion SlopeTilt(ExperimentPlan plan) => Quaternion.Euler(0f, 0f, plan != null ? plan.Get("slope", "angleDeg") : 0f);
 
         void SetMannequin(bool on)
         {

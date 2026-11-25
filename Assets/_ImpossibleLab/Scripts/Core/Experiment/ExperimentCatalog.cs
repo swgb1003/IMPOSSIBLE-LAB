@@ -163,6 +163,7 @@ namespace ImpossibleLab.Core
             // 6週目：走行（坂）
             new MetricInfo { Key = "climbedRatio", LabelJa = "坂を上った割合", Format = "0.00", LowerIsBetter = false, Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = 1 },
             new MetricInfo { Key = "climbTime", LabelJa = "坂を上り切る時間", Unit = " 秒", Format = "0.0", Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = ClimbTimeout },
+            new MetricInfo { Key = "tipAngleDeg", LabelJa = "後ろに倒れずに上れる坂", Unit = "°", Format = "0.0", LowerIsBetter = false, Primary = false, Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = 90 },
             new MetricInfo { Key = "drivePowerW", LabelJa = "坂を上る電力", Unit = " W", Format = "0", Primary = false, RealityOnly = true, Scenarios = new[] { ClimbSlope }, AnyBlocks = new[] { "drive" }, Modules = new[] { "slope" }, Min = 0, Max = 100000 },
             // 6週目：REALITY の共通層（組み立て式の実験で出す。部品の形・大きさ・素材から推定）
             // 8週目：動作プログラム（approach_device）

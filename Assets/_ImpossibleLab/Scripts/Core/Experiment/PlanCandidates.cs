@@ -46,7 +46,9 @@ namespace ImpossibleLab.Core
                 var errors = new List<string>();
                 ExperimentPlanJson.Validate(ai.Plan, dna, errors);
                 if (errors.Count > 0) { rejected?.Add($"AI案「{Short(ai.Title, 20)}」：{errors[0]}"); continue; }
-                list.Add(new PlanCandidate { Title = string.IsNullOrWhiteSpace(ai.Title) ? ScenarioLabel(ai.Plan.Scenario) : Short(ai.Title, 24), Aim = Short(ai.Aim, 80), FromAi = true, Plan = PlanEditor.Clone(ai.Plan) });
+                var plan = PlanEditor.Clone(ai.Plan);
+                FitPayload(plan, dna);
+                list.Add(new PlanCandidate { Title = string.IsNullOrWhiteSpace(ai.Title) ? ScenarioLabel(ai.Plan.Scenario) : Short(ai.Title, 24), Aim = Short(ai.Aim, 80), FromAi = true, Plan = plan });
             }
             foreach (var c in Standard(dna))
             {
@@ -56,6 +58,15 @@ namespace ImpossibleLab.Core
                 if (errors.Count == 0) list.Add(c);
             }
             return list.Take(MaxCandidates).ToList();
+        }
+
+        /// <summary>坂の実験の荷物を、格納部に入る大きさまで小さくする（AI 案・条件の追加）。</summary>
+        public static void FitPayload(ExperimentPlan plan, InventionDna dna)
+        {
+            if (plan?.Scenario != ExperimentCatalog.ClimbSlope) return;
+            var m = plan.Modules.FirstOrDefault(x => x.Type == "payload");
+            if (m == null || !m.Params.TryGetValue("sizeM", out var size)) return;
+            m.Params["sizeM"] = StabilityModel.FitPayloadSize(dna, size);
         }
 
         /// <summary>機能ブロックから決まる標準の計画。既存3カテゴリの実験場は、機能が欠けていても（結果に理由を出すため）用意する。</summary>
@@ -100,7 +111,8 @@ namespace ImpossibleLab.Core
                 // 車いす用スロープの最大勾配（ADA 1:12、約 4.76°）。運ぶ機能があれば荷物を載せる
                 float ramp = BlockCoefficients.V("rampMaxSlopeDeg");
                 var mods = new List<PlanModule> { M("slope", ("angleDeg", ramp), ("lengthM", 5f)) };
-                if (Has("carry_load")) mods.Add(M("payload", ("kg", 5f), ("sizeM", 0.3f)));
+                // 荷物の大きさは格納部に入る大きさにする（入らない箱を上に載せて上るのは、運ぶ道具の使い方と違う）
+                if (Has("carry_load")) mods.Add(M("payload", ("kg", 5f), ("sizeM", StabilityModel.FitPayloadSize(dna, 0.3f))));
                 yield return C("スロープを上る", Has("carry_load") ? "車いす用スロープの上限の坂（約 4.8°）を、5 kg の荷物を載せて上れるか" : "車いす用スロープの上限の坂（約 4.8°）を上れるか",
                     ExperimentCatalog.ClimbSlope, mods.ToArray());
             }
@@ -273,6 +285,7 @@ namespace ImpossibleLab.Core
             var m = new PlanModule { Type = type };
             foreach (var p in info.Params) m.Params[p.Key] = p.Default;
             plan.Modules.Add(m);
+            PlanCandidates.FitPayload(plan, dna);
             return true;
         }
 

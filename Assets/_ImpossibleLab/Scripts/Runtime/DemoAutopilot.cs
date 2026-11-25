@@ -706,6 +706,13 @@ namespace ImpossibleLab
   ""behaviors"": [ { ""type"": ""drive"", ""targetPart"": ""m"", ""parameters"": { ""speedLimit"": 0.8, ""maxSlopeDeg"": 8 } },
                    { ""type"": ""carry_load"", ""targetPart"": ""body"", ""parameters"": { ""capacity"": 10 } } ], ""revision"": 1, ""parentRevision"": null }",
                 ExperimentCatalog.ClimbSlope, "climbedRatio", addModule: null, stepModule: "slope", stepKey: "angleDeg");
+            yield return PlanLabFlow("cart4", @"{ ""schemaVersion"": 2, ""id"": ""verify-ramp-cart4"", ""name"": ""4輪のスロープ運搬カート"", ""purpose"": ""荷物を載せて車いす用スロープを上る"", ""tags"": [""carrier""], ""mount"": ""ground"",
+  ""parts"": [ { ""id"": ""body"", ""type"": ""container"", ""position"": [0, 0.25, 0], ""scale"": [0.5, 0.25, 0.4] }, { ""id"": ""w1"", ""type"": ""wheel"", ""position"": [0.2, 0.08, 0.15], ""scale"": [0.16, 0.05, 0.16] },
+             { ""id"": ""w2"", ""type"": ""wheel"", ""position"": [-0.2, 0.08, 0.15], ""scale"": [0.16, 0.05, 0.16] }, { ""id"": ""w3"", ""type"": ""wheel"", ""position"": [0.2, 0.08, -0.15], ""scale"": [0.16, 0.05, 0.16] },
+             { ""id"": ""w4"", ""type"": ""wheel"", ""position"": [-0.2, 0.08, -0.15], ""scale"": [0.16, 0.05, 0.16] }, { ""id"": ""m"", ""type"": ""motor"", ""position"": [0, 0.1, 0], ""scale"": [0.08, 0.08, 0.08] } ],
+  ""behaviors"": [ { ""type"": ""drive"", ""targetPart"": ""m"", ""parameters"": { ""speedLimit"": 0.8, ""maxSlopeDeg"": 8 } },
+                   { ""type"": ""carry_load"", ""targetPart"": ""body"", ""parameters"": { ""capacity"": 10 } } ], ""revision"": 1, ""parentRevision"": null }",
+                ExperimentCatalog.ClimbSlope, "climbedRatio", addModule: null, stepModule: "slope", stepKey: "angleDeg");
 
             // 6週目の完了条件：代表6件（評価セットの AI 設計：防護・照明・温度・検知・持ち上げ・落下）で、設計 → 実験 → 改良 → 再実験 → 比較 → 保存
             int repPassed = 0;
@@ -1017,6 +1024,21 @@ namespace ImpossibleLab
             Check(!FindObjectsByType<TMPro.TMP_Text>(FindObjectsSortMode.None).Any(t => t.text.StartsWith("実験中 — RainLab", StringComparison.Ordinal) || t.text.Contains("処理した雨粒")),
                 $"plan-{tag}: running screen shows the plan, not the rain lab");
             yield return Shot($"S05_running_plan_{tag}", rainLab: true);
+            if (scenario == ExperimentCatalog.ClimbSlope)
+            {
+                // 坂を上る向き：前（+Z）が坂の上（+x）を向き、坂に合わせて上を向いている
+                var course = FindFirstObjectByType<CourseLabController>();
+                var dv = course != null ? course.DeviceView : null;
+                var fwd = dv != null ? course.transform.InverseTransformDirection(dv.forward) : Vector3.zero;
+                // 前の車輪だけの台車（cart）は重心が後ろの接地より後ろにあるので後ろに倒れ、4輪の台車（cart4）は上る
+                var fr = course != null ? course.CurrentFrame : null;
+                bool tipped = fr.HasValue && fr.Value.TipDeg > 1f;
+                Check(tipped == (tag == "cart"), $"plan-{tag}: tipped={tipped} as the center of mass says");
+                if (tipped) Check(fwd.y > 0.3f && Mathf.Abs(fwd.z) < 0.05f, $"plan-{tag}: device tips back on the slope (forward={fwd})");
+                else Check(fwd.x > 0.9f && fwd.y > 0.03f && Mathf.Abs(fwd.z) < 0.05f, $"plan-{tag}: device faces up the slope (forward={fwd})");
+                if (dv != null)
+                    yield return Shot($"S05_running_plan_{tag}_side", eyeAt: course.transform.TransformPoint(new Vector3(-0.6f, 0.9f, ClimbSlopeScenario.LaneZ - 2.4f)), lookAt: dv.position);
+            }
             yield return WaitState(LabState.ReviewingResult, 60f);
             var r = _app.LastResult;
             Check(r != null && r.IsScenarioLab && r.Scenario == scenario && r.Metric(metric) != null && r.Passed.HasValue,

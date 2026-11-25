@@ -1203,6 +1203,8 @@ namespace ImpossibleLab
         {
             var inv = Repo.Load(id, out var err);
             if (inv == null) { ShowToast("読み込めません：" + err); return; }
+            // 前に保存した設計にも、床に当たる部品を持ち上げる補正を当てる（次に保存したときに残る）
+            int lifted = LayoutFixer.LiftAboveFloor(inv.Current);
             Current = inv;
             _planKey = null;
             LastResult = inv.Experiments.LastOrDefault();
@@ -1215,7 +1217,7 @@ namespace ImpossibleLab
             if (View != null) SetupGrab(View);
             SetHologram(false, null);
             Sm.Transition(LabState.Editing);
-            ShowToast($"「{inv.Current.Name}」Rev.{inv.Current.Revision} を読み込みました");
+            ShowToast($"「{inv.Current.Name}」Rev.{inv.Current.Revision} を読み込みました" + (lifted > 0 ? $"。床に当たる部品 {lifted} 個を持ち上げました" : ""));
         }
 
         public void Duplicate(string id)

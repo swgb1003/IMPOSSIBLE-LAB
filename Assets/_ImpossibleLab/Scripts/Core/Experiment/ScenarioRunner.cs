@@ -25,6 +25,8 @@ namespace ImpossibleLab.Core
         // 発明品（実験場ローカル座標、y は高さ）
         public Vector3 Device;
         public float DeviceYaw;
+        /// <summary>後ろへ倒れた角度（度）。</summary>
+        public float DeviceTip;
         public bool CollidedNow;
         /// <summary>再生用の追加の値（温度・衝撃など、シナリオごとに意味が違う）。</summary>
         public float Aux;
@@ -105,7 +107,7 @@ namespace ImpossibleLab.Core
                 foreach (var m in models) m.AfterTick(ctx);
                 if (ctx.T >= nextFrame || ctx.CollidedNow)
                 {
-                    run.Frames.Add(new CourseFrame { Time = ctx.T, Device = ctx.Device, YawDeg = ctx.DeviceYaw, Leader = new Vector3(ctx.Leader.x, 0f, ctx.Leader.y), Collision = ctx.CollidedNow, Aux = ctx.Aux, Joints = ctx.Joints != null ? (float[])ctx.Joints.Clone() : null });
+                    run.Frames.Add(new CourseFrame { Time = ctx.T, Device = ctx.Device, YawDeg = ctx.DeviceYaw, TipDeg = ctx.DeviceTip, Leader = new Vector3(ctx.Leader.x, 0f, ctx.Leader.y), Collision = ctx.CollidedNow, Aux = ctx.Aux, Joints = ctx.Joints != null ? (float[])ctx.Joints.Clone() : null });
                     if (ctx.T >= nextFrame) nextFrame += FrameInterval;
                 }
                 foreach (var m in models) m.AfterFrame(ctx);

@@ -330,11 +330,14 @@ namespace ImpossibleLab.Core
 
     /// <summary>
     /// 走行：坂を上れるか・上り切る時間・必要な電力（docs/blocks.md 8章）。走行の機能がなければ上れない（理由を制限に出す）。
+    /// 地面を走る発明は、重心（荷物を含む）が後ろの接地より外に出る坂では後ろに倒れる（StabilityModel）。
     /// 滑り・段差・加速と減速は扱わない。
     /// </summary>
     public sealed class DriveBlock : StaticBlockModel
     {
-        float _angle, _len, _speed, _reach, _done;
+        /// <summary>倒れ始めてから止まるまでの時間（秒。見せ方だけ）。</summary>
+        const float FallTime = 0.8f;
+        float _angle, _len, _speed, _reach, _done, _tipTo;
 
         public override void Begin(SimContext ctx)
         {
@@ -342,6 +345,27 @@ namespace ImpossibleLab.Core
             _angle = plan.Get("slope", "angleDeg"); _len = plan.Get("slope", "lengthM");
             bool has = dna.FindBehavior("drive") != null;
             float payload = plan.Has("payload") ? plan.Get("payload", "kg") : 0f;
+            float payloadSize = plan.Has("payload") ? plan.Get("payload", "sizeM") : 0f;
+            if (payload > 0f) ctx.Run.PayloadAt = StabilityModel.PayloadCenter(dna, payloadSize);
+            _tipTo = 0f;
+            var st = StabilityModel.Evaluate(dna, payload, payloadSize);
+            if (st.Valid)
+            {
+                ctx.AddMetric("tipAngleDeg", st.TipBackDeg);
+                ctx.Run.TipPivot = st.BackPivot;
+                res.Assumptions.Add($"倒れる角度：重心（部品の位置と重さ{(payload > 0f ? "・荷物" : "")}から）が床から {(st.Center.y - st.Floor) * 100f:0} cm、後ろの接地から前へ {(st.Center.z - st.MinZ) * 100f:0} cm なので、atan(前後 ÷ 高さ) = {st.TipBackDeg:0.0}° を超える坂で後ろに倒れる（止まった状態で見る。加速・揺れは数えない）");
+                if (_angle >= st.TipBackDeg - 1e-3f)
+                {
+                    res.Limits.Add(st.Center.z <= st.MinZ
+                        ? "後ろに倒れる：重心が後ろの車輪（接地）より後ろにある"
+                        : $"後ろに倒れる：坂の角度 {_angle:0.0}° が倒れる角度 {st.TipBackDeg:0.0}° を超え、重心が後ろの車輪（接地）より外に出る");
+                    _tipTo = st.RestBackDeg;
+                    _speed = 0f; _reach = 0f; _done = FallTime;
+                    ctx.AddMetric("climbedRatio", 0f);
+                    ctx.AddMetric("climbTime", ExperimentCatalog.ClimbTimeout);
+                    return;
+                }
+            }
             if (!has)
             {
                 res.Limits.Add("「走行」の機能がないため、坂を上れない");
@@ -380,6 +404,8 @@ namespace ImpossibleLab.Core
         {
             float s = Mathf.Min(_reach, _speed * ctx.T);
             float th = _angle * Mathf.Deg2Rad;
+            // 倒れるとき：坂の下で、後ろの接地を支点にだんだん速く倒れる（見せ方だけ）
+            if (_tipTo > 0f) { float k = Mathf.Clamp01(ctx.T / FallTime); ctx.DeviceTip = _tipTo * k * k; }
             ctx.Device = new Vector3(ClimbSlopeScenario.StartX(_angle, _len) + s * Mathf.Cos(th), s * Mathf.Sin(th), ClimbSlopeScenario.LaneZ);
             ctx.Aux = s;
         }

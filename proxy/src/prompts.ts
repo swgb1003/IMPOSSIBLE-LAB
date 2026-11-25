@@ -140,6 +140,7 @@ const HONESTY = `## Honesty about what can be tested
 
 /** 部品の配置の決まり（AI は座標を数字だけで決めるので、浮き・深いめり込み・引き伸ばしが出やすい。アプリ側でも LayoutFixer で整える）。 */
 export const LAYOUT = `- Build one product, not a pile of shapes. Start from the main body (the largest part) and attach every other part to the body or to a part already attached: neighbouring parts touch or overlap by about 5 mm. Compute positions from the half sizes, for example a wheel (tire width t) beside a body of width w sits at x = ±(w/2 + t/2), and a part on top of a body of height h sits at y = h/2 + its own height/2.
+- A product that drives on the ground (mount ground, with wheels) rests on its wheels: the bottom of the wheels is the floor, and every other part stays at least 1 cm above it. A drive motor sits inside the body or between the wheels near the axle height, never sticking out below.
 - Nothing floats. The only exception is the canopy of a head-mounted protector; even then, a frame or connector part should link it to the body when it is more than 1 cm away.
 - A part may sink into another by at most half of its own thickness. Only internal parts (battery, motor) may sit completely inside the body.
 - Proportions: the longest side of a part is at most 4 times its shortest side, except canopy, panel, frame, strap and solar parts, which are thin by nature.

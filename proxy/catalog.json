@@ -88,7 +88,7 @@
     },
     {
       "type": "motor",
-      "labelJa": "駆動部（関節）",
+      "labelJa": "駆動部（モーター）",
       "minScale": 0.02,
       "maxScale": 0.3
     },
@@ -1658,6 +1658,25 @@
         "standModules": [],
         "min": 0.0,
         "max": 60.0
+      },
+      {
+        "key": "tipAngleDeg",
+        "labelJa": "後ろに倒れずに上れる坂",
+        "unit": "°",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "climb_slope"
+        ],
+        "anyBlocks": [
+          "drive"
+        ],
+        "modules": [
+          "slope"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 90.0
       },
       {
         "key": "drivePowerW",
