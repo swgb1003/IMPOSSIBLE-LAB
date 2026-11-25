@@ -57,6 +57,103 @@ namespace ImpossibleLab
         }
 
         bool _failed;
+        /// <summary>発明ライブラリの PC の代わり：公開を受け取り、自分の公開に採用を1件付けて返す。</summary>
+        sealed class FakeLibrary : ILibraryTransport
+        {
+            public string InventionId, Name, LastBody;
+            public readonly string Id = "p-verify000001", AdoptionId = "a-" + Guid.NewGuid().ToString("N").Substring(0, 12);
+            public bool Withdrawn;
+            public System.Threading.Tasks.Task<(long code, string body, string transportError)> SendAsync(string method, string path, string json, int timeoutSec)
+            {
+                (long, string, string) r;
+                if (method == "POST" && path == "/library")
+                {
+                    LastBody = json;
+                    r = (201, new JObject { ["status"] = "ok", ["id"] = Id, ["created"] = true }.ToString(Newtonsoft.Json.Formatting.None), null);
+                }
+                else if (method == "GET" && path == "/library/mine") r = (200, Mine(), null);
+                else if (method == "POST" && path == $"/library/{Id}/withdraw") { Withdrawn = true; r = (200, new JObject { ["id"] = Id, ["withdrawn"] = true }.ToString(), null); }
+                else r = (404, new JObject { ["status"] = "error", ["message"] = "not found" }.ToString(), null);
+                return System.Threading.Tasks.Task.FromResult(r);
+            }
+
+            string Mine()
+            {
+                if (LastBody == null) return new JObject { ["items"] = new JArray() }.ToString();
+                var adopter = new JObject { ["id"] = "u-verify", ["name"] = "高瀬 真央", ["affiliation"] = "北辰工科大学 人間支援ロボティクス研究室", ["role"] = "researcher", ["field"] = "", ["verified"] = true };
+                var adoption = new JObject
+                {
+                    ["id"] = AdoptionId, ["at"] = "2026-11-26T01:00:00Z", ["reason"] = "体に付ける支援機器の研究で、頭の動きに合わせて追従する制御の題材に使いたい。",
+                    ["adopter"] = adopter, ["threadId"] = "t-verify", ["messageCount"] = 0, ["lastFrom"] = null,
+                };
+                var item = new JObject
+                {
+                    ["id"] = Id, ["inventionId"] = InventionId, ["revision"] = 3, ["name"] = Name, ["status"] = Withdrawn ? "withdrawn" : "adopted",
+                    ["withdrawnBy"] = Withdrawn ? "creator" : null, ["wants"] = new JObject { ["vr"] = 2, ["site"] = 5 }, ["tried"] = 4, ["considering"] = 1,
+                    ["adoptions"] = new JArray(adoption),
+                };
+                return new JObject { ["items"] = new JArray(item) }.ToString(Newtonsoft.Json.Formatting.None);
+            }
+        }
+
+        /// <summary>保存の画面から公開：確認（表示名）→ 同意 → 送信 → 公開の状態 → 公開をやめる確認。</summary>
+        IEnumerator PublishFlow(FakeLibrary library)
+        {
+            _app.SetLibraryTransportForVerify(library);
+            _app.VerifyHoldsPc = true;
+            _app.ProxyOnline = true;
+            _app.Notify();
+            yield return null;
+            Check(_app.PublishProblemNow == null, "publish: allowed after an experiment");
+            yield return Shot("S06_library_face", facePanel: "MainConsole");
+            _app.StartPublish();
+            yield return null;
+            Check(_app.Publish == PublishStep.Confirm, "publish: confirm step");
+            _app.SetPublishAnonymous(false);
+            _app.SetPublishName("");
+            _app.PublishToConsent();
+            Check(_app.Publish == PublishStep.Confirm, "publish: a display name is needed when not anonymous");
+            _app.SetPublishName("あおい");
+            _app.Notify();
+            yield return null;
+            yield return Shot("S06_publish_confirm_face", facePanel: "MainConsole");
+            _app.PublishToConsent();
+            yield return null;
+            Check(_app.Publish == PublishStep.Consent, "publish: consent step");
+            yield return Shot("S06_publish_consent_face", facePanel: "MainConsole");
+            _app.AgreeAndPublish();
+            float t0 = Time.realtimeSinceStartup;
+            while ((_app.Publish != PublishStep.None || _app.MineFor(library.InventionId) == null) && Time.realtimeSinceStartup - t0 < 20f) yield return null;
+            Check(library.LastBody != null && _app.PublishError == null, "publish: sent " + _app.PublishError);
+            if (library.LastBody != null)
+            {
+                var body = JObject.Parse(library.LastBody);
+                var pub = body["publication"];
+                Check((int)pub["format"] == 1 && (string)pub["creator"]["displayName"] == "あおい" && !(bool)pub["creator"]["anonymous"] && (bool)pub["consent"]["agreed"],
+                    "publish: publication carries the display name and the consent");
+                var glb = Convert.FromBase64String((string)body["glbBase64"]);
+                Check(GlbWriter.Inspect(glb, out var gErr) != null && gErr == null && glb.Length <= ProductExport.TargetBytes, $"publish: model {glb.Length / 1024} KB {gErr}");
+                var images = (JArray)body["images"];
+                byte[] jpg = images.Count == 1 ? Convert.FromBase64String((string)images[0]["jpgBase64"]) : null;
+                Check(jpg != null && jpg.Length > 2000 && jpg[0] == 0xff && jpg[1] == 0xd8 && jpg.Length <= LibraryProtocol.MaxJpegBytes, $"publish: one product photo {(jpg?.Length ?? 0) / 1024} KB");
+                // PC 側の形で確かめるために残す（proxy の tools/check-publish.ts）
+                Directory.CreateDirectory(Path.Combine(OutputDir, "library"));
+                File.WriteAllText(Path.Combine(OutputDir, "library-publish-body.json"), library.LastBody);
+                if (jpg != null) File.WriteAllBytes(Path.Combine(OutputDir, "library-publish-photo.jpg"), jpg);
+            }
+            Check(_app.Library.Published.TryGetValue(library.InventionId, out var pid) && pid == library.Id, "publish: the device remembers the publication id");
+            var mine = _app.MineFor(library.InventionId);
+            Check(mine != null && mine.StatusJa == "採用" && mine.Adoptions.Count == 1, "publish: status read back from the PC");
+            yield return Shot("S06_published_face", facePanel: "MainConsole");
+            _app.AskWithdraw();
+            yield return null;
+            Check(_app.Publish == PublishStep.ConfirmWithdraw, "publish: withdraw asks first");
+            yield return Shot("S06_withdraw_confirm_face", facePanel: "MainConsole");
+            _app.CancelPublish();
+            yield return null;
+            Check(_app.Publish == PublishStep.None && !library.Withdrawn, "publish: withdraw can be cancelled");
+        }
+
         void Check(bool cond, string what) { Log((cond ? "PASS " : "FAIL ") + what); if (!cond) _failed = true; }
         void Log(string s) { _log.AppendLine(s); Debug.Log("[ILAB_VERIFY] " + s); }
 
@@ -453,9 +550,14 @@ namespace ImpossibleLab
                 exUi.ShowExplain(false);
                 yield return null;
             }
+            // 発明ライブラリに公開する（PC の代わりに、送った中身を受け取って採用を1件返す）
+            var library = new FakeLibrary { InventionId = _app.Current.Current.Id, Name = _app.Current.Current.Name };
+            yield return PublishFlow(library);
+
             _app.OpenGallery();
             yield return WaitState(LabState.Gallery);
             Check(_app.PendingDeleteId == null, "gallery opens without delete dialog");
+            Check(_app.Sm.State == LabState.Gallery && _app.MineFor(library.InventionId) != null, "gallery knows the published invention");
             yield return Shot("S06_gallery");
             yield return Shot("S06_gallery_face", facePanel: "MainConsole");
             // 7件以上ならページ送り（新しい順に6件ずつ）
@@ -526,6 +628,23 @@ namespace ImpossibleLab
                 hm.ForceVisible = false; hm.PoseOverride = null;
                 yield return null;
             }
+
+            // 採用の知らせ：最初の指示の画面に一度だけ出て、読んだら消える
+            _app.NewInvention();
+            yield return null; yield return null;
+            Check(_app.AdoptionNotices.Count == 1 && _app.AdoptionNotices[0].adoption.Id == library.AdoptionId, "library: adoption notice waits on the request screen");
+            yield return Shot("S01_adoption_notice_face", facePanel: "MainConsole");
+            _app.DismissAdoptionNotices();
+            yield return null;
+            Check(_app.AdoptionNotices.Count == 0 && _app.Library.SeenAdoptions.Contains(library.AdoptionId), "library: notice dismissed and remembered");
+            // 端末の記録から検証の分を消して、次の検証でも同じように出るようにする
+            _app.Library.SeenAdoptions.Remove(library.AdoptionId);
+            _app.Library.Published.Remove(library.InventionId);
+            _app.Library.Save(Application.persistentDataPath);
+            _app.Mine.Clear();
+            _app.VerifyHoldsPc = false;
+            _app.ProxyOnline = null;
+            _app.Notify();
 
             // 運搬ロボット（障害物コース）・空飛ぶ靴（飛行デッキ）：生成 → 試用 → 実験 → 改良 → 再実験 → REALITY → 保存
             foreach (var (req, cat, fix, key) in new[] {

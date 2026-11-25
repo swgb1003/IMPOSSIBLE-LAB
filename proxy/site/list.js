@@ -1,6 +1,9 @@
 // 発明の一覧。ライブラリの入口（/library）から読み、公開が無いか、つながらないときは見本（sample/list.json）を出す。
 // 並べ替えと絞り込みはこの画面の中で行い、板は新しい位置へ滑って動く。
 import { $, el, date, phraseBreaks } from "./text.js";
+import { mountWho } from "./who.js";
+
+mountWho(); // 上の帯の名乗り（ライブラリにつながらないときは出さない）
 
 const SORTS = [
   { id: "wants", label: "ほしい人の数" },

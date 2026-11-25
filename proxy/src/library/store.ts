@@ -356,7 +356,23 @@ export class LibraryStore {
     return a;
   }
 
-  listAccounts() { return this.db.accounts.map((a) => ({ ...a })); }
+  /** 登録の一覧（採用した数つき。取り下げられた発明の採用は数えない）。 */
+  listAccounts() {
+    const live = this.db.pubs.filter((p) => !p.withdrawn);
+    return this.db.accounts.map((a) => ({ ...a, adoptions: live.filter((p) => p.adoptions.some((x) => x.accountId === a.id)).length }));
+  }
+
+  /** 表示名で公開している発案者の一覧（サイトの名乗りで選ぶ）。匿名の公開は出さない。 */
+  listCreators() {
+    const byId = new Map<string, { publicId: string; name: string; published: number }>();
+    for (const p of this.db.pubs.filter((x) => !x.withdrawn && !x.anonymous)) {
+      const id = publicCreatorId(p.creatorHash);
+      const c = byId.get(id) ?? { publicId: id, name: p.displayName, published: 0 };
+      c.published++;
+      byId.set(id, c);
+    }
+    return [...byId.values()];
+  }
 
   getAccount(id: string) {
     const a = this.accountOrThrow(id);
@@ -373,7 +389,11 @@ export class LibraryStore {
     return {
       publicId, displayName: latest.displayName,
       published: pubs.length, adopted: pubs.filter((p) => p.adoptions.length > 0).length,
-      inventions: pubs.map((p) => ({ id: p.id, name: this.pubData.get(p.id)!.invention.name, status: this.status(p), publishedAt: p.publishedAt })),
+      inventions: pubs.map((p) => {
+        const inv = this.pubData.get(p.id)!.invention;
+        return { id: p.id, name: inv.name, request: inv.request, status: this.status(p), publishedAt: p.publishedAt,
+          wants: p.wantsVr.length + p.wantsSite.length, adoptions: p.adoptions.length };
+      }),
     };
   }
 

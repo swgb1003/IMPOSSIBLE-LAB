@@ -16,8 +16,8 @@
    "status": "open",
    "revision": 3,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -28,7 +28,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.792Z",
-   "updatedAt": "2026-11-25T11:22:16.908Z",
+   "updatedAt": "2026-11-25T14:42:08.079Z",
    "sample": true,
    "result": {
     "title": "雨の実験場",
@@ -73,8 +73,8 @@
    "status": "open",
    "revision": 2,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -85,7 +85,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.771Z",
-   "updatedAt": "2026-11-25T11:22:16.825Z",
+   "updatedAt": "2026-11-25T14:42:08.058Z",
    "sample": true,
    "result": {
     "title": "その場に立つ（日差し）",
@@ -130,8 +130,8 @@
    "status": "open",
    "revision": 2,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -142,7 +142,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.751Z",
-   "updatedAt": "2026-11-25T11:22:16.740Z",
+   "updatedAt": "2026-11-25T14:42:08.038Z",
    "sample": true,
    "result": {
     "title": "その場に立つ（暗さ）",
@@ -187,8 +187,8 @@
    "status": "open",
    "revision": 2,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -199,7 +199,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.731Z",
-   "updatedAt": "2026-11-25T11:22:16.643Z",
+   "updatedAt": "2026-11-25T14:42:08.017Z",
    "sample": true,
    "result": {
     "title": "その場に立つ（検知対象）",
@@ -244,8 +244,8 @@
    "status": "open",
    "revision": 2,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -256,7 +256,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.711Z",
-   "updatedAt": "2026-11-25T11:22:16.561Z",
+   "updatedAt": "2026-11-25T14:42:07.999Z",
    "sample": true,
    "result": {
     "title": "座って過ごす（気温）",
@@ -301,8 +301,8 @@
    "status": "open",
    "revision": 2,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -313,7 +313,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.690Z",
-   "updatedAt": "2026-11-25T11:22:16.480Z",
+   "updatedAt": "2026-11-25T14:42:07.980Z",
    "sample": true,
    "result": {
     "title": "持ち上げて置く（積荷）",
@@ -354,8 +354,8 @@
    "status": "open",
    "revision": 2,
    "creator": {
-    "name": "発案者",
-    "publicId": null
+    "name": "見本の発案者",
+    "publicId": "c-79093c5a51eb"
    },
    "creatorAdoptions": 0,
    "wants": {
@@ -366,7 +366,7 @@
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.664Z",
-   "updatedAt": "2026-11-25T11:22:16.368Z",
+   "updatedAt": "2026-11-25T14:42:07.956Z",
    "sample": true,
    "result": {
     "title": "落とす（落下）",

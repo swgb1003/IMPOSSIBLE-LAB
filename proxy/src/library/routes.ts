@@ -117,6 +117,7 @@ export function createLibraryRoutes(store: LibraryStore, opts: LibraryRouteOptio
   add("GET", "/accounts", "site", () => ({ items: store.listAccounts() }));
   add("POST", "/accounts", "site", async (ctx) => { ctx.res.statusCode = 201; return store.createAccount(parse(AccountInput, await json(ctx))); });
   add("GET", `/accounts/(${ID})`, "site", ({ params }) => store.getAccount(params[0]));
+  add("GET", "/creators", "site", () => ({ items: store.listCreators() }));
   add("GET", `/creators/(${ID})`, "site", ({ params }) => store.creator(params[0]));
 
   // ---- やりとり（サイトと Quest の両方） ----
@@ -138,7 +139,7 @@ export function createLibraryRoutes(store: LibraryStore, opts: LibraryRouteOptio
   return async function handle(req: IncomingMessage, res: ServerResponse, url: URL): Promise<boolean> {
     const p = url.pathname;
     if (!(p === "/library" || p.startsWith("/library/") || p === "/accounts" || p.startsWith("/accounts/")
-      || p.startsWith("/creators/") || p === "/threads" || p.startsWith("/threads/") || p.startsWith("/admin/"))) return false;
+      || p === "/creators" || p.startsWith("/creators/") || p === "/threads" || p.startsWith("/threads/") || p.startsWith("/admin/"))) return false;
     let params: string[] = [];
     const sameMethod = routes.filter((r) => r.method === req.method);
     const route = sameMethod.find((r) => { const m = r.pattern.exec(p); if (m) params = m.slice(1); return m != null; });

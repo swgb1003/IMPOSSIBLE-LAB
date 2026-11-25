@@ -56,6 +56,7 @@ namespace ImpossibleLab
             _raiseAction.Enable();
 
             App.Changed += Refresh;
+            App.CaptureProduct = CaptureProductJpg; // 公開するときに真ん中の試作品を撮る
             Refresh();
         }
 
@@ -80,7 +81,8 @@ namespace ImpossibleLab
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
               .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage).Append('|').Append(App.Voice).Append(App.VoiceTarget).Append(App.ProxyOnline).Append(App.TrialPersonDistance).Append('|').Append(_selParam).Append(_tabL).Append(_tabR).Append(_planPage).Append(_galleryPick)
-              .Append('|').Append(_explain).Append(_explainPart).Append(_explainNeedPage).Append(_zoom);
+              .Append('|').Append(_explain).Append(_explainPart).Append(_explainNeedPage).Append(_zoom)
+              .Append('|').Append(App.LibrarySignature);
             return sb.ToString();
         }
 
@@ -97,6 +99,7 @@ namespace ImpossibleLab
             // 例の選択など、UI以外から変わった入力内容を反映（入力中は上書きしない）
             if (_requestInput != null && !_requestInput.isFocused && _requestInput.text != App.RequestText) _requestInput.SetTextWithoutNotify(App.RequestText);
             if (_revisionInput != null && !_revisionInput.isFocused && _revisionInput.text != App.RevisionText) _revisionInput.SetTextWithoutNotify(App.RevisionText);
+            if (_publishInput != null && !_publishInput.isFocused && _publishInput.text != App.PublishName) _publishInput.SetTextWithoutNotify(App.PublishName);
             UpdateEcho();
         }
 
@@ -152,7 +155,7 @@ namespace ImpossibleLab
 
         void RebuildScreens()
         {
-            _requestInput = null; _revisionInput = null; _liveText = null; _echoText = null; _countText = null; _echoState = null; _liveArc = null;
+            _requestInput = null; _revisionInput = null; _publishInput = null; _liveText = null; _echoText = null; _countText = null; _echoState = null; _liveArc = null;
             string tabKey = StepIndex().ToString();
             if (tabKey != _tabFor) { _tabFor = tabKey; _tabL = 0; _tabR = 0; }
             _con.Clear();

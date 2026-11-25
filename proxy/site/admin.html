@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>運営 | IMPOSSIBLE LIBRARY</title>
+<meta name="description" content="規約に反する公開の取り下げと、研究者・開発者の所属の確認の印">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body class="work">
+<header class="bar">
+  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
+    <b>IMPOSSIBLE LIBRARY</b>
+  </a>
+  <div class="bar-r">
+    <nav aria-label="サイト">
+      <a href="./">発明品一覧</a>
+      <a href="accounts.html">研究者と開発者</a>
+      <a href="threads.html">やりとり</a>
+      <a href="terms.html">利用規約</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="board" aria-labelledby="page-h">
+    <div class="t head">
+      <div>
+        <h1 id="page-h">運営</h1>
+        <p data-slot="lead">規約に反する公開の取り下げと、研究者・開発者の所属を確かめた印。</p>
+      </div>
+    </div>
+    <div class="t span8 pane" aria-labelledby="pubs-h">
+      <div class="blk-h"><h2 id="pubs-h">公開された発明</h2><span class="num" data-slot="pubs-count"></span></div>
+      <table class="tbl">
+        <thead><tr><th>発明と発案者</th><th>状態</th><th class="num">採用</th><th class="num">公開した日</th><th>操作</th></tr></thead>
+        <tbody data-slot="pubs"></tbody>
+      </table>
+    </div>
+    <div class="t span4 alt pane" aria-labelledby="acc-h">
+      <div class="blk-h"><h2 id="acc-h">研究者と開発者</h2><span class="num" data-slot="acc-count"></span></div>
+      <p class="note gap-b">所属の確認は形だけです。ここで印を付けるだけで、本物の確認はしていません。</p>
+      <table class="tbl">
+        <thead><tr><th>名前と所属</th><th>所属の確認の印</th></tr></thead>
+        <tbody data-slot="accounts"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script type="module" src="admin.js"></script>
+</body>
+</html>

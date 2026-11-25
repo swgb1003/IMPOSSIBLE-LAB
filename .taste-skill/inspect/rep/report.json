@@ -1,0 +1,1747 @@
+{
+ "url": "http://127.0.0.1:8799/site/invention.html?id=p-c3c626b0b8",
+ "at": "2026-11-25T11:23:45.409Z",
+ "allow": [
+  "few-pictures"
+ ],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.88,
+    0.8,
+    0.67
+   ],
+   "motion": {
+    "elements": 19,
+    "css": 0,
+    "transitions": 19,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 2543,
+     "screens": 2.8,
+     "words": 176,
+     "img": 1,
+     "video": 0,
+     "canvas": 1,
+     "svg": 1,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "0.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "ついてくる​日陰​キャノピー",
+     "words": 1,
+     "chars": 14,
+     "lines": 1,
+     "size": 56,
+     "vw": 3.9,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "right",
+     "widthRatio": 0.46,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "ついてくる​日陰​キャノピー",
+     "words": 1,
+     "lines": 1,
+     "size": 56,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "ついてくる​日陰​キャノピー",
+      "words": 1,
+      "chars": 14,
+      "lines": 1,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 86,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
+      "words": 1,
+      "chars": 39,
+      "lines": 2,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Noto Sans JP",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.46,
+      "top": 286,
+      "tag": "blockquote",
+      "kind": "statement"
+     },
+     {
+      "text": "76.7%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.21,
+      "top": 486,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "58.2%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.21,
+      "top": 486,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 63.4,
+      "vw": 4.4,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.46,
+      "top": 2357,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 4,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.96,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.04,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      24,
+      36,
+      56,
+      63
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 82,
+     "max": {
+      "size": 63.4,
+      "vw": 4.4,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.07,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 64,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9fbfc",
+       "share": 0.55
+      },
+      {
+       "color": "#9db8bc",
+       "share": 0.4
+      },
+      {
+       "color": "#120600",
+       "share": 0.03
+      },
+      {
+       "color": "#2fe3e6",
+       "share": 0.01
+      },
+      {
+       "color": "#ff6a26",
+       "share": 0
+      }
+     ],
+     "button": {
+      "bg": "#020405",
+      "hsl": {
+       "h": 200,
+       "s": 0.43,
+       "l": 0.01
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 0,
+     "height": 48,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "採用する"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 64
+      },
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1780
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 0.43
+     }
+    ],
+    "nav": {
+     "links": 4,
+     "fixed": false,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 2543,
+    "margins": {
+     "left": 38,
+     "right": 38
+    },
+    "sections": [
+     {
+      "sel": "section.board.first",
+      "tag": "section",
+      "top": 64,
+      "height": 796,
+      "words": 59,
+      "media": 1,
+      "middle": 30,
+      "heading": {
+       "text": "ついてくる​日陰​キャノピー",
+       "size": 56,
+       "tag": "h1"
+      },
+      "left": 16,
+      "right": 38,
+      "textLeft": 38,
+      "textRight": 38,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.board",
+      "tag": "section",
+      "top": 980,
+      "height": 680,
+      "words": 47,
+      "media": 1,
+      "middle": 50,
+      "heading": {
+       "text": "しくみ",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 16,
+      "textLeft": 38,
+      "textRight": 52,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.board",
+      "tag": "section",
+      "top": 1780,
+      "height": 435,
+      "words": 76,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "実験の​記録",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 55,
+      "textLeft": 38,
+      "textRight": 55,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 2335,
+      "height": 192,
+      "words": 11,
+      "media": 0,
+      "middle": 83,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 63,
+       "tag": "p"
+      },
+      "left": 38,
+      "right": 73,
+      "textLeft": 38,
+      "textRight": 73,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "ついてくる​日陰​キャノピー",
+      "size": 56,
+      "top": 86,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 746,
+      "n": 6
+     },
+     {
+      "x": 38,
+      "n": 4
+     },
+     {
+      "x": 1100,
+      "n": 3
+     },
+     {
+      "x": 115,
+      "n": 1
+     },
+     {
+      "x": 392,
+      "n": 1
+     },
+     {
+      "x": 804,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 16,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.03,
+    "voidBox": {
+     "x": 720,
+     "y": 420,
+     "w": 720,
+     "h": 60
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    0.88,
+    0.83,
+    0.96,
+    0.83,
+    0.83
+   ],
+   "motion": {
+    "elements": 19,
+    "css": 0,
+    "transitions": 19,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 4699,
+     "screens": 4.6,
+     "words": 176,
+     "img": 1,
+     "video": 0,
+     "canvas": 1,
+     "svg": 1,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "0.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "ついてくる​日陰​キャノピー",
+     "words": 1,
+     "chars": 14,
+     "lines": 1,
+     "size": 44,
+     "vw": 5.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.9,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "ついてくる​日陰​キャノピー",
+     "words": 1,
+     "lines": 1,
+     "size": 44,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "ついてくる​日陰​キャノピー",
+      "words": 1,
+      "chars": 14,
+      "lines": 1,
+      "size": 44,
+      "vw": 5.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 86,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
+      "words": 1,
+      "chars": 39,
+      "lines": 2,
+      "size": 28,
+      "vw": 3.6,
+      "font": "Noto Sans JP",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 531,
+      "tag": "blockquote",
+      "kind": "statement"
+     },
+     {
+      "text": "76.7%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 44,
+      "vw": 5.7,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.42,
+      "top": 1268,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "58.2%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 44,
+      "vw": 5.7,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.42,
+      "top": 1268,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 40,
+      "vw": 5.2,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 4361,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 4,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.96,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.04,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      24,
+      28,
+      40,
+      44
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 87,
+     "max": {
+      "size": 44,
+      "vw": 5.7,
+      "font": "Noto Sans JP",
+      "text": "ついてくる​日陰​キャノピー"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.07,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 685,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9fbfc",
+       "share": 0.55
+      },
+      {
+       "color": "#9db8bc",
+       "share": 0.4
+      },
+      {
+       "color": "#120600",
+       "share": 0.03
+      },
+      {
+       "color": "#2fe3e6",
+       "share": 0.01
+      },
+      {
+       "color": "#ff6a26",
+       "share": 0
+      }
+     ],
+     "button": {
+      "bg": "#020405",
+      "hsl": {
+       "h": 200,
+       "s": 0.43,
+       "l": 0.01
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 0,
+     "height": 48,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "採用する"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 2,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 0.32
+     }
+    ],
+    "nav": {
+     "links": 4,
+     "fixed": false,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 4699,
+    "margins": {
+     "left": 16,
+     "right": 16
+    },
+    "sections": [
+     {
+      "sel": "section.board.first",
+      "tag": "section",
+      "top": 64,
+      "height": 1541,
+      "words": 59,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "ついてくる​日陰​キャノピー",
+       "size": 44,
+       "tag": "h1"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 38,
+      "textRight": 47,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w6",
+      "tag": "div",
+      "top": 1701,
+      "height": 746,
+      "words": 21,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "しくみ",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 244,
+      "textLeft": 38,
+      "textRight": 244,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 2454,
+      "height": 610,
+      "words": 19,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "部品",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 38,
+      "textRight": 299,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.board",
+      "tag": "section",
+      "top": 3445,
+      "height": 798,
+      "words": 76,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "実験の​記録",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 50,
+      "textLeft": 38,
+      "textRight": 50,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 4339,
+      "height": 344,
+      "words": 11,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 40,
+       "tag": "p"
+      },
+      "left": 38,
+      "right": 109,
+      "textLeft": 38,
+      "textRight": 109,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "ついてくる​日陰​キャノピー",
+      "size": 44,
+      "top": 86,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 12
+     },
+     {
+      "x": 410,
+      "n": 2
+     },
+     {
+      "x": 96,
+      "n": 1
+     },
+     {
+      "x": 115,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 16,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 7,
+   "filled": [
+    0.88,
+    0.92,
+    0.86,
+    0.92,
+    0.76,
+    0.86,
+    0.79
+   ],
+   "motion": {
+    "elements": 19,
+    "css": 0,
+    "transitions": 19,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 5271,
+     "screens": 6.2,
+     "words": 176,
+     "img": 1,
+     "video": 0,
+     "canvas": 1,
+     "svg": 1,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "0.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "ついてくる​日陰​キャノピー",
+     "words": 1,
+     "chars": 14,
+     "lines": 2,
+     "size": 36,
+     "vw": 9.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.84,
+     "top": 129,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "ついてくる​日陰​キャノピー",
+     "words": 1,
+     "lines": 2,
+     "size": 36,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "ついてくる​日陰​キャノピー",
+      "words": 1,
+      "chars": 14,
+      "lines": 2,
+      "size": 36,
+      "vw": 9.2,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 129,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
+      "words": 1,
+      "chars": 39,
+      "lines": 3,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Noto Sans JP",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 680,
+      "tag": "blockquote",
+      "kind": "statement"
+     },
+     {
+      "text": "76.7%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 36,
+      "vw": 9.2,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 1242,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "58.2%",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 36,
+      "vw": 9.2,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": 0,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 1418,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 2,
+      "size": 40,
+      "vw": 10.3,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 4874,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 3,
+     "over2Lines": 0,
+     "statements": 4,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.96,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.04,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      20,
+      24,
+      36,
+      40
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 41,
+     "max": {
+      "size": 40,
+      "vw": 10.3,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.07,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 113,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      },
+      {
+       "color": "#0e1519",
+       "top": 4469,
+       "hsl": {
+        "h": 202,
+        "s": 0.28,
+        "l": 0.08
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9fbfc",
+       "share": 0.55
+      },
+      {
+       "color": "#9db8bc",
+       "share": 0.4
+      },
+      {
+       "color": "#120600",
+       "share": 0.03
+      },
+      {
+       "color": "#2fe3e6",
+       "share": 0.01
+      },
+      {
+       "color": "#ff6a26",
+       "share": 0
+      }
+     ],
+     "button": {
+      "bg": "#020405",
+      "hsl": {
+       "h": 200,
+       "s": 0.43,
+       "l": 0.01
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 0,
+     "height": 48,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "採用する"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 1,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 4,
+     "fixed": false,
+     "height": 113,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 5271,
+    "margins": {
+     "left": 16,
+     "right": 16
+    },
+    "sections": [
+     {
+      "sel": "div.t.name",
+      "tag": "div",
+      "top": 113,
+      "height": 316,
+      "words": 16,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "ついてくる​日陰​キャノピー",
+       "size": 36,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 39,
+      "textLeft": 32,
+      "textRight": 39,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "figure.t.w6",
+      "tag": "figure",
+      "top": 664,
+      "height": 187,
+      "words": 2,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
+       "size": 24,
+       "tag": "blockquote"
+      },
+      "left": 32,
+      "right": 47,
+      "textLeft": 32,
+      "textRight": 47,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.stage",
+      "tag": "div",
+      "top": 859,
+      "height": 359,
+      "words": 9,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "試​作品​",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 32,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 1226,
+      "height": 168,
+      "words": 14,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "76.7",
+       "size": 36,
+       "tag": "p"
+      },
+      "left": 32,
+      "right": 34,
+      "textLeft": 32,
+      "textRight": 34,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 1402,
+      "height": 168,
+      "words": 6,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "58.2",
+       "size": 36,
+       "tag": "p"
+      },
+      "left": 32,
+      "right": 74,
+      "textLeft": 32,
+      "textRight": 74,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 1578,
+      "height": 168,
+      "words": 8,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "改良の​履歴",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 127,
+      "textLeft": 32,
+      "textRight": 127,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 436,
+      "height": 219,
+      "words": 4,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "研究や​製品化に​使う",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w6",
+      "tag": "div",
+      "top": 1818,
+      "height": 961,
+      "words": 21,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "しくみ",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 52,
+      "textLeft": 32,
+      "textRight": 52,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 2787,
+      "height": 664,
+      "words": 19,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "部品",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 32,
+      "textRight": 39,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.board",
+      "tag": "section",
+      "top": 3780,
+      "height": 1006,
+      "words": 76,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "実験の​記録",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 33,
+      "textLeft": 32,
+      "textRight": 33,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 4858,
+      "height": 398,
+      "words": 11,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 40,
+       "tag": "p"
+      },
+      "left": 32,
+      "right": 40,
+      "textLeft": 32,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "ついてくる​日陰​キャノピー",
+      "size": 36,
+      "top": 129,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 12
+     },
+     {
+      "x": 215,
+      "n": 2
+     },
+     {
+      "x": 82,
+      "n": 1
+     },
+     {
+      "x": 97,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 16,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "card-rows",
+   "width": 1440,
+   "message": "2 rows of identical boxed cards.",
+   "fix": "Vary the composition; not every section is a card grid."
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\rep\\desktop-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\rep\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\rep\\tablet-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\rep\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\rep\\mobile-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\rep\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

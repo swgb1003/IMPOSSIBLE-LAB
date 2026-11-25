@@ -54,20 +54,24 @@ namespace ImpossibleLab
             else
             {
                 c.T(48f, 300f, "声は PC の中だけで文字にします", 16f, LabTheme.ConMut);
-                c.T(48f, 324f, "保存はしません", 16f, LabTheme.ConMut);
+                c.T(48f, 324f, "声そのものは保存しません", 16f, LabTheme.ConMut);
             }
 
-            c.Plate(LX, 354f, PW, 394f, "今日の課題");
-            // 行の切れ目を決めて置く（語の途中で折り返さないように）
-            var task = new[]
+            // 採用の知らせがあれば、今日の課題の代わりに一度だけ出す
+            if (!ConAdoptionNotice())
             {
-                ("両手がふさがっていても雨を防げる道具を発明し、", LabTheme.ConInk), ("雨と風の実験で性能を確かめよう。", LabTheme.ConInk),
-                ("荷物や杖で両手がふさがる人の雨対策です。", LabTheme.ConMut), (null, LabTheme.ConMut),
-                ("ほかの道具も作れます。", LabTheme.ConInk), ("言葉で伝えると、AI が設計します。", LabTheme.ConInk),
-                ("使うのは、登録済みの部品と機能だけです。", LabTheme.ConInk), ("できた設計は、発明台の上に組み立てます。", LabTheme.ConInk),
-                (null, LabTheme.ConMut), ("設計元：" + App.Design.DisplayName, LabTheme.ConMut),
-            };
-            for (int i = 0; i < task.Length; i++) if (task[i].Item1 != null) c.TLine(48f, 420f + i * 28f, 414f, task[i].Item1, 17f, task[i].Item2);
+                c.Plate(LX, 354f, PW, 394f, "今日の課題");
+                // 行の切れ目を決めて置く（語の途中で折り返さないように）
+                var task = new[]
+                {
+                    ("両手がふさがっていても雨を防げる道具を発明し、", LabTheme.ConInk), ("雨と風の実験で性能を確かめよう。", LabTheme.ConInk),
+                    ("荷物や杖で両手がふさがる人の雨対策です。", LabTheme.ConMut), (null, LabTheme.ConMut),
+                    ("ほかの道具も作れます。", LabTheme.ConInk), ("言葉で伝えると、AI が設計します。", LabTheme.ConInk),
+                    ("使うのは、登録済みの部品と機能だけです。", LabTheme.ConInk), ("できた設計は、発明台の上に組み立てます。", LabTheme.ConInk),
+                    (null, LabTheme.ConMut), ("設計元：" + App.Design.DisplayName, LabTheme.ConMut),
+                };
+                for (int i = 0; i < task.Length; i++) if (task[i].Item1 != null) c.TLine(48f, 420f + i * 28f, 414f, task[i].Item1, 17f, task[i].Item2);
+            }
 
             c.Plate(RX, 78f, PW, 670f, "例から選ぶ", "発明 ／ 確かめる実験");
             for (int i = 0; i < Mathf.Min(9, QuickInventions.All.Length); i++)
@@ -365,15 +369,16 @@ namespace ImpossibleLab
             var dataNote = new[]
             {
                 ("発明の設計（部品・機能・値）", LabTheme.ConInk), ("改良の履歴（30 版まで）", LabTheme.ConInk),
-                ("実験の記録（条件・シード・計測値）", LabTheme.ConInk), ("声と、入力した文章は保存しません", LabTheme.ConMut),
+                ("実験の記録（条件・シード・計測値）", LabTheme.ConInk), ("依頼の言葉（声そのものは保存しません）", LabTheme.ConInk),
             };
             if (App.Sm.State == LabState.Saved)
             {
                 var inv = App.Current; var dna = inv?.Current;
+                if (inv != null && App.Publish != PublishStep.None && App.Publish != PublishStep.ConfirmWithdraw) { BuildPublish(inv); return; }
                 c.Dial();
                 if (dna != null) { ConTopView(dna, -1); ConLastResult("最後の実験の"); }
                 c.Plate(LX, 78f, PW, 468f, "保存しました");
-                ConParas(48f, 130f, 414f, 540f, new[]
+                ConParasJa(48f, 130f, 414f, 540f, new[]
                 {
                     ($"{dna?.Name} Rev.{dna?.Revision}", LabTheme.ConCy),
                     ($"実験の記録 {inv?.Experiments.Count ?? 0} 件も一緒に保存しています", LabTheme.ConInk),
@@ -384,6 +389,7 @@ namespace ImpossibleLab
                 c.Plate(RX, 78f, PW, 468f, "次にすること");
                 c.Button(RX + 20f, 130f, 414f, 56f, "編集を続ける", App.ContinueEditing);
                 c.Button(RX + 20f, 198f, 414f, 56f, "保存した発明を見る", App.OpenGallery);
+                ConLibrarySection(inv);
                 ConFrame(new List<ConBtn> { new ConBtn("製品の説明", OpenExplain, ConKind.Quiet, 160f, dna != null) }, new ConBtn("新しい発明を始める", App.NewInvention, ConKind.Primary, 320f),
                     new Dictionary<int, UnityAction> { { 0, App.NewInvention }, { 2, App.ContinueEditing } });
                 return;
@@ -433,7 +439,7 @@ namespace ImpossibleLab
             for (int i = 0; i < page.Count; i++)
             {
                 var e = page[i]; string id = e.Id; bool on = e == pick;
-                c.Row(RX, 124f + i * 68f, PW, 64f, ConsoleLayer.Fit(e.Name, 16), $"{(e.HasProgram ? "動きつき・" : "")}{ConsoleLayer.Fit(e.TagsJa, 10)}・{(e.Tested ? "実験済み" : "未実験")}", $"Rev.{e.Revision}",
+                c.Row(RX, 124f + i * 68f, PW, 64f, ConsoleLayer.Fit(e.Name, 16), $"{(e.HasProgram ? "動きつき・" : "")}{ConsoleLayer.Fit(e.TagsJa, 10)}・{(e.Tested ? "実験済み" : "未実験")}{GalleryPublishState(e.Id)}", $"Rev.{e.Revision}",
                     sel: on, onClick: on ? (UnityAction)null : () => { _galleryPick = id; Refresh(); }, name: "Card_" + e.Id);
             }
             if (entries.Count == 0) ConParas(RX + 20f, 130f, 414f, 540f, new[] { ("保存した発明はまだありません。発明して保存すると、ここに並びます。", LabTheme.ConMut) }, 17f);

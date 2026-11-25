@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>研究者と開発者 | IMPOSSIBLE LIBRARY</title>
+<meta name="description" content="発明を採用できる研究者と開発者の一覧と登録">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body class="work">
+<header class="bar">
+  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
+    <b>IMPOSSIBLE LIBRARY</b>
+  </a>
+  <div class="bar-r">
+    <nav aria-label="サイト">
+      <a href="./">発明品一覧</a>
+      <a href="accounts.html" aria-current="page">研究者と開発者</a>
+      <a href="threads.html">やりとり</a>
+      <a href="terms.html">利用規約</a>
+    </nav>
+    <div class="who" data-slot="who" hidden></div>
+  </div>
+</header>
+
+<main>
+  <section class="board" aria-labelledby="page-h">
+    <div class="t head">
+      <div>
+        <h1 id="page-h">研究者と開発者</h1>
+        <p data-slot="lead">登録した研究者と開発者が、理由を書いて発明を採用できます。</p>
+      </div>
+      <button class="btn p sm" type="button" data-slot="new">登録する</button>
+    </div>
+
+    <div class="t span7 list-col pane" aria-labelledby="list-h">
+      <div class="blk-h"><h2 id="list-h">登録している人</h2><span class="num" data-slot="count"></span></div>
+      <div class="rows-h" aria-hidden="true"><span>名前と所属</span><span>立場</span><span>専門</span><span class="num">採用</span><span class="num">所属の確認</span></div>
+      <ul class="people" data-slot="people"></ul>
+      <p class="note list-foot" data-slot="list-note">ログインはありません。上の帯の「名乗り」で人を選ぶと、その人として採用とやりとりができます。</p>
+    </div>
+
+    <div class="t span5 alt pane pane-col" data-slot="pane" aria-live="polite"></div>
+  </section>
+</main>
+<script type="module" src="accounts.js"></script>
+</body>
+</html>

@@ -9,7 +9,8 @@
     "test": "node --test test/*.test.ts",
     "typecheck": "tsc -p .",
     "eval": "node eval/run-eval.ts",
-    "samples": "node tools/load-samples.ts"
+    "samples": "node tools/load-samples.ts",
+    "check-publish": "node tools/check-publish.ts"
   },
   "engines": {
     "node": ">=22.18"

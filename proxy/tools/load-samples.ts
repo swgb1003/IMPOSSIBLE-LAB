@@ -15,8 +15,33 @@ const arg = (name: string, def: string) => { const i = process.argv.indexOf(name
 const FROM = path.resolve(arg("--from", path.join(here, "..", "..", "Logs", "verify", "library")));
 const TO = path.resolve(arg("--to", process.env.ILAB_LIBRARY_DIR ?? path.join(here, "..", "library")));
 const STATIC = path.resolve(arg("--static", path.join(here, "..", "site", "sample")));
-/** 見本の発案者の端末の鍵（見本どうしは同じ発案者。匿名で公開する）。 */
+/** 見本の発案者の端末の鍵（見本どうしは同じ発案者）。サイトで発案者として名乗ってやりとりを試せるよう、表示名で公開する。 */
 const SAMPLE_KEY = "ilab-sample-creator-0001";
+export const SAMPLE_CREATOR_NAME = "見本の発案者";
+
+/** 見本の研究者・開発者（実在しない人と所属）。名前で見分け、何度入れても増えない。 */
+export const SAMPLE_ACCOUNTS = [
+  { name: "高瀬 真央", affiliation: "北辰工科大学 人間支援ロボティクス研究室", role: "researcher", field: "体に付けて動作を助ける機器",
+    intro: "体に付けて動きを助ける機器を研究しています。日常の困りごとから研究の題材を探しています。", verified: true },
+  { name: "森下 圭", affiliation: "白砂器械株式会社 製品開発部", role: "developer", field: "電池で動く小型の機器の量産設計",
+    intro: "家庭向けの小さな電動機器を製品にしています。重さと電池で動く時間を気にして読みます。", verified: false },
+  { name: "野々村 透", affiliation: "個人で開発", role: "developer", field: "雨具と屋外の道具",
+    intro: "雨や日差しをしのぐ道具を一人で作って売っています。", verified: false },
+] as const;
+
+export function loadSampleAccounts(store: LibraryStore) {
+  const have = store.listAccounts();
+  return SAMPLE_ACCOUNTS.map((s) => {
+    let a = have.find((x) => x.sample && x.name === s.name);
+    if (!a) {
+      const created = store.createAccount({ name: s.name, affiliation: s.affiliation, role: s.role, field: s.field, intro: s.intro });
+      store.markSampleAccount(created.id);
+      a = { ...created, sample: true, adoptions: 0 };
+    }
+    if (a.verified !== s.verified) store.verifyAccount(a.id, s.verified);
+    return a.id;
+  });
+}
 
 export function loadSamples(from: string, store: LibraryStore) {
   if (!existsSync(from)) throw new Error(`見本の書き出しが見つかりません：${from}（Unity の通し検証を先に実行してください）`);
@@ -28,7 +53,8 @@ export function loadSamples(from: string, store: LibraryStore) {
     const metaFile = path.join(dir, "images.json");
     const meta = existsSync(metaFile) ? JSON.parse(readFileSync(metaFile, "utf8")) as { file: string; kind: string; caption: string; revision: number }[] : [];
     const images: ImageInput[] = meta.map((m) => ({ kind: ImageKind.parse(m.kind), caption: m.caption, revision: m.revision, jpg: readFileSync(path.join(dir, m.file)) }));
-    const { id } = store.publish(SAMPLE_KEY, parsed.data, glb, images);
+    const pub = { ...parsed.data, creator: { displayName: SAMPLE_CREATOR_NAME, anonymous: false } };
+    const { id } = store.publish(SAMPLE_KEY, pub, glb, images);
     store.markSample(id);
     ids.push(id);
     console.log(`見本 ${id}：${parsed.data.invention.name}（Rev.${parsed.data.invention.revision}、写真 ${images.length} 枚）`);
@@ -59,6 +85,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   // 見本は同じ発案者・同じ発明として公開し直すので、何度入れても増えない。ほかの公開はそのまま残る
   const store = new LibraryStore({ dir: TO });
   const ids = loadSamples(FROM, store);
+  const accounts = loadSampleAccounts(store);
   const n = writeStatic(store, STATIC);
-  console.log(`ライブラリ（${TO}）に見本 ${ids.length} 件を入れ、サイトの見本 ${n} 件を ${STATIC} に書き出しました`);
+  console.log(`ライブラリ（${TO}）に見本 ${ids.length} 件と見本の研究者・開発者 ${accounts.length} 人を入れ、サイトの見本 ${n} 件を ${STATIC} に書き出しました`);
 }

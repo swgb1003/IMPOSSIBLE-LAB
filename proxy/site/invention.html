@@ -22,11 +22,15 @@
     <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
     <b>IMPOSSIBLE LIBRARY</b>
   </a>
-  <nav aria-label="サイト">
-    <a href="./">発明品一覧</a>
-    <a href="accounts.html">研究者と開発者</a>
-    <a href="terms.html">利用規約</a>
-  </nav>
+  <div class="bar-r">
+    <nav aria-label="サイト">
+      <a href="./">発明品一覧</a>
+      <a href="accounts.html">研究者と開発者</a>
+      <a href="threads.html">やりとり</a>
+      <a href="terms.html">利用規約</a>
+    </nav>
+    <div class="who" data-slot="who" hidden></div>
+  </div>
 </header>
 
 <main>
@@ -99,6 +103,14 @@
       <ul data-slot="assumptions"></ul>
     </div>
     <div class="t w3 h2 slot" data-slot="slot-d"></div>
+  </section>
+
+  <section class="board" aria-labelledby="want-h">
+    <div class="t want" data-slot="want">
+      <h2 id="want-h">ほしい人と試した人</h2>
+      <div class="want-figs" data-slot="want-figs"></div>
+      <div class="want-act" data-slot="want-act"></div>
+    </div>
   </section>
 
   <footer class="board end-board">

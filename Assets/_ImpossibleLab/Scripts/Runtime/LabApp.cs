@@ -18,7 +18,7 @@ namespace ImpossibleLab
     /// 縦切りの統括。状態遷移（AppStateMachine）を唯一の画面状態とし、UIはここを読むだけ。
     /// 発明指示 → 設計 → 承認 → 組み立て → 編集/改良 → 実験 → 結果 → 保存/ギャラリー。
     /// </summary>
-    public sealed class LabApp : MonoBehaviour
+    public sealed partial class LabApp : MonoBehaviour
     {
         [Header("Assets")] public LabAssets Assets;
         [Header("Workshop")] public Transform DisplayPoint;
@@ -107,6 +107,7 @@ namespace ImpossibleLab
             Design = Proxy.Enabled && !verify ? new FallbackDesignService(new ProxyDesignService(Proxy), OfflineDesign) : OfflineDesign;
             Debug.Log($"[ILAB] design service = {Design.DisplayName} url={Proxy.Url}");
             Repo = new InventionRepository(Application.persistentDataPath);
+            InitLibrary();
             // 保存した発明の一覧を起動中（読み込みの間）に一度読んでおく。初めて一覧を開いたときに 0.17 秒止まらないように
             try { Repo.List(); } catch (Exception e) { Debug.LogWarning("[ILAB] gallery warmup failed: " + e.Message); }
             Sm.Changed += (a, b) => Notify();
@@ -489,11 +490,12 @@ namespace ImpossibleLab
 
         async void PingProxy()
         {
-            if (_pinging || Proxy == null || !Proxy.Enabled) return;
+            if (_pinging || VerifyHoldsPc || Proxy == null || !Proxy.Enabled) return;
             _pinging = true;
             bool ok = await new ProxyDesignService(Proxy).PingAsync();
             _pinging = false;
             if (ProxyOnline != ok) { ProxyOnline = ok; Debug.Log("[ILAB] proxy online=" + ok); Notify(); }
+            if (ok && !MineLoaded) RefreshMine(); // PC とつながったら、公開の状態と採用の知らせを一度読む
         }
 
         // ================= 発明台の上で試作品を回して眺める =================

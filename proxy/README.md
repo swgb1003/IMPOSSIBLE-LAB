@@ -66,7 +66,7 @@ Quest で公開した発明を PC の中のサイトに載せ、研究者・開�
 | GET | `/library/:id`・`/library/:id/model.glb`・`/library/:id/images/<0〜3>.jpg` | だれでも | 1件の公開データと 3D と写真 |
 | POST | `/library/:id/consider`・`/adopt` | サイト | 検討中・採用（`{accountId}`・`{accountId, reason}`。理由は必須） |
 | GET・POST | `/accounts`、GET `/accounts/:id` | サイト | 研究者・開発者の登録と一覧 |
-| GET | `/creators/:publicId` | サイト | 発案者のページ（表示名で公開したものだけ） |
+| GET | `/creators`・`/creators/:publicId` | サイト | 表示名で公開している発案者の一覧（名乗りに使う）と、発案者のページ（表示名で公開したものだけ） |
 | GET | `/threads`・`/threads/:id`、POST `/threads/:id/messages` | Quest・サイト | 採用した人と発案者のやりとり（2人だけ） |
 | GET | `/admin/library`、POST `/admin/accounts/:id/verify`・`/admin/library/:id/takedown` | サイト | 運営（確認済みの印・取り下げ） |
 
@@ -75,8 +75,9 @@ Quest で公開した発明を PC の中のサイトに載せ、研究者・開�
 - 公開データの形は `src/library/schema.ts`（知らない欄は捨てる、文字数と数の上限、同意の版 `2026-11-25`）。GLB は見出しと JSON の区切りを確かめ、1MB まで。
 - URL には ID だけを入れる（ログに URL が出るため）。依頼文・やりとりの本文はログに書かない。
 - 書き込みは 10 分あたり 600 回まで（AI の回数制限とは別）。
-- サイトの画面は `http://127.0.0.1:8787/`（`site/`。three.js は `node_modules/three` から出す）。
-- **見本を入れる**：Unity の通し検証が `Logs/verify/library/<発明ID>/` に公開データ・3D・写真を書き出す。`npm run samples` でそれを形を確かめてからライブラリに公開し（見本の印つき、何度入れても増えない）、サイトがライブラリにつながらないときに読む見本のファイル（`site/sample/`）も作り直す。
+- サイトの画面は `http://127.0.0.1:8787/`（`site/`。three.js は `node_modules/three` から出す）。一覧・1件のページ・研究者と開発者（登録と名乗り）・やりとり・発案者・運営（`admin.html`、帯には出さず終わりのリンクから）・利用規約。名乗りはブラウザに残すだけで、パスワードは無い。
+- **Quest から送る本文を確かめる**：通し検証が保存の画面から公開したときの本文を `Logs/verify/library-publish-body.json` に残す。`npm run check-publish` で PC 側の形と中身（GLB・写真）の確かめに通るかを見る。
+- **見本を入れる**：Unity の通し検証が `Logs/verify/library/<発明ID>/` に公開データ・3D・写真を書き出す。`npm run samples` でそれを形を確かめてからライブラリに公開し（見本の印つき、表示名は「見本の発案者」、何度入れても増えない）、見本の研究者・開発者 3 人も入れ、サイトがライブラリにつながらないときに読む見本のファイル（`site/sample/`）も作り直す。
 
 ## アプリ側の接続先を変える
 

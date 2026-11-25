@@ -419,3 +419,51 @@ test("contract: a publication built by the app passes the library schema", () =>
   assert.equal(s.before?.revision, 1);
   assert.equal(s.after.revision, 3);
 });
+
+test("accounts list carries adoption counts; creators list only named, live creators", () => {
+  const { store } = freshStore();
+  const named = store.publish(KEY_A, pub({ id: "n1", displayName: "あおい" }), tinyGlb()).id;
+  store.publish(KEY_B, pub({ id: "a1", anonymous: true }), tinyGlb());
+  const res = store.createAccount({ name: "山田", affiliation: "大学", role: "researcher", field: "", intro: "" });
+  assert.equal(store.listAccounts()[0].adoptions, 0);
+  store.adopt(named, res.id, "研究に使える");
+  assert.equal(store.listAccounts()[0].adoptions, 1);
+  assert.deepEqual(store.listCreators(), [{ publicId: publicCreatorId(creatorHashOf(KEY_A)), name: "あおい", published: 1 }]);
+  // 取り下げた発明は、採用の数にも発案者の一覧にも入らない
+  store.withdraw(named, KEY_A);
+  assert.equal(store.listAccounts()[0].adoptions, 0);
+  assert.deepEqual(store.listCreators(), []);
+});
+
+test("samples: loaded under a named sample creator, sample accounts are added once", async () => {
+  const { loadSamples, loadSampleAccounts, SAMPLE_ACCOUNTS, SAMPLE_CREATOR_NAME } = await import("../tools/load-samples.ts");
+  const { mkdirSync, writeFileSync } = await import("node:fs");
+  const from = mkdtempSync(path.join(tmpdir(), "ilab-samples-"));
+  const dir = path.join(from, "inv-handsfree-rain");
+  mkdirSync(dir);
+  writeFileSync(path.join(dir, "publication.json"), readFileSync(path.join(import.meta.dirname, "fixtures", "publication-rain.json")));
+  writeFileSync(path.join(dir, "model.glb"), tinyGlb());
+  const { store } = freshStore();
+  const [id] = loadSamples(from, store);
+  assert.equal(store.get(id).creator.name, SAMPLE_CREATOR_NAME);
+  assert.equal(store.get(id).sample, true);
+  assert.equal(loadSamples(from, store)[0], id, "入れ直しても増えない");
+  loadSampleAccounts(store);
+  loadSampleAccounts(store);
+  const accounts = store.listAccounts();
+  assert.equal(accounts.length, SAMPLE_ACCOUNTS.length, "何度入れても増えない");
+  assert.ok(accounts.every((a) => a.sample));
+  assert.deepEqual(accounts.map((a) => a.verified), SAMPLE_ACCOUNTS.map((a) => a.verified));
+});
+
+test("http: the site lists named creators to choose from", async () => {
+  await withServer(async (base) => {
+    await post(base, "/library", { publication: publication(), glbBase64: tinyGlb().toString("base64") }, { "x-ilab-creator": KEY_A });
+    const r = await fetch(base + "/creators");
+    assert.equal(r.status, 200);
+    const { items } = await r.json() as { items: { name: string; publicId: string }[] };
+    assert.deepEqual(items.map((c) => c.name), ["あおい"]);
+    const page = await (await fetch(`${base}/creators/${items[0].publicId}`)).json() as { displayName: string };
+    assert.equal(page.displayName, "あおい");
+  });
+});
