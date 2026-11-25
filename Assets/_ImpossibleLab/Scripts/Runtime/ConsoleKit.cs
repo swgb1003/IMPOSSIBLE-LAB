@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace ImpossibleLab
@@ -13,6 +14,8 @@ namespace ImpossibleLab
     /// 輪の計器コンソールの部品（docs/design/console6.js の Unity 版）。
     /// 座標は設計図と同じ 1600×900、左上が原点。文字の y は基線（ベースライン）。
     /// 重なりの順：図形 → 押せる部品 → 明滅する図形 → 文字。
+    /// 部品は作り直しのたびに捨てずに使い回す（<see cref="Clear"/> で使い始め、<see cref="Finish"/> で余りを隠す）。
+    /// Quest では、画面を変えるたびに数百個の部品を作って壊すと 0.1〜0.3 秒止まるため。
     /// </summary>
     public sealed class ConsoleLayer
     {
@@ -28,6 +31,36 @@ namespace ImpossibleLab
         public VecGraphic Ghost { get; private set; }
         readonly RectTransform _fx, _hits, _texts;
 
+        /// <summary>使い回す部品の置き場。種類ごとに、作った順に並べておき、前から順に使う。</summary>
+        sealed class Pool<T> where T : class
+        {
+            readonly Transform _parent;
+            readonly System.Func<Transform, T> _create;
+            readonly System.Func<T, GameObject> _go;
+            readonly List<T> _items = new List<T>();
+            int _used;
+            public Pool(Transform parent, System.Func<Transform, T> create, System.Func<T, GameObject> go) { _parent = parent; _create = create; _go = go; }
+            public void Begin() => _used = 0;
+            public T Take()
+            {
+                T it;
+                if (_used < _items.Count) { it = _items[_used]; var g = _go(it); if (!g.activeSelf) g.SetActive(true); }
+                else { it = _create(_parent); _items.Add(it); }
+                _used++;
+                return it;
+            }
+            public void End() { for (int i = _used; i < _items.Count; i++) { var g = _go(_items[i]); if (g.activeSelf) g.SetActive(false); } }
+        }
+
+        sealed class BtnSlot { public VecGraphic G; public Button B; public TextMeshProUGUI Label; }
+        sealed class HitSlot { public Image I; public Button B; }
+
+        readonly Pool<TextMeshProUGUI> _textPool;
+        readonly Pool<BtnSlot> _btnPool, _triPool;
+        readonly Pool<HitSlot> _hitPool;
+        readonly Pool<TMP_InputField> _inputPool;
+        readonly Pool<VecGraphic> _fxPool;
+
         public ConsoleLayer(Transform parent)
         {
             Root = UiKit.Rect("Console", parent); UiKit.Stretch(Root);
@@ -38,12 +71,97 @@ namespace ImpossibleLab
             Ghost = NewGraphic("Ghost", Root);
             Ghost.gameObject.AddComponent<ConsolePulse>();
             _texts = UiKit.Rect("Texts", Root); UiKit.Stretch(_texts);
+
+            // 押せる部品は種類ごとの入れ物に分ける。重なったときは後の入れ物が上（行の当たり判定 → ボタン → 三角 → 入力欄）
+            var rows = UiKit.Rect("Rows", _hits); UiKit.Stretch(rows);
+            var btns = UiKit.Rect("Buttons", _hits); UiKit.Stretch(btns);
+            var tris = UiKit.Rect("Tris", _hits); UiKit.Stretch(tris);
+            var inputs = UiKit.Rect("Inputs", _hits); UiKit.Stretch(inputs);
+
+            _textPool = new Pool<TextMeshProUGUI>(_texts, tr => UiKit.Text(tr, "", LabTheme.ConMinFont, LabTheme.ConInk), t => t.gameObject);
+            _btnPool = new Pool<BtnSlot>(btns, tr =>
+            {
+                var g = NewGraphic("Btn", tr, raycast: true);
+                var b = g.gameObject.AddComponent<Button>();
+                var t = UiKit.Text(g.transform, "", LabTheme.ConMinFont, LabTheme.ConInk, bold: true, align: TextAlignmentOptions.Center, name: "Label");
+                t.textWrappingMode = TextWrappingModes.NoWrap;
+                UiKit.Stretch(t.rectTransform, 12f, 12f, 0f, 0f);
+                return new BtnSlot { G = g, B = b, Label = t };
+            }, x => x.G.gameObject);
+            _triPool = new Pool<BtnSlot>(tris, tr =>
+            {
+                var g = NewGraphic("Tri", tr, raycast: true);
+                return new BtnSlot { G = g, B = g.gameObject.AddComponent<Button>() };
+            }, x => x.G.gameObject);
+            _hitPool = new Pool<HitSlot>(rows, tr =>
+            {
+                var img = UiKit.Image("Hit", tr, LabTheme.ConCy, raycast: true);
+                var btn = img.gameObject.AddComponent<Button>();
+                btn.targetGraphic = img;
+                var cb = btn.colors;
+                cb.normalColor = new Color(1f, 1f, 1f, 0f);
+                cb.highlightedColor = VecGraphic.Soft(Color.white, 0.09f);
+                cb.selectedColor = cb.normalColor;
+                cb.pressedColor = VecGraphic.Soft(Color.white, 0.18f);
+                cb.disabledColor = cb.normalColor;
+                cb.colorMultiplier = 1f; cb.fadeDuration = 0.08f;
+                btn.colors = cb;
+                return new HitSlot { I = img, B = btn };
+            }, x => x.I.gameObject);
+            _inputPool = new Pool<TMP_InputField>(inputs, tr =>
+            {
+                var input = UiKit.Input(tr, "", 0, null);
+                input.GetComponent<Image>().color = LabTheme.ConWell;
+                input.pointSize = 20f;
+                input.textComponent.fontSize = 20f; input.textComponent.color = LabTheme.ConInk;
+                if (input.placeholder is TMP_Text ph) { ph.fontSize = 19f; ph.color = LabTheme.ConMut; ph.fontStyle = FontStyles.Normal; ph.alpha = 1f; }
+                var area = input.textViewport; if (area != null) UiKit.Stretch(area, 14f, 14f, 4f, 4f);
+                return input;
+            }, x => x.gameObject);
+            _fxPool = new Pool<VecGraphic>(_fx, tr => NewGraphic("LiveArc", tr), x => x.gameObject);
         }
 
+        // 真ん中の列に置く画像（試作品の立体の写し）。図形の上、押せる部品と文字の下。触れて動かすと drag に動いた量（px）を渡す
+        RawImage _winImg;
+        ConsoleDrag _winDrag;
+        bool _winUsed;
+
+        /// <summary>設計図の座標の四角に画像を置く。押したまま動かすと、動いた量（px・右と上が正）を drag に渡す。</summary>
+        public void Window(Texture tex, float x, float y, float w, float h, System.Action<Vector2> drag)
+        {
+            if (_winImg == null)
+            {
+                _winImg = new GameObject("Window", typeof(RectTransform), typeof(RawImage)).GetComponent<RawImage>();
+                _winImg.transform.SetParent(Root, false);
+                _winImg.transform.SetSiblingIndex(G.transform.GetSiblingIndex() + 1);
+                _winImg.raycastTarget = true;
+                _winDrag = _winImg.gameObject.AddComponent<ConsoleDrag>();
+            }
+            _winUsed = true;
+            if (!_winImg.gameObject.activeSelf) _winImg.gameObject.SetActive(true);
+            Place(_winImg.rectTransform, x, y, w, h);
+            if (_winImg.texture != tex) _winImg.texture = tex;
+            _winDrag.Moved = drag;
+        }
+
+        /// <summary>作り直しを始める。部品は消さずに、前から順に使い直す。</summary>
         public void Clear()
         {
-            G.ClearShapes(); Ghost.ClearShapes();
-            UiKit.Clear(_fx); UiKit.Clear(_hits); UiKit.Clear(_texts);
+            _winUsed = false;
+            G.BeginShapes(); Ghost.BeginShapes();
+            _textPool.Begin(); _btnPool.Begin(); _triPool.Begin(); _hitPool.Begin(); _inputPool.Begin(); _fxPool.Begin();
+            // 押したボタンが選ばれたまま別の場所で使い直されると色が残るので、選択を外す（入力中の欄はそのまま）
+            var es = EventSystem.current;
+            var sel = es != null ? es.currentSelectedGameObject : null;
+            if (sel != null && sel.GetComponent<TMP_InputField>() == null && sel.transform.IsChildOf(Root)) es.SetSelectedGameObject(null);
+        }
+
+        /// <summary>作り直しの終わり。使わなかった部品を隠し、図形が前と違うときだけ描き直す。</summary>
+        public void Finish()
+        {
+            _textPool.End(); _btnPool.End(); _triPool.End(); _hitPool.End(); _inputPool.End(); _fxPool.End();
+            if (_winImg != null && _winImg.gameObject.activeSelf != _winUsed) _winImg.gameObject.SetActive(_winUsed);
+            G.EndShapes(); Ghost.EndShapes();
         }
 
         static VecGraphic NewGraphic(string name, Transform parent, bool raycast = false)
@@ -71,15 +189,32 @@ namespace ImpossibleLab
         public TextMeshProUGUI T(float x, float y, string text, float size = 18f, Color? fill = null, bool bold = false, int anchor = -1, bool halo = false)
         {
             size = Mathf.Max(size, LabTheme.ConMinFont);
-            var t = UiKit.Text(_texts, text, size, fill ?? LabTheme.ConInk, bold,
-                anchor < 0 ? TextAlignmentOptions.BaselineLeft : anchor == 0 ? TextAlignmentOptions.Baseline : TextAlignmentOptions.BaselineRight);
+            var t = NewText(text, size, fill ?? LabTheme.ConInk, bold,
+                anchor < 0 ? TextAlignmentOptions.BaselineLeft : anchor == 0 ? TextAlignmentOptions.Baseline : TextAlignmentOptions.BaselineRight, halo);
             t.textWrappingMode = TextWrappingModes.NoWrap;
+            t.overflowMode = TextOverflowModes.Overflow;
             var rt = t.rectTransform;
             rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
             rt.pivot = new Vector2(anchor < 0 ? 0f : anchor == 0 ? 0.5f : 1f, 0.5f);
             rt.sizeDelta = new Vector2(8f, size * 1.4f);
             rt.anchoredPosition = new Vector2(x, -y);
-            if (halo) { var m = Halo(t.font); if (m != null) t.fontSharedMaterial = m; }
+            return t;
+        }
+
+        /// <summary>使い回す文字の部品を取り出し、前に使ったときの設定を全部入れ直す（同じ値なら TMP は作り直さない）。</summary>
+        TextMeshProUGUI NewText(string text, float size, Color color, bool bold, TextAlignmentOptions align, bool halo)
+        {
+            var t = _textPool.Take();
+            var font = bold && LabTheme.FontBold != null ? LabTheme.FontBold : LabTheme.Font;
+            t.font = font;
+            var mat = halo ? Halo(font) : null;
+            if (font != null) t.fontSharedMaterial = mat != null ? mat : font.material;
+            t.fontSize = size;
+            t.fontStyle = FontStyles.Normal;
+            t.characterSpacing = 0f;
+            t.color = color;
+            t.alignment = align;
+            t.text = text ?? "";
             return t;
         }
 
@@ -97,7 +232,8 @@ namespace ImpossibleLab
         public TextMeshProUGUI TBox(float x, float y, float w, float h, string text, float size = 17f, Color? fill = null, bool bold = false)
         {
             size = Mathf.Max(size, LabTheme.ConMinFont);
-            var t = UiKit.Text(_texts, text, size, fill ?? LabTheme.ConInk, bold, TextAlignmentOptions.TopLeft);
+            var t = NewText(text, size, fill ?? LabTheme.ConInk, bold, TextAlignmentOptions.TopLeft, false);
+            t.textWrappingMode = TextWrappingModes.Normal;
             t.overflowMode = TextOverflowModes.Ellipsis;
             Place(t.rectTransform, x, y, w, h);
             return t;
@@ -136,27 +272,33 @@ namespace ImpossibleLab
             cb.colorMultiplier = 1f; cb.fadeDuration = 0.08f;
             b.colors = cb;
             b.interactable = enabled;
+            b.onClick.RemoveAllListeners();
             b.onClick.AddListener(UiKit.NotifyClick);
         }
 
         /// <summary>斜めのボタン。</summary>
         public Button Button(float x, float y, float w, float h, string label, UnityAction onClick, ConKind kind = ConKind.Normal, float size = 20f, bool enabled = true)
         {
-            var g = NewGraphic("Btn_" + UiKit.Sanitize(label), _hits, raycast: true);
+            var slot = _btnPool.Take();
+            var g = slot.G;
+            g.name = "Btn_" + UiKit.Sanitize(label);
             Place(g.rectTransform, x, y, w, h);
             Color fill = kind == ConKind.Primary ? LabTheme.ConCy : kind == ConKind.Warm ? LabTheme.ConOr : kind == ConKind.On ? LabTheme.ConCyDeep : LabTheme.ConPlate2;
             Color stroke = kind == ConKind.Primary || kind == ConKind.On ? LabTheme.ConCy : kind == ConKind.Warm ? LabTheme.ConOr : kind == ConKind.Quiet ? LabTheme.ConEdgeHi : LabTheme.ConCyDim;
             var pts = VecGraphic.Slant(1f, 1f, w - 2f, h - 2f, 12f);
+            g.BeginShapes();
             g.Poly(fill, pts);
             g.PolyLine(2f, stroke, true, pts);
+            g.EndShapes();
             if (kind == ConKind.Primary && enabled) G.Glow(LabTheme.ConCy, VecGraphic.Slant(x + 1f, y + 1f, w - 2f, h - 2f, 12f));
-            var btn = g.gameObject.AddComponent<Button>();
+            var btn = slot.B;
             Tint(btn, g, enabled);
             if (onClick != null) btn.onClick.AddListener(onClick);
             Color ink = kind == ConKind.Primary || kind == ConKind.Warm ? LabTheme.ConOnCy : kind == ConKind.Quiet ? LabTheme.ConMut : LabTheme.ConInk;
-            var t = UiKit.Text(g.transform, label, Mathf.Max(size, LabTheme.ConMinFont), ink, bold: true, align: TextAlignmentOptions.Center, name: "Label");
-            t.textWrappingMode = TextWrappingModes.NoWrap;
-            UiKit.Stretch(t.rectTransform, 12f, 12f, 0f, 0f);
+            var t = slot.Label;
+            t.text = label ?? "";
+            t.fontSize = Mathf.Max(size, LabTheme.ConMinFont);
+            t.color = ink;
             if (!enabled) t.alpha = 0.45f;
             return btn;
         }
@@ -164,14 +306,18 @@ namespace ImpossibleLab
         /// <summary>三角のスイッチ（48×48 の当たり判定）。dir：-1 左向き、+1 右向き。</summary>
         public Button Tri(float x, float y, int dir, UnityAction onClick, bool sel = false, bool enabled = true, string name = "Tri")
         {
-            var g = NewGraphic(name + (dir < 0 ? "_Prev" : "_Next"), _hits, raycast: true);
+            var slot = _triPool.Take();
+            var g = slot.G;
+            g.name = name + (dir < 0 ? "_Prev" : "_Next");
             Place(g.rectTransform, x, y, 48f, 48f);
             var pts = dir < 0
                 ? new[] { new Vector2(36f, 8f), new Vector2(36f, 40f), new Vector2(10f, 24f) }
                 : new[] { new Vector2(12f, 8f), new Vector2(12f, 40f), new Vector2(38f, 24f) };
+            g.BeginShapes();
             g.Poly(LabTheme.ConPlate2, pts);
             g.PolyLine(2f, sel ? LabTheme.ConOr : LabTheme.ConCy, true, pts);
-            var btn = g.gameObject.AddComponent<Button>();
+            g.EndShapes();
+            var btn = slot.B;
             Tint(btn, g, enabled);
             if (onClick != null) btn.onClick.AddListener(onClick);
             return btn;
@@ -180,18 +326,12 @@ namespace ImpossibleLab
         /// <summary>見えない当たり判定（行・チップ）。レイを当てると薄く明るくなる。</summary>
         public Button Hit(float x, float y, float w, float h, UnityAction onClick, string name = "Hit")
         {
-            var img = UiKit.Image(name, _hits, LabTheme.ConCy, raycast: true);
-            Place(img.rectTransform, x, y, w, h);
-            var btn = img.gameObject.AddComponent<Button>();
-            btn.targetGraphic = img;
-            var cb = btn.colors;
-            cb.normalColor = new Color(1f, 1f, 1f, 0f);
-            cb.highlightedColor = VecGraphic.Soft(Color.white, 0.09f);
-            cb.selectedColor = cb.normalColor;
-            cb.pressedColor = VecGraphic.Soft(Color.white, 0.18f);
-            cb.disabledColor = cb.normalColor;
-            cb.colorMultiplier = 1f; cb.fadeDuration = 0.08f;
-            btn.colors = cb;
+            var slot = _hitPool.Take();
+            slot.I.name = name;
+            Place(slot.I.rectTransform, x, y, w, h);
+            var btn = slot.B;
+            btn.interactable = true;
+            btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(UiKit.NotifyClick);
             if (onClick != null) btn.onClick.AddListener(onClick);
             return btn;
@@ -200,15 +340,14 @@ namespace ImpossibleLab
         /// <summary>入力欄（黒いくぼみ）。</summary>
         public TMP_InputField Input(float x, float y, float w, float h, string placeholder, int limit, System.Action<string> onChanged, bool strong = false)
         {
-            var input = UiKit.Input(_hits, placeholder, limit, onChanged);
+            var input = _inputPool.Take();
             Place((RectTransform)input.transform, x, y, w, h);
-            input.GetComponent<Image>().color = LabTheme.ConWell;
+            input.characterLimit = limit;
+            input.onValueChanged.RemoveAllListeners();
+            if (onChanged != null) input.onValueChanged.AddListener(v => onChanged(v));
+            if (input.placeholder is TMP_Text ph) ph.text = placeholder ?? "";
             var o = input.GetComponent<Outline>();
             if (o != null) { o.effectColor = strong ? LabTheme.ConCy : LabTheme.ConCyDim; o.effectDistance = new Vector2(1.5f, -1.5f); }
-            input.pointSize = 20f;
-            input.textComponent.fontSize = 20f; input.textComponent.color = LabTheme.ConInk;
-            if (input.placeholder is TMP_Text ph) { ph.fontSize = 19f; ph.color = LabTheme.ConMut; ph.fontStyle = FontStyles.Normal; ph.alpha = 1f; }
-            var area = input.textViewport; if (area != null) UiKit.Stretch(area, 14f, 14f, 4f, 4f);
             return input;
         }
 
@@ -319,7 +458,7 @@ namespace ImpossibleLab
         }
 
         /// <summary>動いている間だけ描き直す弧（実験の経過）。<see cref="SetLive"/> で進み具合を入れる。</summary>
-        public VecGraphic LiveArc() => NewGraphic("LiveArc", _fx);
+        public VecGraphic LiveArc() { var g = _fxPool.Take(); g.ClearShapes(); return g; }
 
         public static void SetLive(VecGraphic g, float fraction)
         {
@@ -357,5 +496,35 @@ namespace ImpossibleLab
             if (dashed) G.DashedCircle(C, radiusPx, 3f, LabTheme.ConCy, 10f / radiusPx * Mathf.Rad2Deg, 8f / radiusPx * Mathf.Rad2Deg);
             else G.GlowArc(C, radiusPx, 3f, 0f, 360f, LabTheme.ConCy);
         }
+    }
+
+    /// <summary>
+    /// 押したまま動かした量を、画像の上の距離（px）で知らせる。コントローラーの光線でもマウスでも同じ。
+    /// 光線が当たっている点（ワールド座標）を画像の座標に直して差を取る（当たっていない間は数えない）。
+    /// </summary>
+    public sealed class ConsoleDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        public System.Action<Vector2> Moved;
+        Vector2? _last;
+
+        Vector2? Local(PointerEventData e)
+        {
+            var hit = e.pointerCurrentRaycast;
+            // 同じ板の上に当たっているときだけ（隣の板に移ると、面が違うので差が飛ぶ）
+            var canvas = GetComponentInParent<Canvas>();
+            if (hit.gameObject == null || canvas == null || !hit.gameObject.transform.IsChildOf(canvas.rootCanvas.transform)) return null;
+            return transform.InverseTransformPoint(hit.worldPosition);
+        }
+
+        public void OnBeginDrag(PointerEventData e) => _last = Local(e);
+
+        public void OnDrag(PointerEventData e)
+        {
+            var p = Local(e);
+            if (p.HasValue && _last.HasValue) Moved?.Invoke(p.Value - _last.Value);
+            if (p.HasValue) _last = p;
+        }
+
+        public void OnEndDrag(PointerEventData e) => _last = null;
     }
 }

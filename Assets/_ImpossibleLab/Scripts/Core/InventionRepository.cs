@@ -64,6 +64,11 @@ namespace ImpossibleLab.Core
         public const int MaxExperiments = 50;
         readonly string _dir;
 
+        // 一覧の読み込み結果を、ファイルの更新時刻と大きさごとに覚えておく。
+        // 一覧を開くたびに全ファイル（履歴・実験記録つき）を読み直すと、Quest では 0.15 秒ほど止まるため。
+        sealed class Cached { public DateTime Time; public long Size; public GalleryEntry Entry; public string Error; }
+        readonly Dictionary<string, Cached> _listCache = new Dictionary<string, Cached>();
+
         public InventionRepository(string rootDirectory)
         {
             _dir = Path.Combine(rootDirectory, "inventions");
@@ -99,6 +104,7 @@ namespace ImpossibleLab.Core
             File.WriteAllText(tmp, root.ToString(Formatting.Indented));
             if (File.Exists(path)) File.Delete(path);
             File.Move(tmp, path);
+            _listCache.Remove(inv.Current.Id);
         }
 
         public SavedInvention Load(string id, out string error)
@@ -135,23 +141,42 @@ namespace ImpossibleLab.Core
         public List<GalleryEntry> List(List<string> skipped)
         {
             var list = new List<GalleryEntry>();
+            var seen = new HashSet<string>();
             foreach (var file in Directory.GetFiles(_dir, "*.json"))
             {
                 var id = Path.GetFileNameWithoutExtension(file);
                 if (!DnaJson.IsSafeId(id)) continue;
-                var inv = Load(id, out var err);
-                if (inv == null) { skipped?.Add($"{id}：{err}"); continue; }
-                list.Add(new GalleryEntry
+                seen.Add(id);
+                var info = new FileInfo(file);
+                if (!_listCache.TryGetValue(id, out var c) || c.Time != info.LastWriteTimeUtc || c.Size != info.Length)
                 {
-                    Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags), Tags = new List<string>(inv.Current.Tags), HasProgram = inv.Current.Program != null,
-                    Revision = inv.Current.Revision, UpdatedAt = inv.UpdatedAt, Tested = inv.Tested,
-                });
+                    c = new Cached { Time = info.LastWriteTimeUtc, Size = info.Length };
+                    var inv = Load(id, out var err);
+                    if (inv == null) c.Error = err;
+                    else c.Entry = new GalleryEntry
+                    {
+                        Id = inv.Current.Id, Name = inv.Current.Name, Category = inv.Current.Category, TagsJa = LabCatalog.TagsJa(inv.Current.Tags), Tags = new List<string>(inv.Current.Tags), HasProgram = inv.Current.Program != null,
+                        Revision = inv.Current.Revision, UpdatedAt = inv.UpdatedAt, Tested = inv.Tested,
+                    };
+                    _listCache[id] = c;
+                }
+                if (c.Entry == null) { skipped?.Add($"{id}：{c.Error}"); continue; }
+                list.Add(Copy(c.Entry));
             }
+            foreach (var gone in _listCache.Keys.Where(k => !seen.Contains(k)).ToList()) _listCache.Remove(gone);
             return list.OrderByDescending(e => e.UpdatedAt, StringComparer.Ordinal).ToList();
         }
 
+        // 呼び出し側が一覧の項目を書き換えても、覚えている結果が変わらないように写しを渡す
+        static GalleryEntry Copy(GalleryEntry e) => new GalleryEntry
+        {
+            Id = e.Id, Name = e.Name, Category = e.Category, UpdatedAt = e.UpdatedAt, TagsJa = e.TagsJa, Tags = new List<string>(e.Tags),
+            HasProgram = e.HasProgram, Revision = e.Revision, Tested = e.Tested,
+        };
+
         public bool Delete(string id)
         {
+            _listCache.Remove(id ?? "");
             string path;
             try { path = PathFor(id); } catch (ArgumentException) { return false; }
             if (!File.Exists(path)) return false;

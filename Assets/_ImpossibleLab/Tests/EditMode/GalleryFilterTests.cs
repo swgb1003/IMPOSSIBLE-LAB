@@ -50,5 +50,40 @@ namespace ImpossibleLab.Tests
             }
             finally { if (Directory.Exists(dir)) Directory.Delete(dir, true); }
         }
+
+        /// <summary>一覧は読み込み結果を覚えるが、保存・削除・ほかからの書き換え・壊れたファイルは次の一覧に反映する。</summary>
+        [Test] public void Repository_ListCache_FollowsChanges()
+        {
+            string dir = Path.Combine(Path.GetTempPath(), "ilab-test-" + System.Guid.NewGuid().ToString("N"));
+            try
+            {
+                var dna = DnaJson.Parse(Resources.Load<TextAsset>("ImpossibleLabSamples/back_heater").text).Dna;
+                var repo = new InventionRepository(dir);
+                repo.Save(new SavedInvention { Current = dna });
+                var first = repo.List().Single();
+                first.Tags.Clear(); first.Name = "書き換え";
+                Assert.AreEqual(dna.Name, repo.List().Single().Name, "渡した項目を書き換えても、覚えている結果は変わらない");
+                CollectionAssert.AreEqual(dna.Tags, repo.List().Single().Tags);
+
+                // 同じフォルダを使う別の保存先から書き換える（ファイルの時刻と大きさで気づく）
+                var other = new InventionRepository(dir);
+                var renamed = DnaJson.Parse(DnaJson.ToJObject(dna).ToString()).Dna;
+                renamed.Name = dna.Name + "（改良版）";
+                other.Save(new SavedInvention { Current = renamed });
+                Assert.AreEqual(renamed.Name, repo.List().Single().Name);
+
+                // 壊れたファイルは出さずに理由を返す
+                File.WriteAllText(Path.Combine(repo.DirectoryPath, "broken_one.json"), "{ not json");
+                var skipped = new List<string>();
+                Assert.AreEqual(1, repo.List(skipped).Count);
+                Assert.AreEqual(1, skipped.Count);
+                StringAssert.StartsWith("broken_one", skipped[0]);
+
+                Assert.IsTrue(repo.Delete(dna.Id));
+                File.Delete(Path.Combine(repo.DirectoryPath, "broken_one.json"));
+                Assert.AreEqual(0, repo.List().Count);
+            }
+            finally { if (Directory.Exists(dir)) Directory.Delete(dir, true); }
+        }
     }
 }

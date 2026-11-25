@@ -23,6 +23,8 @@ namespace ImpossibleLab
     public sealed class InventionBuilder
     {
         readonly LabAssets _assets;
+        /// <summary>下を濃い色に塗り分ける外装の部品 id（ProductLook）。</summary>
+        string _lowerShell;
         public InventionBuilder(LabAssets assets) { _assets = assets; }
 
         public BuildResult Build(InventionDna dna, Transform parent)
@@ -36,6 +38,7 @@ namespace ImpossibleLab
             root.transform.SetParent(parent, false);
             var view = root.AddComponent<InventionView>();
             view.Dna = report.Dna;
+            _lowerShell = ProductLook.Enabled ? ProductLook.LowerShell(report.Dna) : null;
 
             foreach (var part in report.Dna.Parts)
             {
@@ -44,6 +47,7 @@ namespace ImpossibleLab
                 go.transform.localPosition = part.Position;
                 view.Parts[part.Id] = go.transform;
             }
+            if (ProductLook.Enabled) ProductLook.AddDetails(view, report.Dna, _assets);
             BuildJoints(report.Dna, view);
 
             // 動作プログラム（仕様 28）：試用で同じインタプリタを動かす
@@ -198,14 +202,21 @@ namespace ImpossibleLab
             go.transform.localScale = scale;
             // 機能の色を飾りが持つキットでは、筐体は素材の色にする
             var surface = kit.HasAccent ? PartLook.Housing(part) : PartLook.Surface(part);
-            AddMesh(go, kit.Mesh, _assets.For(surface), PartLook.Tint(surface, part, dna.Appearance));
+            // 角の丸みを実寸で一定にする（飾りも同じ変形で筐体の面に沿わせる）。センサーのレンズは真円にする
+            bool fit = ProductLook.Enabled && ProductLook.Fits(kit.Key, shape);
+            bool cylinder = shape == "cylinder";
+            int? tint = PartLook.Tint(surface, part, dna.Appearance);
+            if (tint.HasValue && part.Id == _lowerShell) tint = ProductLook.Darker(tint.Value);
+            AddMesh(go, fit ? ProductLook.Fit(kit.Mesh, scale, cylinder) : kit.Mesh, _assets.For(surface), tint);
             var fn = PartLook.Surface(part);
+            bool roundLens = ProductLook.Enabled && part.Type == "sensor" && shape == "sphere";
             foreach (var x in kit.Extras)
             {
                 var child = new GameObject(x.Name);
                 child.transform.SetParent(go.transform, false);
                 bool functionColor = x.IsAccent && (fn == PartSurface.AccentBlue || fn == PartSurface.AccentOrange);
-                AddMesh(child, x.Mesh, functionColor ? _assets.For(fn) : x.Material, functionColor ? PartLook.Tint(fn, part, dna.Appearance) : null);
+                var mesh = fit ? ProductLook.Fit(x.Mesh, scale, cylinder) : roundLens && x.IsAccent ? ProductLook.Lens(x.Mesh, scale) : x.Mesh;
+                AddMesh(child, mesh, functionColor ? _assets.For(fn) : x.Material, functionColor ? PartLook.Tint(fn, part, dna.Appearance) : null);
             }
             if (part.Type == "sensor" && shape == "sphere" && kit.HasAccent && _assets.LensGlow != null) AddLensGlow(go.transform, scale);
             return go;

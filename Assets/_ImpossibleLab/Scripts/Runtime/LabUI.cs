@@ -72,12 +72,15 @@ namespace ImpossibleLab
         {
             var s = App.Sm.State;
             string screen = s == LabState.Idle || s == LabState.Drafting ? "S01" : s.ToString();
+            SyncExplain();
+            SyncZoom();
             var sb = new StringBuilder(screen);
             sb.Append('|').Append(App.InputWarning).Append('|').Append(App.Current?.Current.Revision).Append('|').Append(App.Current?.Current.Id).Append(App.Current?.Current.Appearance)
               .Append('|').Append(App.PendingRevision != null).Append(App.RevisionBusy).Append(App.RevisionMessage)
               .Append('|').Append(App.TestConfig.Describe()).Append('|').Append(App.PendingDeleteId).Append('|').Append(App.GalleryEntries.Count)
               .Append('|').Append(App.DeviceRunning).Append(App.InRainLab).Append(App.Seated).Append('|').Append(App.LastResult?.ExperimentId)
-              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage).Append('|').Append(App.Voice).Append(App.VoiceTarget).Append(App.ProxyOnline).Append(App.TrialPersonDistance).Append('|').Append(_selParam).Append(_tabL).Append(_tabR).Append(_planPage).Append(_galleryPick);
+              .Append('|').Append(string.Join(",", App.Stages.Values)).Append('|').Append(App.Current?.History.Count).Append('|').Append(App.CoefficientPage).Append('|').Append(_paramPage).Append('|').Append(App.PlanSignature).Append(_modulePage).Append('|').Append(_needPage).Append('|').Append(_galleryPage).Append('|').Append(App.SelectedPartIndex).Append(_galleryTag).Append(_s03Program).Append(_programPage).Append('|').Append(App.Voice).Append(App.VoiceTarget).Append(App.ProxyOnline).Append(App.TrialPersonDistance).Append('|').Append(_selParam).Append(_tabL).Append(_tabR).Append(_planPage).Append(_galleryPick)
+              .Append('|').Append(_explain).Append(_explainPart).Append(_explainNeedPage).Append(_zoom);
             return sb.ToString();
         }
 
@@ -138,7 +141,11 @@ namespace ImpossibleLab
             int added = GlyphCount() - glyphs0;
             if (sw.Elapsed.TotalMilliseconds > 20.0 || added > 0)
                 Debug.Log($"[ILAB] ui rebuild state={App.Sm.State} ms={sw.Elapsed.TotalMilliseconds:F0} glyphsAdded={added} glyphs={GlyphCount()}");
+            _rebuildFrame = Time.frameCount; _rebuildMs = sw.Elapsed.TotalMilliseconds;
         }
+
+        // 計測：作り直したフレームの全体の時間（文字のメッシュ・キャンバスのまとめ直しを含む。次のフレームで分かる）
+        int _rebuildFrame = -10; double _rebuildMs;
 
         static int GlyphCount() =>
             (LabTheme.Font != null ? LabTheme.Font.characterTable.Count : 0) + (LabTheme.FontBold != null ? LabTheme.FontBold.characterTable.Count : 0);
@@ -149,16 +156,72 @@ namespace ImpossibleLab
             string tabKey = StepIndex().ToString();
             if (tabKey != _tabFor) { _tabFor = tabKey; _tabL = 0; _tabR = 0; }
             _con.Clear();
-            switch (App.Sm.State)
+            _productShown = false;
+            try
             {
-                case LabState.Idle: case LabState.Drafting: case LabState.Cancelled: BuildC01(); break;
-                case LabState.GeneratingDesign: case LabState.AwaitingApproval: case LabState.Building: BuildC02(); break;
-                case LabState.Error: BuildCError(); break;
-                case LabState.Editing: BuildC03(); break;
-                case LabState.ConfiguringTest: if (ShowingCoefficients) BuildCCoefficients(); else BuildC04(); break;
-                case LabState.RunningTest: case LabState.ReviewingResult: BuildC05(); break;
-                case LabState.Saved: case LabState.Gallery: BuildC06(); break;
+                if (ExplainOverlay) { BuildC02Explain(App.Current.Current); return; }
+                switch (App.Sm.State)
+                {
+                    case LabState.Idle: case LabState.Drafting: case LabState.Cancelled: BuildC01(); break;
+                    case LabState.GeneratingDesign: case LabState.AwaitingApproval: case LabState.Building: BuildC02(); break;
+                    case LabState.Error: BuildCError(); break;
+                    case LabState.Editing: BuildC03(); break;
+                    case LabState.ConfiguringTest: if (ShowingCoefficients) BuildCCoefficients(); else BuildC04(); break;
+                    case LabState.RunningTest: case LabState.ReviewingResult: BuildC05(); break;
+                    case LabState.Saved: case LabState.Gallery: BuildC06(); break;
+                }
             }
+            finally
+            {
+                _con.Finish();
+                if (!_productShown && _product != null) _product.Hide();
+            }
+        }
+
+        // ---- 真ん中の列の試作品（編集の画面と製品の説明のページ）。部品を選ぶとその部品に寄る。押したまま動かすと回る ----
+        ProductPreview _product;
+        bool _productShown, _zoom;
+        string _zoomFor;
+        // 真ん中の列（左右の板のあいだ）。下は名前・実験の結果の大きい文字
+        const float ProductX = 500f, ProductY = 84f, ProductW = 600f, ProductH = 525f;
+        /// <summary>真ん中の試作品が、選んだ部品に寄っているか。</summary>
+        public bool ProductZoomed => _zoom;
+        /// <summary>真ん中の試作品（自動の確認で、撮る前に描かせるため）。</summary>
+        public ProductPreview Product => _product;
+        public void ShowWholeProduct() { _zoom = false; Refresh(); }
+        /// <summary>編集の画面の部品の矢印と同じ：選ぶ部品を dir だけ動かし、その部品に寄る。</summary>
+        public void StepPartAndZoom(int dir) => ZoomThen(() => App.StepSelectedPart(dir))();
+
+        /// <summary>画面か発明が変わったら、全体の表示に戻す。</summary>
+        void SyncZoom()
+        {
+            var s = App.Sm.State;
+            string key = s + "|" + _explain + "|" + App.Current?.Current.Id + "|" + (s == LabState.AwaitingApproval ? App.Preview?.Id : null);
+            if (key == _zoomFor) return;
+            _zoomFor = key;
+            _zoom = false;
+        }
+
+        /// <summary>部品を選ぶ・変える操作：その部品に寄ってから実行する。</summary>
+        UnityEngine.Events.UnityAction ZoomThen(UnityEngine.Events.UnityAction a) => () => { _zoom = true; a(); };
+
+        /// <summary>
+        /// 真ん中の列いっぱいに試作品の立体を出す（ゆっくり回る。押したまま動かすと手で回せる）。
+        /// 寄っているときは part 番の部品に寄り、「全体を見る」で戻す。写しを作れないときは真上からの図にする。
+        /// </summary>
+        void ConProduct(InventionDna dna, int part)
+        {
+            if (dna == null) return;
+            if (_product == null) _product = ProductPreview.Create(App.Assets);
+            _product.Show(dna, _zoom ? part : -1);
+            var c = _con;
+            if (!_product.Shown) { c.Dial(); ConTopView(dna, part); return; }
+            _productShown = true;
+            var p = _product;
+            c.Window(p.Texture, ProductX, ProductY, ProductW, ProductH, d => p.Orbit(d));
+            c.T(ProductX + 8f, ProductY + ProductH - 14f, "トリガーを押したまま動かすと回せます", 15f, LabTheme.ConMut, halo: true);
+            if (_zoom && part >= 0)
+                c.Button(ProductX + ProductW - 168f, ProductY + ProductH - 52f, 160f, 44f, "全体を見る", ShowWholeProduct, ConKind.Quiet, 16f);
         }
 
 
@@ -217,6 +280,51 @@ namespace ImpossibleLab
         public int NeedPage => _needPage;
         public void StepNeedPage(int dir) { _needPage = Mathf.Max(0, _needPage + dir); Refresh(); }
 
+        // ---- 製品の説明（設計ができてから承認するまでの最初のページ）：概要・しくみ・部品の役割 ----
+        bool _explain;
+        InventionDna _explainDna;
+        int _explainPart, _explainNeedPage;
+        const int ExplainNeedsPerPage = 3, ExplainPartWindow = 4;
+        /// <summary>製品の説明のページを出しているか（設計の確認の前のページ）。</summary>
+        public bool ExplainPage => _explain;
+        public int ExplainPart => _explainPart;
+        public void ShowExplain(bool on) { _explain = on; Refresh(); }
+        public void SelectExplainPart(int index) { _explainPart = Mathf.Max(0, index); _zoom = true; Refresh(); }
+        public void StepExplainNeedPage(int dir) { _explainNeedPage = Mathf.Max(0, _explainNeedPage + dir); Refresh(); }
+
+        // 承認したあとの画面（編集・結果・保存）からも開ける。開いた画面から移ったら閉じる
+        LabState _explainFrom;
+        static bool ExplainAfterApproval(LabState s) => s == LabState.Editing || s == LabState.ReviewingResult || s == LabState.Saved;
+        bool ExplainOverlay => _explain && ExplainAfterApproval(App.Sm.State) && App.Current != null;
+
+        /// <summary>今の画面（編集・結果・保存）から製品の説明を開く。編集で選んでいる部品から見せる。</summary>
+        public void OpenExplain()
+        {
+            if (!ExplainAfterApproval(App.Sm.State) || App.Current == null) return;
+            _explainFrom = App.Sm.State;
+            _explainPart = Mathf.Max(0, App.SelectedPartIndex); _explainNeedPage = 0;
+            _explain = true;
+            Refresh();
+        }
+
+        /// <summary>新しい設計が届いたら、製品の説明のページから見せる。</summary>
+        void SyncExplain()
+        {
+            var s = App.Sm.State;
+            if (s != LabState.AwaitingApproval)
+            {
+                if (_explain && s != _explainFrom) _explain = false;
+                _explainDna = null;
+                return;
+            }
+            _explainFrom = s;
+            var dna = App.Preview;
+            if (ReferenceEquals(dna, _explainDna)) return;
+            _explainDna = dna;
+            _explain = dna != null;
+            _explainPart = 0; _explainNeedPage = 0;
+        }
+
         // ---------------- S03 発明品編集 ----------------
         // 性能パラメータの表示ページ（AI設計ではパラメータが多く、1画面に収まらないため）
         int _paramPage;
@@ -254,6 +362,8 @@ namespace ImpossibleLab
         int _lastGlyphs = -1;
         void LateUpdate()
         {
+            if (Time.frameCount == _rebuildFrame + 1 && Time.unscaledDeltaTime * 1000f > 30f)
+                Debug.Log($"[ILAB] ui frame state={App.Sm.State} ms={Time.unscaledDeltaTime * 1000f:F0} build={_rebuildMs:F0}");
             int g = GlyphCount();
             if (_lastGlyphs >= 0 && g != _lastGlyphs)
                 Debug.Log($"[ILAB] glyphs added={g - _lastGlyphs} total={g} prevFrameMs={Time.unscaledDeltaTime * 1000f:F0} state={App.Sm.State}");

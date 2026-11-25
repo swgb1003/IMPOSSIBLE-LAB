@@ -115,6 +115,7 @@ namespace ImpossibleLab
             var s = App.Sm.State;
             var dna = s == LabState.AwaitingApproval ? App.Preview : App.Current?.Current ?? App.Preview;
             if (s == LabState.GeneratingDesign) dna = null;
+            if (s == LabState.AwaitingApproval && _explain && dna != null) { BuildC02Explain(dna); return; }
 
             c.Dial();
             // 外周：設計の進み（段階ごとの区画）
@@ -213,10 +214,96 @@ namespace ImpossibleLab
             else if (s == LabState.AwaitingApproval)
             {
                 left.Add(new ConBtn("指示に戻る", App.BackToDraft, ConKind.Quiet, 150f));
+                left.Add(new ConBtn("製品の説明", () => ShowExplain(true), ConKind.Quiet, 160f));
                 left.Add(new ConBtn("作り直す", App.Regenerate));
                 primary = new ConBtn("承認して組み立てる", App.ApprovePreview, ConKind.Primary, 330f);
             }
             ConFrame(left, primary);
+        }
+
+        /// <summary>
+        /// 製品の説明：左に概要としくみ（要望ごとに、どの部品が何をするか）、右に部品の役割。部品を選ぶと上から見た図でオレンジに光る。
+        /// 設計に説明が無い（見本・古い保存データ・AI を使わない設計）ときは、部品と機能の対応から作った文であることを示す。
+        /// </summary>
+        void BuildC02Explain(InventionDna dna)
+        {
+            var c = _con;
+            const float LX = ConsoleLayer.LX, PW = ConsoleLayer.PW, RX = ConsoleLayer.RX;
+            int n = dna.Parts.Count;
+            _explainPart = Mathf.Clamp(_explainPart, 0, Mathf.Max(0, n - 1));
+
+            ConProduct(dna, _explainPart);
+            c.BigWord(ConsoleLayer.Fit(dna.Name, 14), _zoom ? "オレンジの枠が、右で選んでいる部品" : "右で部品を選ぶと、その部品に寄ります", LabTheme.ConInk);
+
+            // しくみ（要望ごとに、どの部品が何をするか）。設計に対応表が無いときは機能ごとの行から作る
+            var rows = App.FunctionRows(dna, out bool rowsDerived);
+            var needs = rows.Select((r, i) => !rowsDerived && i < dna.FunctionMap.Count ? dna.FunctionMap[i]
+                : new FunctionNeed { Need = r.Need, Blocks = new List<string>(r.Blocks), Status = r.Status, Note = r.Note }).ToList();
+            // 左上：製品の概要（しくみが定型文なら、そのことを下に書く）
+            var ov = ProductExplain.Overview(dna);
+            bool howDerived = needs.Any(nd => ProductExplain.How(dna, nd).Derived);
+            c.Plate(LX, 78f, PW, 214f, "製品の概要");
+            ConParas(48f, 128f, 414f, howDerived ? 258f : 280f, new[] { (ov.Derived ? "（説明がありません）" : ov.Value, LabTheme.ConInk) }, 18f);
+            if (howDerived) c.T(48f, 280f, "説明がないため、しくみは部品と機能から作った文です", 15f, LabTheme.ConMut);
+
+            // 左下：しくみ
+            int pages = Mathf.Max(1, (needs.Count + ExplainNeedsPerPage - 1) / ExplainNeedsPerPage);
+            _explainNeedPage = Mathf.Clamp(_explainNeedPage, 0, pages - 1);
+            c.Plate(LX, 304f, PW, 444f, "しくみ");
+            ConPager(LX, _explainNeedPage, pages, () => StepExplainNeedPage(-1), () => StepExplainNeedPage(+1), PW, 304f);
+            float y = 356f;
+            if (needs.Count == 0) c.T(48f, y + 24f, "要望の対応表がありません", 17f, LabTheme.ConMut);
+            foreach (var need in needs.Skip(_explainNeedPage * ExplainNeedsPerPage).Take(ExplainNeedsPerPage))
+            {
+                var how = ProductExplain.How(dna, need);
+                Color col = need.Status == "simulated" ? LabTheme.ConCy : need.Status == "unverifiable" ? LabTheme.ConMut : LabTheme.ConInk;
+                c.G.Rect(LX + 8f, y, PW - 16f, 124f, VecGraphic.Soft(LabTheme.ConCy, 0.05f));
+                c.TLine(LX + 24f, y + 28f, 280f, need.Need, 18f, bold: true);
+                c.T(LX + PW - 24f, y + 28f, ProductExplain.StatusLabel(need.Status), 16f, col, bold: true, anchor: 1);
+                c.TBox(LX + 24f, y + 42f, 406f, 78f, how.Value, 16f, LabTheme.ConMut);
+                y += 128f;
+            }
+
+            // 右：部品の役割（選ぶと上から見た図で光る）
+            c.Plate(RX, 78f, PW, 670f, "部品の役割", n > 0 ? $"{_explainPart + 1} / {n} 点" : "0 点");
+            if (n > ExplainPartWindow)
+            {
+                c.Tri(RX + 232f, 86f, -1, () => SelectExplainPart(_explainPart - 1), enabled: _explainPart > 0, name: "Part");
+                c.Tri(RX + 282f, 86f, +1, () => SelectExplainPart(_explainPart + 1), enabled: _explainPart < n - 1, name: "Part");
+            }
+            int start = Mathf.Clamp(_explainPart - 1, 0, Mathf.Max(0, n - ExplainPartWindow));
+            for (int i = start; i < Mathf.Min(n, start + ExplainPartWindow); i++)
+            {
+                var p = dna.Parts[i]; int idx = i;
+                c.Row(RX, 128f + (i - start) * 58f, PW, 56f, LabCatalog.Part(p.Type)?.LabelJa ?? p.Type, PartNames.WithJa(p.Id),
+                    null, sel: i == _explainPart, onClick: () => SelectExplainPart(idx), name: "ExplainPart");
+            }
+            if (n > 0)
+            {
+                var sel = dna.Parts[_explainPart];
+                var role = ProductExplain.Role(dna, sel);
+                float ry = 128f + Mathf.Min(n, ExplainPartWindow) * 58f + 20f;
+                c.T(RX + 24f, ry + 8f, "この部品の役割", 16f, LabTheme.ConMut);
+                float ey = ConParas(RX + 24f, ry + 20f, 406f, ry + 130f, new[] { (role.Value, LabTheme.ConInk) }, 19f);
+                var blocks = ProductExplain.BehaviorsOf(dna, sel);
+                var mat = LabCatalog.Material(sel.MaterialOrDefault);
+                var facts = new List<(string, Color)>
+                {
+                    ("受け持つ機能：" + (blocks.Count > 0 ? string.Join("・", blocks) : "なし（形を支える・まとめる部品）"), LabTheme.ConMut),
+                    ($"{LabCatalog.Shape(sel.ShapeOrDefault)?.LabelJa ?? sel.ShapeOrDefault}・{mat?.LabelJa ?? sel.MaterialOrDefault}　{sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m　{MassModel.Part(sel).Kg:0.00} kg", LabTheme.ConMut),
+                };
+                if (sel.Joint != null) facts.Add(("関節で動く（動作プログラムで動かす）", LabTheme.ConMut));
+                if (role.Derived) facts.Add(("説明がないため、部品の種類から作った文です", LabTheme.ConMut));
+                ConParas(RX + 24f, Mathf.Max(ey + 4f, ry + 100f), 406f, 740f, facts, 16f);
+            }
+
+            var st = App.Sm.State;
+            if (st == LabState.AwaitingApproval)
+                ConFrame(new List<ConBtn> { new ConBtn("指示に戻る", App.BackToDraft, ConKind.Quiet, 150f), new ConBtn("作り直す", App.Regenerate) },
+                    new ConBtn("次へ　設計の確認", () => ShowExplain(false), ConKind.Primary, 330f));
+            else
+                ConFrame(new List<ConBtn>(), new ConBtn(st == LabState.Editing ? "編集に戻る" : st == LabState.ReviewingResult ? "結果に戻る" : "保存の画面に戻る",
+                    () => ShowExplain(false), ConKind.Primary, 330f));
         }
 
         /// <summary>要望ごとの確かめ方（検証する／単純化／動きで見せる／検証できない）。</summary>
@@ -297,7 +384,7 @@ namespace ImpossibleLab
                 c.Plate(RX, 78f, PW, 468f, "次にすること");
                 c.Button(RX + 20f, 130f, 414f, 56f, "編集を続ける", App.ContinueEditing);
                 c.Button(RX + 20f, 198f, 414f, 56f, "保存した発明を見る", App.OpenGallery);
-                ConFrame(new List<ConBtn>(), new ConBtn("新しい発明を始める", App.NewInvention, ConKind.Primary, 320f),
+                ConFrame(new List<ConBtn> { new ConBtn("製品の説明", OpenExplain, ConKind.Quiet, 160f, dna != null) }, new ConBtn("新しい発明を始める", App.NewInvention, ConKind.Primary, 320f),
                     new Dictionary<int, UnityAction> { { 0, App.NewInvention }, { 2, App.ContinueEditing } });
                 return;
             }

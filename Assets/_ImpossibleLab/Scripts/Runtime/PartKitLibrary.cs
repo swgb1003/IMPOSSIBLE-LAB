@@ -14,6 +14,8 @@ namespace ImpossibleLab
 
         public sealed class Entry
         {
+            /// <summary>KIT_[部品タイプ]_[形]。</summary>
+            public string Key;
             public Mesh Mesh;
             public readonly List<Extra> Extras = new List<Extra>();
             public bool HasAccent => Extras.Exists(x => x.IsAccent);
@@ -57,7 +59,7 @@ namespace ImpossibleLab
 
         static Entry Get(string key)
         {
-            if (!_entries.TryGetValue(key, out var e)) _entries[key] = e = new Entry();
+            if (!_entries.TryGetValue(key, out var e)) _entries[key] = e = new Entry { Key = key };
             return e;
         }
     }

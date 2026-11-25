@@ -110,6 +110,9 @@ namespace ImpossibleLab.Core
                 }
             }
             if (result.Errors.Count > 0) return result;
+            // 足した部品だけ、浮いていたら近くの部品に付ける（もとからある部品は利用者の配置のまま）
+            var added = next.Parts.Where(p => current.FindPart(p.Id) == null).Select(p => p.Id).ToList();
+            if (added.Count > 0) LayoutFixer.Apply(next, added);
 
             next.Revision = current.Revision + 1;
             next.ParentRevision = current.Revision;
@@ -485,12 +488,17 @@ namespace ImpossibleLab.Core
                 }
                 if (op.Op == RevisionOps.AddPart)
                 {
-                    // 部品は DNA のスキーマ検証器で検証する
+                    // 部品は DNA のスキーマ検証器で検証する（役割の説明は表示だけの文なので、外してから検証し、あとで付ける）
+                    var partJson = jo["part"] is JObject pj ? (JObject)pj.DeepClone() : null;
+                    string role = partJson?.Value<string>("role");
+                    partJson?.Remove("role");
                     var wrapper = new JObject { ["schemaVersion"] = 2, ["id"] = "tmp", ["name"] = "tmp", ["tags"] = new JArray("daily"), ["mount"] = "fixed", ["purpose"] = "tmp",
-                        ["parts"] = new JArray(jo["part"]), ["behaviors"] = new JArray() };
+                        ["parts"] = new JArray(partJson ?? jo["part"]), ["behaviors"] = new JArray() };
                     var rep = DnaJson.Parse(wrapper.ToString());
                     if (!rep.IsValid) { error = "追加部品が不正: " + rep.Summary; return false; }
                     op.Part = rep.Dna.Parts[0];
+                    if (!string.IsNullOrWhiteSpace(role))
+                        op.Part.Role = DnaJson.ExplainText(role, LabCatalog.MaxRoleLength);
                 }
                 p.Operations.Add(op);
             }

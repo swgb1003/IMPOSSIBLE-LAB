@@ -8,7 +8,7 @@ import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { loadCatalog } from "./catalog.ts";
-import { buildSchemas, toDna, toPlans, toProposal } from "./schemas.ts";
+import { buildSchemas, designPoints, toDna, toPlans, toProposal } from "./schemas.ts";
 import type { DesignOutput, PlanOutput, ReviseOutput } from "./schemas.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "./prompts.ts";
 import { checkRequestText, pickExperiment, RateLimiter, readJsonBody, readWavBody, HttpError } from "./http-util.ts";
@@ -126,7 +126,7 @@ async function handleDesign(body: unknown) {
   }
   const { dna, fixes } = toDna(o.design, catalog);
   return {
-    status: "ok", dna, designPoints: o.design.designPoints.slice(0, 4), plans: toPlans(o.design.plans, catalog),
+    status: "ok", dna, designPoints: designPoints(o.design), plans: toPlans(o.design.plans, catalog),
     fixes, message: o.message, model: r.model, usage: r.usage,
   };
 }

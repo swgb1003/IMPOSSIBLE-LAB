@@ -86,6 +86,8 @@ namespace ImpossibleLab.Core
         public const int MaxTags = 3, MaxFunctionNeeds = 8, MaxNeedLength = 60, MaxNoteLength = 120;
         public const int MaxNameLength = 40;
         public const int MaxPurposeLength = 200;
+        /// <summary>説明の文の長さ（製品の概要・部品の役割・しくみ）。超えた分は切り詰める（設計は拒否しない）。</summary>
+        public const int MaxOverviewLength = 160, MaxRoleLength = 50, MaxHowLength = 100;
 
         public static readonly PartTypeInfo[] PartTypes =
         {
@@ -338,6 +340,7 @@ namespace ImpossibleLab.Core
                     ["positionLimitXZ"] = PositionLimitXZ, ["positionMinY"] = PositionMinY, ["positionMaxY"] = PositionMaxY,
                     ["maxNameLength"] = MaxNameLength, ["maxPurposeLength"] = MaxPurposeLength, ["maxRequestLength"] = RequestRules.MaxRequestLength,
                     ["maxTags"] = MaxTags, ["maxFunctionNeeds"] = MaxFunctionNeeds, ["maxNeedLength"] = MaxNeedLength, ["maxNoteLength"] = MaxNoteLength,
+                    ["maxOverviewLength"] = MaxOverviewLength, ["maxRoleLength"] = MaxRoleLength, ["maxHowLength"] = MaxHowLength,
                     ["maxPlans"] = ProxyProtocol.MaxPlans, ["maxModules"] = ExperimentCatalog.MaxModules, ["maxMetrics"] = ExperimentCatalog.MaxMetrics,
                     ["maxCriteria"] = ExperimentCatalog.MaxCriteria, ["maxReasonLength"] = ExperimentCatalog.MaxReasonLength,
                     ["minDurationSec"] = RainExperimentConfig.MinDuration, ["maxDurationSec"] = RainExperimentConfig.MaxDuration,

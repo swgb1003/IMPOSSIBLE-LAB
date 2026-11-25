@@ -17,6 +17,8 @@ namespace ImpossibleLab
         public static bool Finished;
         public static int ExitCode;
         public string OutputDir;
+        /// <summary>見比べ用：このフォルダの AI の応答（*.json）を1件ずつ設計させ、製品の説明と試作品を撮るだけ（通しの検証はしない）。</summary>
+        public string ShowcaseDir;
         LabApp _app;
         Camera _cam;
         RenderTexture _rt;
@@ -36,7 +38,7 @@ namespace ImpossibleLab
             yield return null;
             yield return null;
             bool ok = true;
-            IEnumerator run = Run();
+            IEnumerator run = string.IsNullOrEmpty(ShowcaseDir) ? Run() : Showcase(ShowcaseDir);
             while (true)
             {
                 object cur;
@@ -60,9 +62,11 @@ namespace ImpossibleLab
             while (_app.Sm.State != s && t < timeout) { t += Time.unscaledDeltaTime; yield return null; }
             Check(_app.Sm.State == s, "state reached " + s + " (now " + _app.Sm.State + ")");
             yield return null; yield return null;
+            // 実験場との行き来（暗転）の途中は操作を受け付けないので、終わるまで待つ（画面の作り直しが速いと、2フレームでは暗転が終わらない）
+            float tw = 0; while (_app.Transitioning && tw < 10f) { tw += Time.unscaledDeltaTime; yield return null; }
         }
 
-        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null, bool device = false, string devicePart = null, Vector3? eyeAt = null, Vector3? lookAt = null)
+        IEnumerator Shot(string name, bool rainLab = false, bool overview = false, string facePanel = null, bool device = false, string devicePart = null, Vector3? eyeAt = null, Vector3? lookAt = null, bool productView = false)
         {
             yield return null; // batchmode では WaitForEndOfFrame が呼ばれないため
             Vector3 basePos = rainLab ? _app.RainLab.transform.position : Vector3.zero;
@@ -86,8 +90,9 @@ namespace ImpossibleLab
                 var b = rs.Length > 0 ? rs[0].bounds : new Bounds(focus.position, Vector3.one * 0.3f);
                 foreach (var r in rs) b.Encapsulate(r.bounds);
                 // 前（+Z）から、少し下から見上げる（参考：描き直した画像の角度）
-                float d = Mathf.Max(0.35f, b.extents.magnitude * (devicePart != null ? 3.2f : 1.15f));
-                var dir = (devicePart != null ? new Vector3(0.6f, -0.35f, 1f) : new Vector3(0.35f, -0.1f, 1f)).normalized;
+                float d = Mathf.Max(0.35f, b.extents.magnitude * (devicePart != null ? 3.2f : productView ? 2.6f : 1.15f));
+                var dir = (devicePart != null ? new Vector3(0.6f, -0.35f, 1f) : productView ? new Vector3(0.7f, 0.55f, 1f) : new Vector3(0.35f, -0.1f, 1f)).normalized;
+                // productView：製品の写真のように斜め上の前から全体を撮る（上面の細部・塗り分けの確認用）
                 _cam.transform.SetPositionAndRotation(b.center + dir * d, Quaternion.LookRotation(-dir));
                 hideConsole = _app.ConsoleRoot.gameObject.activeSelf;
                 _app.ConsoleRoot.gameObject.SetActive(false);
@@ -109,6 +114,9 @@ namespace ImpossibleLab
                 var look = basePos + new Vector3(0, rainLab ? 1.05f : 1.0f, rainLab ? -1.6f : -0.9f);
                 _cam.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(look - eye));
             }
+            // 計器の輪の中の試作品は 2 フレームに 1 回描くので、撮る前に今の状態で描かせる
+            var preview = FindFirstObjectByType<ProductPreview>();
+            if (preview != null) preview.RenderNow();
             _cam.targetTexture = _rt;
             _cam.Render();
             var prev = RenderTexture.active;
@@ -231,6 +239,21 @@ namespace ImpossibleLab
             yield return Shot("S02_generating_face", facePanel: "MainConsole");
             yield return WaitState(LabState.AwaitingApproval);
             Check(_app.Preview != null && _app.Preview.Category == "protection", "preview DNA valid");
+            // 設計ができたら、まず製品の説明のページ（概要・しくみ・部品の役割）
+            var exUi = FindFirstObjectByType<LabUI>();
+            Check(exUi != null && exUi.ExplainPage, "explain page shown first after design");
+            yield return Shot("S02_explain");
+            yield return Shot("S02_explain_face", facePanel: "MainConsole");
+            if (exUi != null)
+            {
+                exUi.SelectExplainPart(1);
+                yield return null;
+                Check(exUi.ExplainPart == 1, "explain: select part");
+                Check(exUi.Product != null && exUi.Product.Focus == 1, "explain: product preview zooms to the selected part");
+                yield return Shot("S02_explain_part_face", facePanel: "MainConsole");
+                exUi.ShowExplain(false);
+                yield return null;
+            }
             yield return Shot("S02_preview");
             yield return Shot("S02_preview_face", facePanel: "MainConsole");
             _app.ApprovePreview();
@@ -240,7 +263,30 @@ namespace ImpossibleLab
             yield return WaitState(LabState.Editing);
             yield return Shot("S03_edit");
             yield return Shot("S03_edit_face", facePanel: "MainConsole");
+            // 輪の中は試作品の立体。部品を選ぶとその部品に寄り、「全体を見る」で戻る
+            if (exUi != null)
+            {
+                Check(exUi.Product != null && exUi.Product.Shown && exUi.Product.Focus == -1, "edit: product preview shows the whole product");
+                exUi.StepPartAndZoom(+1);
+                yield return null;
+                Check(exUi.ProductZoomed && exUi.Product.Focus == _app.SelectedPartIndex && _app.SelectedPartIndex == 1, "edit: selecting a part zooms to it");
+                yield return Shot("S03_zoom_face", facePanel: "MainConsole");
+                exUi.ShowWholeProduct();
+                yield return null;
+                Check(!exUi.ProductZoomed && exUi.Product.Focus == -1, "edit: back to the whole product");
+                // 押したまま動かすと回り、そのあとは自動で回らない
+                float yaw0 = exUi.Product.Yaw;
+                exUi.Product.Orbit(new Vector2(40f, -20f));
+                yield return null;
+                Check(exUi.Product.Manual && Mathf.Abs(Mathf.DeltaAngle(exUi.Product.Yaw, yaw0 - 18f)) < 0.01f, "edit: dragging turns the product and stops the auto turn");
+                yield return Shot("S03_turned_face", facePanel: "MainConsole");
+                exUi.StepPartAndZoom(-1);
+                yield return null;
+                exUi.ShowWholeProduct();
+                yield return null;
+            }
             yield return Shot("S03_device_rain", device: true);
+            yield return Shot("S03_product_rain", device: true, productView: true);
             yield return Shot("S03_device_rain_core", device: true, devicePart: "core");
 
             // 発明台の上で回す（右スティック・「向き ◀ ▶」）。試用を止めても回した向きに戻る
@@ -300,6 +346,17 @@ namespace ImpossibleLab
             t = 0; while (_app.PendingRevision == null && t < 5f) { t += Time.unscaledDeltaTime; yield return null; }
             _app.ApproveRevision();
             yield return Shot("S03_after_revision");
+            // 承認したあとも、編集の画面から製品の説明を開ける（戻ると編集のまま）
+            if (exUi != null)
+            {
+                exUi.OpenExplain();
+                yield return null;
+                Check(exUi.ExplainPage && _app.Sm.State == LabState.Editing, "explain opens from editing");
+                yield return Shot("S03_explain_face", facePanel: "MainConsole");
+                exUi.ShowExplain(false);
+                yield return null;
+                Check(!exUi.ExplainPage && _app.Sm.State == LabState.Editing, "explain closes back to editing");
+            }
 
             // 同一条件で再実験
             _app.GoToTestSetup();
@@ -312,10 +369,19 @@ namespace ImpossibleLab
             Check(r2.WetnessScore < r1.WetnessScore, "improvement reduced wetness");
             yield return Shot("S05_result_compare", rainLab: true);
             yield return Shot("S05_result_compare_face", facePanel: "MainConsole");
+            // 結果の画面からも開ける。開いたまま次の実験に移ると閉じる
+            if (exUi != null)
+            {
+                exUi.OpenExplain();
+                yield return null;
+                Check(exUi.ExplainPage, "explain opens from result");
+                yield return Shot("S05_explain_face", facePanel: "MainConsole");
+            }
 
             // REALITY で比較
             _app.RerunOtherMode();
             yield return WaitState(LabState.ReviewingResult, 40f);
+            Check(exUi == null || !exUi.ExplainPage, "explain closes when the screen changes");
             var r3 = _app.LastResult;
             Log($"RESULT rev{r3.Revision} {r3.Config.Mode} wetness={r3.WetnessScore:0.00} coverage={r3.CoverageRatio:0.000} energy={r3.EnergyWh:0.000}Wh drift={r3.DriftM:0.00}");
             Check(r3.Config.Mode == LabModes.Reality && r3.EnergyWh.HasValue, "reality result has energy");
@@ -348,6 +414,15 @@ namespace ImpossibleLab
             yield return WaitState(LabState.Saved);
             yield return Shot("S06_saved");
             yield return Shot("S06_saved_face", facePanel: "MainConsole");
+            if (exUi != null)
+            {
+                exUi.OpenExplain();
+                yield return null;
+                Check(exUi.ExplainPage && _app.Sm.State == LabState.Saved, "explain opens from saved");
+                yield return Shot("S06_explain_face", facePanel: "MainConsole");
+                exUi.ShowExplain(false);
+                yield return null;
+            }
             _app.OpenGallery();
             yield return WaitState(LabState.Gallery);
             Check(_app.PendingDeleteId == null, "gallery opens without delete dialog");
@@ -438,6 +513,7 @@ namespace ImpossibleLab
                 yield return WaitState(LabState.Editing);
                 yield return Shot($"S03_edit_{cat}");
                 yield return Shot($"S03_device_{cat}", device: true);
+                yield return Shot($"S03_product_{cat}", device: true, productView: true);
                 if (cat == "carrier")
                 {
                     int rev = _app.Current.Current.Revision;
@@ -790,6 +866,32 @@ namespace ImpossibleLab
             yield return WaitState(LabState.Saved, 20f); // 次の検証は保存完了の画面から新しい発明を始める
         }
 
+        /// <summary>見比べ用：記録した AI の応答を1件ずつ設計させ、製品の説明のページと試作品を撮る（通しの検証はしない）。</summary>
+        IEnumerator Showcase(string dir)
+        {
+            yield return new WaitForSeconds(1f);
+            var ui = FindFirstObjectByType<LabUI>();
+            foreach (var path in Directory.GetFiles(dir, "*.json").OrderBy(p => p, StringComparer.Ordinal))
+            {
+                string id = Path.GetFileNameWithoutExtension(path);
+                _app.SetDesignServiceForVerify(new FixtureDesignService(File.ReadAllText(path)));
+                if (_app.Sm.State == LabState.Saved) _app.ContinueEditing();
+                _app.NewInvention();
+                _app.SetRequestText("見比べ " + id);
+                float w = 0;
+                while (_app.Sm.State == LabState.Drafting && w < 10f) { _app.SubmitRequest(); w += Time.unscaledDeltaTime; yield return null; }
+                yield return WaitState(LabState.AwaitingApproval);
+                if (_app.Preview == null) { Check(false, $"showcase-{id}: design ({_app.LastOutcome?.Message})"); continue; }
+                Log($"SHOWCASE {id} {_app.LastOutcome?.Message}");
+                yield return Shot($"{id}_explain", facePanel: "MainConsole");
+                if (ui != null && _app.Preview.Parts.Count > 1) { ui.SelectExplainPart(1); yield return null; yield return Shot($"{id}_explain_part2", facePanel: "MainConsole"); }
+                _app.ApprovePreview();
+                yield return WaitState(LabState.Editing);
+                yield return Shot($"{id}_product", device: true, productView: true);
+                yield return Shot($"{id}_device", device: true);
+            }
+        }
+
         /// <summary>
         /// 代表1件：記録した AI 設計 → 承認 → S04（AI 案の1つ目）→ 実験 → 改善案の依頼文で改良（オフライン改良ルール）→ 再実験
         /// → 前の版と比較（判定に使った計測項目が良くなる。合格済みなら悪くならない）→ 保存して読み直す。
@@ -806,10 +908,12 @@ namespace ImpossibleLab
             while (_app.Sm.State == LabState.Drafting && w < 10f) { _app.SubmitRequest(); w += Time.unscaledDeltaTime; yield return null; }
             yield return WaitState(LabState.AwaitingApproval);
             if (_app.Preview == null) { Check(false, $"rep-{id}: design"); done(false); yield break; }
+            yield return Shot($"S02_explain_rep_{id}_face", facePanel: "MainConsole");
             _app.ApprovePreview();
             yield return WaitState(LabState.Editing);
             var dna = _app.Current.Current;
             yield return Shot($"S03_device_rep_{id}", device: true);
+            yield return Shot($"S03_product_rep_{id}", device: true, productView: true);
             _app.TestConfig.Mode = LabModes.Dream;
             _app.GoToTestSetup();
             yield return WaitState(LabState.ConfiguringTest);

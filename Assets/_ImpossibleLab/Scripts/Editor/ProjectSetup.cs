@@ -235,7 +235,8 @@ namespace ImpossibleLab.EditorTools
             mi.globalScale = 1f; mi.useFileScale = true;
             mi.importCameras = false; mi.importLights = false;
             mi.importAnimation = false; mi.animationType = ModelImporterAnimationType.None;
-            mi.importBlendShapes = false; mi.addCollider = false; mi.isReadable = false;
+            mi.importBlendShapes = false; mi.addCollider = false;
+            mi.isReadable = bakeAxis; // 部品キットは実行時に角の丸みを直す（ProductLook）ので頂点を読める必要がある
             mi.importNormals = ModelImporterNormals.Import;
             mi.generateSecondaryUV = !bakeAxis; // ライトの焼き込み用（部品キットは動く物なので不要）
             // 部品キットは DNA の大きさをそのまま掛けるので、軸の変換をメッシュに焼き込み、各部品の回転を無しにする

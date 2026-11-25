@@ -29,14 +29,15 @@ namespace ImpossibleLab.Core
         public const int MaxJsonLength = 32 * 1024;
         static readonly Regex IdPattern = new Regex("^[a-z0-9][a-z0-9_-]{0,47}$");
         static readonly HashSet<string> RootFieldsV1 = new HashSet<string>
-        { "schemaVersion", "id", "name", "category", "purpose", "mode", "appearance", "parts", "behaviors", "constraints", "revision", "parentRevision" };
+        { "schemaVersion", "id", "name", "category", "purpose", "mode", "appearance", "parts", "behaviors", "constraints", "revision", "parentRevision", "overview" };
         static readonly HashSet<string> RootFieldsV2 = new HashSet<string>
-        { "schemaVersion", "id", "name", "purpose", "tags", "mount", "appearance", "mode", "parts", "behaviors", "functionMap", "constraints", "revision", "parentRevision" };
+        { "schemaVersion", "id", "name", "purpose", "tags", "mount", "appearance", "mode", "parts", "behaviors", "functionMap", "constraints", "revision", "parentRevision", "overview" };
         static readonly HashSet<string> RootFieldsV3 = new HashSet<string>(RootFieldsV2) { "program" };
-        static readonly HashSet<string> PartFieldsV1 = new HashSet<string> { "id", "type", "position", "scale" };
-        static readonly HashSet<string> PartFieldsV2 = new HashSet<string> { "id", "type", "shape", "material", "position", "scale" };
+        // role（部品の役割の説明）はどの版でも書ける（表示だけの文。見本の設計図にも書く）
+        static readonly HashSet<string> PartFieldsV1 = new HashSet<string> { "id", "type", "position", "scale", "role" };
+        static readonly HashSet<string> PartFieldsV2 = new HashSet<string> { "id", "type", "shape", "material", "position", "scale", "role" };
         static readonly HashSet<string> PartFieldsV3 = new HashSet<string>(PartFieldsV2) { "joint" };
-        static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "status", "note" };
+        static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "status", "note", "how" };
         static readonly HashSet<string> BehaviorFields = new HashSet<string> { "type", "targetPart", "parameters" };
         static readonly HashSet<string> ConstraintFields = new HashSet<string> { "maxParts", "maxSpeed" };
 
@@ -78,6 +79,7 @@ namespace ImpossibleLab.Core
             if (dna.Id.Length > 0 && !IsSafeId(dna.Id)) r.Errors.Add("id は英小文字・数字・-・_ のみ使用できます");
             dna.Name = Str(root, "name", r, true, LabCatalog.MaxNameLength) ?? "";
             dna.Purpose = Str(root, "purpose", r, true, LabCatalog.MaxPurposeLength) ?? "";
+            dna.Overview = Explain(root, "overview", LabCatalog.MaxOverviewLength, r);
             if (version == 1)
             {
                 string cat = Str(root, "category", r, true, 32) ?? "";
@@ -172,6 +174,7 @@ namespace ImpossibleLab.Core
                     Need = Str(o, "need", r, true, LabCatalog.MaxNeedLength, at) ?? "",
                     Status = Str(o, "status", r, true, 16, at) ?? "",
                     Note = Str(o, "note", r, false, LabCatalog.MaxNoteLength, at) ?? "",
+                    How = Explain(o, "how", LabCatalog.MaxHowLength, r, at),
                 };
                 if (n.Status.Length > 0 && !LabCatalog.FunctionStatuses.Contains(n.Status)) r.Errors.Add($"{at}.status が不正です: {Shorten(n.Status)}");
                 if (o.TryGetValue("blocks", out var bt) && bt.Type != JTokenType.Null)
@@ -237,6 +240,7 @@ namespace ImpossibleLab.Core
                         Clamp(v.y, info.MinScale, info.MaxScale, at + ".scale.y", r),
                         Clamp(v.z, info.MinScale, info.MaxScale, at + ".scale.z", r));
                 }
+                p.Role = Explain(po, "role", LabCatalog.MaxRoleLength, r, at);
                 if (version >= 3 && po.TryGetValue("joint", out var jt) && jt.Type != JTokenType.Null) p.Joint = MotionProgramJson.ParseJoint(jt, at + ".joint", r);
                 dna.Parts.Add(p);
             }
@@ -310,6 +314,7 @@ namespace ImpossibleLab.Core
                     ["position"] = V(p.Position), ["scale"] = V(p.Scale),
                 };
                 if (p.Joint != null) po["joint"] = MotionProgramJson.JointToJson(p.Joint);
+                if (!string.IsNullOrEmpty(p.Role)) po["role"] = p.Role;
                 parts.Add(po);
             }
             var needs = new JArray();
@@ -317,6 +322,7 @@ namespace ImpossibleLab.Core
             {
                 var no = new JObject { ["need"] = n.Need, ["blocks"] = new JArray(n.Blocks), ["status"] = n.Status };
                 if (!string.IsNullOrEmpty(n.Note)) no["note"] = n.Note;
+                if (!string.IsNullOrEmpty(n.How)) no["how"] = n.How;
                 needs.Add(no);
             }
             var behaviors = new JArray();
@@ -340,6 +346,7 @@ namespace ImpossibleLab.Core
                 ["parentRevision"] = dna.ParentRevision.HasValue ? new JValue(dna.ParentRevision.Value) : JValue.CreateNull(),
             };
             if (dna.Program != null) root["program"] = MotionProgramJson.ProgramToJson(dna.Program);
+            if (!string.IsNullOrEmpty(dna.Overview)) root["overview"] = dna.Overview;
             return root;
         }
 
@@ -351,6 +358,23 @@ namespace ImpossibleLab.Core
         {
             foreach (var p in o.Properties())
                 if (!allowed.Contains(p.Name)) r.Errors.Add($"{at} に未知のフィールド: {Shorten(p.Name)}");
+        }
+
+        /// <summary>
+        /// 説明の文（任意）。表示だけに使うので、長すぎる分は切り詰め、改行と &lt; &gt; は表示の書式として解釈されないよう置き換える（設計は拒否しない）。
+        /// </summary>
+        static string Explain(JObject o, string key, int maxLen, ValidationReport r, string at = null)
+        {
+            if (!o.TryGetValue(key, out var t) || t.Type == JTokenType.Null) return "";
+            if (t.Type != JTokenType.String) { r.Errors.Add($"{(at == null ? key : at + "." + key)} は文字列です"); return ""; }
+            return ExplainText(t.Value<string>(), maxLen);
+        }
+
+        /// <summary>説明の文を表示用に整える（改行・タブを空白に、&lt; &gt; を全角に、長すぎる分を切り詰め）。</summary>
+        public static string ExplainText(string text, int maxLen)
+        {
+            var s = (text ?? "").Replace('\r', ' ').Replace('\n', ' ').Replace('\t', ' ').Replace('<', '＜').Replace('>', '＞').Trim();
+            return s.Length > maxLen ? s.Substring(0, maxLen) : s;
         }
 
         static string Str(JObject o, string key, ValidationReport r, bool required, int maxLen, string at = null)

@@ -38,10 +38,14 @@ namespace ImpossibleLab.EditorTools
         static void OnPlayMode(PlayModeStateChange s)
         {
             if (s != PlayModeStateChange.EnteredPlayMode) return;
-            _deadline = EditorApplication.timeSinceStartup + 480; // 検証の流れが増えたため（2026-11-23：キャリーバッグ・座ったまま試用、コンソールを正面から撮る画像を追加）
+            _deadline = EditorApplication.timeSinceStartup + 600; // 検証の流れが増えたため（2026-11-24：製品の見た目・製品の説明のページの画像を追加）
             var go = new GameObject("DemoAutopilot");
             var ap = go.AddComponent<DemoAutopilot>();
             ap.OutputDir = OutDir;
+            // -ilabShowcase <フォルダ>：記録した AI の応答を並べて撮るだけ（見比べ用）。画像はそのフォルダの shots に出す
+            var args = Environment.GetCommandLineArgs();
+            int si = Array.IndexOf(args, "-ilabShowcase");
+            if (si >= 0 && si + 1 < args.Length) { ap.ShowcaseDir = args[si + 1]; ap.OutputDir = System.IO.Path.Combine(args[si + 1], "shots"); }
         }
 
         static void Poll()

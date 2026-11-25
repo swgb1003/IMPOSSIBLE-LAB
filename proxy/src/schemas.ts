@@ -73,7 +73,8 @@ export function buildSchemas(c: Catalog) {
         behaviors: z.array(behavior),
         functionMap: z.array(need),
         program: jsonText("Motion program (with its joints), only when the request needs conditions or an order of movements;"),
-        designPoints: z.array(z.string()).describe("Japanese. 2-4 short reasons for the design choices"),
+        // 構造化出力の文法の大きさの上限に収めるため、製品の説明は1つの JSON 文字列で受け取る（読めなければ説明なしで続ける）
+        explain: z.string().describe('Product description as JSON text: {"overview": text, "roles": {partId: text}, "how": [text for each functionMap item, same order], "points": [2-4 short reasons for the design choices]}'),
         plans: z.array(plan).describe("1-3 experiment plans"),
       })
       .nullable(),
@@ -129,6 +130,30 @@ function clip(s: string, n: number): string {
   return [...s].length > n ? [...s].slice(0, n).join("") : s;
 }
 
+/** 説明の文の長さの上限（古い catalog.json には無いので既定値で補う。アプリの LabCatalog と同じ値）。 */
+function lim(c: Catalog) {
+  return { overview: c.limits.maxOverviewLength ?? 160, role: c.limits.maxRoleLength ?? 50, how: c.limits.maxHowLength ?? 100 };
+}
+
+/** JSON の値から文字列だけを取り出す（無い・文字列でなければ空）。 */
+function text(o: unknown, key: string): string {
+  if (!o || typeof o !== "object" || Array.isArray(o)) return "";
+  const v = (o as Record<string, unknown>)[key];
+  return typeof v === "string" ? v : "";
+}
+
+/** 説明の文：改行を空白にし、長すぎる分を切り詰める（アプリ側でも同じ整え方をする）。 */
+function explain(s: string | undefined, max: number): string {
+  return clip((s ?? "").replace(/[\r\n\t]+/g, " "), max);
+}
+
+/** 設計の要点（説明の JSON の points）。読めなければ空。 */
+export function designPoints(d: { explain: string }): string[] {
+  const ex = parseObject(d.explain);
+  const pts = Array.isArray(ex?.points) ? (ex!.points as unknown[]) : [];
+  return pts.filter((x): x is string => typeof x === "string" && x.trim() !== "").slice(0, 4).map((x) => clip(x.replace(/\s+/g, " "), 120));
+}
+
 export function newInventionId(now = Date.now()): string {
   return "ai-" + now.toString(36) + "-" + Math.floor(Math.random() * 36 ** 3).toString(36);
 }
@@ -141,12 +166,16 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
   const fixes: string[] = [];
   const idMap = new Map<string, string>();
   const used = new Set<string>();
+  const ex = parseObject(d.explain);
+  if (d.explain && d.explain.trim() && !ex) fixes.push("製品の説明を読めないので外した");
+  const howList = Array.isArray(ex?.how) ? (ex!.how as unknown[]) : [];
   const parts = d.parts.slice(0, c.limits.maxParts).map((p, i) => {
     let pid = sanitizeId(p.id, `part-${i + 1}`);
     while (used.has(pid)) pid = `${pid.slice(0, 44)}-${i + 1}`;
     used.add(pid);
     idMap.set(p.id, pid);
-    return { id: pid, type: p.type, shape: p.shape, material: p.material, position: vec3(p.position), scale: vec3(p.scale, 0.1) } as Record<string, unknown>;
+    const role = explain(text(ex?.roles, p.id), lim(c).role);
+    return { id: pid, type: p.type, shape: p.shape, material: p.material, position: vec3(p.position), scale: vec3(p.scale, 0.1), ...(role ? { role } : {}) } as Record<string, unknown>;
   });
   if (d.parts.length > c.limits.maxParts) fixes.push(`部品を${c.limits.maxParts}個までに切り詰め`);
   const seenBehavior = new Set<string>();
@@ -157,7 +186,7 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     return out;
   });
   const present = new Set(behaviors.map((b) => b.type as string));
-  const functionMap = d.functionMap.slice(0, c.limits.maxFunctionNeeds).map((n) => {
+  const functionMap = d.functionMap.slice(0, c.limits.maxFunctionNeeds).map((n, ni) => {
     const blocks = [...new Set(n.blocks)].filter((b) => present.has(b));
     if (blocks.length < new Set(n.blocks).size) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、設計に無い機能を外した`);
     let status = n.status;
@@ -170,7 +199,8 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
       fixes.push(`「${clip(n.need, 20)}」を「検証できない」に変更（対応する機能なし）`);
     }
     if (status === "unverifiable" && !note) { note = "理由の記載なし"; fixes.push(`「${clip(n.need, 20)}」に理由を補った`); }
-    return { need: clip(n.need, c.limits.maxNeedLength) || "（要望）", blocks, status, ...(note ? { note } : {}) };
+    const how = explain(typeof howList[ni] === "string" ? (howList[ni] as string) : "", lim(c).how);
+    return { need: clip(n.need, c.limits.maxNeedLength) || "（要望）", blocks, status, ...(note ? { note } : {}), ...(how ? { how } : {}) };
   });
   const tags = [...new Set(d.tags)].slice(0, c.limits.maxTags);
   const prog = toProgram(d.program, idMap, c, fixes);
@@ -186,6 +216,7 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
       id,
       name: clip(d.name, c.limits.maxNameLength) || "AI設計の発明",
       purpose: clip(d.purpose, c.limits.maxPurposeLength) || "（目的未記入）",
+      ...(explain(text(ex, "overview"), lim(c).overview) ? { overview: explain(text(ex, "overview"), lim(c).overview) } : {}),
       tags: tags.length ? tags : ["daily"],
       mount: d.mount,
       appearance: d.appearance,

@@ -50,6 +50,8 @@ export interface Catalog {
     maxParts: number; maxBehaviors: number; positionLimitXZ: number; positionMinY: number; positionMaxY: number;
     maxNameLength: number; maxPurposeLength: number; maxRequestLength: number;
     maxTags: number; maxFunctionNeeds: number; maxNeedLength: number; maxNoteLength: number;
+    /** 説明の文（製品の概要・部品の役割・しくみ）。古い catalog.json には無いので既定値で補う。 */
+    maxOverviewLength: number; maxRoleLength: number; maxHowLength: number;
     maxPlans: number; maxModules: number; maxMetrics: number; maxCriteria: number; maxReasonLength: number;
     minDurationSec: number; maxDurationSec: number;
   };

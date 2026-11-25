@@ -12,8 +12,12 @@ namespace ImpossibleLab
     [RequireComponent(typeof(CanvasRenderer))]
     public sealed class VecGraphic : MaskableGraphic
     {
-        readonly List<UIVertex> _verts = new List<UIVertex>(4096);
-        readonly List<int> _tris = new List<int>(8192);
+        List<UIVertex> _verts = new List<UIVertex>(4096);
+        List<int> _tris = new List<int>(8192);
+        // BeginShapes〜EndShapes の間は描き直しの合図を止め、最後に前の図形と比べて違うときだけ合図する
+        List<UIVertex> _prevVerts = new List<UIVertex>(4096);
+        List<int> _prevTris = new List<int>(8192);
+        bool _batch;
 
         /// <summary>
         /// 薄く重ねる色（光のにじみ・選択の地）。設計図の不透明度は sRGB での重ね方が前提なので、
@@ -25,7 +29,39 @@ namespace ImpossibleLab
             return new Color(c.r, c.g, c.b, alpha);
         }
 
-        public void ClearShapes() { _verts.Clear(); _tris.Clear(); SetVerticesDirty(); }
+        public void ClearShapes() { _verts.Clear(); _tris.Clear(); Dirty(); }
+
+        void Dirty() { if (!_batch) SetVerticesDirty(); }
+
+        /// <summary>図形を描き直し始める。<see cref="EndShapes"/> までに描いた図形が前と同じなら、メッシュを作り直さない。</summary>
+        public void BeginShapes()
+        {
+            // 前の作り直しが途中で止まっていた（例外など）ときは、比べる相手を残したまま描き始め直す
+            if (_batch) { _verts.Clear(); _tris.Clear(); return; }
+            (_prevVerts, _verts) = (_verts, _prevVerts);
+            (_prevTris, _tris) = (_tris, _prevTris);
+            _verts.Clear(); _tris.Clear();
+            _batch = true;
+        }
+
+        public void EndShapes()
+        {
+            if (!_batch) return;
+            _batch = false;
+            if (!SameAsPrevious()) SetVerticesDirty();
+        }
+
+        bool SameAsPrevious()
+        {
+            if (_verts.Count != _prevVerts.Count || _tris.Count != _prevTris.Count) return false;
+            for (int i = 0; i < _tris.Count; i++) if (_tris[i] != _prevTris[i]) return false;
+            for (int i = 0; i < _verts.Count; i++)
+            {
+                UIVertex a = _verts[i], b = _prevVerts[i];
+                if (a.position != b.position || a.color.r != b.color.r || a.color.g != b.color.g || a.color.b != b.color.b || a.color.a != b.color.a) return false;
+            }
+            return true;
+        }
 
         Vector3 Local(Vector2 p)
         {
@@ -48,7 +84,7 @@ namespace ImpossibleLab
             Color32 c32 = c;
             int i0 = V(pts[0], c32), prev = V(pts[1], c32);
             for (int i = 2; i < pts.Length; i++) { int cur = V(pts[i], c32); _tris.Add(i0); _tris.Add(prev); _tris.Add(cur); prev = cur; }
-            SetVerticesDirty();
+            Dirty();
         }
 
         public void Rect(float x, float y, float w, float h, Color c) =>
@@ -61,7 +97,7 @@ namespace ImpossibleLab
             int i0 = V(new Vector2(x, y), t), i1 = V(new Vector2(x + w, y), t), i2 = V(new Vector2(x + w, y + h), b), i3 = V(new Vector2(x, y + h), b);
             _tris.Add(i0); _tris.Add(i1); _tris.Add(i2);
             _tris.Add(i0); _tris.Add(i2); _tris.Add(i3);
-            SetVerticesDirty();
+            Dirty();
         }
 
         /// <summary>斜めの四角（左上と右下を slant だけ寄せた平行四辺形）の4点。</summary>
@@ -122,7 +158,7 @@ namespace ImpossibleLab
                 _tris.Add(pi); _tris.Add(co); _tris.Add(ci);
                 pi = ci; po = co;
             }
-            SetVerticesDirty();
+            Dirty();
         }
 
         public void Circle(Vector2 center, float r, float width, Color c) => Arc(center, r, width, 0f, 360f, c);
@@ -144,7 +180,7 @@ namespace ImpossibleLab
                 int cur = V(center + new Vector2(r * Mathf.Cos(a), r * Mathf.Sin(a) * squashY), c32);
                 _tris.Add(ic); _tris.Add(prev); _tris.Add(cur); prev = cur;
             }
-            SetVerticesDirty();
+            Dirty();
         }
 
         /// <summary>光って見える弧：同じ弧を太く・薄く重ねる（ぼかしの代わり。後処理を使わないので軽い）。</summary>

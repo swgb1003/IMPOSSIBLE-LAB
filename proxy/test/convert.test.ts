@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { loadCatalog, legacyCategories } from "../src/catalog.ts";
-import { buildSchemas, sanitizeId, toDna, toPlans, toProposal } from "../src/schemas.ts";
+import { buildSchemas, designPoints, sanitizeId, toDna, toPlans, toProposal } from "../src/schemas.ts";
 import { checkRequestText, pickExperiment, RateLimiter, HttpError, isWav } from "../src/http-util.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "../src/prompts.ts";
 import { estimateCostUsd } from "../src/cost.ts";
@@ -14,7 +14,7 @@ const catalog = loadCatalog(path.join(here, "..", "catalog.json"));
 const schemas = buildSchemas(catalog);
 
 const nightLight = {
-  name: "夜道ライトリュック", tags: ["lighting", "safety", "lighting"], mount: "back", appearance: "night_navy", purpose: "暗い帰り道で足元を照らす",
+  name: "夜道ライトリュック", tags: ["lighting", "safety", "lighting"], mount: "back", appearance: "night_navy", purpose: "暗い帰り道で足元を照らす", 
   parts: [
     { id: "Pack Body", type: "body", shape: "box", material: "fabric", position: [0, 0, 0], scale: [0.3, 0.42, 0.14] },
     { id: "lamp", type: "light", shape: "cylinder", material: "plastic", position: [0, -0.18, 0.08], scale: [0.05, 0.03, 0.05] },
@@ -31,7 +31,12 @@ const nightLight = {
     { need: "かっこいい", blocks: [], status: "unverifiable", note: "" },
   ],
   program: "",
-  designPoints: ["背中の下側から足元へ向ける"],
+  explain: JSON.stringify({
+    overview: "夜に歩いて帰る人が背負い、\n足元を照らす。",
+    roles: { "Pack Body": "", lamp: "背中の下から足元を照らす灯り。夜道で車からも見えるように光で知らせる役目もある。電池が減ると暗くなるので、帰る前に充電しておく" },
+    how: ["灯り（lamp）が照明の機能で足元を照らす", 3],
+    points: ["背中の下側から足元へ向ける", 5, ""],
+  }),
   plans: [{
     title: "夜道の足元", aim: "足元が見えるか", scenario: "stand", mode: "dream", durationSec: 120,
     modules: [{ type: "darkness", params: [{ name: "lux", value: 2 }] }],
@@ -67,7 +72,7 @@ const autoBin = {
   behaviors: [{ type: "detect", targetPart: "eye", parameters: [{ name: "rangeM", value: 3 }] }],
   functionMap: [{ need: "近づくと開く", blocks: ["detect"], status: "simulated", note: "" }],
   program: JSON.stringify(binProgram),
-  designPoints: ["フタは後ろの辺で回る"],
+  explain: JSON.stringify({ points: ["フタは後ろの辺で回る"] }),
   plans: [{
     title: "近づいて離れる", aim: "近づくと開くか", scenario: "approach_device", mode: "dream", durationSec: 60,
     modules: [{ type: "approach", params: [{ name: "count", value: 3 }] }],
@@ -107,6 +112,15 @@ test("design output converts to DNA v3 with safe ids and a repaired function map
   assert.equal(dna.functionMap[4].note, "理由の記載なし");
   assert.equal(fixes.length, 4, "外した機能2件・状態の変更1件・理由の補い1件");
   assert.ok(!("note" in dna.functionMap[0]), "空の note は出さない");
+  // 製品の説明：概要は改行を空白に、部品の役割は上限で切り詰め、空の説明は出さない
+  assert.equal((dna as { overview?: string }).overview, "夜に歩いて帰る人が背負い、 足元を照らす。");
+  assert.equal([...(dna.parts[1].role as string)].length, catalog.limits.maxRoleLength ?? 50);
+  assert.ok(!("role" in dna.parts[0]), "空の役割は出さない");
+  assert.equal((dna.functionMap[0] as { how?: string }).how, "灯り（lamp）が照明の機能で足元を照らす");
+  assert.ok(!("how" in dna.functionMap[1]), "文字列でない説明は外す");
+  assert.deepEqual(designPoints(out.design!), ["背中の下側から足元へ向ける"], "設計の要点は文字列だけ");
+  assert.deepEqual(designPoints({ explain: "" }), []);
+  assert.equal(toDna({ ...out.design!, explain: "{ 壊れた" }, catalog).fixes.includes("製品の説明を読めないので外した"), true);
 });
 
 test("plans convert to the app's ExperimentPlan JSON", () => {
@@ -284,4 +298,9 @@ test("system prompts include the whole catalog, the experiment rules and the inj
   for (const s of catalog.program.sensors) assert.ok(d.includes(s.id), s.id);
   assert.ok(d.includes("move_joint") && d.includes("approach_device") && d.includes("demonstrated"));
   assert.ok(!d.includes("${"), "テンプレートの埋め込み漏れがない");
+  // 部品の配置の決まり（浮かせない・めり込みは半分まで・4倍まで・左右対称）
+  assert.ok(d.includes("Nothing floats") && d.includes("at most 4 times") && d.includes("mirror images"));
+  assert.ok(rv.includes("it must not float"));
+  // 製品の説明（概要・部品の役割・しくみ）と、設計に無いしくみを作らない決まり
+  assert.ok(d.includes("explain: JSON text") && d.includes("Each part's role") && d.includes("Do not invent hidden mechanisms") && d.includes("never by their ids"));
 });

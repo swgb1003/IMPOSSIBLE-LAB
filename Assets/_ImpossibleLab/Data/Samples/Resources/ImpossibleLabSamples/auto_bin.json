@@ -3,23 +3,25 @@
   "id": "inv-auto-bin",
   "name": "自動で開くゴミ箱",
   "purpose": "両手がふさがっていても、近づくだけでフタが開き、離れると閉じるゴミ箱。",
+  "overview": "台所や玄関に置き、ゴミを両手で持ったまま近づくとフタが開く。離れると自動で閉じる。",
   "tags": ["daily"],
   "mount": "fixed",
   "appearance": "lab_white",
   "mode": "dream",
   "parts": [
-    { "id": "bin", "type": "container", "shape": "box", "material": "plastic", "position": [0, 0, 0], "scale": [0.36, 0.6, 0.36] },
+    { "id": "bin", "type": "container", "shape": "box", "material": "plastic", "position": [0, 0, 0], "scale": [0.36, 0.6, 0.36], "role": "ゴミをためる箱。ほかの部品をすべて支える土台も兼ねる" },
     { "id": "lid", "type": "panel", "shape": "box", "material": "plastic", "position": [0, 0.31, 0], "scale": [0.38, 0.025, 0.38],
-      "joint": { "type": "hinge", "parent": "bin", "axis": "x", "pivot": [0, 0, -0.19], "min": 0, "max": 110, "speed": 360, "home": 0 } },
-    { "id": "eye", "type": "sensor", "shape": "sphere", "material": "plastic", "position": [0, 0.2, 0.19], "scale": [0.04, 0.03, 0.04] },
-    { "id": "hinge-motor", "type": "motor", "shape": "cylinder", "material": "steel", "position": [0, 0.31, -0.19], "scale": [0.04, 0.3, 0.04] }
+      "joint": { "type": "hinge", "parent": "bin", "axis": "x", "pivot": [0, 0, -0.19], "min": 0, "max": 110, "speed": 360, "home": 0 },
+      "role": "後ろの辺を軸に開け閉めするフタ" },
+    { "id": "eye", "type": "sensor", "shape": "sphere", "material": "plastic", "position": [0, 0.2, 0.19], "scale": [0.04, 0.03, 0.04], "role": "前に立つ人までの距離を測り、開けるきっかけを作る" },
+    { "id": "hinge-motor", "type": "motor", "shape": "cylinder", "material": "steel", "position": [0, 0.31, -0.19], "scale": [0.04, 0.3, 0.04], "role": "フタの後ろの軸を回して開け閉めする" }
   ],
   "behaviors": [
     { "type": "detect", "targetPart": "eye", "parameters": { "rangeM": 3.0, "fovDeg": 120 } }
   ],
   "functionMap": [
-    { "need": "近づいたらフタが開く", "blocks": ["detect"], "status": "demonstrated", "note": "人型モデルが近づく実験で、フタの角度と反応時間を記録する" },
-    { "need": "臭いが漏れない", "blocks": [], "status": "unverifiable", "note": "密閉性や臭いは実験できない" }
+    { "need": "近づいたらフタが開く", "blocks": ["detect"], "status": "demonstrated", "note": "人型モデルが近づく実験で、フタの角度と反応時間を記録する", "how": "センサー（eye）が人の近さを測り、動作プログラムの手順でモーター（hinge-motor）がフタを開け閉めする" },
+    { "need": "臭いが漏れない", "blocks": [], "status": "unverifiable", "note": "密閉性や臭いは実験できない", "how": "フタの合わせ目の密閉が必要だが、この研究室では臭いや密閉を実験しない" }
   ],
   "program": {
     "version": 1,

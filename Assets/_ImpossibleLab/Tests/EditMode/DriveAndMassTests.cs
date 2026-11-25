@@ -78,6 +78,18 @@ namespace ImpossibleLab.Tests
             Assert.That(r.Metric("mountLoadRatio").Value, Is.GreaterThan(1f));
             Assert.IsTrue(r.Limits.Any(l => l.Contains("背中に付けるには重い")), string.Join(" / ", r.Limits));
             Assert.IsFalse(r.Success, "目安の合格条件（≤ 1）を満たさない");
+
+            // 頭の上に浮いてついていく雨よけは、取り付け位置が頭でも体に載らないので目安を使わない
+            var rain = DnaJson.Parse(Resources.Load<TextAsset>("ImpossibleLabSamples/handsfree_rain").text).Dna;
+            Assert.AreEqual("head", rain.Mount);
+            Assert.IsNull(MassModel.BodyLoadLimitKg(rain), "頭上追従は体に載らない");
+            var rr = ScenarioRunner.RunPlan(rain, p).Result;
+            Assert.IsNull(rr.Metric("mountLoadRatio"));
+            Assert.IsFalse(rr.Limits.Any(l => l.Contains("に付けるには重い")), string.Join(" / ", rr.Limits));
+            // 頭に付けるもの（頭上追従なし）は目安を使う
+            var lamp = Dna("head", Part("lamp", "light", 0.04f, 0.04f, 0.04f),
+                @"{ ""type"": ""illuminate"", ""targetPart"": ""lamp"", ""parameters"": { ""lumens"": 150, ""beamAngleDeg"": 60, ""tiltDeg"": 50 } }");
+            Assert.AreEqual(BlockCoefficients.V("mountLimitHead"), MassModel.BodyLoadLimitKg(lamp));
             // DREAM では重さを測らない
             p.Mode = LabModes.Dream;
             var d = ScenarioRunner.RunPlan(heavy, p).Result;

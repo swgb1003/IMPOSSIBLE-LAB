@@ -129,7 +129,7 @@ namespace ImpossibleLab
         }
 
         /// <summary>外周のゲージと大きい数字：この発明の直近の実験（同じ条件の前の版があれば、その値も）。</summary>
-        void ConLastResult(string labelPrefix)
+        void ConLastResult(string labelPrefix, bool gauge = true)
         {
             var c = _con;
             var exps = App.Current.Experiments;
@@ -137,7 +137,7 @@ namespace ImpossibleLab
             var g = ResultCriteria.Headline(last);
             if (g == null)
             {
-                c.Gauge(null, 100f);
+                if (gauge) c.Gauge(null, 100f);
                 c.BigWord("未実験", "実験すると、ここに結果が出ます");
                 return;
             }
@@ -152,7 +152,7 @@ namespace ImpossibleLab
                 break;
             }
             string pass = g.Pass.HasValue ? $"合格 {g.Pass.Value:0.##}{g.Unit}{(g.LowerIsBetter ? " 以下" : "")}" : null;
-            c.Gauge(g.Value, g.Max, g.Pass, pass, prev, prevLabel);
+            if (gauge) c.Gauge(g.Value, g.Max, g.Pass, pass, prev, prevLabel);
             c.BigNumber(g.ValueText, g.Unit, labelPrefix + g.LabelJa);
         }
 
@@ -163,9 +163,9 @@ namespace ImpossibleLab
         {
             var c = _con;
             var dna = App.Current.Current;
-            c.Dial();
-            ConTopView(dna, App.SelectedPartIndex);
-            ConLastResult("前回の実験の");
+            // 真ん中は試作品の立体（計器の輪は出さない。前回の実験の結果は下に数字で出す）
+            ConProduct(dna, App.SelectedPartIndex);
+            ConLastResult("前回の実験の", gauge: false);
 
             // 左上：性能の値 ／ 動きの手順
             const float LX = ConsoleLayer.LX, PW = ConsoleLayer.PW;
@@ -197,22 +197,24 @@ namespace ImpossibleLab
             }
             else
             {
-                left.Add(new ConBtn("元に戻す", App.Undo, ConKind.Quiet, 132f, App.CanUndo));
-                left.Add(new ConBtn(App.DeviceRunning ? "停止" : "試用する", App.ToggleDevice, App.DeviceRunning ? ConKind.On : ConKind.Normal));
-                left.Add(new ConBtn("保存", App.Save, ConKind.Normal, 100f));
+                // 下の6段階の帯（x=488 から）に重ならない幅に収める
+                left.Add(new ConBtn("元に戻す", App.Undo, ConKind.Quiet, 108f, App.CanUndo));
+                left.Add(new ConBtn(App.DeviceRunning ? "停止" : "試用する", App.ToggleDevice, App.DeviceRunning ? ConKind.On : ConKind.Normal, 108f));
+                left.Add(new ConBtn("保存", App.Save, ConKind.Normal, 80f));
+                left.Add(new ConBtn("製品の説明", OpenExplain, ConKind.Quiet, 120f, size: 18f));
             }
             ConFrame(left, new ConBtn("実験へ進む", App.GoToTestSetup, App.PendingRevision != null ? ConKind.Normal : ConKind.Primary, 260f),
                 new Dictionary<int, UnityAction> { { 0, App.NewInvention }, { 3, App.GoToTestSetup }, { 5, App.OpenGallery } });
         }
 
         /// <summary>板の見出しの右に置くページ送り。</summary>
-        void ConPager(float plateX, int page, int pages, UnityAction prev, UnityAction next, float plateW = ConsoleLayer.PW)
+        void ConPager(float plateX, int page, int pages, UnityAction prev, UnityAction next, float plateW = ConsoleLayer.PW, float plateY = 78f)
         {
             if (pages <= 1) return;
-            float r = plateX + plateW;
-            _con.Tri(r - 196f, 86f, -1, prev, enabled: page > 0, name: "Page");
-            _con.T(r - 110f, 118f, $"{page + 1} / {pages}", 17f, LabTheme.ConMut, anchor: 0);
-            _con.Tri(r - 72f, 86f, +1, next, enabled: page < pages - 1, name: "Page");
+            float r = plateX + plateW, dy = plateY - 78f;
+            _con.Tri(r - 196f, 86f + dy, -1, prev, enabled: page > 0, name: "Page");
+            _con.T(r - 110f, 118f + dy, $"{page + 1} / {pages}", 17f, LabTheme.ConMut, anchor: 0);
+            _con.Tri(r - 72f, 86f + dy, +1, next, enabled: page < pages - 1, name: "Page");
         }
 
         void ConValueRows(InventionDna dna)
@@ -389,8 +391,8 @@ namespace ImpossibleLab
             const int Window = 3;
             if (n > Window)
             {
-                c.Tri(RX + 232f, 86f, -1, () => App.StepSelectedPart(-1), name: "Part");
-                c.Tri(RX + 282f, 86f, +1, () => App.StepSelectedPart(+1), name: "Part");
+                c.Tri(RX + 232f, 86f, -1, ZoomThen(() => App.StepSelectedPart(-1)), name: "Part");
+                c.Tri(RX + 282f, 86f, +1, ZoomThen(() => App.StepSelectedPart(+1)), name: "Part");
             }
             int start = Mathf.Clamp(selIndex - 1, 0, Mathf.Max(0, n - Window));
             for (int i = start; i < Mathf.Min(n, start + Window); i++)
@@ -399,15 +401,15 @@ namespace ImpossibleLab
                 var mat = LabCatalog.Material(p.MaterialOrDefault);
                 c.Row(RX, 128f + (i - start) * 58f, PW, 56f, LabCatalog.Part(p.Type)?.LabelJa ?? p.Type, PartNames.WithJa(p.Id),
                     $"{LabCatalog.Shape(p.ShapeOrDefault)?.LabelJa ?? p.ShapeOrDefault}・{mat?.LabelJa ?? p.MaterialOrDefault}",
-                    sel: i == selIndex, onClick: delta == 0 ? (UnityAction)null : () => App.StepSelectedPart(delta), name: "PartRow");
+                    sel: i == selIndex, onClick: ZoomThen(() => App.StepSelectedPart(delta)), name: "PartRow");
             }
             float y0 = 340f;
             if (sel != null)
             {
                 c.T(RX + 24f, 326f, $"{sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m ／ この部品 {MassModel.Part(sel).Kg:0.00} kg", 16f, LabTheme.ConMut);
                 var mat = LabCatalog.Material(sel.MaterialOrDefault);
-                ConOption(y0, "形", LabCatalog.Shape(sel.ShapeOrDefault)?.LabelJa ?? sel.ShapeOrDefault, () => App.StepPartShape(-1), () => App.StepPartShape(+1), "PartShape");
-                ConOption(y0 + 50f, "素材", $"{mat?.LabelJa ?? sel.MaterialOrDefault}<size=80%>　{mat?.DensityKgM3:0} kg/m³</size>", () => App.StepPartMaterial(-1), () => App.StepPartMaterial(+1), "PartMaterial");
+                ConOption(y0, "形", LabCatalog.Shape(sel.ShapeOrDefault)?.LabelJa ?? sel.ShapeOrDefault, ZoomThen(() => App.StepPartShape(-1)), ZoomThen(() => App.StepPartShape(+1)), "PartShape");
+                ConOption(y0 + 50f, "素材", $"{mat?.LabelJa ?? sel.MaterialOrDefault}<size=80%>　{mat?.DensityKgM3:0} kg/m³</size>", ZoomThen(() => App.StepPartMaterial(-1)), ZoomThen(() => App.StepPartMaterial(+1)), "PartMaterial");
             }
             ConOption(y0 + 100f, "外観", LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, () => App.StepAppearance(-1), () => App.StepAppearance(+1), "Appearance");
             // 発明台の上で回して眺める（右スティックでも回せる。角度は出さない：回すたびに画面を作り直さないため）
@@ -432,7 +434,7 @@ namespace ImpossibleLab
             const float RX = ConsoleLayer.RX, PW = ConsoleLayer.PW;
             c.Plate(RX, 558f, PW, 190f, "総質量（推定）");
             float kg = MassModel.TotalKg(dna);
-            var limit = MassModel.MountLimitKg(dna.Mount);
+            var limit = MassModel.BodyLoadLimitKg(dna);
             bool over = limit.HasValue && kg > limit.Value;
             Color col = over ? LabTheme.ConOr : LabTheme.ConCy;
             c.T(1518f, 606f, kg.ToString("0.00"), 44f, col, bold: true, anchor: 1);
@@ -456,7 +458,7 @@ namespace ImpossibleLab
             }
             else
             {
-                c.T(1138f, 652f, "体に付けない道具なので、重さの目安はありません", 16f, LabTheme.ConMut);
+                c.T(1138f, 652f, MassModel.FloatsOverHead(dna) ? "頭の上に浮いて体に触れないので、目安はありません" : "体に付けない道具なので、重さの目安はありません", 16f, LabTheme.ConMut);
                 var heavy = dna.Parts.OrderByDescending(p => MassModel.Part(p).Kg).FirstOrDefault();
                 if (heavy != null) c.T(1138f, 700f, $"いちばん重い部品　{LabCatalog.Part(heavy.Type)?.LabelJa ?? heavy.Type} {MassModel.Part(heavy).Kg:0.00} kg", 17f);
             }

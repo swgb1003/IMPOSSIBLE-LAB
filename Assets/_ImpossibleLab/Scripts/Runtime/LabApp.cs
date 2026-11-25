@@ -107,6 +107,8 @@ namespace ImpossibleLab
             Design = Proxy.Enabled && !verify ? new FallbackDesignService(new ProxyDesignService(Proxy), OfflineDesign) : OfflineDesign;
             Debug.Log($"[ILAB] design service = {Design.DisplayName} url={Proxy.Url}");
             Repo = new InventionRepository(Application.persistentDataPath);
+            // 保存した発明の一覧を起動中（読み込みの間）に一度読んでおく。初めて一覧を開いたときに 0.17 秒止まらないように
+            try { Repo.List(); } catch (Exception e) { Debug.LogWarning("[ILAB] gallery warmup failed: " + e.Message); }
             Sm.Changed += (a, b) => Notify();
             ResetStages();
             if (RainLab != null)

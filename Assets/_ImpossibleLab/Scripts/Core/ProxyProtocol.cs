@@ -59,10 +59,15 @@ namespace ImpossibleLab.Core
             var report = DnaJson.Parse(dna.ToString());
             if (!report.IsValid)
                 return new DesignOutcome { Status = DesignStatus.Failed, Report = report, Source = "ai", Message = "AIの設計が検証に通りませんでした：" + report.Summary };
+            // AI は座標を数字だけで決めるので、浮いた部品・深いめり込み・左右のずれを整える（位置だけ。実験の計算には使わない）
+            int moved = LayoutFixer.Apply(report.Dna);
+            var fixes = new List<string>();
+            if (report.Warnings.Count > 0) fixes.Add($"範囲外の値 {report.Warnings.Count} 件");
+            if (moved > 0) fixes.Add($"部品の位置 {moved} 個");
             var outcome = new DesignOutcome
             {
                 Status = DesignStatus.Success, Dna = report.Dna, Report = report, Source = "ai",
-                Message = "AI（Claude）が設計しました" + (report.Warnings.Count > 0 ? $"（範囲外の値 {report.Warnings.Count} 件を補正）" : ""),
+                Message = "AI（Claude）が設計しました" + (fixes.Count > 0 ? $"（{string.Join("・", fixes)}を補正）" : ""),
                 DesignPoints = Strings(o["designPoints"], 4),
             };
             ParsePlans(o["plans"], report.Dna, outcome.Plans, outcome.PlanErrors);

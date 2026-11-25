@@ -49,6 +49,19 @@ namespace ImpossibleLab.Core
             return sum;
         }
 
+        /// <summary>
+        /// この発明が体に載せる重さの目安（kg）。体に付けないもの、頭の上に浮いてついていくもの（頭上追従）は null。
+        /// 頭上追従の取り付け位置は「頭」だが、浮いていて体に触れないので、頭に付ける重さの目安は当てはまらない。
+        /// </summary>
+        public static float? BodyLoadLimitKg(InventionDna dna)
+        {
+            if (dna == null || FloatsOverHead(dna)) return null;
+            return MountLimitKg(dna.Mount);
+        }
+
+        /// <summary>頭の上に浮いてついていく（頭上追従の機能がある）。</summary>
+        public static bool FloatsOverHead(InventionDna dna) => dna != null && dna.FindBehavior("follow_head") != null;
+
         /// <summary>装着部位ごとの重さの目安（kg）。体に付けないもの（床・空中・設置）は null。</summary>
         public static float? MountLimitKg(string mount)
         {

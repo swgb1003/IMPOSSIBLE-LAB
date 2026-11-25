@@ -4,13 +4,14 @@
   "name": "空飛ぶ靴",
   "category": "mobility",
   "purpose": "靴の底の推進ユニットで浮き上がり、短い距離を飛んで移動する",
+  "overview": "靴の底の推進ユニットで浮き上がり、短い距離を飛んで移動する靴。",
   "mode": "dream",
   "parts": [
-    { "id": "shoe-l", "type": "body", "position": [-0.12, 0.05, 0], "scale": [0.11, 0.08, 0.28] },
-    { "id": "shoe-r", "type": "body", "position": [0.12, 0.05, 0], "scale": [0.11, 0.08, 0.28] },
-    { "id": "jet-l", "type": "thruster", "position": [-0.12, -0.02, 0.02], "scale": [0.12, 0.05, 0.12] },
-    { "id": "jet-r", "type": "thruster", "position": [0.12, -0.02, 0.02], "scale": [0.12, 0.05, 0.12] },
-    { "id": "gyro", "type": "stabilizer", "position": [0, 0.06, -0.12], "scale": [0.06, 0.04, 0.06] }
+    { "id": "shoe-l", "type": "body", "position": [-0.12, 0.05, 0], "scale": [0.11, 0.08, 0.28], "role": "左足をのせる靴の本体" },
+    { "id": "shoe-r", "type": "body", "position": [0.12, 0.05, 0], "scale": [0.11, 0.08, 0.28], "role": "右足をのせる靴の本体" },
+    { "id": "jet-l", "type": "thruster", "position": [-0.12, -0.02, 0.02], "scale": [0.12, 0.05, 0.12], "role": "左の靴の下で空気を押し出し、浮く力と進む力を出す" },
+    { "id": "jet-r", "type": "thruster", "position": [0.12, -0.02, 0.02], "scale": [0.12, 0.05, 0.12], "role": "右の靴の下で空気を押し出し、浮く力と進む力を出す" },
+    { "id": "gyro", "type": "stabilizer", "position": [0, 0.06, -0.12], "scale": [0.06, 0.04, 0.06], "role": "傾きを感じて姿勢を保つ" }
   ],
   "behaviors": [
     { "type": "hover", "parameters": { "lift": 0.5, "maxHeight": 1.0 } },

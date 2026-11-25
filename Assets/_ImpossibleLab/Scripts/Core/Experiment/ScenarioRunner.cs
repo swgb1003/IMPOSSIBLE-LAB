@@ -206,7 +206,7 @@ namespace ImpossibleLab.Core
             float kg = MassModel.TotalKg(dna), lo = MassModel.TotalKg(dna, RealityCase.Optimistic), hi = MassModel.TotalKg(dna, RealityCase.Pessimistic);
             ctx.AddMetric("totalMassKg", kg);
             r.Assumptions.Add($"総質量 約 {kg:0.00} kg（{lo:0.00}〜{hi:0.00} kg）：部品を中空の殻として、表面積×外殻の厚み×素材の密度で推定（布は面密度、発泡材・電池は中身が詰まったもの）");
-            var limit = MassModel.MountLimitKg(dna.Mount);
+            var limit = MassModel.BodyLoadLimitKg(dna);
             if (limit == null) return;
             ctx.AddMetric("mountLoadRatio", kg / limit.Value);
             string where = LabCatalog.Mount(dna.Mount)?.LabelJa ?? dna.Mount;

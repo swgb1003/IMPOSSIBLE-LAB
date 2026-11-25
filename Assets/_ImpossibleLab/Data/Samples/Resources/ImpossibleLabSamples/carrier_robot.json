@@ -4,15 +4,16 @@
   "name": "追従運搬ロボット",
   "category": "carrier",
   "purpose": "重い荷物を載せて、持ち主の後ろを自動でついてくる",
+  "overview": "買い物や引っ越しで重い荷物を載せ、持ち主の後ろを自動でついてくる運搬ロボット。",
   "mode": "dream",
   "parts": [
-    { "id": "chassis", "type": "body", "position": [0, 0.22, 0], "scale": [0.5, 0.16, 0.62] },
-    { "id": "cargo", "type": "container", "position": [0, 0.42, -0.04], "scale": [0.44, 0.24, 0.48] },
-    { "id": "wheel-fl", "type": "wheel", "position": [-0.29, 0.1, 0.2], "scale": [0.2, 0.06, 0.2] },
-    { "id": "wheel-fr", "type": "wheel", "position": [0.29, 0.1, 0.2], "scale": [0.2, 0.06, 0.2] },
-    { "id": "wheel-rl", "type": "wheel", "position": [-0.29, 0.1, -0.2], "scale": [0.2, 0.06, 0.2] },
-    { "id": "wheel-rr", "type": "wheel", "position": [0.29, 0.1, -0.2], "scale": [0.2, 0.06, 0.2] },
-    { "id": "eye", "type": "sensor", "position": [0, 0.36, 0.32], "scale": [0.08, 0.06, 0.08] }
+    { "id": "chassis", "type": "body", "position": [0, 0.22, 0], "scale": [0.5, 0.16, 0.62], "role": "車輪と荷台を支える車体" },
+    { "id": "cargo", "type": "container", "position": [0, 0.42, -0.04], "scale": [0.44, 0.24, 0.48], "role": "荷物を載せる荷台" },
+    { "id": "wheel-fl", "type": "wheel", "position": [-0.29, 0.1, 0.2], "scale": [0.2, 0.06, 0.2], "role": "床の上を走る前左の車輪" },
+    { "id": "wheel-fr", "type": "wheel", "position": [0.29, 0.1, 0.2], "scale": [0.2, 0.06, 0.2], "role": "床の上を走る前右の車輪" },
+    { "id": "wheel-rl", "type": "wheel", "position": [-0.29, 0.1, -0.2], "scale": [0.2, 0.06, 0.2], "role": "床の上を走る後左の車輪" },
+    { "id": "wheel-rr", "type": "wheel", "position": [0.29, 0.1, -0.2], "scale": [0.2, 0.06, 0.2], "role": "床の上を走る後右の車輪" },
+    { "id": "eye", "type": "sensor", "position": [0, 0.36, 0.32], "scale": [0.08, 0.06, 0.08], "role": "持ち主と前の障害物の位置を見る" }
   ],
   "behaviors": [
     { "type": "follow_user", "parameters": { "speed": 1.0, "followDistance": 1.2 } },

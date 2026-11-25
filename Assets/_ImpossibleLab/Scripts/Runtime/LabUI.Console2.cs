@@ -435,7 +435,7 @@ namespace ImpossibleLab
             }
             else ConParas(RX + 20f, 610f, 414f, 742f, new[] { ("比べる相手がまだありません。改良してもう一度実験するか、物理の決まりを切り替えると、ここに差が出ます。", LabTheme.ConMut) });
 
-            ConFrame(new List<ConBtn>(), new ConBtn("改良して再実験", App.ImproveAndRetest, ConKind.Primary, 300f),
+            ConFrame(new List<ConBtn> { new ConBtn("製品の説明", OpenExplain, ConKind.Quiet, 160f) }, new ConBtn("改良して再実験", App.ImproveAndRetest, ConKind.Primary, 300f),
                 new Dictionary<int, UnityAction> { { 2, App.ImproveAndRetest } });
         }
 

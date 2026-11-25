@@ -37,6 +37,8 @@ namespace ImpossibleLab.Core
             }
         }
         public string Purpose = "";
+        /// <summary>製品の概要（誰が・どんな場面で・どう使うか）。説明の表示だけに使う（任意）。</summary>
+        public string Overview = "";
         public string Mode = LabModes.Dream;
         /// <summary>外観プリセットID（LabCatalog.Appearances）。性能には影響しない。</summary>
         public string Appearance = LabCatalog.DefaultAppearance;
@@ -82,6 +84,8 @@ namespace ImpossibleLab.Core
         public string Material = "";
         /// <summary>関節（任意。仕様 28.2）。</summary>
         public JointSpec Joint;
+        /// <summary>この製品の中での役割（何のために付いているか）。説明の表示だけに使う（任意）。</summary>
+        public string Role = "";
 
         public PartSpec Clone()
         {
@@ -101,7 +105,9 @@ namespace ImpossibleLab.Core
         /// <summary>simulated / simplified / unverifiable</summary>
         public string Status = "simulated";
         public string Note = "";
-        public FunctionNeed Clone() => new FunctionNeed { Need = Need, Blocks = new List<string>(Blocks), Status = Status, Note = Note };
+        /// <summary>しくみ（どの部品が何をしてこの要望をかなえるか）。説明の表示だけに使う（任意）。</summary>
+        public string How = "";
+        public FunctionNeed Clone() => new FunctionNeed { Need = Need, Blocks = new List<string>(Blocks), Status = Status, Note = Note, How = How };
     }
 
     public sealed class BehaviorSpec
