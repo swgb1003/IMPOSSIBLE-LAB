@@ -12,7 +12,7 @@ namespace ImpossibleLab.Tests
 
         [Test] public void Consent_BreaksBetweenWords_AndFits()
         {
-            const string s = "この発明を発明ライブラリに公開します。研究者と開発者が読み、研究や開発の検討に使えるようになります。";
+            const string s = "この発明を発明ライブラリーに公開します。名前と3D、実験の結果はだれでも見られます。依頼の言葉と設計の詳しい内容は、ログインした開発者だけが読めます。";
             var lines = Lines(s, 23.7f);
             Assert.Greater(lines.Length, 1);
             Assert.AreEqual(s, string.Concat(lines), "字は増えも減りもしない");
@@ -27,7 +27,7 @@ namespace ImpossibleLab.Tests
 
         [Test] public void KatakanaWordsAndAddresses_StayWhole()
         {
-            var lines = Lines("研究者　高瀬 真央（北辰工科大学 人間支援ロボティクス研究室）　所属は運営が確かめています", 23.7f);
+            var lines = Lines("開発者　高瀬 真央（北辰工科大学 人間支援ロボティクス研究室）　所属は運営が確かめています", 23.7f);
             Assert.IsTrue(lines.Any(l => l.Contains("ロボティクス")), string.Join(" / ", lines));
             lines = Lines("PC のブラウザで http://127.0.0.1:8787/ を開くと見られます", 23.7f);
             Assert.IsTrue(lines.Any(l => l.Contains("http://127.0.0.1:8787/")), string.Join(" / ", lines));

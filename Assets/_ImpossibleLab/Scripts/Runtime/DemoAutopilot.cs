@@ -73,6 +73,7 @@ namespace ImpossibleLab
                 }
                 else if (method == "GET" && path == "/library/mine") r = (200, Mine(), null);
                 else if (method == "POST" && path == $"/library/{Id}/withdraw") { Withdrawn = true; r = (200, new JObject { ["id"] = Id, ["withdrawn"] = true }.ToString(), null); }
+                else if (method == "POST" && path == "/library/pair") r = (200, new JObject { ["code"] = "042917", ["expiresAt"] = DateTime.UtcNow.AddMinutes(10).ToString("o") }.ToString(), null);
                 else r = (404, new JObject { ["status"] = "error", ["message"] = "not found" }.ToString(), null);
                 return System.Threading.Tasks.Task.FromResult(r);
             }
@@ -80,7 +81,7 @@ namespace ImpossibleLab
             string Mine()
             {
                 if (LastBody == null) return new JObject { ["items"] = new JArray() }.ToString();
-                var adopter = new JObject { ["id"] = "u-verify", ["name"] = "高瀬 真央", ["affiliation"] = "北辰工科大学 人間支援ロボティクス研究室", ["role"] = "researcher", ["field"] = "", ["verified"] = true };
+                var adopter = new JObject { ["id"] = "u-verify", ["name"] = "高瀬 真央", ["affiliation"] = "北辰工科大学 人間支援ロボティクス研究室", ["field"] = "", ["intro"] = "", ["verified"] = true };
                 var adoption = new JObject
                 {
                     ["id"] = AdoptionId, ["at"] = "2026-11-26T01:00:00Z", ["reason"] = "体に付ける支援機器の研究で、頭の動きに合わせて追従する制御の題材に使いたい。",
@@ -145,6 +146,12 @@ namespace ImpossibleLab
             var mine = _app.MineFor(library.InventionId);
             Check(mine != null && mine.StatusJa == "採用" && mine.Adoptions.Count == 1, "publish: status read back from the PC");
             yield return Shot("S06_published_face", facePanel: "MainConsole");
+            // サイトに入る番号：PC にもらって保存の画面に出す
+            _app.RequestPairCode();
+            t0 = Time.realtimeSinceStartup;
+            while (_app.PairCodeNow == null && _app.PairError == null && Time.realtimeSinceStartup - t0 < 5f) yield return null;
+            Check(_app.PairCodeNow == "042917", "pair: the save screen shows the code for the site " + _app.PairError);
+            yield return Shot("S06_pair_face", facePanel: "MainConsole");
             _app.AskWithdraw();
             yield return null;
             Check(_app.Publish == PublishStep.ConfirmWithdraw, "publish: withdraw asks first");
@@ -533,10 +540,10 @@ namespace ImpossibleLab
                 int rev = saved.Current.Revision;
                 WriteSample(saved, new[]
                 {
-                    ("stage", $"研究所の発明台に置いた Rev.{rev}", rev, CropJpg(_lastShot, 300, 60, 1000, 700)),
+                    ("stage", $"IMPOSSIBLE LAB の発明台に置いた Rev.{rev}", rev, CropJpg(_lastShot, 300, 60, 1000, 700)),
                     ("experiment", "Rev.1 の実験。横風 4 m/s、雨量 30 mm/h の中で人型の頭が濡れた", 1, CropJpg(_rainRunningShot, 440, 0, 720, 400)),
                     ("experiment", $"Rev.{rev} を REALITY で測ると、覆いが風で流されて頭から外れた", rev, CropJpg(_rainRealityShot, 440, 0, 720, 400)),
-                    ("result", "研究所の操作パネルで見た Rev.1 の結果", 1, CropJpg(_rainResultShot, 540, 415, 520, 485)),
+                    ("result", "IMPOSSIBLE LAB の操作パネルで見た Rev.1 の結果", 1, CropJpg(_rainResultShot, 540, 415, 520, 485)),
                 });
             }
             yield return Shot("S06_saved");
@@ -1217,7 +1224,7 @@ namespace ImpossibleLab
             if (saved != null)
             {
                 yield return Shot($"S06_product_final_rep_{id}", device: true, productView: true);
-                WriteSample(saved, new[] { ("stage", $"研究所の発明台に置いた Rev.{saved.Current.Revision}", saved.Current.Revision, CropJpg(_lastShot, 300, 60, 1000, 700)) });
+                WriteSample(saved, new[] { ("stage", $"IMPOSSIBLE LAB の発明台に置いた Rev.{saved.Current.Revision}", saved.Current.Revision, CropJpg(_lastShot, 300, 60, 1000, 700)) });
             }
             _app.ContinueEditing();
             yield return WaitState(LabState.Editing);

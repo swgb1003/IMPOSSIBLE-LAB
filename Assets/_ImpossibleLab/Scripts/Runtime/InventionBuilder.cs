@@ -98,6 +98,10 @@ namespace ImpossibleLab
                 col.center = pb.center;
                 col.size = Vector3.Max(pb.size, Vector3.one * 0.25f);
             }
+            // 形の仕上げ・外装を一体の殻にする・部品どうしのすき間と付け根の陰り（見た目のみ）
+            ProductForm.Apply(view, report.Dna);
+            ProductShell.Apply(view, report.Dna, _lowerShell);
+            PartShading.Apply(view, _assets.PartShade);
             result.View = view;
             return result;
         }
@@ -157,6 +161,7 @@ namespace ImpossibleLab
         GameObject CreatePrimitive(PartSpec part, InventionDna dna)
         {
             if (IsThinFrame(part)) return CreateThinFrame(part, dna);
+            if (FormMesher.IsMadeShape(part.ShapeOrDefault)) return CreateMadeShape(part, dna);
             var kit = PartKitLibrary.Find(_assets, part.Type, part.ShapeOrDefault);
             if (kit != null) return CreateFromKit(part, dna, kit);
             // 見た目は DNA の素材（機能部品は機能の色）、形は DNA の shape（未指定なら部品タイプの既定）で決める（PartLook）
@@ -188,6 +193,15 @@ namespace ImpossibleLab
                 mpb.SetColor("_BaseColor", RgbColor(rgb.Value));
                 rend.SetPropertyBlock(mpb);
             }
+            return go;
+        }
+
+        /// <summary>組み立てるときに作る形（ドーム・円すい・輪）。大きさは DNA の scale のまま掛ける。</summary>
+        GameObject CreateMadeShape(PartSpec part, InventionDna dna)
+        {
+            var go = new GameObject($"Part_{part.Id}_{part.Type}");
+            go.transform.localScale = part.Scale;
+            AddMesh(go, ProductForm.MadeShapeMesh(part.ShapeOrDefault, part.Scale), _assets.For(PartLook.Surface(part)), PartLook.Tint(part, dna.Appearance));
             return go;
         }
 

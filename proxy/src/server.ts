@@ -14,7 +14,8 @@ import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "./prom
 import { checkRequestText, pickExperiment, RateLimiter, readJsonBody, readWavBody, HttpError } from "./http-util.ts";
 import { estimateCostUsd, type Usage } from "./cost.ts";
 import { LibraryStore } from "./library/store.ts";
-import { createLibraryRoutes } from "./library/routes.ts";
+import { createLibraryRoutes, sessionReader } from "./library/routes.ts";
+import { hostAllowed } from "./library/auth.ts";
 import { createSite } from "./site.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -80,9 +81,10 @@ const limiter = new RateLimiter(Number(process.env.ILAB_RATE_PER_10MIN ?? 40), 1
 
 // 発明ライブラリ（IMPOSSIBLE LIBRARY）：公開データは proxy/library/ に保存する（git に入れない。PC の外へは出さない）
 const LIBRARY_DIR = process.env.ILAB_LIBRARY_DIR ?? path.join(here, "..", "library");
-const library = createLibraryRoutes(new LibraryStore({ dir: LIBRARY_DIR }), { token: TOKEN });
-// サイトの画面（http://127.0.0.1:8787/ を PC のブラウザで開く）
-const site = createSite(path.join(here, "..", "site"), path.join(here, "..", "node_modules", "three"));
+const libraryStore = new LibraryStore({ dir: LIBRARY_DIR });
+const library = createLibraryRoutes(libraryStore, { token: TOKEN });
+// サイトの画面（http://127.0.0.1:8787/ を PC のブラウザで開く）。ログインが要る画面は、ログインの記録を確かめてから出す
+const site = createSite(path.join(here, "..", "site"), path.join(here, "..", "node_modules", "three"), sessionReader(libraryStore));
 
 const hasKey = Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 // 1回あたり120秒、SDK既定の再試行2回（429/5xx/接続エラー）
@@ -179,6 +181,8 @@ const ROUTES: Record<string, (body: unknown) => Promise<unknown>> = {
 
 async function route(req: IncomingMessage, res: ServerResponse) {
   const url = new URL(req.url ?? "/", "http://localhost");
+  // この PC の中からの要求は、宛先名がこの PC の名前のときだけ（ほかの名前を向けて外のサイトから読む手口を防ぐ）
+  if (!hostAllowed(req)) throw new HttpError(421, "bad_host", "この宛先名では受け付けません");
   if (req.method === "GET" && url.pathname === "/health") {
     return send(res, 200, { ok: true, model: MODEL, effort: EFFORT, apiKey: hasKey, schemaVersion: catalog.schemaVersion ?? 1, behaviors: catalog.behaviors.length });
   }

@@ -8,22 +8,21 @@
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="icon" href="/site/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site/site.css">
 </head>
 <body class="doc">
 <header class="bar">
-  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+  <a class="mark" href="/" aria-label="IMPOSSIBLE LIBRARY の入口へ">
     <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
     <b>IMPOSSIBLE LIBRARY</b>
   </a>
   <div class="bar-r">
     <nav aria-label="サイト">
-      <a href="./">発明品一覧</a>
-      <a href="accounts.html">研究者と開発者</a>
-      <a href="threads.html">やりとり</a>
-      <a href="terms.html" aria-current="page">利用規約</a>
+      <a href="/inventions">発明品一覧</a>
+      <a href="/terms" aria-current="page">利用規約</a>
     </nav>
-    <div class="who" data-slot="who" hidden></div>
+    <div class="acct" data-slot="acct"></div>
   </div>
 </header>
 
@@ -32,27 +31,27 @@
     <div class="t span12 name">
       <h1 id="page-h">利用規約</h1>
       <p class="lead">IMPOSSIBLE LIBRARY に発明を公開するとき、採用するときの約束です。</p>
-      <p class="meta">2026年11月25日版。デモ用の文面で、法律の専門家の確認はしていません。</p>
+      <p class="meta">2026年11月26日版。デモ用の文面で、法律の専門家の確認はしていません。</p>
     </div>
 
     <div class="t span7 terms">
       <ol>
-        <li><h2>公開される範囲</h2><p>公開すると、依頼文の原文、試作品の3D、部品の構成と役割、しくみ、実験の条件と結果（合格しなかったものを含む）、改良の履歴（結果が変わった版）、表示名が、発明ライブラリのだれでも読めるページに載ります。保存してあるほかの発明、音声そのもの、端末の情報は載りません。</p></li>
+        <li><h2>公開される範囲</h2><p>公開すると、名前、何をするものか、試作品の3Dと写真、実験の結果の要点、表示名が、発明ライブラリーのだれでも読めるページに載ります。依頼文の原文、部品の構成と役割、しくみ、実験の条件と数値（合格しなかったものを含む）、改良の履歴（結果が変わった版）は、ログインした開発者だけが読めます。保存してあるほかの発明、音声そのもの、端末の情報は載りません。</p></li>
         <li><h2>発案者の表示</h2><p>公開するときに、表示名で載せるか、匿名で載せるかを選べます。匿名の場合は「発案者」とだけ表示します。</p></li>
-        <li><h2>権利の扱い</h2><p>発明のアイデアの権利は、発案者に残ります。研究者と開発者は、公開された発明を読み、研究や製品化の検討に使えます。検討を超えて製品として作る場合は、発案者との話し合いが必要です。</p></li>
-        <li><h2>採用・製品化されたとき</h2><p>研究者か開発者が採用すると、発案者に知らせが届きます。製品化に進むときの条件（対価や名前の表示）は、発案者と相手が別に話し合って決めます。</p></li>
-        <li><h2>特許の注意</h2><p>公開すると、その内容は新しい発明として扱われにくくなり、特許を取りにくくなることがあります。特許を考えている場合は、公開の前に専門家に相談してください。</p></li>
+        <li><h2>権利の扱い</h2><p>発明のアイデアの権利は、発案者に残ります。開発者は、公開された発明を読み、研究や製品化の検討に使えます。発案者の許諾なく、公開された発明をもとに製品を作ったり売ったりしてはいけません。運営は、どの開発者がどの発明の詳しい内容を読んだかを記録しています。</p></li>
+        <li><h2>採用・製品化されたとき</h2><p>開発者が採用すると、発案者に知らせが届き、開発者の名前・所属・専門・紹介が発案者に伝わります。製品化に進むときの条件（対価や名前の表示）は、発案者と相手が別に話し合って決めます。</p></li>
+        <li><h2>特許の注意</h2><p>公開すると、その内容は新しい発明として扱われにくくなり、特許を取りにくくなることがあります。特許を考えている場合は、公開の前に専門家に相談してください。詳しい内容を開発者だけに見せていても、読んだ人が写すことを完全には止められません。</p></li>
         <li><h2>取り下げ</h2><p>発案者は、いつでも公開を取り下げられます。取り下げると、ページは一覧から消えます。取り下げる前に読まれた内容を、読んだ人の記憶から消すことはできません。</p></li>
         <li><h2>安全と性能を保証しないこと</h2><p>試作品と実験は、仮想の空間での簡単な計算によるものです。実際の安全・性能・法令への適合を保証しません。現実に作るときは、別に設計と試験が必要です。</p></li>
         <li><h2>AI が設計を手伝ったこと</h2><p>設計・実験の計画・説明の文には、AI が作ったものが含まれます。内容が正しいとは限りません。</p></li>
         <li><h2>載せてはいけないもの</h2><p>個人を特定できる情報、他人の権利（特許・著作権・商標など）を侵すもの、人や動物を傷つける道具、法令に反する使い方を目的とするものは公開できません。運営は、これに当たる公開を取り下げることがあります。</p></li>
         <li><h2>18歳未満の場合</h2><p>18歳未満の人は、保護者の同意を得てから公開してください。</p></li>
-        <li><h2>採用した相手とのやりとり</h2><p>採用されると、採用した研究者・開発者とあなただけが読める連絡の場ができます。相手に見えるのは、公開ページの内容と、あなたがやりとりの中で書いた内容だけです。連絡先や本名を伝えるかどうかは、あなたが決めてください。運営は、規約に反する使い方を確かめるために、やりとりの内容を読むことがあります。</p></li>
+        <li><h2>採用した相手とのやりとり</h2><p>採用されると、採用した開発者とあなただけが読める連絡の場ができます。相手に見えるのは、公開した内容と、あなたがやりとりの中で書いた内容だけです。連絡先や本名を伝えるかどうかは、あなたが決めてください。運営は、規約に反する使い方を確かめるために、やりとりの内容を読むことがあります。</p></li>
       </ol>
     </div>
 
-    <div class="t span5 alt short notes">
-      <h2>研究所で公開の前に見せる文</h2>
+    <div class="t span5 alt short notes held">
+      <h2>IMPOSSIBLE LAB で公開の前に見せる文</h2>
       <p>Quest で公開するときは、同意の画面にこの短い文を出します。</p>
       <ul>
         <li>公開するもの：依頼文、試作品の3D、実験の結果、改良の履歴、表示名</li>
@@ -68,28 +67,20 @@
   </section>
 
   <footer class="board end-board">
-    <div class="t w6 h2 end">
+    <div class="t end">
       <p class="big" lang="en">IMPOSSIBLE LIBRARY</p>
-      <p>研究所で試して直した発明を、研究と製品化につなぐ図書館です。この PC の中だけで動いています。</p>
-    </div>
-    <div class="t w6 h2 end alt">
-      <nav aria-label="サイトの終わりのリンク">
-        <a href="./">発明品一覧</a><a href="accounts.html">研究者と開発者の登録</a><a href="terms.html">利用規約</a><a href="admin.html">運営</a>
-      </nav>
+      <div class="end-row">
+        <div class="end-text">
+          <p>IMPOSSIBLE LAB で試して直した発明を、研究と製品化につなぐライブラリーです。この&nbsp;PC の中だけで動いています。</p>
+        </div>
+        <nav aria-label="サイトの終わりのリンク">
+          <a href="/inventions">発明品一覧</a><a href="/signup">開発者の新規登録</a><a href="/terms">利用規約</a><a href="/privacy">個人情報の扱い</a>
+        </nav>
+      </div>
     </div>
   </footer>
   <div class="page-end"></div>
 </main>
-<script type="module">
-import { phraseBreaks } from "./text.js";
-import { mountWho } from "./who.js";
-phraseBreaks(document.querySelector("main"));
-mountWho();
-// 板は読み込んだときに順に入る（スクロールは待たない）
-let i = 0;
-const parts = document.querySelectorAll(".board > .t, .terms li, .short li");
-for (const t of parts) t.style.setProperty("--d", `${Math.min(i++, 14) * 50}ms`);
-requestAnimationFrame(() => requestAnimationFrame(() => { for (const t of parts) t.classList.add("in"); }));
-</script>
+<script type="module" src="/site/plain.js"></script>
 </body>
 </html>

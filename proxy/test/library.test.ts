@@ -111,7 +111,7 @@ test("publish: creates once per device and invention, republish updates and keep
   const again = store.publish(KEY_A, pub({ name: "雨よけ 改" }), tinyGlb());
   assert.deepEqual(again, { id: "p-0001", created: false });
   assert.equal(store.get(a.id).invention.name, "雨よけ 改");
-  assert.equal(store.get(a.id).wants.site, 1, "更新してもほしいの数は残る");
+  assert.equal(store.get(a.id).wants, 1, "更新してもほしいの数は残る");
   // 別の端末の同じ発明 ID は別の公開
   assert.equal(store.publish(KEY_B, pub(), tinyGlb()).created, true);
   assert.equal(store.list().items.length, 2);
@@ -154,9 +154,10 @@ test("wants: site once per browser, VR only after trying and once per device", (
   assert.equal(code(() => store.wantVr(id, KEY_B)), "409 not_tried");
   store.tried(id, KEY_B);
   store.tried(id, KEY_B);
-  assert.deepEqual(store.wantVr(id, KEY_B).wants, { vr: 1, site: 1 });
+  assert.equal(store.wantVr(id, KEY_B).wants, 2, "ほしいは VR とサイトを合わせた人数");
   assert.equal(store.wantVr(id, KEY_B).added, false);
-  assert.equal(store.get(id).tried, 1);
+  assert.equal(store.get(id).wants, 2);
+  assert.equal(store.mine(KEY_A)[0].tried, 1, "試した数は発案者にだけ返す");
 });
 
 // ---------------- 一覧の並びと絞り込み ----------------
@@ -166,7 +167,7 @@ test("list: sorts by wants, new, name and creator adoptions, and filters by tag 
   const r2 = store.publish(KEY_A, pub({ id: "b", name: "あまがさ", tag: "protection" }), tinyGlb()).id;
   const r3 = store.publish(KEY_B, pub({ id: "c", name: "かばん", tag: "carrier" }), tinyGlb()).id;
   store.wantSite(r2, "browser-11111111"); store.wantSite(r2, "browser-22222222"); store.wantSite(r3, "browser-11111111");
-  const u = store.createAccount({ name: "山田", affiliation: "大学", role: "researcher", field: "材料", intro: "" });
+  const u = store.createAccount({ name: "山田", affiliation: "大学", field: "材料", intro: "" });
   store.adopt(r3, u.id, "研究テーマに近い");
   const ids = (sort: string) => store.list({ sort }).items.map((x) => x.id);
   assert.deepEqual(ids("wants"), [r2, r3, r1]);
@@ -176,14 +177,16 @@ test("list: sorts by wants, new, name and creator adoptions, and filters by tag 
   assert.deepEqual(store.list({ tag: "protection" }).items.map((x) => x.id), [r2]);
   assert.deepEqual(store.list({ status: "adopted" }).items.map((x) => x.id), [r3]);
   assert.equal(store.list({ sort: "drop table" }).sort, "wants");
+  // 取り付け位置（頭の上のものは、サイトの 3D で床に置かずに見上げる）
+  assert.deepEqual(store.list().items[0].mount, { id: "head", label: "頭" });
 });
 
 // ---------------- 検討中・採用・やりとり ----------------
 test("adopt: needs a registered account and a reason; creates a private thread for the two", () => {
   const { store } = freshStore();
   const { id } = store.publish(KEY_A, pub(), tinyGlb());
-  const res = store.createAccount({ name: "山田", affiliation: "大学", role: "researcher", field: "流体", intro: "" });
-  const dev = store.createAccount({ name: "佐藤", affiliation: "メーカー", role: "developer", field: "雨具", intro: "" });
+  const res = store.createAccount({ name: "山田", affiliation: "大学", field: "流体", intro: "雨の研究" });
+  const dev = store.createAccount({ name: "佐藤", affiliation: "メーカー", field: "雨具", intro: "" });
   assert.equal(code(() => store.adopt(id, "u-9999", "理由")), "404 no_account");
   store.consider(id, dev.id);
   assert.equal(store.get(id).status, "considering");
@@ -211,7 +214,50 @@ test("adopt: needs a registered account and a reason; creates a private thread f
   assert.equal(mine.adoptions[0].reason, "雨粒の当たり方の研究に使える");
   assert.equal(mine.adoptions[0].messageCount, 2);
   assert.equal(mine.adoptions[0].lastFrom, "creator");
-  assert.deepEqual(store.getAccount(res.id).adopted.map((x) => x.id), [id]);
+  // 採用した人の所属と紹介は、発案者（やりとりの相手）には見える
+  assert.equal(mine.adoptions[0].adopter.affiliation, "大学");
+  assert.equal(store.thread(a.threadId, creator).adopter.intro, "雨の研究");
+  assert.deepEqual(store.accountActivity(res.id).adopted.map((x) => x.id), [id]);
+});
+
+/** 詳しい内容つきの発明（だれでも見られる形には無い欄を読む）。 */
+const full = (page: { invention: unknown }) => page.invention as { request: string; parts: unknown[] };
+
+test("privacy: the public page has no adopter names; details are for developers, the owner and operators", () => {
+  const { store } = freshStore();
+  const { id } = store.publish(KEY_A, pub(), tinyGlb());
+  const res = store.createAccount({ name: "山田", affiliation: "北辰大学", field: "流体", intro: "雨の研究" });
+  const dev = store.createAccount({ name: "佐藤", affiliation: "メーカー", field: "雨具", intro: "" });
+  store.consider(id, dev.id);
+  store.adopt(id, res.id, "研究に使える");
+  // だれでも見られるページ：採用と検討中は数だけ。依頼の原文・部品・改良の履歴は載らない
+  const pub1 = store.get(id);
+  assert.equal(pub1.adoptions, 1);
+  assert.equal(pub1.considering, 1);
+  const open = JSON.stringify([pub1, store.list()]);
+  for (const secret of ["山田", "北辰大学", "佐藤", "手を使わず雨を防ぐ装置を作って", '"parts"', '"revisions"', '"conditions"']) {
+    assert.ok(!open.includes(secret), `だれでも見られる所に ${secret} が出ない`);
+  }
+  assert.equal(pub1.invention.partCount, 2);
+  assert.ok(pub1.invention.experiments.every((e) => e.metrics.every((m) => m.primary)), "実験は主な計測と合否だけ");
+  // 検討中の知らせには、だれかを書かない
+  const notes = store.members.notices({ kind: "creator", hash: creatorHashOf(KEY_A) });
+  assert.equal(notes.find((n) => n.kind === "considering")?.fromName, undefined);
+  assert.equal(notes.find((n) => n.kind === "adopted")?.fromName, "山田");
+  // 詳しい内容：開発者・公開した発案者・運営は読める。ほかの発案者は読めない
+  const d = store.detail(id, { kind: "account", id: dev.id });
+  assert.equal(full(d).request, "手を使わず雨を防ぐ装置を作って");
+  assert.deepEqual(d.mine, { adopted: false, threadId: null, considering: true });
+  assert.equal(store.detail(id, { kind: "account", id: res.id }).mine?.adopted, true);
+  assert.equal(full(store.detail(id, { kind: "creator", hash: creatorHashOf(KEY_A) })).parts.length, 2);
+  const other = store.detail(id, { kind: "creator", hash: creatorHashOf(KEY_B) });
+  assert.equal(other.detail, false, "ほかの発案者には詳しい内容を見せない");
+  assert.ok(!JSON.stringify(other).includes("手を使わず雨を防ぐ装置を作って"));
+  // 読んだ記録は、運営の一覧に残る（同じ人は1回）
+  store.detail(id, { kind: "account", id: dev.id });
+  const viewers = store.adminList()[0].viewers;
+  assert.deepEqual(viewers.map((v) => v.name), ["佐藤", "山田"]);
+  assert.equal(store.adminAccounts().find((a) => a.id === dev.id)?.viewed, 1);
 });
 
 test("anonymous creators are shown as 発案者 and have no public page", () => {
@@ -232,12 +278,12 @@ test("anonymous creators are shown as 発案者 and have no public page", () => 
 test("verify mark and persistence across restarts", () => {
   const { dir, store } = freshStore();
   const { id } = store.publish(KEY_A, pub(), tinyGlb());
-  const u = store.createAccount({ name: "山田", affiliation: "大学", role: "researcher", field: "", intro: "" });
+  const u = store.createAccount({ name: "山田", affiliation: "大学", field: "", intro: "" });
   store.verifyAccount(u.id, true);
   store.adopt(id, u.id, "研究に使う");
   const again = new LibraryStore({ dir });
-  assert.equal(again.get(id).adoptions[0].adopter.verified, true);
-  assert.equal(again.get(id).invention.request, "手を使わず雨を防ぐ装置を作って");
+  assert.equal(again.mine(KEY_A)[0].adoptions[0].adopter.verified, true);
+  assert.equal(full(again.detail(id, { kind: "account", id: u.id })).request, "手を使わず雨を防ぐ装置を作って");
   assert.ok(checkGlb(again.model(id)) === null);
   // 鍵はファイルにも残さない
   assert.ok(!readFileSync(path.join(dir, "db.json"), "utf8").includes(KEY_A));
@@ -261,6 +307,9 @@ async function withServer(fn: (base: string) => Promise<void>, token = "") {
   try { await fn(base); } finally { server.close(); }
 }
 
+/** ログインの記録（cookie）を、次の要求に付ける形で取り出す。 */
+const sid = (r: Response) => /ilab_sid=[^;]+/.exec(r.headers.get("set-cookie") ?? "")?.[0] ?? "";
+
 const post = (base: string, p: string, body: unknown, headers: Record<string, string> = {}) =>
   fetch(base + p, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
 
@@ -276,38 +325,48 @@ test("http: publish → list → page → model → want → register → adopt 
     const list = await (await fetch(base + "/library?sort=new")).json() as { items: { id: string; creator: { name: string } }[] };
     assert.equal(list.items[0].id, id);
     assert.equal(list.items[0].creator.name, "あおい");
-    const page = await (await fetch(`${base}/library/${id}`)).json() as { invention: { request: string } };
-    assert.equal(page.invention.request, "手を使わず雨を防ぐ装置を作って");
+    const page = await (await fetch(`${base}/library/${id}`)).json() as { detail: boolean; invention: { name: string; request?: string } };
+    assert.equal(page.detail, false);
+    assert.equal(page.invention.request, undefined, "依頼の原文は、だれでも見られるページに載せない");
+    assert.equal((await fetch(`${base}/api/library/${id}`)).status, 401, "詳しい内容はログインが要る");
     const model = await fetch(`${base}/library/${id}/model.glb`);
     assert.equal(model.headers.get("content-type"), "model/gltf-binary");
     assert.equal(checkGlb(Buffer.from(await model.arrayBuffer())), null);
 
     r = await post(base, `/library/${id}/want`, { voter: "browser-aaaaaaaa" });
-    assert.deepEqual(((await r.json()) as { wants: unknown }).wants, { vr: 0, site: 1 });
+    assert.equal(((await r.json()) as { wants: unknown }).wants, 1);
     r = await post(base, `/library/${id}/want`, {}, { "x-ilab-creator": KEY_B });
     assert.equal(r.status, 409, "VR は試してから");
     await post(base, `/library/${id}/tried`, {}, { "x-ilab-creator": KEY_B });
     r = await post(base, `/library/${id}/want`, {}, { "x-ilab-creator": KEY_B });
-    assert.deepEqual(((await r.json()) as { wants: unknown }).wants, { vr: 1, site: 1 });
+    assert.equal(((await r.json()) as { wants: unknown }).wants, 2);
 
-    r = await post(base, "/accounts", { name: "山田", affiliation: "大学", role: "researcher", field: "流体", intro: "雨の研究" });
+    r = await post(base, `/api/library/${id}/adopt`, { reason: "研究テーマにしたい" });
+    assert.equal(r.status, 401, "採用はログインが要る");
+    r = await post(base, "/api/signup", { name: "山田", affiliation: "大学", field: "流体", intro: "雨の研究", email: "Yamada@Example.jp", password: "rain-research", agreed: true });
     assert.equal(r.status, 201);
-    const acc = await r.json() as { id: string };
-    r = await post(base, `/library/${id}/adopt`, { accountId: acc.id, reason: " " });
+    const cookie = sid(r);
+    const full = await (await fetch(`${base}/api/library/${id}`, { headers: { cookie } })).json() as { detail: boolean; invention: { request: string } };
+    assert.equal(full.detail, true);
+    assert.equal(full.invention.request, "手を使わず雨を防ぐ装置を作って");
+    r = await post(base, `/api/library/${id}/adopt`, { reason: " " }, { cookie });
     assert.equal(r.status, 400, "理由は必須");
-    r = await post(base, `/library/${id}/adopt`, { accountId: acc.id, reason: "研究テーマにしたい" });
+    r = await post(base, `/api/library/${id}/adopt`, { reason: "研究テーマにしたい" }, { cookie });
     const { threadId } = await r.json() as { threadId: string };
 
-    r = await post(base, `/threads/${threadId}/messages`, { text: "はじめまして" }, { "x-ilab-as": `account:${acc.id}` });
+    r = await post(base, `/api/threads/${threadId}/messages`, { text: "はじめまして" }, { cookie });
     assert.equal(r.status, 201);
     r = await post(base, `/threads/${threadId}/messages`, { text: "よろしくお願いします" }, { "x-ilab-creator": KEY_A });
     assert.equal(r.status, 201);
     r = await post(base, `/threads/${threadId}/messages`, { text: "のぞき見" }, { "x-ilab-creator": KEY_B });
     assert.equal(r.status, 404);
-    // サイトで「発案者として見る」（表示名で公開した発案者）
-    const creatorId = publicCreatorId(creatorHashOf(KEY_A));
-    const asCreator = await (await fetch(`${base}/threads/${threadId}`, { headers: { "x-ilab-as": `creator:${creatorId}` } })).json() as { messages: { from: string }[] };
+    // サイトでは、Quest が出した番号で発案者として入る
+    const { code: pairCode } = await (await post(base, "/library/pair", {}, { "x-ilab-creator": KEY_A })).json() as { code: string };
+    assert.match(pairCode, /^\d{6}$/);
+    const asCreatorCookie = sid(await post(base, "/api/pair", { code: pairCode }));
+    const asCreator = await (await fetch(`${base}/api/threads/${threadId}`, { headers: { cookie: asCreatorCookie } })).json() as { messages: { from: string }[] };
     assert.deepEqual(asCreator.messages.map((m) => m.from), ["adopter", "creator"]);
+    assert.equal((await post(base, "/api/pair", { code: pairCode })).status, 401, "番号は1回だけ");
 
     const mine = await (await fetch(base + "/library/mine", { headers: { "x-ilab-creator": KEY_A } })).json() as { items: { status: string; adoptions: { messageCount: number }[] }[] };
     assert.equal(mine.items[0].status, "adopted");
@@ -330,8 +389,9 @@ test("http: bad input gets a short reason; unknown paths and methods are refused
     assert.equal(r.status, 415);
     assert.equal((await fetch(base + "/library/p-9999")).status, 404);
     assert.equal((await fetch(base + "/library/P_bad!")).status, 404);
-    assert.equal((await fetch(base + "/accounts", { method: "DELETE" })).status, 405);
-    assert.equal((await fetch(base + "/threads")).status, 401, "名乗りが要る");
+    assert.equal((await fetch(base + "/api/session", { method: "DELETE" })).status, 405);
+    assert.equal((await fetch(base + "/threads")).status, 401, "端末の鍵が要る");
+    assert.equal((await fetch(base + "/api/threads")).status, 401, "ログインが要る");
   });
 });
 
@@ -420,18 +480,18 @@ test("contract: a publication built by the app passes the library schema", () =>
   assert.equal(s.after.revision, 3);
 });
 
-test("accounts list carries adoption counts; creators list only named, live creators", () => {
+test("operator's account list carries adoption counts; creators list only named, live creators", () => {
   const { store } = freshStore();
   const named = store.publish(KEY_A, pub({ id: "n1", displayName: "あおい" }), tinyGlb()).id;
   store.publish(KEY_B, pub({ id: "a1", anonymous: true }), tinyGlb());
-  const res = store.createAccount({ name: "山田", affiliation: "大学", role: "researcher", field: "", intro: "" });
-  assert.equal(store.listAccounts()[0].adoptions, 0);
+  const res = store.createAccount({ name: "山田", affiliation: "大学", field: "", intro: "" });
+  assert.equal(store.adminAccounts()[0].adoptions, 0);
   store.adopt(named, res.id, "研究に使える");
-  assert.equal(store.listAccounts()[0].adoptions, 1);
+  assert.equal(store.adminAccounts()[0].adoptions, 1);
   assert.deepEqual(store.listCreators(), [{ publicId: publicCreatorId(creatorHashOf(KEY_A)), name: "あおい", published: 1 }]);
   // 取り下げた発明は、採用の数にも発案者の一覧にも入らない
   store.withdraw(named, KEY_A);
-  assert.equal(store.listAccounts()[0].adoptions, 0);
+  assert.equal(store.adminAccounts()[0].adoptions, 0);
   assert.deepEqual(store.listCreators(), []);
 });
 
@@ -450,20 +510,16 @@ test("samples: loaded under a named sample creator, sample accounts are added on
   assert.equal(loadSamples(from, store)[0], id, "入れ直しても増えない");
   loadSampleAccounts(store);
   loadSampleAccounts(store);
-  const accounts = store.listAccounts();
+  const accounts = store.adminAccounts();
   assert.equal(accounts.length, SAMPLE_ACCOUNTS.length, "何度入れても増えない");
   assert.ok(accounts.every((a) => a.sample));
   assert.deepEqual(accounts.map((a) => a.verified), SAMPLE_ACCOUNTS.map((a) => a.verified));
 });
 
-test("http: the site lists named creators to choose from", async () => {
+test("http: a named creator has a public page", async () => {
   await withServer(async (base) => {
     await post(base, "/library", { publication: publication(), glbBase64: tinyGlb().toString("base64") }, { "x-ilab-creator": KEY_A });
-    const r = await fetch(base + "/creators");
-    assert.equal(r.status, 200);
-    const { items } = await r.json() as { items: { name: string; publicId: string }[] };
-    assert.deepEqual(items.map((c) => c.name), ["あおい"]);
-    const page = await (await fetch(`${base}/creators/${items[0].publicId}`)).json() as { displayName: string };
+    const page = await (await fetch(`${base}/api/creators/${publicCreatorId(creatorHashOf(KEY_A))}`)).json() as { displayName: string };
     assert.equal(page.displayName, "あおい");
   });
 });

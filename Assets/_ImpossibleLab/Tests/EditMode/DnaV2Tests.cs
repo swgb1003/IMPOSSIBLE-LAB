@@ -88,7 +88,7 @@ namespace ImpossibleLab.Tests
         [TestCase("\"tags\": [\"lighting\", \"safety\"]", "\"tags\": [\"lighting\", \"lighting\"]", "重複")]
         [TestCase("\"tags\": [\"lighting\", \"safety\"]", "\"tags\": [\"lighting\", \"safety\", \"daily\", \"outdoor\"]", "tags は1〜3")]
         [TestCase("\"mount\": \"back\"", "\"mount\": \"tail\"", "取り付け位置")]
-        [TestCase("\"shape\": \"box\", \"material\": \"fabric\"", "\"shape\": \"cone\", \"material\": \"fabric\"", "shape")]
+        [TestCase("\"shape\": \"box\", \"material\": \"fabric\"", "\"shape\": \"pyramid\", \"material\": \"fabric\"", "shape")]
         [TestCase("\"shape\": \"box\", \"material\": \"fabric\"", "\"shape\": \"box\", \"material\": \"vibranium\"", "material")]
         [TestCase("\"blocks\": [\"stabilize\"], \"status\": \"simplified\"", "\"blocks\": [\"teleport\"], \"status\": \"simplified\"", "無い機能")]
         [TestCase("\"blocks\": [\"stabilize\"], \"status\": \"simplified\"", "\"blocks\": [], \"status\": \"simplified\"", "blocks")]

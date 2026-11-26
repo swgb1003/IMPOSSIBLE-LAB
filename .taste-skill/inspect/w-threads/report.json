@@ -1,6 +1,6 @@
 {
- "url": "http://127.0.0.1:8799/site/threads.html",
- "at": "2026-11-25T14:47:39.130Z",
+ "url": "http://127.0.0.1:8787/site/threads.html",
+ "at": "2026-11-26T03:07:44.919Z",
  "allow": [],
  "viewports": [
   {
@@ -810,7 +810,7 @@
    "load": "load",
    "screens": 2,
    "filled": [
-    0.73,
+    0.74,
     0.81
    ],
    "motion": {
@@ -971,11 +971,11 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.78
+       "share": 0.77
       },
       {
        "color": "#e9fbfc",
-       "share": 0.22
+       "share": 0.23
       }
      ],
      "button": null,
@@ -1045,14 +1045,14 @@
       "tag": "header",
       "top": 0,
       "height": 208,
-      "words": 7,
+      "words": 6,
       "media": 0,
-      "middle": 0,
+      "middle": 4,
       "heading": null,
-      "left": 16,
-      "right": 82,
-      "textLeft": 16,
-      "textRight": 82,
+      "left": 32,
+      "right": 66,
+      "textLeft": 32,
+      "textRight": 66,
       "fullBleed": false,
       "footer": false,
       "hero": true,

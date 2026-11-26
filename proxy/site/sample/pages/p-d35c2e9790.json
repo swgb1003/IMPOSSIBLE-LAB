@@ -2,26 +2,23 @@
  "id": "p-d35c2e9790",
  "status": "open",
  "sample": true,
+ "detail": false,
  "publishedAt": "2026-11-25T11:14:25.711Z",
- "updatedAt": "2026-11-25T14:42:07.999Z",
- "consentVersion": "2026-11-25",
+ "updatedAt": "2026-11-26T14:16:30.931Z",
+ "consentVersion": "2026-11-26",
  "creator": {
   "name": "見本の発案者",
   "publicId": "c-79093c5a51eb"
  },
- "wants": {
-  "vr": 0,
-  "site": 0
- },
- "tried": 0,
- "adoptions": [],
- "considering": [],
+ "wants": 0,
+ "adoptions": 0,
+ "considering": 0,
  "images": [
   {
    "kind": "stage",
-   "caption": "研究所の発明台に置いた Rev.2",
+   "caption": "IMPOSSIBLE LAB の発明台に置いた Rev.2",
    "revision": 2,
-   "url": "sample/images/p-d35c2e9790-0.jpg"
+   "url": "/site/sample/images/p-d35c2e9790-0.jpg"
   }
  ],
  "invention": {
@@ -49,192 +46,15 @@
    "id": "back",
    "label": "背中"
   },
-  "request": "冬のバス停で待つ間、背中を温めてくれる道具",
-  "designSource": "ai",
-  "needs": [
-   {
-    "need": "背中を温める",
-    "status": "simulated",
-    "blocks": [
-     {
-      "id": "heat",
-      "label": "加温"
-     }
-    ],
-    "how": "加熱部（heater-upper）が加温を受け持つ",
-    "note": "集中定数の熱モデルで温度の上がり方を計算します。"
-   },
-   {
-    "need": "寒い外気でも効く",
-    "status": "simplified",
-    "blocks": [
-     {
-      "id": "heat",
-      "label": "加温"
-     }
-    ],
-    "how": "加熱部（heater-upper）が加温を受け持つ",
-    "note": "気温だけを変えて試します。バス停の風による冷え（風冷え）は座る実験では扱えません。"
-   },
-   {
-    "need": "待ち時間の間電池がもつ",
-    "status": "simplified",
-    "blocks": [
-     {
-      "id": "heat",
-      "label": "加温"
-     }
-    ],
-    "how": "加熱部（heater-upper）が加温を受け持つ",
-    "note": "現実モードの消費電力から目安を見るだけで、電池の容量や劣化は計算しません。"
-   },
-   {
-    "need": "着け心地・コートとの相性",
-    "status": "unverifiable",
-    "blocks": [],
-    "how": "対応する機能がない",
-    "note": "重さの感じ方や服との相性、低温やけどの危険はシミュレーションでは確かめられません。"
-   }
-  ],
-  "parts": [
-   {
-    "id": "back-pad",
-    "type": "body",
-    "label": "本体",
-    "role": "部品をまとめて支える本体",
-    "shape": "箱",
-    "material": "布",
-    "sizeM": [
-     0.32,
-     0.4,
-     0.04
-    ],
-    "massKg": 0.024
-   },
-   {
-    "id": "heater-upper",
-    "type": "heater",
-    "label": "加熱部",
-    "role": "加温の機能を受け持つ。熱を出して温める",
-    "shape": "箱",
-    "material": "布",
-    "sizeM": [
-     0.26,
-     0.14,
-     0.01
-    ],
-    "massKg": 0.006
-   },
-   {
-    "id": "heater-lower",
-    "type": "heater",
-    "label": "加熱部",
-    "role": "熱を出して温める",
-    "shape": "箱",
-    "material": "布",
-    "sizeM": [
-     0.26,
-     0.14,
-     0.01
-    ],
-    "massKg": 0.006
-   },
-   {
-    "id": "insulation",
-    "type": "cushion",
-    "label": "緩衝材",
-    "role": "ぶつかったときの衝撃をやわらげる",
-    "shape": "箱",
-    "material": "発泡材",
-    "sizeM": [
-     0.32,
-     0.4,
-     0.02
-    ],
-    "massKg": 0.077
-   },
-   {
-    "id": "battery-pack",
-    "type": "battery",
-    "label": "電池",
-    "role": "電気をためて各部に送る",
-    "shape": "箱",
-    "material": "樹脂",
-    "sizeM": [
-     0.1,
-     0.06,
-     0.03
-    ],
-    "massKg": 0.36
-   },
-   {
-    "id": "temp-sensor",
-    "type": "sensor",
-    "label": "センサー",
-    "role": "まわりの様子や人の位置を感じ取る",
-    "shape": "球",
-    "material": "樹脂",
-    "sizeM": [
-     0.02,
-     0.02,
-     0.02
-    ],
-    "massKg": 0.003
-   },
-   {
-    "id": "strap-left",
-    "type": "strap",
-    "label": "ベルト・取り付け具",
-    "role": "体や物に取り付ける",
-    "shape": "箱",
-    "material": "布",
-    "sizeM": [
-     0.04,
-     0.5,
-     0.2
-    ],
-    "massKg": 0.019
-   },
-   {
-    "id": "strap-right",
-    "type": "strap",
-    "label": "ベルト・取り付け具",
-    "role": "体や物に取り付ける",
-    "shape": "箱",
-    "material": "布",
-    "sizeM": [
-     0.04,
-     0.5,
-     0.2
-    ],
-    "massKg": 0.019
-   },
-   {
-    "id": "waist-belt",
-    "type": "strap",
-    "label": "ベルト・取り付け具",
-    "role": "体や物に取り付ける",
-    "shape": "箱",
-    "material": "布",
-    "sizeM": [
-     0.5,
-     0.05,
-     0.25
-    ],
-    "massKg": 0.024
-   }
-  ],
+  "partCount": 9,
+  "experimentCount": 2,
   "experiments": [
    {
     "revision": 1,
     "title": "座って過ごす（気温）",
     "mode": "dream",
-    "conditions": [
-     {
-      "label": "気温",
-      "value": "-2 °C・8 °C・15 分"
-     }
-    ],
+    "passed": true,
+    "criteria": "狙った向きの温度変化≥8.0°C・目標の温度に届くまで≤10.0分",
     "metrics": [
      {
       "key": "temperatureGain",
@@ -254,26 +74,14 @@
       "lowerIsBetter": true,
       "primary": true
      }
-    ],
-    "passed": true,
-    "criteria": "狙った向きの温度変化≥8.0°C・目標の温度に届くまで≤10.0分",
-    "seed": 2026,
-    "notes": [
-     "人型モデルが座って 15 分過ごす（10 秒に早送りして再生）。気温 -2 °C",
-     "加温：電力 25 W → 熱 +22.5 W。装着部の熱容量 600 J/K・熱損失 1.5 W/K（調整用の仮定）→ 定常で +15.0 °C"
-    ],
-    "at": "2026-11-25T23:22:22"
+    ]
    },
    {
     "revision": 2,
     "title": "座って過ごす（気温）",
     "mode": "dream",
-    "conditions": [
-     {
-      "label": "気温",
-      "value": "-2 °C・8 °C・15 分"
-     }
-    ],
+    "passed": true,
+    "criteria": "狙った向きの温度変化≥8.0°C・目標の温度に届くまで≤10.0分",
     "metrics": [
      {
       "key": "temperatureGain",
@@ -293,60 +101,8 @@
       "lowerIsBetter": true,
       "primary": true
      }
-    ],
-    "passed": true,
-    "criteria": "狙った向きの温度変化≥8.0°C・目標の温度に届くまで≤10.0分",
-    "seed": 2026,
-    "notes": [
-     "人型モデルが座って 15 分過ごす（10 秒に早送りして再生）。気温 -2 °C",
-     "加温：電力 30 W → 熱 +27.0 W。装着部の熱容量 600 J/K・熱損失 1.5 W/K（調整用の仮定）→ 定常で +18.0 °C"
-    ],
-    "at": "2026-11-25T23:22:27"
+    ]
    }
-  ],
-  "revisions": [
-   {
-    "revision": 2,
-    "parent": 1,
-    "source": "offline",
-    "request": "もっと温かくして",
-    "summary": "加温の電力を上げる",
-    "changes": [
-     {
-      "label": "加温：加熱の電力",
-      "before": "25 W",
-      "after": "30 W"
-     }
-    ],
-    "resultChanged": true
-   }
-  ],
-  "research": {
-   "unverifiable": [
-    {
-     "need": "着け心地・コートとの相性",
-     "reason": "重さの感じ方や服との相性、低温やけどの危険はシミュレーションでは確かめられません。"
-    }
-   ],
-   "assumptions": [
-    "加温：集中定数の熱モデル C dT/dt = 電力×効率 − G(T − 外気温)",
-    "人型モデルが座って 15 分過ごす（10 秒に早送りして再生）。気温 -2 °C",
-    "加温：電力 25 W → 熱 +22.5 W。装着部の熱容量 600 J/K・熱損失 1.5 W/K（調整用の仮定）→ 定常で +15.0 °C",
-    "加温：電力 30 W → 熱 +27.0 W。装着部の熱容量 600 J/K・熱損失 1.5 W/K（調整用の仮定）→ 定常で +18.0 °C"
-   ],
-   "simplified": [
-    "寒い外気でも効く：気温だけを変えて試します。バス停の風による冷え（風冷え）は座る実験では扱えません。",
-    "待ち時間の間電池がもつ：現実モードの消費電力から目安を見るだけで、電池の容量や劣化は計算しません。"
-   ]
-  },
-  "developer": {
-   "totalMassKg": 0.538,
-   "tipAngleDeg": null,
-   "powerW": null,
-   "runtimeMin": null,
-   "challenges": [
-    "着け心地・コートとの相性：重さの感じ方や服との相性、低温やけどの危険はシミュレーションでは確かめられません。"
-   ]
-  }
+  ]
  }
 }

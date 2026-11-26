@@ -31,7 +31,7 @@ Shapes: ${named(c.shapes)}
 Materials: ${materials}
 Appearance presets (colors only, no effect on performance): ${looks || "lab_white"}
 
-Shape scale convention: cylinder and capsule scale is [diameter, height, diameter]; box is [width, height, depth]; sphere is [diameter, diameter, diameter]. A wheel is turned on its side by the app, so give a wheel [diameter, tire width, diameter] (for example [0.2, 0.06, 0.2]).
+Shape scale convention: cylinder and capsule scale is [diameter, height, diameter]; box is [width, height, depth]; sphere is [diameter, diameter, diameter]; dome is [diameter, how high the middle rises, diameter] (a thin curved shell, open at the bottom, like an umbrella); cone is [bottom diameter, height, bottom diameter] (the top is 30% as wide); ring is [outer diameter, ring thickness, outer diameter] (lying flat, the hole goes up and down). A wheel is turned on its side by the app, so give a wheel [diameter, tire width, diameter] (for example [0.2, 0.06, 0.2]).
 
 Limits: at most ${L.maxParts} parts and ${L.maxBehaviors} behaviors. Positions are local to the body center (y up, +z forward), x/z within ±${L.positionLimitXZ} m, y within ${L.positionMinY}..${L.positionMaxY} m. Part ids: lowercase letters, digits, "-" or "_", unique. Each behavior appears at most once.`;
 }
@@ -143,9 +143,9 @@ export const LAYOUT = `- Build one product, not a pile of shapes. Start from the
 - A product that drives on the ground (mount ground, with wheels) rests on its wheels: the bottom of the wheels is the floor, and every other part stays at least 1 cm above it. A drive motor sits inside the body or between the wheels near the axle height, never sticking out below.
 - Nothing floats. The only exception is the canopy of a head-mounted protector; even then, a frame or connector part should link it to the body when it is more than 1 cm away.
 - A part may sink into another by at most half of its own thickness. Only internal parts (battery, motor) may sit completely inside the body.
-- Proportions: the longest side of a part is at most 4 times its shortest side, except canopy, panel, frame, strap and solar parts, which are thin by nature.
+- Proportions: the longest side of a part is at most 4 times its shortest side, except canopy, panel, frame, strap and solar parts and the dome and ring shapes, which are thin by nature.
 - Paired parts (wheels, thrusters, arms, lights on both sides) are mirror images: positions x and -x with the same y and z, same scale.
-- Shapes: box or cylinder for housings, sphere only for sensors and cushions, capsule only for arms. Prefer a few well-sized parts over many tiny ones; parts smaller than 3 cm only for sensors and lights.`;
+- Shapes: box or cylinder for housings, sphere only for sensors and cushions, capsule only for arms. Use dome for umbrella-like covers, hoods, hat brims and lamp covers (canopy, panel or cushion parts); cone for parts that narrow toward the top, such as lamp shades, nozzles and feet; ring for bumpers, guards and rims that go around something (cushion, frame or connector parts). Use these three only where the real product has that form. Prefer a few well-sized parts over many tiny ones; parts smaller than 3 cm only for sensors and lights.`;
 
 /** 製品の説明（初心者が「なぜこの部品があるのか」「どうやって動くのか」を理解できるように）。 */
 export const EXPLAIN = `- Explain the product to a beginner. overview: who uses it, in what situation, and how (1-2 sentences). Each part's role: why this part is in this product and what it does here, not a dictionary definition (for example "人の位置を測って、ついていく向きを決める", not "センサー"). Each need's how: which parts do what, through which behaviors, to realize the need.
@@ -171,7 +171,7 @@ ${HONESTY}
 ${LAYOUT}
 ${EXPLAIN}
 - Tags: if the invention is a rain protector, a following carrier robot or a flying mobility device, put ${legacy} (whichever fits) first, because the current screens choose the demo experiment from it. Otherwise use the tags that fit.
-- Protection: the canopy with rain_shield blocks rain; make the canopy scale x and z about 2 × radius and its y thin (0.02-0.05). follow_head keeps the device above the head (mount head). skirtLength adds a side cover for windy rain.
+- Protection: the canopy with rain_shield blocks rain; make the canopy scale x and z about 2 × radius. Use a dome canopy (y 0.1-0.25, how high the middle rises) for an umbrella look, or a flat cylinder canopy (y 0.02-0.05). follow_head keeps the device above the head (mount head). skirtLength adds a side cover for windy rain.
 - Carrier (mount ground): follow_user, avoid_obstacle (the robot reacts about 0.3 s late, so detectionRange below about 0.5 m rarely helps), carry_load.capacity at least the payload.
 - Flying shoes (mount foot): hover.lift at least 0.15, move_forward thrust/speedLimit, stabilize against crosswind. In reality mode the power to lift a person is enormous, which is an intended learning point.
 - Program: use program "" unless the request needs conditions or a sequence. When you write one, every sensor needs its required behavior or part, and the first plan should be approach_device when the trigger is a person coming near.

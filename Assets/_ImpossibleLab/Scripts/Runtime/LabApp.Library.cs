@@ -34,6 +34,17 @@ namespace ImpossibleLab
 
         /// <summary>サイトの入口（PC のブラウザで開く）。</summary>
         public const string SiteAddress = "http://127.0.0.1:8787/";
+        /// <summary>発案者が Quest の番号で入るサイトの画面。</summary>
+        public const string PairAddress = "http://127.0.0.1:8787/pair";
+
+        /// <summary>サイトに入る番号（PC のサイトに、この端末の発案者として入る。10 分有効）。</summary>
+        [NonSerialized] public string PairCode;
+        [NonSerialized] public DateTime PairExpiresUtc;
+        [NonSerialized] public string PairError;
+        bool _pairBusy;
+        public bool PairBusy => _pairBusy;
+        /// <summary>今使える番号（期限が切れていれば null）。</summary>
+        public string PairCodeNow => PairCode != null && DateTime.UtcNow < PairExpiresUtc ? PairCode : null;
 
         void InitLibrary()
         {
@@ -42,7 +53,7 @@ namespace ImpossibleLab
             _library = new LibraryClient(Proxy, () => Library.CreatorKey);
             Sm.Changed += (from, to) =>
             {
-                if (to != LabState.Saved) Publish = PublishStep.None;
+                if (to != LabState.Saved) { Publish = PublishStep.None; PairCode = null; PairError = null; }
                 // 保存の画面・一覧と、最初の指示の画面に来たときに読み直す（採用の知らせを、アプリを開き直さなくても出す）
                 bool reread = to == LabState.Saved || to == LabState.Gallery || (to == LabState.Drafting && from != LabState.Idle) || (to == LabState.Idle && from != LabState.Drafting);
                 if (reread && ProxyOnline == true) RefreshMine();
@@ -62,7 +73,7 @@ namespace ImpossibleLab
 
         /// <summary>画面の作り直しの判定に使う（状態・数・知らせが変わったら描き直す）。</summary>
         public string LibrarySignature =>
-            $"{Publish}{PublishAnonymous}{PublishError}|{MineLoaded}|{string.Join(",", Mine.Select(m => $"{m.Id}{m.Status}{m.WantsVr}{m.WantsSite}{m.Adoptions.Count}"))}|{AdoptionNotices.Count}";
+            $"{Publish}{PublishAnonymous}{PublishError}|{MineLoaded}|{string.Join(",", Mine.Select(m => $"{m.Id}{m.Status}{m.WantsVr}{m.WantsSite}{m.Adoptions.Count}"))}|{AdoptionNotices.Count}|{PairCodeNow}{PairError}{_pairBusy}";
 
         // ---------------- 公開の流れ ----------------
         public void StartPublish()
@@ -109,7 +120,7 @@ namespace ImpossibleLab
                 var images = new List<(string, string, int, byte[])>();
                 byte[] jpg = null;
                 try { jpg = CaptureProduct?.Invoke(dna); } catch (Exception e) { Debug.LogWarning("[ILAB] 試作品の写真を撮れません: " + e.Message); }
-                if (jpg != null) images.Add(("stage", $"研究所で組み立てた Rev.{dna.Revision} の試作品", dna.Revision, jpg));
+                if (jpg != null) images.Add(("stage", $"IMPOSSIBLE LAB で組み立てた Rev.{dna.Revision} の試作品", dna.Revision, jpg));
                 body = LibraryProtocol.PublishBody(pub, glb, images);
             }
             catch (Exception e)
@@ -126,7 +137,7 @@ namespace ImpossibleLab
             if (!opt.Anonymous) Library.DisplayName = opt.DisplayName;
             SaveLibrary();
             Publish = PublishStep.None;
-            ShowToast("発明ライブラリに公開しました。PC のサイトで見られます");
+            ShowToast("発明ライブラリーに公開しました。PC のサイトで見られます");
             RefreshMine();
         }
 
@@ -172,6 +183,23 @@ namespace ImpossibleLab
             }
             catch (Exception e) { Debug.LogWarning("[ILAB] library mine failed: " + e.Message); }
             finally { _mineBusy = false; }
+        }
+
+        // ---------------- サイトに入る番号 ----------------
+        /// <summary>PC のサイトに、この端末の発案者として入るための6桁の番号を PC にもらう（番号はサイトで1回だけ使える）。</summary>
+        public async void RequestPairCode()
+        {
+            if (_pairBusy || _library == null) return;
+            _pairBusy = true; PairError = null;
+            Notify();
+            try
+            {
+                var (code, body, err) = await _library.SendAsync("POST", "/library/pair", "{}", 10);
+                var (pair, expires, error) = LibraryProtocol.ParsePair(code, body, err);
+                PairCode = pair; PairExpiresUtc = expires; PairError = error;
+            }
+            catch (Exception e) { PairCode = null; PairError = "番号をもらえませんでした"; Debug.LogWarning("[ILAB] library pair failed: " + e.Message); }
+            finally { _pairBusy = false; Notify(); }
         }
 
         /// <summary>採用の知らせを読んだ（次からは出さない。保存の画面の公開の状態には残る）。</summary>

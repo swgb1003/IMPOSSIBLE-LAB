@@ -31,6 +31,7 @@ namespace ImpossibleLab
         public Material PartFabric;
         public Material PartFoam;
         public Material PartRubber;
+        public Material PartShade;       // 部品のすき間の陰りつきの素材の型（Art/Shaders/PartLit.shader。PartShading が性質を写して使う）
         // 研究室のモデル（Blender 制作、ArtSource/blender）用
         public Material GlowOrange;    // 床・台座の橙の光の線
         public Material LightPanel;    // 天井の照明面

@@ -390,6 +390,7 @@ namespace ImpossibleLab
                 c.Button(RX + 20f, 130f, 414f, 56f, "編集を続ける", App.ContinueEditing);
                 c.Button(RX + 20f, 198f, 414f, 56f, "保存した発明を見る", App.OpenGallery);
                 ConLibrarySection(inv);
+                ConPairSection();
                 ConFrame(new List<ConBtn> { new ConBtn("製品の説明", OpenExplain, ConKind.Quiet, 160f, dna != null) }, new ConBtn("新しい発明を始める", App.NewInvention, ConKind.Primary, 320f),
                     new Dictionary<int, UnityAction> { { 0, App.NewInvention }, { 2, App.ContinueEditing } });
                 return;

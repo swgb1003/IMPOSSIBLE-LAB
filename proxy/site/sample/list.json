@@ -5,7 +5,6 @@
    "id": "p-3897b44f0f",
    "name": "ハンズフリー雨よけ装置",
    "summary": "荷物で両手がふさがっている人の頭上に浮かび、傘を持たなくても雨を防ぐ装置。",
-   "request": "手を使わず雨を防ぐ装置を作って",
    "tags": [
     {
      "id": "protection",
@@ -13,22 +12,22 @@
     }
    ],
    "sceneTags": [],
-   "status": "open",
+   "mount": {
+    "id": "head",
+    "label": "頭"
+   },
+   "status": "adopted",
    "revision": 3,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
-   "adoptions": 0,
+   "creatorAdoptions": 1,
+   "wants": 0,
+   "adoptions": 1,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.792Z",
-   "updatedAt": "2026-11-25T14:42:08.079Z",
+   "updatedAt": "2026-11-26T14:16:30.999Z",
    "sample": true,
    "result": {
     "title": "雨の実験場",
@@ -47,14 +46,13 @@
      "passed": false
     }
    },
-   "thumb": "sample/images/p-3897b44f0f-0.jpg",
-   "page": "invention.html?id=p-3897b44f0f"
+   "thumb": "/site/sample/images/p-3897b44f0f-0.jpg",
+   "page": "/inventions/p-3897b44f0f"
   },
   {
    "id": "p-c3c626b0b8",
    "name": "ついてくる日陰キャノピー",
    "summary": "夏の通学路で頭の上に浮かび、強い日差しをさえぎって体に日陰を作る道具。",
-   "request": "夏の通学路で日差しがきついので、頭の上で日陰を作ってくれる道具",
    "tags": [
     {
      "id": "outdoor",
@@ -70,22 +68,22 @@
     }
    ],
    "sceneTags": [],
+   "mount": {
+    "id": "head",
+    "label": "頭"
+   },
    "status": "open",
    "revision": 2,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
+   "creatorAdoptions": 1,
+   "wants": 0,
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.771Z",
-   "updatedAt": "2026-11-25T14:42:08.058Z",
+   "updatedAt": "2026-11-26T14:16:30.981Z",
    "sample": true,
    "result": {
     "title": "その場に立つ（日差し）",
@@ -104,14 +102,13 @@
      "passed": true
     }
    },
-   "thumb": "sample/images/p-c3c626b0b8-0.jpg",
-   "page": "invention.html?id=p-c3c626b0b8"
+   "thumb": "/site/sample/images/p-c3c626b0b8-0.jpg",
+   "page": "/inventions/p-c3c626b0b8"
   },
   {
    "id": "p-9099caee0c",
    "name": "夜道あんしん足元ライト",
    "summary": "夜道を歩くとき、腰に付けたライトが足元を斜め下に照らして暗さの不安を減らす道具です。",
-   "request": "夜道で足元が暗くて怖いので、自動で足元を照らしてくれる道具",
    "tags": [
     {
      "id": "lighting",
@@ -127,22 +124,22 @@
     }
    ],
    "sceneTags": [],
+   "mount": {
+    "id": "waist",
+    "label": "腰"
+   },
    "status": "open",
    "revision": 2,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
+   "creatorAdoptions": 1,
+   "wants": 0,
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.751Z",
-   "updatedAt": "2026-11-25T14:42:08.038Z",
+   "updatedAt": "2026-11-26T14:16:30.964Z",
    "sample": true,
    "result": {
     "title": "その場に立つ（暗さ）",
@@ -161,14 +158,13 @@
      "passed": true
     }
    },
-   "thumb": "sample/images/p-9099caee0c-0.jpg",
-   "page": "invention.html?id=p-9099caee0c"
+   "thumb": "/site/sample/images/p-9099caee0c-0.jpg",
+   "page": "/inventions/p-9099caee0c"
   },
   {
    "id": "p-e164511db6",
    "name": "うしろ見守りリュック",
    "summary": "背中側のセンサーで後ろから近づく自転車などを検知し、音と光で背負っている人に知らせるリュック。",
-   "request": "後ろから自転車が近づいてきたら教えてくれるリュック",
    "tags": [
     {
      "id": "safety",
@@ -184,22 +180,22 @@
     }
    ],
    "sceneTags": [],
+   "mount": {
+    "id": "back",
+    "label": "背中"
+   },
    "status": "open",
    "revision": 2,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
+   "creatorAdoptions": 1,
+   "wants": 0,
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.731Z",
-   "updatedAt": "2026-11-25T14:42:08.017Z",
+   "updatedAt": "2026-11-26T14:16:30.947Z",
    "sample": true,
    "result": {
     "title": "その場に立つ（検知対象）",
@@ -218,14 +214,13 @@
      "passed": false
     }
    },
-   "thumb": "sample/images/p-e164511db6-0.jpg",
-   "page": "invention.html?id=p-e164511db6"
+   "thumb": "/site/sample/images/p-e164511db6-0.jpg",
+   "page": "/inventions/p-e164511db6"
   },
   {
    "id": "p-d35c2e9790",
    "name": "バス停ぬくぬく背中ヒーター",
    "summary": "冬のバス停で待つ間、背中に当てた加熱パッドで体を温める背負い型の道具。",
-   "request": "冬のバス停で待つ間、背中を温めてくれる道具",
    "tags": [
     {
      "id": "thermal",
@@ -241,22 +236,22 @@
     }
    ],
    "sceneTags": [],
+   "mount": {
+    "id": "back",
+    "label": "背中"
+   },
    "status": "open",
    "revision": 2,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
+   "creatorAdoptions": 1,
+   "wants": 0,
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.711Z",
-   "updatedAt": "2026-11-25T14:42:07.999Z",
+   "updatedAt": "2026-11-26T14:16:30.931Z",
    "sample": true,
    "result": {
     "title": "座って過ごす（気温）",
@@ -275,14 +270,13 @@
      "passed": true
     }
    },
-   "thumb": "sample/images/p-d35c2e9790-0.jpg",
-   "page": "invention.html?id=p-d35c2e9790"
+   "thumb": "/site/sample/images/p-d35c2e9790-0.jpg",
+   "page": "/inventions/p-d35c2e9790"
   },
   {
    "id": "p-7a2e6c0086",
    "name": "だんボール持ち上げリフト「アゲルくん」",
    "summary": "床に置いた段ボールを左右からはさみ、柱に沿って棚の高さまで持ち上げて置く道具。",
-   "request": "床に置いた段ボールを棚の上まで持ち上げてくれる道具",
    "tags": [
     {
      "id": "assist",
@@ -298,22 +292,22 @@
     }
    ],
    "sceneTags": [],
+   "mount": {
+    "id": "ground",
+    "label": "床（自走）"
+   },
    "status": "open",
    "revision": 2,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
+   "creatorAdoptions": 1,
+   "wants": 0,
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.690Z",
-   "updatedAt": "2026-11-25T14:42:07.980Z",
+   "updatedAt": "2026-11-26T14:16:30.910Z",
    "sample": true,
    "result": {
     "title": "持ち上げて置く（積荷）",
@@ -332,14 +326,13 @@
      "passed": true
     }
    },
-   "thumb": "sample/images/p-7a2e6c0086-0.jpg",
-   "page": "invention.html?id=p-7a2e6c0086"
+   "thumb": "/site/sample/images/p-7a2e6c0086-0.jpg",
+   "page": "/inventions/p-7a2e6c0086"
   },
   {
    "id": "p-e7e5e547b2",
    "name": "エアバンパー・スマホガード",
    "summary": "スマホの角とふちを厚めの緩衝材で囲み、落としたときに画面へ伝わる衝撃を小さくするケース。",
-   "request": "スマホを落としても画面が割れないようにする道具",
    "tags": [
     {
      "id": "safety",
@@ -351,22 +344,22 @@
     }
    ],
    "sceneTags": [],
+   "mount": {
+    "id": "hand",
+    "label": "手"
+   },
    "status": "open",
    "revision": 2,
    "creator": {
     "name": "見本の発案者",
     "publicId": "c-79093c5a51eb"
    },
-   "creatorAdoptions": 0,
-   "wants": {
-    "vr": 0,
-    "site": 0
-   },
-   "tried": 0,
+   "creatorAdoptions": 1,
+   "wants": 1,
    "adoptions": 0,
    "considering": 0,
    "publishedAt": "2026-11-25T11:14:25.664Z",
-   "updatedAt": "2026-11-25T14:42:07.956Z",
+   "updatedAt": "2026-11-26T14:16:30.886Z",
    "sample": true,
    "result": {
     "title": "落とす（落下）",
@@ -385,8 +378,8 @@
      "passed": true
     }
    },
-   "thumb": "sample/images/p-e7e5e547b2-0.jpg",
-   "page": "invention.html?id=p-e7e5e547b2"
+   "thumb": "/site/sample/images/p-e7e5e547b2-0.jpg",
+   "page": "/inventions/p-e7e5e547b2"
   }
  ]
 }

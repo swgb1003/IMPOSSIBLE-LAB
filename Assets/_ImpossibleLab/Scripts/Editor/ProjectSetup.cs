@@ -80,6 +80,7 @@ namespace ImpossibleLab.EditorTools
             asset.supportsCameraDepthTexture = false;
             asset.supportsCameraOpaqueTexture = false;
             asset.shadowDistance = 8f; // 動かない物の影は焼き込み（シャドウマスク）。実行中の影は近くの動く物だけなので短くして細かくする
+            SoftShadows(asset);
             EditorUtility.SetDirty(asset);
             GraphicsSettings.defaultRenderPipeline = asset;
             int current = QualitySettings.GetQualityLevel();
@@ -89,6 +90,18 @@ namespace ImpossibleLab.EditorTools
                 QualitySettings.renderPipeline = asset;
             }
             QualitySettings.SetQualityLevel(current, false);
+        }
+
+        /// <summary>
+        /// 実行中の影（発明など近くの動く物）の縁を柔らかくする。品質は軽い Low（Quest 向け）。
+        /// URP の設定の書き込み口が公開されていないので、保存される値を直接書く。
+        /// </summary>
+        public static void SoftShadows(UniversalRenderPipelineAsset asset)
+        {
+            var so = new SerializedObject(asset);
+            so.FindProperty("m_SoftShadowsSupported").boolValue = true;
+            so.FindProperty("m_SoftShadowQuality").intValue = 1; // Low
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // ---------------- XR（OpenXR / Meta Quest） ----------------
@@ -138,6 +151,18 @@ namespace ImpossibleLab.EditorTools
         }
 
         /// <summary>AI設計プロキシが読むカタログ（proxy/catalog.json）を C# のカタログから書き出す。</summary>
+        /// <summary>部品のすき間の陰りの素材の型と、柔らかい影だけを設定する（ほかの素材・シーンは作り直さない）。</summary>
+        [MenuItem("IMPOSSIBLE LAB/7. 部品の陰りと柔らかい影を設定")]
+        public static void ApplyPartShade()
+        {
+            var a = AssetDatabase.LoadAssetAtPath<LabAssets>(LabAssetsPath);
+            if (a != null) { a.PartShade = PartShadeMaterial(); EditorUtility.SetDirty(a); }
+            var urp = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(SettingsDir + "/URP_Quest.asset");
+            if (urp != null) { SoftShadows(urp); EditorUtility.SetDirty(urp); }
+            AssetDatabase.SaveAssets();
+            Debug.Log($"PartShade: {(a != null && a.PartShade != null ? a.PartShade.shader.name : "なし")}, soft shadows: {urp?.supportsSoftShadows}");
+        }
+
         [MenuItem("IMPOSSIBLE LAB/6. AIプロキシ用カタログを書き出す")]
         public static void ExportProxyCatalog()
         {
@@ -202,6 +227,7 @@ namespace ImpossibleLab.EditorTools
             a.PartFabric = Lit("PartFabric", new Color(0.20f, 0.25f, 0.33f), 0.08f, 0f);
             a.PartFoam = Lit("PartFoam", new Color(0.86f, 0.84f, 0.76f), 0.03f, 0f);
             a.PartRubber = Lit("PartRubber", new Color(0.09f, 0.10f, 0.11f), 0.22f, 0f);
+            a.PartShade = PartShadeMaterial();
             a.GlowOrange = Emissive(Lit("GlowOrange", LabTheme.AccentWarning, 0.4f, 0f), LabTheme.AccentWarning * 1.2f);
             a.LightPanel = Emissive(Lit("LightPanel", new Color(0.95f, 0.96f, 0.97f), 0.5f, 0f), new Color(1f, 0.99f, 0.98f) * 2.2f, bakeGI: true);
             a.FloorConcrete = FloorMaterial();
@@ -355,6 +381,22 @@ namespace ImpossibleLab.EditorTools
                 foreach (var ch in File.ReadAllText(f, Encoding.UTF8)) if (ch > 0x7F && !char.IsControl(ch) && !char.IsSurrogate(ch)) set.Add(ch);
             foreach (var ch in "ぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろわをんァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワヲンヴー、。「」・！？（）") set.Add(ch);
             return new string(set.ToArray());
+        }
+
+        /// <summary>
+        /// 部品のすき間の陰りつきの素材の型（Art/Shaders/PartLit.shader）。実行中に部品の素材の性質を写して使う（PartShading）。
+        /// シェーダーをビルドに含めるため、素材の形で LabAssets から指す。
+        /// </summary>
+        public static Material PartShadeMaterial()
+        {
+            var shader = Shader.Find("ImpossibleLab/PartLit");
+            if (shader == null) { Debug.LogWarning("ImpossibleLab/PartLit が見つかりません"); return null; }
+            string p = $"{MatDir}/PartShade.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(p);
+            if (m == null) { m = new Material(shader); AssetDatabase.CreateAsset(m, p); }
+            m.shader = shader;
+            EditorUtility.SetDirty(m);
+            return m;
         }
 
         static Material Lit(string name, Color c, float smooth, float metal)

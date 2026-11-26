@@ -1,9 +1,9 @@
 // 発案者のページ：表示名で公開した発明だけで作る（公開した数・採用された数・発明の一覧）。
 import { $, el, date, phraseBreaks } from "./text.js";
-import { api, mountWho } from "./who.js";
+import { api, mountAccount } from "./session.js";
 
 const STATUS = { open: "公開中", considering: "検討中", adopted: "採用" };
-const id = new URLSearchParams(location.search).get("id") ?? "";
+const id = location.pathname.split("/")[2] ?? "";
 
 const fig = (v, unit, label) => {
   const d = el("div");
@@ -13,9 +13,9 @@ const fig = (v, unit, label) => {
   return d;
 };
 
-await mountWho();
+await mountAccount();
 try {
-  const c = await api(`/creators/${encodeURIComponent(id)}`);
+  const c = await api(`/api/creators/${encodeURIComponent(id)}`);
   document.title = `${c.displayName} | IMPOSSIBLE LIBRARY`;
   $("name").textContent = c.displayName;
   $("figs").append(fig(c.published, "件", "公開した発明"), fig(c.adopted, "件", "採用された発明"));
@@ -23,11 +23,11 @@ try {
   for (const p of c.inventions) {
     const tr = el("tr");
     const a = el("a", null, p.name);
-    a.href = `invention.html?id=${p.id}`;
+    a.href = `/inventions/${p.id}`;
     const name = el("td");
     const nb = el("b");
     nb.append(a);
-    name.append(nb, el("span", "sub", p.request || "依頼の文の記録なし"));
+    name.append(nb, el("span", "sub", p.summary));
     const st = el("td");
     st.append(el("span", p.status === "adopted" ? "now nw" : "nw", STATUS[p.status] ?? p.status));
     const w = el("td", "num", String(p.wants)), n = el("td", "num", String(p.adoptions)), d = el("td", "num nw", date(p.publishedAt));

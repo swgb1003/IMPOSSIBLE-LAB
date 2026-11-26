@@ -1,23 +1,24 @@
 {
- "url": "http://127.0.0.1:8799/site/invention.html?id=p-7a9d0d0132",
- "at": "2026-11-25T14:57:49.117Z",
- "allow": [],
+ "url": "http://127.0.0.1:8787/inventions/p-7a2e6c0086",
+ "at": "2026-11-26T13:43:13.893Z",
+ "allow": [
+  "few-pictures"
+ ],
  "viewports": [
   {
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 4,
+   "screens": 3,
    "filled": [
-    0.97,
-    0.73,
+    0.95,
     0.73,
     0.73
    ],
    "motion": {
-    "elements": 20,
+    "elements": 11,
     "css": 0,
-    "transitions": 20,
+    "transitions": 11,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -28,25 +29,22 @@
      "h": 900
     },
     "page": {
-     "height": 2716,
-     "screens": 3,
-     "words": 172,
-     "img": 4,
+     "height": 2238,
+     "screens": 2.5,
+     "words": 92,
+     "img": 1,
      "video": 0,
      "canvas": 1,
      "svg": 1,
-     "sections": 4,
+     "sections": 3,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 4,
+     "realPictures": 1,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
-      "1.jpg",
-      "2.jpg",
-      "3.jpg",
       "0.jpg"
      ],
      "blendText": 0,
@@ -56,39 +54,35 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "ハンズ​フリー​雨よけ​装置",
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
      "words": 1,
-     "chars": 14,
-     "lines": 1,
+     "chars": 23,
+     "lines": 2,
      "size": 56,
      "vw": 3.9,
      "font": "Noto Sans JP",
      "weight": 700,
      "tracking": -0.02,
      "leading": 1.05,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "right",
-     "widthRatio": 0.46,
      "top": 86,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
-     "text": "ハンズ​フリー​雨よけ​装置",
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
      "words": 1,
-     "lines": 1,
+     "lines": 2,
      "size": 56,
      "font": "Noto Sans JP"
     },
     "headings": [
      {
-      "text": "ハンズ​フリー​雨よけ​装置",
+      "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
       "words": 1,
-      "chars": 14,
-      "lines": 1,
+      "chars": 23,
+      "lines": 2,
       "size": 56,
       "vw": 3.9,
       "font": "Noto Sans JP",
@@ -106,30 +100,9 @@
       "kind": "heading"
      },
      {
-      "text": "手を​使わず​雨を​防ぐ​装置を​作って",
+      "text": "0回",
       "words": 1,
-      "chars": 20,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Noto Sans JP",
-      "weight": 500,
-      "tracking": 0,
-      "leading": 1.3,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.46,
-      "top": 312,
-      "tag": "blockquote",
-      "kind": "statement"
-     },
-     {
-      "text": "66.4%",
-      "words": 1,
-      "chars": 5,
+      "chars": 2,
       "lines": 1,
       "size": 56,
       "vw": 3.9,
@@ -143,14 +116,14 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.21,
-      "top": 512,
+      "top": 571,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "30.7%",
+      "text": "0回",
       "words": 1,
-      "chars": 5,
+      "chars": 2,
       "lines": 1,
       "size": 56,
       "vw": 3.9,
@@ -164,49 +137,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.21,
-      "top": 512,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "377W",
-      "words": 1,
-      "chars": 4,
-      "lines": 1,
-      "size": 56,
-      "vw": 3.9,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.22,
-      "top": 1625,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "8.5分",
-      "words": 1,
-      "chars": 4,
-      "lines": 1,
-      "size": 56,
-      "vw": 3.9,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.22,
-      "top": 1625,
+      "top": 571,
       "tag": "p",
       "kind": "statement"
      },
@@ -227,12 +158,12 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.1,
-      "top": 2272,
+      "top": 1693,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "0人",
+      "text": "0件",
       "words": 1,
       "chars": 2,
       "lines": 1,
@@ -248,49 +179,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.1,
-      "top": 2272,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0人",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.1,
-      "top": 2272,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "1件",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.1,
-      "top": 2272,
+      "top": 1693,
       "tag": "p",
       "kind": "statement"
      },
@@ -299,28 +188,28 @@
       "words": 2,
       "chars": 18,
       "lines": 1,
-      "size": 63.4,
-      "vw": 4.4,
+      "size": 136.4,
+      "vw": 9.5,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
-      "position": "left",
-      "widthRatio": 0.46,
-      "top": 2530,
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 1932,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
-     "count": 11,
-     "maxLines": 1,
+     "count": 6,
+     "maxLines": 2,
      "over2Lines": 0,
-     "statements": 10,
+     "statements": 5,
      "centered": 0,
      "medianWords": 1,
      "mixedFontHeadings": 0
@@ -329,12 +218,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.94,
+       "share": 0.93,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.06,
+       "share": 0.07,
        "mono": false
       }
      ],
@@ -345,7 +234,7 @@
       24,
       36,
       56,
-      63
+      136
      ],
      "sizeCount": 6,
      "notLoaded": [],
@@ -359,8 +248,8 @@
      },
      "measureChars": 38,
      "max": {
-      "size": 63.4,
-      "vw": 4.4,
+      "size": 136.4,
+      "vw": 9.5,
       "font": "Oxanium",
       "text": "IMPOSSIBLE LIBRARY"
      },
@@ -371,8 +260,8 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.11,
-     "centerShare": 0,
+     "upperShare": 0.19,
+     "centerShare": 0.03,
      "smallText": 0
     },
     "eyebrows": [],
@@ -399,19 +288,19 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.49
+       "share": 0.56
       },
       {
        "color": "#e9fbfc",
-       "share": 0.46
+       "share": 0.37
       },
       {
        "color": "#120600",
-       "share": 0.03
+       "share": 0.06
       },
       {
        "color": "#2fe3e6",
-       "share": 0.02
+       "share": 0.01
       },
       {
        "color": "#ff6a26",
@@ -419,26 +308,28 @@
       }
      ],
      "button": {
-      "bg": "#020405",
+      "bg": "#131d22",
       "hsl": {
        "h": 200,
-       "s": 0.43,
-       "l": 0.01
+       "s": 0.28,
+       "l": 0.1
       },
       "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 2,
-     "inHero": 1,
+     "count": 4,
+     "inHero": 3,
      "radius": 0,
-     "height": 48,
+     "height": 40,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
+      "ログインして​読む",
       "採用する"
      ]
     },
@@ -457,22 +348,16 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 5,
+     "squareMedia": 2,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
      "cardRows": [
       {
-       "count": 3,
+       "count": 4,
        "iconTopped": false,
        "rounded": false,
        "top": 64
-      },
-      {
-       "count": 3,
-       "iconTopped": false,
-       "rounded": false,
-       "top": 1603
       }
      ]
     },
@@ -499,29 +384,29 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 2716,
+    "pageH": 2238,
     "margins": {
-     "left": 38,
-     "right": 16
+     "left": 16,
+     "right": 47
     },
     "sections": [
      {
       "sel": "section.board.first",
       "tag": "section",
       "top": 64,
-      "height": 868,
-      "words": 72,
+      "height": 877,
+      "words": 51,
       "media": 1,
       "middle": 30,
       "heading": {
-       "text": "ハンズ​フリー​雨よけ​装置",
+       "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
        "size": 56,
        "tag": "h1"
       },
       "left": 16,
-      "right": 75,
+      "right": 47,
       "textLeft": 38,
-      "textRight": 75,
+      "textRight": 47,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -531,66 +416,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 1052,
-      "height": 431,
-      "words": 34,
-      "media": 2,
-      "middle": 132,
+      "top": 1061,
+      "height": 490,
+      "words": 19,
+      "media": 1,
+      "middle": 30,
       "heading": {
-       "text": "しくみ",
+       "text": "実験の​記録",
        "size": 24,
        "tag": "h2"
-      },
-      "left": 38,
-      "right": 16,
-      "textLeft": 38,
-      "textRight": 47,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 1603,
-      "height": 527,
-      "words": 38,
-      "media": 2,
-      "middle": 15,
-      "heading": {
-       "text": "377",
-       "size": 56,
-       "tag": "p"
       },
       "left": 16,
-      "right": 16,
+      "right": 201,
       "textLeft": 38,
-      "textRight": 121,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 2250,
-      "height": 138,
-      "words": 8,
-      "media": 0,
-      "middle": 137,
-      "heading": {
-       "text": "ほしい​人と​試した​人",
-       "size": 24,
-       "tag": "h2"
-      },
-      "left": 38,
-      "right": 104,
-      "textLeft": 38,
-      "textRight": 104,
+      "textRight": 201,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -600,20 +439,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 2508,
-      "height": 192,
-      "words": 11,
+      "top": 1910,
+      "height": 312,
+      "words": 18,
       "media": 0,
-      "middle": 83,
+      "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 63,
+       "size": 136,
        "tag": "p"
       },
       "left": 38,
-      "right": 73,
+      "right": 38,
       "textLeft": 38,
-      "textRight": 73,
+      "textRight": 38,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -624,7 +463,7 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "ハンズ​フリー​雨よけ​装置",
+      "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
       "size": 56,
       "top": 86,
       "firstScreen": true
@@ -638,57 +477,147 @@
      },
      {
       "x": 38,
-      "n": 3
-     },
-     {
-      "x": 1100,
       "n": 2
      },
      {
       "x": 115,
       "n": 1
-     },
-     {
-      "x": 392,
-      "n": 1
-     },
-     {
-      "x": 804,
-      "n": 1
      }
     ],
-    "leftBlocks": 14,
+    "leftBlocks": 9,
     "bodySize": 16,
     "stage": false,
     "explains": true,
     "slivers": [],
-    "voidShare": 0.04,
+    "voidShare": 0.05,
     "voidBox": {
-     "x": 1380,
-     "y": 120,
-     "w": 60,
-     "h": 780
+     "x": 1080,
+     "y": 480,
+     "w": 360,
+     "h": 180
     }
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 64
+    },
+    "canvas": {
+     "left": 16,
+     "right": 38
+    },
+    "hero": {
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+     "words": 1,
+     "chars": 23,
+     "lines": 2,
+     "size": 56,
+     "vw": 3.9,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 6,
+     "ragged": [
+      {
+       "diff": 400,
+       "top": 64
+      }
+     ],
+     "voids": [
+      {
+       "gap": 346,
+       "at": 1183,
+       "panel": "実験の​記録"
+      },
+      {
+       "gap": 42,
+       "at": 627,
+       "panel": "0回"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       0,
+       10
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      24,
+      56,
+      136
+     ]
+    },
+    "title": {
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+     "size": 56,
+     "top": 86
+    },
+    "colourShare": 0.082
+   },
    "consoleErrors": []
   },
   {
    "width": 768,
    "height": 1024,
    "load": "load",
-   "screens": 5,
+   "screens": 3,
    "filled": [
-    0.85,
+    0.94,
     0.77,
-    0.83,
-    0.83,
-    0.77
+    0.7
    ],
    "motion": {
-    "elements": 20,
+    "elements": 11,
     "css": 0,
-    "transitions": 20,
+    "transitions": 11,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -699,25 +628,22 @@
      "h": 1024
     },
     "page": {
-     "height": 4690,
-     "screens": 4.6,
-     "words": 172,
-     "img": 4,
+     "height": 2821,
+     "screens": 2.8,
+     "words": 92,
+     "img": 1,
      "video": 0,
      "canvas": 1,
      "svg": 1,
-     "sections": 4,
+     "sections": 3,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 4,
+     "realPictures": 1,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
-      "1.jpg",
-      "2.jpg",
-      "3.jpg",
       "0.jpg"
      ],
      "blendText": 0,
@@ -727,39 +653,35 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "ハンズ​フリー​雨よけ​装置",
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
      "words": 1,
-     "chars": 14,
-     "lines": 1,
+     "chars": 23,
+     "lines": 2,
      "size": 44,
      "vw": 5.7,
      "font": "Noto Sans JP",
      "weight": 700,
      "tracking": -0.02,
      "leading": 1.05,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "center",
-     "widthRatio": 0.9,
-     "top": 133,
+     "top": 95,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
-     "text": "ハンズ​フリー​雨よけ​装置",
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
      "words": 1,
-     "lines": 1,
+     "lines": 2,
      "size": 44,
      "font": "Noto Sans JP"
     },
     "headings": [
      {
-      "text": "ハンズ​フリー​雨よけ​装置",
+      "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
       "words": 1,
-      "chars": 14,
-      "lines": 1,
+      "chars": 23,
+      "lines": 2,
       "size": 44,
       "vw": 5.7,
       "font": "Noto Sans JP",
@@ -772,35 +694,14 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 133,
+      "top": 95,
       "tag": "h1",
       "kind": "heading"
      },
      {
-      "text": "手を​使わず​雨を​防ぐ​装置を​作って",
+      "text": "0回",
       "words": 1,
-      "chars": 20,
-      "lines": 1,
-      "size": 28,
-      "vw": 3.6,
-      "font": "Noto Sans JP",
-      "weight": 500,
-      "tracking": 0,
-      "leading": 1.3,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.9,
-      "top": 553,
-      "tag": "blockquote",
-      "kind": "statement"
-     },
-     {
-      "text": "66.4%",
-      "words": 1,
-      "chars": 5,
+      "chars": 2,
       "lines": 1,
       "size": 44,
       "vw": 5.7,
@@ -814,14 +715,14 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.42,
-      "top": 1290,
+      "top": 1362,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "30.7%",
+      "text": "0回",
       "words": 1,
-      "chars": 5,
+      "chars": 2,
       "lines": 1,
       "size": 44,
       "vw": 5.7,
@@ -835,49 +736,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.42,
-      "top": 1290,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "377W",
-      "words": 1,
-      "chars": 4,
-      "lines": 1,
-      "size": 44,
-      "vw": 5.7,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.44,
-      "top": 2931,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "8.5分",
-      "words": 1,
-      "chars": 4,
-      "lines": 1,
-      "size": 44,
-      "vw": 5.7,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.44,
-      "top": 2931,
+      "top": 1362,
       "tag": "p",
       "kind": "statement"
      },
@@ -898,12 +757,12 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.2,
-      "top": 4028,
+      "top": 2243,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "0人",
+      "text": "0件",
       "words": 1,
       "chars": 2,
       "lines": 1,
@@ -919,49 +778,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.2,
-      "top": 4028,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0人",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 28,
-      "vw": 3.6,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.2,
-      "top": 4028,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "1件",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 28,
-      "vw": 3.6,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.2,
-      "top": 4028,
+      "top": 2243,
       "tag": "p",
       "kind": "statement"
      },
@@ -970,28 +787,28 @@
       "words": 2,
       "chars": 18,
       "lines": 1,
-      "size": 40,
-      "vw": 5.2,
+      "size": 69.2,
+      "vw": 9,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 4352,
+      "top": 2542,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
-     "count": 11,
-     "maxLines": 1,
+     "count": 6,
+     "maxLines": 2,
      "over2Lines": 0,
-     "statements": 10,
+     "statements": 5,
      "centered": 0,
      "medianWords": 1,
      "mixedFontHeadings": 0
@@ -1000,12 +817,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.94,
+       "share": 0.93,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.06,
+       "share": 0.07,
        "mono": false
       }
      ],
@@ -1015,8 +832,8 @@
       18,
       24,
       28,
-      40,
-      44
+      44,
+      69
      ],
      "sizeCount": 6,
      "notLoaded": [],
@@ -1030,10 +847,10 @@
      },
      "measureChars": 40,
      "max": {
-      "size": 44,
-      "vw": 5.7,
-      "font": "Noto Sans JP",
-      "text": "ハンズ​フリー​雨よけ​装置"
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -1042,8 +859,8 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.11,
-     "centerShare": 0,
+     "upperShare": 0.19,
+     "centerShare": 0.03,
      "smallText": 0
     },
     "eyebrows": [],
@@ -1059,7 +876,7 @@
      "sectionBgs": [
       {
        "color": "#0a0f12",
-       "top": 707,
+       "top": 779,
        "hsl": {
         "h": 203,
         "s": 0.29,
@@ -1070,19 +887,19 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.49
+       "share": 0.56
       },
       {
        "color": "#e9fbfc",
-       "share": 0.46
+       "share": 0.37
       },
       {
        "color": "#120600",
-       "share": 0.03
+       "share": 0.06
       },
       {
        "color": "#2fe3e6",
-       "share": 0.02
+       "share": 0.01
       },
       {
        "color": "#ff6a26",
@@ -1090,26 +907,28 @@
       }
      ],
      "button": {
-      "bg": "#020405",
+      "bg": "#131d22",
       "hsl": {
        "h": 200,
-       "s": 0.43,
-       "l": 0.01
+       "s": 0.28,
+       "l": 0.1
       },
       "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 2,
-     "inHero": 1,
+     "count": 4,
+     "inHero": 3,
      "radius": 0,
-     "height": 48,
+     "height": 40,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
+      "ログインして​読む",
       "採用する"
      ]
     },
@@ -1128,7 +947,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 5,
+     "squareMedia": 2,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -1137,13 +956,13 @@
     "heroMedia": [
      {
       "type": "canvas",
-      "ratio": 0.3
+      "ratio": 0.23
      }
     ],
     "nav": {
      "links": 5,
      "fixed": false,
-     "height": 111,
+     "height": 73,
      "floatingPill": false,
      "blur": false
     },
@@ -1157,7 +976,7 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 4690,
+    "pageH": 2821,
     "margins": {
      "left": 16,
      "right": 16
@@ -1166,20 +985,20 @@
      {
       "sel": "section.board.first",
       "tag": "section",
-      "top": 111,
-      "height": 1540,
-      "words": 72,
+      "top": 73,
+      "height": 1449,
+      "words": 51,
       "media": 1,
       "middle": 0,
       "heading": {
-       "text": "ハンズ​フリー​雨よけ​装置",
+       "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
        "size": 44,
        "tag": "h1"
       },
       "left": 16,
       "right": 16,
       "textLeft": 38,
-      "textRight": 39,
+      "textRight": 38,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1189,20 +1008,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 1747,
-      "height": 1066,
-      "words": 34,
-      "media": 2,
+      "top": 1618,
+      "height": 452,
+      "words": 19,
+      "media": 1,
       "middle": 0,
       "heading": {
-       "text": "しくみ",
+       "text": "実験の​記録",
        "size": 24,
        "tag": "h2"
       },
       "left": 16,
       "right": 16,
       "textLeft": 38,
-      "textRight": 72,
+      "textRight": 237,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1212,43 +1031,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 2909,
-      "height": 947,
-      "words": 38,
-      "media": 2,
+      "top": 2167,
+      "height": 258,
+      "words": 5,
+      "media": 0,
       "middle": 0,
       "heading": {
-       "text": "377",
-       "size": 44,
-       "tag": "p"
-      },
-      "left": 16,
-      "right": 16,
-      "textLeft": 38,
-      "textRight": 86,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 3952,
-      "height": 282,
-      "words": 8,
-      "media": 0,
-      "middle": 52,
-      "heading": {
-       "text": "ほしい​人と​試した​人",
+       "text": "ほしいと​採用",
        "size": 24,
        "tag": "h2"
       },
       "left": 38,
-      "right": 65,
+      "right": 455,
       "textLeft": 38,
-      "textRight": 65,
+      "textRight": 455,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1258,20 +1054,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 4330,
-      "height": 344,
-      "words": 11,
+      "top": 2520,
+      "height": 284,
+      "words": 18,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 40,
+       "size": 69,
        "tag": "p"
       },
       "left": 38,
-      "right": 109,
+      "right": 48,
       "textLeft": 38,
-      "textRight": 109,
+      "textRight": 48,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1282,9 +1078,9 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "ハンズ​フリー​雨よけ​装置",
+      "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
       "size": 44,
-      "top": 133,
+      "top": 95,
       "firstScreen": true
      }
     ],
@@ -1292,22 +1088,14 @@
     "edges": [
      {
       "x": 38,
-      "n": 11
-     },
-     {
-      "x": 96,
-      "n": 1
+      "n": 8
      },
      {
       "x": 115,
       "n": 1
-     },
-     {
-      "x": 410,
-      "n": 1
      }
     ],
-    "leftBlocks": 14,
+    "leftBlocks": 9,
     "bodySize": 16,
     "stage": false,
     "explains": true,
@@ -1315,26 +1103,118 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 73
+    },
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+     "words": 1,
+     "chars": 23,
+     "lines": 2,
+     "size": 44,
+     "vw": 5.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "top": 95,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 45,
+       "at": 1406,
+       "panel": "0回"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       0,
+       10
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      24,
+      44,
+      69
+     ]
+    },
+    "title": {
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+     "size": 44,
+     "top": 95
+    },
+    "colourShare": 0.172
+   },
    "consoleErrors": []
   },
   {
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 6,
+   "screens": 4,
    "filled": [
-    0.74,
-    0.92,
+    0.83,
     0.86,
-    0.86,
-    0.79,
-    0.79
+    0.73,
+    0.73
    ],
    "motion": {
-    "elements": 20,
+    "elements": 11,
     "css": 0,
-    "transitions": 20,
+    "transitions": 11,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -1345,25 +1225,22 @@
      "h": 844
     },
     "page": {
-     "height": 5042,
-     "screens": 6,
-     "words": 172,
-     "img": 4,
+     "height": 2820,
+     "screens": 3.3,
+     "words": 92,
+     "img": 1,
      "video": 0,
      "canvas": 1,
      "svg": 1,
-     "sections": 4,
+     "sections": 3,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 4,
+     "realPictures": 1,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
-      "1.jpg",
-      "2.jpg",
-      "3.jpg",
       "0.jpg"
      ],
      "blendText": 0,
@@ -1373,41 +1250,37 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "ハンズ​フリー​雨よけ​装置",
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
      "words": 1,
-     "chars": 14,
+     "chars": 23,
      "lines": 2,
-     "size": 36,
-     "vw": 9.2,
+     "size": 28,
+     "vw": 7.2,
      "font": "Noto Sans JP",
      "weight": 700,
      "tracking": -0.02,
      "leading": 1.05,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "center",
-     "widthRatio": 0.84,
-     "top": 224,
+     "top": 180,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
-     "text": "ハンズ​フリー​雨よけ​装置",
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
      "words": 1,
      "lines": 2,
-     "size": 36,
+     "size": 28,
      "font": "Noto Sans JP"
     },
     "headings": [
      {
-      "text": "ハンズ​フリー​雨よけ​装置",
+      "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
       "words": 1,
-      "chars": 14,
+      "chars": 23,
       "lines": 2,
-      "size": 36,
-      "vw": 9.2,
+      "size": 28,
+      "vw": 7.2,
       "font": "Noto Sans JP",
       "weight": 700,
       "tracking": -0.02,
@@ -1418,35 +1291,14 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 224,
+      "top": 180,
       "tag": "h1",
       "kind": "heading"
      },
      {
-      "text": "手を​使わず​雨を​防ぐ​装置を​作って",
+      "text": "0回",
       "words": 1,
-      "chars": 20,
-      "lines": 2,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Noto Sans JP",
-      "weight": 500,
-      "tracking": 0,
-      "leading": 1.3,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.84,
-      "top": 750,
-      "tag": "blockquote",
-      "kind": "statement"
-     },
-     {
-      "text": "66.4%",
-      "words": 1,
-      "chars": 5,
+      "chars": 2,
       "lines": 1,
       "size": 36,
       "vw": 9.2,
@@ -1460,14 +1312,14 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 1293,
+      "top": 1325,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "30.7%",
+      "text": "0回",
       "words": 1,
-      "chars": 5,
+      "chars": 2,
       "lines": 1,
       "size": 36,
       "vw": 9.2,
@@ -1481,49 +1333,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 1469,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "377W",
-      "words": 1,
-      "chars": 4,
-      "lines": 1,
-      "size": 36,
-      "vw": 9.2,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.84,
-      "top": 3028,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "8.5分",
-      "words": 1,
-      "chars": 4,
-      "lines": 1,
-      "size": 36,
-      "vw": 9.2,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.84,
-      "top": 3216,
+      "top": 1501,
       "tag": "p",
       "kind": "statement"
      },
@@ -1544,12 +1354,12 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.39,
-      "top": 4258,
+      "top": 2226,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "0人",
+      "text": "0件",
       "words": 1,
       "chars": 2,
       "lines": 1,
@@ -1565,49 +1375,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.39,
-      "top": 4258,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0人",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.39,
-      "top": 4360,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "1件",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.39,
-      "top": 4360,
+      "top": 2226,
       "tag": "p",
       "kind": "statement"
      },
@@ -1615,29 +1383,29 @@
       "text": "IMPOSSIBLE LIBRARY",
       "words": 2,
       "chars": 18,
-      "lines": 2,
-      "size": 40,
-      "vw": 10.3,
+      "lines": 1,
+      "size": 32.6,
+      "vw": 8.4,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 4644,
+      "top": 2486,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
-     "count": 11,
+     "count": 6,
      "maxLines": 2,
      "over2Lines": 0,
-     "statements": 10,
+     "statements": 5,
      "centered": 0,
      "medianWords": 1,
      "mixedFontHeadings": 0
@@ -1646,12 +1414,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.94,
+       "share": 0.93,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.06,
+       "share": 0.07,
        "mono": false
       }
      ],
@@ -1661,10 +1429,11 @@
       18,
       20,
       24,
-      36,
-      40
+      28,
+      33,
+      36
      ],
-     "sizeCount": 6,
+     "sizeCount": 7,
      "notLoaded": [],
      "body": {
       "font": "Noto Sans JP",
@@ -1676,10 +1445,10 @@
      },
      "measureChars": 41,
      "max": {
-      "size": 40,
-      "vw": 10.3,
+      "size": 36,
+      "vw": 9.2,
       "font": "Oxanium",
-      "text": "IMPOSSIBLE LIBRARY"
+      "text": "0"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -1688,8 +1457,8 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.11,
-     "centerShare": 0,
+     "upperShare": 0.19,
+     "centerShare": 0.03,
      "smallText": 0
     },
     "eyebrows": [],
@@ -1705,39 +1474,30 @@
      "sectionBgs": [
       {
        "color": "#0a0f12",
-       "top": 208,
+       "top": 164,
        "hsl": {
         "h": 203,
         "s": 0.29,
         "l": 0.05
-       }
-      },
-      {
-       "color": "#0e1519",
-       "top": 3829,
-       "hsl": {
-        "h": 202,
-        "s": 0.28,
-        "l": 0.08
        }
       }
      ],
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.49
+       "share": 0.56
       },
       {
        "color": "#e9fbfc",
-       "share": 0.46
+       "share": 0.37
       },
       {
        "color": "#120600",
-       "share": 0.03
+       "share": 0.06
       },
       {
        "color": "#2fe3e6",
-       "share": 0.02
+       "share": 0.01
       },
       {
        "color": "#ff6a26",
@@ -1745,26 +1505,27 @@
       }
      ],
      "button": {
-      "bg": "#020405",
+      "bg": "#131d22",
       "hsl": {
        "h": 200,
-       "s": 0.43,
-       "l": 0.01
+       "s": 0.28,
+       "l": 0.1
       },
       "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 2,
-     "inHero": 1,
+     "count": 4,
+     "inHero": 2,
      "radius": 0,
-     "height": 48,
+     "height": 40,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
       "採用する"
      ]
     },
@@ -1783,7 +1544,7 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 1,
+     "squareMedia": 2,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
@@ -1793,7 +1554,7 @@
     "nav": {
      "links": 5,
      "fixed": false,
-     "height": 208,
+     "height": 164,
      "floatingPill": false,
      "blur": false
     },
@@ -1807,7 +1568,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 5042,
+    "pageH": 2820,
     "margins": {
      "left": 16,
      "right": 16
@@ -1817,15 +1578,15 @@
       "sel": "header.bar",
       "tag": "header",
       "top": 0,
-      "height": 208,
+      "height": 164,
       "words": 6,
       "media": 0,
-      "middle": 4,
+      "middle": 0,
       "heading": null,
       "left": 32,
-      "right": 66,
+      "right": 134,
       "textLeft": 32,
-      "textRight": 66,
+      "textRight": 134,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1835,20 +1596,20 @@
      {
       "sel": "div.t.name",
       "tag": "div",
-      "top": 208,
-      "height": 316,
+      "top": 164,
+      "height": 324,
       "words": 17,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "ハンズ​フリー​雨よけ​装置",
-       "size": 36,
+       "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+       "size": 28,
        "tag": "h1"
       },
       "left": 32,
-      "right": 35,
+      "right": 34,
       "textLeft": 32,
-      "textRight": 35,
+      "textRight": 34,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1856,22 +1617,22 @@
       "pinned": false
      },
      {
-      "sel": "figure.t.w6",
-      "tag": "figure",
-      "top": 734,
-      "height": 168,
-      "words": 2,
+      "sel": "div.t.w6",
+      "tag": "div",
+      "top": 723,
+      "height": 211,
+      "words": 4,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "手を​使わず​雨を​防ぐ​装置を​作って",
-       "size": 24,
-       "tag": "blockquote"
+       "text": "詳しい​内容は​開発者だけが​読めます",
+       "size": 20,
+       "tag": "h2"
       },
       "left": 32,
-      "right": 54,
+      "right": 38,
       "textLeft": 32,
-      "textRight": 54,
+      "textRight": 38,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1881,7 +1642,7 @@
      {
       "sel": "div.t.stage",
       "tag": "div",
-      "top": 910,
+      "top": 942,
       "height": 359,
       "words": 9,
       "media": 1,
@@ -1894,7 +1655,7 @@
       "left": 16,
       "right": 16,
       "textLeft": 32,
-      "textRight": 40,
+      "textRight": 150,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1904,20 +1665,16 @@
      {
       "sel": "div.t.w3",
       "tag": "div",
-      "top": 1277,
+      "top": 1309,
       "height": 168,
-      "words": 11,
+      "words": 12,
       "media": 0,
       "middle": 0,
-      "heading": {
-       "text": "66.4",
-       "size": 36,
-       "tag": "p"
-      },
+      "heading": null,
       "left": 32,
-      "right": 46,
+      "right": 62,
       "textLeft": 32,
-      "textRight": 46,
+      "textRight": 62,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1927,20 +1684,16 @@
      {
       "sel": "div.t.w3",
       "tag": "div",
-      "top": 1453,
+      "top": 1485,
       "height": 168,
-      "words": 11,
+      "words": 5,
       "media": 0,
       "middle": 0,
-      "heading": {
-       "text": "30.7",
-       "size": 36,
-       "tag": "p"
-      },
+      "heading": null,
       "left": 32,
-      "right": 51,
+      "right": 74,
       "textLeft": 32,
-      "textRight": 51,
+      "textRight": 74,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1948,45 +1701,22 @@
       "pinned": false
      },
      {
-      "sel": "div.t.w3",
+      "sel": "div.t.w6",
       "tag": "div",
-      "top": 1629,
-      "height": 225,
-      "words": 15,
+      "top": 495,
+      "height": 219,
+      "words": 4,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "改良の​履歴",
+       "text": "開発に​使う",
        "size": 20,
        "tag": "h2"
       },
       "left": 32,
-      "right": 63,
+      "right": 72,
       "textLeft": 32,
-      "textRight": 63,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "div.t.w3",
-      "tag": "div",
-      "top": 531,
-      "height": 195,
-      "words": 7,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "研究や​製品化に​使う",
-       "size": 20,
-       "tag": "h2"
-      },
-      "left": 32,
-      "right": 98,
-      "textLeft": 32,
-      "textRight": 98,
+      "textRight": 72,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1996,20 +1726,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 1925,
-      "height": 1015,
-      "words": 34,
-      "media": 2,
+      "top": 1725,
+      "height": 365,
+      "words": 19,
+      "media": 1,
       "middle": 0,
       "heading": {
-       "text": "しくみ",
+       "text": "実験の​記録",
        "size": 20,
        "tag": "h2"
       },
       "left": 16,
       "right": 16,
       "textLeft": 32,
-      "textRight": 33,
+      "textRight": 41,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -2019,43 +1749,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 3012,
-      "height": 1109,
-      "words": 38,
-      "media": 2,
-      "middle": 0,
-      "heading": {
-       "text": "377",
-       "size": 36,
-       "tag": "p"
-      },
-      "left": 16,
-      "right": 16,
-      "textLeft": 32,
-      "textRight": 43,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 4193,
-      "height": 363,
-      "words": 8,
+      "top": 2161,
+      "height": 237,
+      "words": 5,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "ほしい​人と​試した​人",
+       "text": "ほしいと​採用",
        "size": 20,
        "tag": "h2"
       },
       "left": 32,
-      "right": 55,
+      "right": 87,
       "textLeft": 32,
-      "textRight": 55,
+      "textRight": 87,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -2065,20 +1772,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 4628,
-      "height": 398,
-      "words": 11,
+      "top": 2470,
+      "height": 334,
+      "words": 18,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 40,
+       "size": 33,
        "tag": "p"
       },
       "left": 32,
-      "right": 40,
+      "right": 37,
       "textLeft": 32,
-      "textRight": 40,
+      "textRight": 37,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -2089,9 +1796,9 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "ハンズ​フリー​雨よけ​装置",
-      "size": 36,
-      "top": 224,
+      "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+      "size": 28,
+      "top": 180,
       "firstScreen": true
      }
     ],
@@ -2099,18 +1806,14 @@
     "edges": [
      {
       "x": 32,
-      "n": 12
-     },
-     {
-      "x": 82,
-      "n": 1
+      "n": 8
      },
      {
       "x": 97,
       "n": 1
      }
     ],
-    "leftBlocks": 14,
+    "leftBlocks": 9,
     "bodySize": 16,
     "stage": false,
     "explains": true,
@@ -2118,31 +1821,136 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+     "words": 1,
+     "chars": 23,
+     "lines": 2,
+     "size": 28,
+     "vw": 7.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 3,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 50,
+       "at": 1537,
+       "panel": "0回"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       0,
+       10
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      20,
+      28,
+      33
+     ]
+    },
+    "title": {
+     "text": "だん​ボール​持ち上げ​リフト​「アゲルくん」",
+     "size": 28,
+     "top": 180
+    },
+    "colourShare": 0.223
+   },
    "consoleErrors": []
   }
  ],
  "findings": [
   {
    "level": "WARN",
-   "id": "card-rows",
+   "id": "ragged-row",
    "width": 1440,
-   "message": "2 rows of identical boxed cards.",
-   "fix": "Vary the composition; not every section is a card grid."
+   "message": "1 pair(s) of cards in one row end at different heights (by 400px).",
+   "fix": "Cards that share a row share a bottom edge: balance them by their content (the same number of rows, a block of similar height beside it), or stack them. In testing, ragged rows were marked down every time."
   },
   {
    "level": "WARN",
-   "id": "no-footage",
+   "id": "panel-void",
    "width": 1440,
-   "message": "No video anywhere on the page.",
-   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+   "message": "2 card(s) hold a blank band inside: 346px in \"実験の​記録\", 42px in \"0回\".",
+   "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
   },
   {
    "level": "WARN",
-   "id": "off-centre",
+   "id": "app-title-size",
    "width": 1440,
-   "message": "The margins differ: 38px on the left, 16px on the right, at 1440px.",
-   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+   "message": "The h1 is 56px (\"だん​ボール​持ち上げ​リフト​「アゲルくん」\").",
+   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "colour-sprawl",
+   "width": 768,
+   "message": "17% of the first screen is strongly coloured.",
+   "fix": "Keep the screen neutral and spend colour on data and status: the studied screens sit near 3%, and only tinted styles reach 10–15%, as pale tints rather than saturated fills.",
+   "alsoAt": [
+    390
+   ]
   }
  ],
  "images": [

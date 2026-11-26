@@ -1,6 +1,6 @@
 {
- "url": "http://127.0.0.1:8799/site/index.html",
- "at": "2026-11-25T14:55:02.713Z",
+ "url": "http://127.0.0.1:8787/inventions",
+ "at": "2026-11-26T13:42:50.465Z",
  "allow": [
   "few-pictures"
  ],
@@ -11,14 +11,14 @@
    "load": "load",
    "screens": 3,
    "filled": [
-    0.91,
+    0.89,
     0.93,
     0.87
    ],
    "motion": {
-    "elements": 11,
+    "elements": 10,
     "css": 0,
-    "transitions": 11,
+    "transitions": 10,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -29,9 +29,9 @@
      "h": 900
     },
     "page": {
-     "height": 2542,
-     "screens": 2.8,
-     "words": 232,
+     "height": 2637,
+     "screens": 2.9,
+     "words": 218,
      "img": 0,
      "video": 0,
      "canvas": 7,
@@ -62,15 +62,11 @@
      "weight": 700,
      "tracking": -0.02,
      "leading": 1,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "left",
-     "widthRatio": 0.33,
      "top": 95,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
      "text": "発明品​一覧",
@@ -106,18 +102,18 @@
       "words": 2,
       "chars": 18,
       "lines": 1,
-      "size": 63.4,
-      "vw": 4.4,
+      "size": 136.4,
+      "vw": 9.5,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
-      "position": "left",
-      "widthRatio": 0.46,
+      "position": "center",
+      "widthRatio": 0.95,
       "top": 2356,
       "tag": "p",
       "kind": "statement"
@@ -136,12 +132,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.95,
+       "share": 0.94,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.05,
+       "share": 0.06,
        "mono": false
       }
      ],
@@ -150,25 +146,25 @@
       16,
       18,
       24,
-      63,
-      96
+      96,
+      136
      ],
      "sizeCount": 5,
      "notLoaded": [],
      "body": {
       "font": "Noto Sans JP",
-      "size": 18,
+      "size": 16,
       "leading": 1.55,
       "weight": 400,
       "tracking": 0,
-      "contrast": 18
+      "contrast": 9.2
      },
-     "measureChars": 67,
+     "measureChars": 80,
      "max": {
-      "size": 96,
-      "vw": 6.7,
-      "font": "Noto Sans JP",
-      "text": "発明品​一覧"
+      "size": 136.4,
+      "vw": 9.5,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -177,7 +173,7 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.08,
+     "upperShare": 0.1,
      "centerShare": 0.06,
      "smallText": 0
     },
@@ -191,15 +187,25 @@
       "l": 0.01
      },
      "dark": true,
-     "sectionBgs": [],
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 2334,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.56
+       "share": 0.62
       },
       {
        "color": "#e9fbfc",
-       "share": 0.41
+       "share": 0.35
       },
       {
        "color": "#ff6a26",
@@ -211,7 +217,7 @@
       },
       {
        "color": "#2fe3e6",
-       "share": 0
+       "share": 0.01
       }
      ],
      "button": {
@@ -226,8 +232,8 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
-     "inHero": 17,
+     "count": 18,
+     "inHero": 18,
      "radius": 0,
      "height": 40,
      "withShadow": 0,
@@ -235,11 +241,11 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
       "ほしい​人の​数",
       "新しい​順",
       "採用の​実績",
-      "すべて",
-      "生活​ ​6"
+      "すべて"
      ]
     },
     "surfaces": {
@@ -281,7 +287,7 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 2542,
+    "pageH": 2637,
     "margins": {
      "left": 16,
      "right": 52
@@ -315,13 +321,13 @@
       "tag": "section",
       "top": 391,
       "height": 1823,
-      "words": 152,
+      "words": 145,
       "media": 7,
-      "middle": 34,
+      "middle": 57,
       "heading": {
-       "text": "手を​使わず​雨を​防ぐ​装置を​作って",
+       "text": "ハンズ​フリー​雨よけ​装置",
        "size": 24,
-       "tag": "blockquote"
+       "tag": "h2"
       },
       "left": 16,
       "right": 58,
@@ -337,19 +343,19 @@
       "sel": "footer.board.end-board",
       "tag": "footer",
       "top": 2334,
-      "height": 192,
-      "words": 11,
+      "height": 287,
+      "words": 14,
       "media": 0,
-      "middle": 83,
+      "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 63,
+       "size": 136,
        "tag": "p"
       },
       "left": 38,
-      "right": 274,
+      "right": 38,
       "textLeft": 38,
-      "textRight": 274,
+      "textRight": 38,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -390,7 +396,95 @@
      "h": 120
     }
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 64
+    },
+    "canvas": {
+     "left": 16,
+     "right": 52
+    },
+    "hero": {
+     "text": "発明品​一覧",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 96,
+     "vw": 6.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1,
+     "top": 95,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       0,
+       10
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 12,
+     "tabularShare": 0,
+     "kpiMax": 24
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      24,
+      96,
+      136
+     ]
+    },
+    "title": {
+     "text": "発明品​一覧",
+     "size": 96,
+     "top": 95
+    },
+    "colourShare": 0.009
+   },
    "consoleErrors": []
   },
   {
@@ -399,15 +493,15 @@
    "load": "load",
    "screens": 4,
    "filled": [
-    0.85,
-    0.89,
+    0.94,
+    0.96,
     0.83,
-    0.83
+    0.89
    ],
    "motion": {
-    "elements": 11,
+    "elements": 10,
     "css": 0,
-    "transitions": 11,
+    "transitions": 10,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -418,9 +512,9 @@
      "h": 1024
     },
     "page": {
-     "height": 3736,
-     "screens": 3.6,
-     "words": 232,
+     "height": 3318,
+     "screens": 3.2,
+     "words": 218,
      "img": 0,
      "video": 0,
      "canvas": 7,
@@ -445,21 +539,17 @@
      "words": 1,
      "chars": 6,
      "lines": 1,
-     "size": 51.5,
+     "size": 51,
      "vw": 6.7,
      "font": "Noto Sans JP",
      "weight": 700,
      "tracking": -0.02,
      "leading": 1,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "center",
-     "widthRatio": 0.9,
-     "top": 133,
+     "top": 95,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
      "text": "発明品​一覧",
@@ -486,7 +576,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 133,
+      "top": 95,
       "tag": "h1",
       "kind": "heading"
      },
@@ -495,19 +585,19 @@
       "words": 2,
       "chars": 18,
       "lines": 1,
-      "size": 40,
-      "vw": 5.2,
+      "size": 69.2,
+      "vw": 9,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 3398,
+      "top": 3065,
       "tag": "p",
       "kind": "statement"
      }
@@ -525,12 +615,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.95,
+       "share": 0.94,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.05,
+       "share": 0.06,
        "mono": false
       }
      ],
@@ -539,25 +629,25 @@
       16,
       18,
       24,
-      40,
-      52
+      52,
+      69
      ],
      "sizeCount": 5,
      "notLoaded": [],
      "body": {
       "font": "Noto Sans JP",
-      "size": 18,
+      "size": 16,
       "leading": 1.55,
       "weight": 400,
       "tracking": 0,
-      "contrast": 18
+      "contrast": 9.2
      },
-     "measureChars": 67,
+     "measureChars": 80,
      "max": {
-      "size": 51.5,
-      "vw": 6.7,
-      "font": "Noto Sans JP",
-      "text": "発明品​一覧"
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -566,7 +656,7 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.08,
+     "upperShare": 0.1,
      "centerShare": 0.06,
      "smallText": 0
     },
@@ -583,7 +673,7 @@
      "sectionBgs": [
       {
        "color": "#0e1519",
-       "top": 339,
+       "top": 301,
        "hsl": {
         "h": 202,
         "s": 0.28,
@@ -592,7 +682,7 @@
       },
       {
        "color": "#0a0f12",
-       "top": 683,
+       "top": 1597,
        "hsl": {
         "h": 203,
         "s": 0.29,
@@ -603,11 +693,11 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.56
+       "share": 0.62
       },
       {
        "color": "#e9fbfc",
-       "share": 0.41
+       "share": 0.35
       },
       {
        "color": "#ff6a26",
@@ -619,7 +709,7 @@
       },
       {
        "color": "#2fe3e6",
-       "share": 0
+       "share": 0.01
       }
      ],
      "button": {
@@ -634,8 +724,8 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
-     "inHero": 17,
+     "count": 18,
+     "inHero": 18,
      "radius": 0,
      "height": 40,
      "withShadow": 0,
@@ -643,11 +733,11 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
       "ほしい​人の​数",
       "新しい​順",
       "採用の​実績",
-      "すべて",
-      "生活​ ​6"
+      "すべて"
      ]
     },
     "surfaces": {
@@ -674,13 +764,13 @@
     "heroMedia": [
      {
       "type": "canvas",
-      "ratio": 0.12
+      "ratio": 0.11
      }
     ],
     "nav": {
      "links": 5,
      "fixed": false,
-     "height": 111,
+     "height": 73,
      "floatingPill": false,
      "blur": false
     },
@@ -694,16 +784,16 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 3736,
+    "pageH": 3318,
     "margins": {
      "left": 16,
-     "right": 42
+     "right": 46
     },
     "sections": [
      {
       "sel": "section.board.index",
       "tag": "section",
-      "top": 111,
+      "top": 73,
       "height": 564,
       "words": 41,
       "media": 0,
@@ -726,15 +816,15 @@
      {
       "sel": "section.shelf",
       "tag": "section",
-      "top": 683,
-      "height": 2597,
-      "words": 152,
+      "top": 645,
+      "height": 2302,
+      "words": 145,
       "media": 7,
       "middle": 28,
       "heading": {
-       "text": "手を​使わず​雨を​防ぐ​装置を​作って",
+       "text": "ハンズ​フリー​雨よけ​装置",
        "size": 24,
-       "tag": "blockquote"
+       "tag": "h2"
       },
       "left": 16,
       "right": 22,
@@ -749,20 +839,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 3376,
-      "height": 344,
-      "words": 11,
+      "top": 3043,
+      "height": 259,
+      "words": 14,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 40,
+       "size": 69,
        "tag": "p"
       },
       "left": 38,
-      "right": 113,
+      "right": 48,
       "textLeft": 38,
-      "textRight": 113,
+      "textRight": 48,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -775,7 +865,7 @@
      {
       "text": "発明品​一覧",
       "size": 51,
-      "top": 133,
+      "top": 95,
       "firstScreen": true
      }
     ],
@@ -794,27 +884,114 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 73
+    },
+    "canvas": {
+     "left": 16,
+     "right": 46
+    },
+    "hero": {
+     "text": "発明品​一覧",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 51,
+     "vw": 6.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1,
+     "top": 95,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       0,
+       10
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 12,
+     "tabularShare": 0,
+     "kpiMax": 24
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      24,
+      51,
+      69
+     ]
+    },
+    "title": {
+     "text": "発明品​一覧",
+     "size": 51,
+     "top": 95
+    },
+    "colourShare": 0.016
+   },
    "consoleErrors": []
   },
   {
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 7,
+   "screens": 6,
    "filled": [
-    0.76,
-    0.92,
-    0.92,
-    0.92,
+    0.83,
     0.86,
+    0.86,
+    0.92,
     0.79,
-    0.79
+    0.86
    ],
    "motion": {
-    "elements": 11,
+    "elements": 10,
     "css": 0,
-    "transitions": 11,
+    "transitions": 10,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -825,9 +1002,9 @@
      "h": 844
     },
     "page": {
-     "height": 5400,
-     "screens": 6.4,
-     "words": 232,
+     "height": 5011,
+     "screens": 5.9,
+     "words": 218,
      "img": 0,
      "video": 0,
      "canvas": 7,
@@ -858,15 +1035,11 @@
      "weight": 700,
      "tracking": -0.02,
      "leading": 1,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "center",
-     "widthRatio": 0.84,
-     "top": 224,
+     "top": 180,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
      "text": "発明品​一覧",
@@ -893,7 +1066,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 224,
+      "top": 180,
       "tag": "h1",
       "kind": "heading"
      },
@@ -901,27 +1074,27 @@
       "text": "IMPOSSIBLE LIBRARY",
       "words": 2,
       "chars": 18,
-      "lines": 2,
-      "size": 40,
-      "vw": 10.3,
+      "lines": 1,
+      "size": 32.6,
+      "vw": 8.4,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 5002,
+      "top": 4702,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
      "count": 2,
-     "maxLines": 2,
+     "maxLines": 1,
      "over2Lines": 0,
      "statements": 1,
      "centered": 0,
@@ -932,12 +1105,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.95,
+       "share": 0.94,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.05,
+       "share": 0.06,
        "mono": false
       }
      ],
@@ -946,20 +1119,20 @@
       16,
       18,
       20,
-      40,
+      33,
       44
      ],
      "sizeCount": 5,
      "notLoaded": [],
      "body": {
       "font": "Noto Sans JP",
-      "size": 18,
+      "size": 16,
       "leading": 1.55,
       "weight": 400,
       "tracking": 0,
-      "contrast": 18
+      "contrast": 9.2
      },
-     "measureChars": 36,
+     "measureChars": 41,
      "max": {
       "size": 44,
       "vw": 11.3,
@@ -973,7 +1146,7 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.08,
+     "upperShare": 0.1,
      "centerShare": 0.06,
      "smallText": 0
     },
@@ -990,7 +1163,7 @@
      "sectionBgs": [
       {
        "color": "#0e1519",
-       "top": 444,
+       "top": 400,
        "hsl": {
         "h": 202,
         "s": 0.28,
@@ -999,7 +1172,7 @@
       },
       {
        "color": "#0a0f12",
-       "top": 914,
+       "top": 870,
        "hsl": {
         "h": 203,
         "s": 0.29,
@@ -1010,11 +1183,11 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.56
+       "share": 0.62
       },
       {
        "color": "#e9fbfc",
-       "share": 0.41
+       "share": 0.35
       },
       {
        "color": "#ff6a26",
@@ -1026,7 +1199,7 @@
       },
       {
        "color": "#2fe3e6",
-       "share": 0
+       "share": 0.01
       }
      ],
      "button": {
@@ -1041,8 +1214,8 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 17,
-     "inHero": 16,
+     "count": 18,
+     "inHero": 18,
      "radius": 0,
      "height": 40,
      "withShadow": 0,
@@ -1050,11 +1223,11 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
       "ほしい​人の​数",
       "新しい​順",
       "採用の​実績",
-      "すべて",
-      "生活​ ​6"
+      "すべて"
      ]
     },
     "surfaces": {
@@ -1082,7 +1255,7 @@
     "nav": {
      "links": 5,
      "fixed": false,
-     "height": 208,
+     "height": 164,
      "floatingPill": false,
      "blur": false
     },
@@ -1096,7 +1269,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 5400,
+    "pageH": 5011,
     "margins": {
      "left": 16,
      "right": 16
@@ -1106,15 +1279,15 @@
       "sel": "header.bar",
       "tag": "header",
       "top": 0,
-      "height": 208,
+      "height": 164,
       "words": 6,
       "media": 0,
-      "middle": 4,
+      "middle": 0,
       "heading": null,
       "left": 32,
-      "right": 66,
+      "right": 134,
       "textLeft": 32,
-      "textRight": 66,
+      "textRight": 134,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1124,7 +1297,7 @@
      {
       "sel": "section.board.index",
       "tag": "section",
-      "top": 208,
+      "top": 164,
       "height": 699,
       "words": 41,
       "media": 0,
@@ -1147,20 +1320,20 @@
      {
       "sel": "section.shelf",
       "tag": "section",
-      "top": 914,
-      "height": 4000,
-      "words": 152,
+      "top": 870,
+      "height": 3743,
+      "words": 145,
       "media": 7,
       "middle": 0,
       "heading": {
        "text": "ハンズ​フリー​雨よけ​装置",
-       "size": 18,
+       "size": 20,
        "tag": "h2"
       },
       "left": 16,
       "right": 16,
       "textLeft": 32,
-      "textRight": 36,
+      "textRight": 34,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1170,20 +1343,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 4986,
-      "height": 398,
-      "words": 11,
+      "top": 4686,
+      "height": 309,
+      "words": 14,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 40,
+       "size": 33,
        "tag": "p"
       },
       "left": 32,
-      "right": 70,
+      "right": 37,
       "textLeft": 32,
-      "textRight": 70,
+      "textRight": 37,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1196,7 +1369,7 @@
      {
       "text": "発明品​一覧",
       "size": 44,
-      "top": 224,
+      "top": 180,
       "firstScreen": true
      }
     ],
@@ -1215,34 +1388,125 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "発明品​一覧",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 44,
+     "vw": 11.3,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 10,
+     "radii": [
+      [
+       0,
+       10
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 12,
+     "tabularShare": 0,
+     "kpiMax": 20
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      20,
+      33,
+      44
+     ]
+    },
+    "title": {
+     "text": "発明品​一覧",
+     "size": 44,
+     "top": 180
+    },
+    "colourShare": 0.03
+   },
    "consoleErrors": []
   }
  ],
  "findings": [
   {
    "level": "WARN",
-   "id": "no-footage",
+   "id": "tabular",
    "width": 1440,
-   "message": "No video anywhere on the page.",
-   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
-  },
-  {
-   "level": "WARN",
-   "id": "off-centre",
-   "width": 1440,
-   "message": "The margins differ: 16px on the left, 52px on the right, at 1440px.",
-   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page.",
+   "message": "Only 0% of the figures use tabular numerals.",
+   "fix": "Set font-variant-numeric: tabular-nums on tables, KPIs and anything that updates, so digits keep their width.",
    "alsoAt": [
-    768
+    768,
+    390
    ]
   },
   {
    "level": "WARN",
-   "id": "still-page",
+   "id": "below-fold",
    "width": 1440,
-   "message": "Little motion: 11 element(s) moved while the page loaded and scrolled.",
-   "fix": "Give every section an entrance for its parts (not one fade of the whole block) and add one moving picture: a looping clip or a slow move on a photograph."
+   "message": "Only 4 of 10 blocks start on the first 1440px screen.",
+   "fix": "Every block the brief names shows its header and first rows on the first desktop screen: size the headline block to its question, cap long lists with \"View all\", and put time-sensitive blocks before long tables."
+  },
+  {
+   "level": "WARN",
+   "id": "app-title-size",
+   "width": 1440,
+   "message": "The h1 is 96px (\"発明品​一覧\").",
+   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
+   "alsoAt": [
+    768,
+    390
+   ]
   }
  ],
  "images": [

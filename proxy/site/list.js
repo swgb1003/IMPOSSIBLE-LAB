@@ -1,9 +1,9 @@
 // 発明の一覧。ライブラリの入口（/library）から読み、公開が無いか、つながらないときは見本（sample/list.json）を出す。
 // 並べ替えと絞り込みはこの画面の中で行い、板は新しい位置へ滑って動く。
 import { $, el, date, phraseBreaks } from "./text.js";
-import { mountWho } from "./who.js";
+import { mountAccount } from "./session.js";
 
-mountWho(); // 上の帯の名乗り（ライブラリにつながらないときは出さない）
+mountAccount(); // 上の帯の右（ライブラリにつながらないときは出さない）
 
 const SORTS = [
   { id: "wants", label: "ほしい人の数" },
@@ -31,22 +31,22 @@ async function load() {
       const res = await fetch("/library?sort=new");
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data.items) && data.items.length > 0) return data.items.map((x) => ({ ...x, page: `invention.html?id=${encodeURIComponent(x.id)}`, model: `/library/${encodeURIComponent(x.id)}/model.glb`, key: null }));
+        if (Array.isArray(data.items) && data.items.length > 0) return data.items.map((x) => ({ ...x, page: `/inventions/${encodeURIComponent(x.id)}`, model: `/library/${encodeURIComponent(x.id)}/model.glb`, key: null }));
       }
     } catch { /* ライブラリにつながらない（共有ページなど）→ 見本 */ }
   }
   sample = true;
-  const res = await fetch("sample/list.json");
-  return (await res.json()).items.map((x) => ({ ...x, model: `sample/models/${x.id}.glb`, key: x.id }));
+  const res = await fetch("/site/sample/list.json");
+  return (await res.json()).items.map((x) => ({ ...x, model: `/site/sample/models/${x.id}.glb`, key: x.id }));
 }
 
-const wants = (x) => x.wants.vr + x.wants.site;
+const wants = (x) => x.wants;
 const newer = (a, b) => b.publishedAt.localeCompare(a.publishedAt);
 function ordered() {
   const list = items.filter((x) => (!view.tag || x.tags.some((t) => t.id === view.tag)) && (!view.status || x.status === view.status));
   const by = {
     new: newer,
-    wants: (a, b) => wants(b) - wants(a) || b.wants.vr - a.wants.vr || newer(a, b),
+    wants: (a, b) => wants(b) - wants(a) || newer(a, b),
     adoptions: (a, b) => b.creatorAdoptions - a.creatorAdoptions || newer(a, b),
     name: (a, b) => a.name.localeCompare(b.name, "ja") || newer(a, b),
   }[view.sort];
@@ -71,18 +71,17 @@ function row(x) {
     if (!x.thumb) return;
     const img = el("img");
     img.src = x.thumb; img.width = 640; img.height = 480; img.loading = "lazy";
-    img.alt = `研究所の発明台に置いた「${x.name}」の試作品`;
+    img.alt = `IMPOSSIBLE LAB の発明台に置いた「${x.name}」の試作品`;
     fig.append(img);
   });
 
   const body = el("div", "body");
-  const ask = el("blockquote", "ask-line", x.request || "依頼の文の記録なし");
   const h = el("h2", "row-name");
   if (x.page) { const a = el("a", null, x.name); a.href = x.page; h.append(a); } else h.textContent = x.name;
   const meta = el("p", "meta");
   const status = el("span", `st ${x.status}`, STATUS_TEXT[x.status] ?? "");
   meta.append(status, document.createTextNode(`　${x.tags.map((t) => t.label).join("・")}　Rev.${x.revision}　${date(x.publishedAt)} 公開　ほしい ${wants(x)} 人　採用 ${x.adoptions} 件`));
-  body.append(ask, h, el("p", "row-sum", x.summary), meta);
+  body.append(h, el("p", "row-sum", x.summary), meta);
   li.append(body);
 
   const r = x.result;
@@ -120,19 +119,21 @@ const spinner = (() => {
   // 3D の部品は後から読む（読めなくても一覧は出す）
   let L = null;
   const lib = () => (L ??= import("./stage3d.js"));
-  let THREE, createRenderer, createScene, loadModel, measure, stageRing, aim;
+  let THREE, createRenderer, createScene, loadModel, measure, stageRing, dress, aim;
 
   async function start(it) {
     it.loading = true;
-    try { ({ THREE, createRenderer, createScene, loadModel, measure, stageRing, aim } = await lib()); } catch { failed = true; }
+    try { ({ THREE, createRenderer, createScene, loadModel, measure, stageRing, dress, aim } = await lib()); } catch { failed = true; }
     if (!renderer && !failed) { try { renderer = createRenderer(); renderer.setPixelRatio(1); } catch { failed = true; } }
     if (failed) { it.fail(); return; }
-    loadModel(it.model, it.key).then((root) => {
+    loadModel(it.model, it.key).then(async (root) => {
       it.scene = createScene(renderer);
       it.scene.add(root);
       const m = measure(root);
       it.root = root; it.center = m.center; it.radius = m.fit; it.baseY = root.position.y;
-      it.scene.add(stageRing(m.center, m.floor, m.halfWidth));
+      // 撮影台（床・影・光）。頭の上に付けるものは床に置かず、少し下から見上げる
+      if (!it.floating) it.scene.add(stageRing(m.center, m.floor, m.halfWidth));
+      it.lights = await dress(it.scene, root, m, { floating: it.floating });
       it.cam = new THREE.PerspectiveCamera(28, 4 / 3, 0.01, 100);
       it.ready = true;
       draw(it, 0);
@@ -146,9 +147,10 @@ const spinner = (() => {
     const size = renderer.getSize(new THREE.Vector2());
     if (size.x !== w || size.y !== h) renderer.setSize(w, h, false);
     it.cam.aspect = w / h; it.cam.updateProjectionMatrix();
-    // ふわっと：ゆっくり回りながら、わずかに上下する
-    it.root.position.y = it.baseY + (reduced ? 0 : Math.sin(t * 1.3 + it.phase) * it.radius * 0.025);
-    aim(it.cam, it.center, it.radius * 1.06, it.yaw, 0.34);
+    // 頭の上に付けるものは、ゆっくり回りながらわずかに上下する（床に置いたものは床から離れない）
+    it.root.position.y = it.baseY + (reduced || !it.floating ? 0 : Math.sin(t * 1.3 + it.phase) * it.radius * 0.025);
+    aim(it.cam, it.center, it.radius * 1.06, it.yaw, it.floating ? -0.2 : 0.34);
+    it.lights.light(it.yaw);
     renderer.render(it.scene, it.cam);
     const ctx = it.canvas.getContext("2d");
     ctx.clearRect(0, 0, w, h);
@@ -168,7 +170,7 @@ const spinner = (() => {
 
   return {
     add(fig, canvas, x, fail) {
-      const it = { fig, canvas, fail: () => { if (!it.failed) { it.failed = true; fail(); } }, model: x.model, key: x.key,
+      const it = { fig, canvas, fail: () => { if (!it.failed) { it.failed = true; fail(); } }, model: x.model, key: x.key, floating: x.mount?.id === "head",
         yaw: all.length * 0.9 + 0.5, phase: all.length * 1.7, visible: false, loading: false, ready: false, fast: false };
       all.push(it);
       // 板にのせると少し速く回る
@@ -229,7 +231,7 @@ try {
   seg("status", STATUS.map((s) => ({ ...s, count: s.id ? items.filter((x) => x.status === s.id).length : undefined })), "status");
   draw();
   $("sample-note").textContent = sample
-    ? "この一覧は見本です。研究所の通し確認で作った記録で、依頼文は AI の評価に使った依頼の原文です。ほしい・採用の数はまだ 0 です。"
+    ? "この一覧は見本です。IMPOSSIBLE LAB の通し確認で作った記録で、実在の発案者はいません。"
     : "公開を取り下げた発明は、この一覧から消えます。";
   phraseBreaks(document.querySelector("main"));
 } catch {

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新規登録 | IMPOSSIBLE LIBRARY</title>
+<meta name="description" content="開発者の新規登録">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="/site/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site/site.css">
+</head>
+<body class="work auth" data-page="signup">
+<header class="bar">
+  <a class="mark" href="/" aria-label="IMPOSSIBLE LIBRARY の入口へ">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
+    <b>IMPOSSIBLE LIBRARY</b>
+  </a>
+  <div class="bar-r">
+    <nav aria-label="サイト">
+      <a href="/inventions">発明品一覧</a>
+      <a href="/terms">利用規約</a>
+    </nav>
+    <div class="acct" data-slot="acct"></div>
+  </div>
+</header>
+
+<main>
+  <section class="board" aria-labelledby="page-h">
+    <div class="t span8c form-plate">
+      <h1 id="page-h">開発者の新規登録</h1>
+      <p class="lead-s">登録すると、発明の詳しい内容を読み、理由を書いて採用できます。</p>
+      <form class="form" data-slot="form" novalidate>
+        <label class="field"><span>名前<small>必須</small></span><input name="name" maxlength="40" autocomplete="name" required></label>
+        <label class="field"><span>所属<small>大学・会社・個人など</small></span><input name="affiliation" maxlength="60" autocomplete="organization"></label>
+        <label class="field"><span>専門の分野</span><input name="field" maxlength="60"></label>
+        <label class="field"><span>ひとことの紹介<small>200 字まで</small></span><textarea name="intro" maxlength="200" rows="3"></textarea></label>
+        <p class="note">名前・所属・専門・紹介は、あなたが採用した発明の発案者にだけ伝わります。</p>
+        <label class="field"><span>メールアドレス<small>ほかの人には見せません</small></span><input name="email" type="email" maxlength="254" autocomplete="email" required></label>
+        <label class="field"><span>パスワード<small>8 文字以上</small></span><input name="password" type="password" maxlength="128" autocomplete="new-password" required></label>
+        <label class="check"><input type="checkbox" name="agreed"><span>発案者の許諾なく製品にしないことを含め、<a href="/terms" target="_blank">利用規約</a>と<a href="/privacy" target="_blank">個人情報の扱い</a>に同意する</span></label>
+        <p class="err" role="alert" data-slot="err"></p>
+        <div class="acts"><button class="btn p sm" type="submit">登録する</button></div>
+      </form>
+      <div class="alt-ways"><p>すでに登録しているとき<a href="/login">ログイン</a></p></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="/site/auth.js"></script>
+</body>
+</html>

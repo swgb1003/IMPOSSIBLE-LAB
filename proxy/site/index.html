@@ -3,85 +3,124 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>発明品一覧 | IMPOSSIBLE LIBRARY</title>
-<meta name="description" content="IMPOSSIBLE LAB で生まれた発明品の一覧。研究や製品化に使えるものを探して、採用できる">
+<title>IMPOSSIBLE LIBRARY</title>
+<meta name="description" content="誰もが開発に携われる未来へ。IMPOSSIBLE LAB で、だれかのひと言から生まれた発明品のライブラリー。開発者が読んで採用できる">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="icon" href="/site/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site/site.css">
+<link rel="stylesheet" href="/site/title.css">
 <script type="importmap">
 { "imports": {
-  "three": "../vendor/three/build/three.module.js",
-  "three/addons/": "../vendor/three/examples/jsm/"
+  "three": "/vendor/three/build/three.module.js",
+  "three/addons/": "/vendor/three/examples/jsm/"
 } }
 </script>
 </head>
-<body>
-<header class="bar">
-  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+<body class="title-page">
+<header class="bar" data-slot="bar">
+  <a class="mark" href="/" aria-label="IMPOSSIBLE LIBRARY の入口へ">
     <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
     <b>IMPOSSIBLE LIBRARY</b>
   </a>
   <div class="bar-r">
     <nav aria-label="サイト">
-      <a href="./" aria-current="page">発明品一覧</a>
-      <a href="accounts.html">研究者と開発者</a>
-      <a href="threads.html">やりとり</a>
-      <a href="terms.html">利用規約</a>
+      <a href="/inventions">発明品一覧</a>
+      <a href="/terms">利用規約</a>
     </nav>
-    <div class="who" data-slot="who" hidden></div>
+    <div class="acct" data-slot="acct"></div>
   </div>
 </header>
 
 <main>
-  <section class="board index" aria-labelledby="list-h">
-    <div class="t w6 h2 name">
-      <h1 id="list-h">発明品一覧</h1>
-      <div class="intro">
-        <p class="lead">IMPOSSIBLE LAB で生まれた発明品です。研究や製品化に使えるものを探して、採用できます。</p>
-        <p class="meta" data-slot="count"></p>
+  <!-- 最初の画面から実験まで、試作品は画面に残り、スクロールに合わせて分かれたり回ったりする -->
+  <div class="story" data-slot="story">
+    <div class="story-track" aria-hidden="true">
+      <div class="story-stage">
+        <canvas class="story-3d" data-slot="stage"></canvas>
+        <div class="tags" data-slot="tags"></div>
       </div>
     </div>
 
-    <div class="t w6 h2 alt controls">
-      <div class="ctl" role="group" aria-labelledby="sort-l">
-        <p id="sort-l" class="ctl-l">並べる順</p>
-        <div class="seg" data-slot="sort"></div>
+    <section class="hero" data-slot="hero" aria-labelledby="hero-h">
+      <div class="seam" aria-hidden="true"></div>
+      <img class="hero-photo" src="/site/sample/images/p-7a2e6c0086-0.jpg" width="720" height="504"
+        alt="IMPOSSIBLE LAB の発明台に置いた、だんボール持ち上げリフト アゲルくん">
+      <div class="hero-text">
+        <h1 id="hero-h"><span>誰もが開発に</span><span>携われる未来へ</span></h1>
+        <p class="hero-lead">IMPOSSIBLE LAB で、だれかのひと言から生まれた発明品のライブラリーです。開発者が読んで、採用できます。</p>
+        <a class="btn go" href="/inventions">発明品一覧を見る</a>
       </div>
-      <div class="ctl" role="group" aria-labelledby="tag-l">
-        <p id="tag-l" class="ctl-l">機能</p>
-        <div class="seg" data-slot="tags"></div>
+      <a class="hero-cap" data-slot="cap" href="/inventions/p-7a2e6c0086">
+        <b data-slot="cap-name">だんボール持ち上げリフト「アゲルくん」</b>
+        <span data-slot="cap-meta"><span class="sep">Rev.2</span>持ち上げて置く実験に合格</span>
+      </a>
+    </section>
+
+    <section class="chapter s-parts" data-slot="parts" aria-labelledby="parts-h">
+      <div class="chapter-text" data-slot="parts-text" data-enter>
+        <h2 id="parts-h" data-slot="parts-h">AI がプロンプトを元に部品を組み立てる</h2>
+        <p class="quote" data-slot="request">「床に置いた段ボールを棚の上まで持ち上げてくれる道具」</p>
+        <p class="note" data-slot="request-note">運営が作った見本の発明のプロンプトです。公開された発明のプロンプトは、ログインした開発者だけが読めます。</p>
+        <p class="note narrow-only" data-slot="part-list"></p>
       </div>
-      <div class="ctl" role="group" aria-labelledby="status-l">
-        <p id="status-l" class="ctl-l">状態</p>
-        <div class="seg" data-slot="status"></div>
+    </section>
+
+    <section class="chapter s-test" data-slot="test" aria-labelledby="test-h">
+      <div class="chapter-text" data-enter>
+        <h2 id="test-h"><span class="line">実験結果を元に</span><span class="line">改良を申請</span></h2>
+        <p class="f-title" data-slot="test-title">持ち上げて置く（積荷）の実験</p>
+        <ol class="facts" data-slot="facts"></ol>
       </div>
+    </section>
+  </div>
+
+  <section class="others" aria-labelledby="others-h">
+    <div class="others-stage" aria-hidden="true">
+      <canvas class="shelf-3d" data-slot="shelf"></canvas>
+    </div>
+    <div class="others-list" data-enter>
+      <h2 id="others-h">公開中の発明品</h2>
+      <p class="meta" data-slot="others-count"></p>
+      <ul class="shelf-rows" data-slot="rows"></ul>
     </div>
   </section>
 
-  <section class="shelf" aria-label="発明">
-    <ol class="rows" data-slot="rows"></ol>
-    <div class="t empty" data-slot="empty" hidden>
-      <h2>この条件の発明はまだありません</h2>
-      <p>機能か状態の絞り込みを外すと、ほかの発明が出ます。</p>
+  <section class="adopt" aria-labelledby="adopt-h">
+    <figure class="adopt-pic">
+      <img data-slot="adopt-img" src="/site/sample/images/p-7a2e6c0086-0.jpg" width="720" height="504" loading="lazy"
+        alt="IMPOSSIBLE LAB の発明台に置いた、だんボール持ち上げリフト アゲルくん">
+      <figcaption data-slot="adopt-cap">IMPOSSIBLE LAB の発明台に置いた Rev.2</figcaption>
+    </figure>
+    <div class="adopt-text" data-enter>
+      <h2 id="adopt-h">採用するには</h2>
+      <ol class="steps">
+        <li><a href="/inventions">発明品一覧で探す</a><p>名前と試作品、実験の結果をだれでも見られます。</p></li>
+        <li><a href="/signup">開発者として登録する</a><p>ログインすると、依頼の原文と設計の詳しい内容を読み、採用できます。</p></li>
+        <li><a href="/messages">採用した相手とやりとりする</a><p>採用すると、発案者との連絡の場ができます。</p></li>
+      </ol>
+      <p class="terms-line">公開と採用の約束は<a href="/terms">利用規約</a>にあります。</p>
     </div>
   </section>
-
-  <footer class="board end-board">
-    <div class="t w6 h2 end">
-      <p class="big" lang="en">IMPOSSIBLE LIBRARY</p>
-      <p>研究所で試して直した発明を、研究と製品化につなぐ図書館です。この PC の中だけで動いています。</p>
-    </div>
-    <div class="t w6 h2 end alt">
-      <nav aria-label="サイトの終わりのリンク">
-        <a href="./">発明品一覧</a><a href="accounts.html">研究者と開発者の登録</a><a href="terms.html">利用規約</a><a href="admin.html">運営</a>
-      </nav>
-      <p data-slot="sample-note"></p>
-    </div>
-  </footer>
-  <div class="page-end"></div>
 </main>
-<noscript><p style="padding:24px">一覧を読むには JavaScript を有効にしてください。</p></noscript>
-<script type="module" src="list.js"></script>
+
+<footer class="board end-board">
+  <div class="t end">
+    <p class="big" lang="en">IMPOSSIBLE LIBRARY</p>
+    <div class="end-row">
+      <div class="end-text">
+        <p>IMPOSSIBLE LAB で試して直した発明を、研究と製品化につなぐライブラリーです。この&nbsp;PC の中だけで動いています。</p>
+        <p data-slot="sample-note"></p>
+      </div>
+      <nav aria-label="サイトの終わりのリンク">
+        <a href="/inventions">発明品一覧</a><a href="/signup">開発者の新規登録</a><a href="/terms">利用規約</a><a href="/privacy">個人情報の扱い</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+<div class="page-end"></div>
+
+<script type="module" src="/site/title.js"></script>
 </body>
 </html>

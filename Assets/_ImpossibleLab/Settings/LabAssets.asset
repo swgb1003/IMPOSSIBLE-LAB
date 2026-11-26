@@ -34,6 +34,7 @@ MonoBehaviour:
   PartFabric: {fileID: 2100000, guid: 7faaf582417f08246a012ecf670064de, type: 2}
   PartFoam: {fileID: 2100000, guid: c545519d9e3b9c94c9dd596a3be00698, type: 2}
   PartRubber: {fileID: 2100000, guid: 0ab4a569eee85c54c997a88f90fa099d, type: 2}
+  PartShade: {fileID: 2100000, guid: 4689bda5350c1b64e8961d182af83f90, type: 2}
   GlowOrange: {fileID: 2100000, guid: 93b77b06f810f9540b8de984c1ff238f, type: 2}
   LightPanel: {fileID: 2100000, guid: b4a2c6646dcbbc444a1799cf0735e4fa, type: 2}
   CentralDevice: {fileID: 919132149155446097, guid: 8b58c7e02f3a58d4cb968e0787da938c, type: 3}

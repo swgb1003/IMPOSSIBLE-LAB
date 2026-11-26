@@ -4,32 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>発明のページ | IMPOSSIBLE LIBRARY</title>
-<meta name="description" content="VR の研究所で試して直した発明を、依頼の原文・回せる試作品・実験の数値・改良の履歴とともに読む">
+<meta name="description" content="IMPOSSIBLE LAB で試して直した発明の、回せる試作品と実験の結果。依頼の原文と設計の詳しい内容は、ログインした開発者が読める">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="icon" href="/site/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site/site.css">
 <script type="importmap">
 { "imports": {
-  "three": "../vendor/three/build/three.module.js",
-  "three/addons/": "../vendor/three/examples/jsm/"
+  "three": "/vendor/three/build/three.module.js",
+  "three/addons/": "/vendor/three/examples/jsm/"
 } }
 </script>
 </head>
 <body>
 <header class="bar">
-  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+  <a class="mark" href="/" aria-label="IMPOSSIBLE LIBRARY の入口へ">
     <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
     <b>IMPOSSIBLE LIBRARY</b>
   </a>
   <div class="bar-r">
     <nav aria-label="サイト">
-      <a href="./">発明品一覧</a>
-      <a href="accounts.html">研究者と開発者</a>
-      <a href="threads.html">やりとり</a>
-      <a href="terms.html">利用規約</a>
+      <a href="/inventions">発明品一覧</a>
+      <a href="/terms">利用規約</a>
     </nav>
-    <div class="who" data-slot="who" hidden></div>
+    <div class="acct" data-slot="acct"></div>
   </div>
 </header>
 
@@ -43,14 +42,14 @@
 
     <figure class="t w6 h2 ask">
       <blockquote data-slot="request"></blockquote>
-      <figcaption>発案者が研究所で頼んだ言葉。原文のまま載せています</figcaption>
+      <figcaption>発案者が IMPOSSIBLE LAB で頼んだ言葉。原文のまま載せています</figcaption>
     </figure>
 
     <div class="t stage">
       <canvas data-slot="canvas" aria-label="試作品の立体。押したまま動かすと回せます" role="img"></canvas>
       <p class="fallback" data-slot="fallback" hidden>この画面では 3D を表示できません</p>
       <div class="over top"><h2>試作品 <span class="rev num" data-slot="rev"></span></h2><p class="pick" data-slot="pick" aria-live="polite"></p></div>
-      <div class="over foot"><p>押したまま動かすと回せます。部品を押すと光ります</p><p class="num size" data-slot="size"></p></div>
+      <div class="over foot"><p data-slot="stage-hint">押したまま動かすと回せます。部品を押すと光ります</p><p class="num size" data-slot="size"></p></div>
     </div>
 
     <div class="t w3 h2 fig">
@@ -68,13 +67,13 @@
     </div>
 
     <div class="t w3 h2 act">
-      <h2>研究や製品化に使う</h2>
-      <p>登録した研究者と開発者が、理由を書いて採用できます。採用すると発案者に知らせが届きます。</p>
+      <h2>開発に使う</h2>
+      <p>登録した開発者が、理由を書いて採用できます。採用すると発案者に知らせが届きます。</p>
       <button class="btn" type="button" data-slot="adopt">採用する</button>
     </div>
   </section>
 
-  <section class="board" aria-labelledby="how-h">
+  <section class="board" aria-labelledby="how-h" data-slot="board-how">
     <div class="t w6 h4 how">
       <h2 id="how-h">しくみ</h2>
       <ol data-slot="needs"></ol>
@@ -87,7 +86,7 @@
     <div class="t w3 h2 slot" data-slot="slot-b"></div>
   </section>
 
-  <section class="board" aria-labelledby="real-h">
+  <section class="board" aria-labelledby="real-h" data-slot="board-real">
     <div class="t w6 h2 pair">
       <div class="fig"><p class="v num" data-slot="power"></p><p data-slot="power-note"></p></div>
       <div class="fig"><p class="v num" data-slot="runtime"></p><p data-slot="runtime-note"></p></div>
@@ -107,27 +106,29 @@
 
   <section class="board" aria-labelledby="want-h">
     <div class="t want" data-slot="want">
-      <h2 id="want-h">ほしい人と試した人</h2>
+      <h2 id="want-h">ほしいと採用</h2>
       <div class="want-figs" data-slot="want-figs"></div>
       <div class="want-act" data-slot="want-act"></div>
     </div>
   </section>
 
   <footer class="board end-board">
-    <div class="t w6 h2 end">
+    <div class="t end">
       <p class="big" lang="en">IMPOSSIBLE LIBRARY</p>
-      <p>研究所で試して直した発明を、研究と製品化につなぐ図書館です。この PC の中だけで動いています。</p>
-    </div>
-    <div class="t w6 h2 end alt">
-      <nav aria-label="サイトの終わりのリンク">
-        <a href="./">発明品一覧</a><a href="accounts.html">研究者と開発者の登録</a><a href="terms.html">利用規約</a><a href="admin.html">運営</a>
-      </nav>
-      <p data-slot="sample-note"></p>
+      <div class="end-row">
+        <div class="end-text">
+          <p>IMPOSSIBLE LAB で試して直した発明を、研究と製品化につなぐライブラリーです。この&nbsp;PC の中だけで動いています。</p>
+          <p data-slot="sample-note"></p>
+        </div>
+        <nav aria-label="サイトの終わりのリンク">
+          <a href="/inventions">発明品一覧</a><a href="/signup">開発者の新規登録</a><a href="/terms">利用規約</a><a href="/privacy">個人情報の扱い</a>
+        </nav>
+      </div>
     </div>
   </footer>
   <div class="page-end"></div>
 </main>
 <noscript><p style="padding:24px">このページを読むには JavaScript を有効にしてください。</p></noscript>
-<script type="module" src="invention.js"></script>
+<script type="module" src="/site/invention.js"></script>
 </body>
 </html>

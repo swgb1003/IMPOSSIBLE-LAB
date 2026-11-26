@@ -167,9 +167,21 @@ test("a design with a motion program converts to the app's program format", () =
   }
 });
 
+test("new shapes (dome, cone, ring) are in the catalog and explained to the AI", () => {
+  const ids = catalog.shapes.map((x) => x.id);
+  for (const s of ["dome", "cone", "ring"]) assert.ok(ids.includes(s), s);
+  const lamp = { ...nightLight, parts: nightLight.parts.map((p) => (p.id === "lamp" ? { ...p, shape: "cone" } : p)) };
+  const out = schemas.design.parse({ status: "ok", message: "", suggestions: [], design: lamp });
+  assert.equal(toDna(out.design!, catalog, "ai-test").dna.parts[1].shape, "cone");
+  const prompt = designSystemPrompt(catalog);
+  assert.match(prompt, /dome is \[diameter, how high the middle rises, diameter\]/);
+  assert.match(prompt, /ring for bumpers/);
+});
+
 test("schema rejects values outside the catalog", () => {
   const bad = (patch: Record<string, unknown>) => () => schemas.design.parse({ status: "ok", message: "", suggestions: [], design: { ...nightLight, ...patch } });
   assert.throws(bad({ parts: [{ id: "a", type: "laser_cannon", shape: "box", material: "steel", position: [0, 0, 0], scale: [1, 1, 1] }] }));
+  assert.throws(bad({ parts: [{ id: "a", type: "body", shape: "pyramid", material: "steel", position: [0, 0, 0], scale: [1, 1, 1] }] }));
   assert.throws(bad({ appearance: "rainbow_neon" }));
   assert.throws(bad({ mount: "tail" }));
   assert.throws(bad({ tags: ["weapon"] }));

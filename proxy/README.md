@@ -51,33 +51,49 @@ adb reverse tcp:8787 tcp:8787   # Quest を USB 接続した状態で。Quest �
 - 利用者の指示文はログに残さない（記録するのはモデル名・トークン数・所要時間・HTTPステータスのみ）
 - 拒否（refusal）時は `fallbacks: "default"`（beta `server-side-fallback-2026-07-01`）でサーバー側の推奨モデルに自動切替
 
-## 発明ライブラリ（IMPOSSIBLE LIBRARY、2026-11-25）
+## 発明ライブラリー（IMPOSSIBLE LIBRARY、2026-11-25。ログインと見せる範囲は 2026-11-26）
 
-Quest で公開した発明を PC の中のサイトに載せ、研究者・開発者が採用する流れ（設計は `docs/PUBLISH_LIBRARY.md`）。AI は呼ばない。データは `proxy/library/`（`ILAB_LIBRARY_DIR` で変更、git に入れない）に保存し、PC の外には出さない。
+Quest で公開した発明を PC の中のサイトに載せ、開発者が採用する流れ（設計は `docs/PUBLISH_LIBRARY.md`）。AI は呼ばない。データは `proxy/library/`（`ILAB_LIBRARY_DIR` で変更、git に入れない）に保存し、PC の外には出さない。
+
+**Quest の入口**（端末ごとの発案者キーを `x-ilab-creator` で送る）
+
+| メソッド | パス | 内容 |
+|---|---|---|
+| POST | `/library` | 公開・更新（`{publication, glbBase64, images?}`、4MB まで。写真は JPEG 4 枚・1 枚 300KB まで）。同じ端末の同じ発明はページを更新 |
+| GET | `/library/mine` | 自分の公開の状態・ほしい・試した数・採用の知らせ（採用した人の名前・所属・紹介）・やりとりの数 |
+| POST | `/library/:id/withdraw`・`/tried`・`/want` | 取り下げ（公開した端末だけ）・VR で試した・ほしい（試した端末だけ） |
+| POST | `/library/pair` | サイトに入る6桁の番号（10 分有効、1回だけ使える） |
+| GET・POST | `/threads`・`/threads/:id`・`/threads/:id/messages` | 採用した人とのやりとり |
+| GET | `/library?sort=&tag=&scene=&status=`・`/library/:id`・`model.glb`・`images/<0〜3>.jpg` | 一覧・1件（だれでも見られる形）・3D・写真（サイトも読む） |
+
+**サイトの入口**（`/api/`。この PC の中からだけ。本人はログインの記録の cookie で決める）
 
 | メソッド | パス | だれが | 内容 |
 |---|---|---|---|
-| POST | `/library` | Quest | 公開・更新（`{publication, glbBase64, images?}`、4MB まで。写真は JPEG 4 枚・1 枚 300KB まで）。同じ端末の同じ発明はページを更新 |
-| GET | `/library/mine` | Quest | 自分の公開の状態・ほしい・採用の知らせ・やりとりの数 |
-| POST | `/library/:id/withdraw` | Quest | 取り下げ（公開した端末だけ） |
-| POST | `/library/:id/tried` | Quest | VR で呼び出して試した |
-| POST | `/library/:id/want` | Quest・サイト | ほしい。Quest は試した端末だけ、サイトは `{voter}`（ブラウザごと）。別々に数える |
-| GET | `/library?sort=&tag=&scene=&status=` | だれでも | 一覧（並び：wants・new・adoptions・name） |
-| GET | `/library/:id`・`/library/:id/model.glb`・`/library/:id/images/<0〜3>.jpg` | だれでも | 1件の公開データと 3D と写真 |
-| POST | `/library/:id/consider`・`/adopt` | サイト | 検討中・採用（`{accountId}`・`{accountId, reason}`。理由は必須） |
-| GET・POST | `/accounts`、GET `/accounts/:id` | サイト | 研究者・開発者の登録と一覧 |
-| GET | `/creators`・`/creators/:publicId` | サイト | 表示名で公開している発案者の一覧（名乗りに使う）と、発案者のページ（表示名で公開したものだけ） |
-| GET | `/threads`・`/threads/:id`、POST `/threads/:id/messages` | Quest・サイト | 採用した人と発案者のやりとり（2人だけ） |
-| GET | `/admin/library`、POST `/admin/accounts/:id/verify`・`/admin/library/:id/takedown` | サイト | 運営（確認済みの印・取り下げ） |
+| GET | `/api/session` | だれでも | ログインしている人と、新しい知らせの数 |
+| POST | `/api/signup`・`/api/login`・`/api/logout`・`/api/pair` | だれでも | 新規登録（開発者）・ログイン・ログアウト・Quest の番号で入る（発案者） |
+| POST | `/api/verify-email`・`/api/password/forgot`・`/api/password/reset` | だれでも | メールアドレスの確認、パスワードの再設定 |
+| GET・POST | `/api/me`・`/api/me/password`・`/api/me/delete`・`/api/logout-all` | ログインした人 | 自分の登録と見せる項目・パスワードの変更・退会・すべての端末でログアウト |
+| GET・POST | `/api/notifications`・`/api/notifications/read` | ログインした人 | 知らせ（採用・検討中・返事・所属の確認・取り下げ） |
+| GET | `/api/creators/:publicId` | だれでも | 表示名で公開した発案者のページ |
+| GET | `/api/library/:id` | ログインした人 | 詳しい内容つきの1件（開発者・公開した発案者・運営。ほかの発案者にはだれでも見られる形）。開発者が読んだ記録を残す |
+| POST | `/api/library/:id/consider`・`/adopt` | 開発者 | 検討中・採用（`{reason}`。理由は必須） |
+| POST | `/api/library/:id/report` | だれでも | 運営に知らせる（通報） |
+| GET・POST | `/api/threads`・`/api/threads/:id`・`/messages` | 当事者の2人 | やりとり |
+| GET | `/api/mail` | だれでも | このデモで送ったメール（外へは送らない） |
+| GET・POST | `/api/admin/library`・`/accounts`・`/reports`、`…/verify`・`…/takedown`・`…/resolve` | 運営 | 通報・取り下げ・確認済みの印 |
 
-- **Quest** は端末ごとの発案者キーを `x-ilab-creator` で送る（16〜64 文字の英数字・`-`・`_`）。サーバーはキーを保存せずハッシュだけ持つ。`ILAB_PROXY_TOKEN` を設定したときは `x-ilab-token` も要る。
-- **サイトと運営**の入口は、この PC の中（127.0.0.1）からだけ受け付ける。サイトでの名乗りは `x-ilab-as: account:<ID>` か `creator:<発案者の公開 ID>`（ログインは形だけ）。
-- 公開データの形は `src/library/schema.ts`（知らない欄は捨てる、文字数と数の上限、同意の版 `2026-11-25`）。GLB は見出しと JSON の区切りを確かめ、1MB まで。
-- URL には ID だけを入れる（ログに URL が出るため）。依頼文・やりとりの本文はログに書かない。
+- **ログイン**：パスワードは scrypt で元に戻せない形にして保存する。ログインの記録は cookie（`HttpOnly`・`SameSite=Strict`、14 日）で、サーバーには札のハッシュだけを残す。ログインの失敗が 15 分に 5 回続くと待たせる。
+- **見せる範囲**：発明のだれでも見られる形は、名前・何をするものか・3D と写真・実験の結果の要点（主な計測と合否）・ほしいと採用の数だけ。依頼の原文・部品としくみ・実験の条件とほかの計測・改良の履歴は、ログインした開発者（と公開した発案者・運営）だけに返し、開発者が読んだ記録（開発者ごとに最初と最後の時刻）を運営の画面に出す。開発者の一覧と個人のページは無く、名前・所属・専門・紹介は、採用した発明の発案者と運営にだけ見せる。検討中の知らせには、だれかを書かない。メールアドレスは本人と運営にだけ見せる。やりとりは当事者の2人だけ（ほかの人には、あるかどうかも見せない）。
+- **守り**：この PC の中からの要求は、宛先名（Host）が `127.0.0.1`・`localhost` のときだけ受け付ける（DNS リバインディング対策）。サイトの書き込みは、送り元のページ（Origin）が同じサイトのときだけ。画面には CSP などの見出しを付ける。
+- **メール**：外へは送らない。登録の確認と再設定のメールは、送ったメールの画面（`/mail`）に入る。リンクの札は `#` の後ろに置き、サーバーのアドレスの記録に残さない。
+- 公開データの形は `src/library/schema.ts`（知らない欄は捨てる、文字数と数の上限、同意の版 `2026-11-26`。前の版 `2026-11-25` も受け付ける）。GLB は見出しと JSON の区切りを確かめ、1MB まで。
+- URL には ID だけを入れる（ログに URL が出るため）。依頼文・やりとりの本文・パスワードはログに書かない。
 - 書き込みは 10 分あたり 600 回まで（AI の回数制限とは別）。
-- サイトの画面は `http://127.0.0.1:8787/`（`site/`。three.js は `node_modules/three` から出す）。一覧・1件のページ・研究者と開発者（登録と名乗り）・やりとり・発案者・運営（`admin.html`、帯には出さず終わりのリンクから）・利用規約。名乗りはブラウザに残すだけで、パスワードは無い。
+- **画面**（`http://127.0.0.1:8787/`。部品は `site/` を `/site/` で、three.js は `node_modules/three` を `/vendor/three/` で出す）：入口 `/`・一覧 `/inventions`・1件 `/inventions/<ID>`・発案者 `/creators/<ID>`・ログイン `/login`・新規登録 `/signup`・Quest の番号で入る `/pair`・パスワードの再設定 `/forgot`・自分のページ `/me`・設定 `/settings`・知らせ `/notifications`・やりとり `/messages`・運営 `/admin`・利用規約 `/terms`・個人情報の扱い `/privacy`・送ったメール `/mail`。ログインが要る画面は、ログインしていなければ `/login` へ送る。前のアドレス（`/site/〇〇.html?id=`）は新しいアドレスへ移す。
+- **見本の人のログイン**（PC の中だけのデモ用。パスワードはどれも `mihon-2026`）：開発者 `takase@sample.invalid`・`morishita@sample.invalid`・`nonomura@sample.invalid`、見本の発案者 `creator@sample.invalid`、運営 `unei@sample.invalid`。
 - **Quest から送る本文を確かめる**：通し検証が保存の画面から公開したときの本文を `Logs/verify/library-publish-body.json` に残す。`npm run check-publish` で PC 側の形と中身（GLB・写真）の確かめに通るかを見る。
-- **見本を入れる**：Unity の通し検証が `Logs/verify/library/<発明ID>/` に公開データ・3D・写真を書き出す。`npm run samples` でそれを形を確かめてからライブラリに公開し（見本の印つき、表示名は「見本の発案者」、何度入れても増えない）、見本の研究者・開発者 3 人も入れ、サイトがライブラリにつながらないときに読む見本のファイル（`site/sample/`）も作り直す。
+- **見本を入れる**：Unity の通し検証が `Logs/verify/library/<発明ID>/` に公開データ・3D・写真を書き出す。`npm run samples` でそれを形を確かめてからライブラリに公開し（見本の印つき、表示名は「見本の発案者」、何度入れても増えない）、見本の開発者 3 人と、見本の発案者・運営のログインも入れ、サイトがライブラリにつながらないときに読む見本のファイル（`site/sample/`。1件はだれでも見られる形だけ。入口でしくみを紹介する見本1件だけは詳しい内容つきの `showcase.json`）も作り直す。見本の人のログインだけを入れるときは `npm run samples -- --logins-only`。
 
 ## アプリ側の接続先を変える
 

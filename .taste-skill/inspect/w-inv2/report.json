@@ -1,6 +1,6 @@
 {
- "url": "http://127.0.0.1:8799/site/invention.html?id=p-b4f88a77fc",
- "at": "2026-11-25T14:56:47.310Z",
+ "url": "http://127.0.0.1:8787/inventions/p-3897b44f0f",
+ "at": "2026-11-26T13:43:38.363Z",
  "allow": [
   "few-pictures"
  ],
@@ -9,17 +9,16 @@
    "width": 1440,
    "height": 900,
    "load": "load",
-   "screens": 4,
+   "screens": 3,
    "filled": [
-    0.9,
-    0.8,
-    0.73,
+    0.96,
+    0.67,
     0.73
    ],
    "motion": {
-    "elements": 19,
+    "elements": 14,
     "css": 0,
-    "transitions": 19,
+    "transitions": 14,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -30,22 +29,25 @@
      "h": 900
     },
     "page": {
-     "height": 2800,
-     "screens": 3.1,
-     "words": 191,
-     "img": 1,
+     "height": 2212,
+     "screens": 2.5,
+     "words": 117,
+     "img": 4,
      "video": 0,
      "canvas": 1,
      "svg": 1,
-     "sections": 4,
+     "sections": 3,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 1,
+     "realPictures": 4,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
+      "1.jpg",
+      "2.jpg",
+      "3.jpg",
       "0.jpg"
      ],
      "blendText": 0,
@@ -55,7 +57,7 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "ついてくる​日陰​キャノピー",
+     "text": "ハンズ​フリー​雨よけ​装置",
      "words": 1,
      "chars": 14,
      "lines": 1,
@@ -65,18 +67,14 @@
      "weight": 700,
      "tracking": -0.02,
      "leading": 1.05,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "right",
-     "widthRatio": 0.46,
      "top": 86,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
-     "text": "ついてくる​日陰​キャノピー",
+     "text": "ハンズ​フリー​雨よけ​装置",
      "words": 1,
      "lines": 1,
      "size": 56,
@@ -84,7 +82,7 @@
     },
     "headings": [
      {
-      "text": "ついてくる​日陰​キャノピー",
+      "text": "ハンズ​フリー​雨よけ​装置",
       "words": 1,
       "chars": 14,
       "lines": 1,
@@ -105,28 +103,7 @@
       "kind": "heading"
      },
      {
-      "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
-      "words": 1,
-      "chars": 39,
-      "lines": 2,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Noto Sans JP",
-      "weight": 500,
-      "tracking": 0,
-      "leading": 1.3,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.46,
-      "top": 286,
-      "tag": "blockquote",
-      "kind": "statement"
-     },
-     {
-      "text": "76.7%",
+      "text": "66.4%",
       "words": 1,
       "chars": 5,
       "lines": 1,
@@ -142,12 +119,12 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.21,
-      "top": 486,
+      "top": 512,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "58.2%",
+      "text": "30.7%",
       "words": 1,
       "chars": 5,
       "lines": 1,
@@ -163,7 +140,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.21,
-      "top": 486,
+      "top": 512,
       "tag": "p",
       "kind": "statement"
      },
@@ -184,12 +161,12 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.1,
-      "top": 2357,
+      "top": 1667,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "0人",
+      "text": "1件",
       "words": 1,
       "chars": 2,
       "lines": 1,
@@ -205,49 +182,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.1,
-      "top": 2357,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0人",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.1,
-      "top": 2357,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0件",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.1,
-      "top": 2357,
+      "top": 1667,
       "tag": "p",
       "kind": "statement"
      },
@@ -256,28 +191,28 @@
       "words": 2,
       "chars": 18,
       "lines": 1,
-      "size": 63.4,
-      "vw": 4.4,
+      "size": 136.4,
+      "vw": 9.5,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
-      "position": "left",
-      "widthRatio": 0.46,
-      "top": 2614,
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 1906,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
-     "count": 9,
-     "maxLines": 2,
+     "count": 6,
+     "maxLines": 1,
      "over2Lines": 0,
-     "statements": 8,
+     "statements": 5,
      "centered": 0,
      "medianWords": 1,
      "mixedFontHeadings": 0
@@ -286,12 +221,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.96,
+       "share": 0.93,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.04,
+       "share": 0.07,
        "mono": false
       }
      ],
@@ -302,7 +237,7 @@
       24,
       36,
       56,
-      63
+      136
      ],
      "sizeCount": 6,
      "notLoaded": [],
@@ -314,10 +249,10 @@
       "tracking": 0,
       "contrast": 9.2
      },
-     "measureChars": 92,
+     "measureChars": 38,
      "max": {
-      "size": 63.4,
-      "vw": 4.4,
+      "size": 136.4,
+      "vw": 9.5,
       "font": "Oxanium",
       "text": "IMPOSSIBLE LIBRARY"
      },
@@ -328,8 +263,8 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.05,
-     "centerShare": 0,
+     "upperShare": 0.16,
+     "centerShare": 0.02,
      "smallText": 0
     },
     "eyebrows": [],
@@ -356,7 +291,7 @@
      "textColors": [
       {
        "color": "#e9fbfc",
-       "share": 0.52
+       "share": 0.49
       },
       {
        "color": "#9db8bc",
@@ -364,11 +299,11 @@
       },
       {
        "color": "#120600",
-       "share": 0.03
+       "share": 0.05
       },
       {
        "color": "#2fe3e6",
-       "share": 0.01
+       "share": 0.02
       },
       {
        "color": "#ff6a26",
@@ -376,26 +311,28 @@
       }
      ],
      "button": {
-      "bg": "#020405",
+      "bg": "#131d22",
       "hsl": {
        "h": 200,
-       "s": 0.43,
-       "l": 0.01
+       "s": 0.28,
+       "l": 0.1
       },
       "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 2,
-     "inHero": 1,
+     "count": 4,
+     "inHero": 3,
      "radius": 0,
-     "height": 48,
+     "height": 40,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
+      "ログインして​読む",
       "採用する"
      ]
     },
@@ -414,23 +351,29 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 2,
+     "squareMedia": 5,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
      "cardRows": [
       {
-       "count": 3,
+       "count": 4,
        "iconTopped": false,
        "rounded": false,
        "top": 64
+      },
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1002
       }
      ]
     },
     "heroMedia": [
      {
       "type": "canvas",
-      "ratio": 0.43
+      "ratio": 0.44
      }
     ],
     "nav": {
@@ -450,29 +393,29 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 2800,
+    "pageH": 2212,
     "margins": {
-     "left": 38,
-     "right": 40
+     "left": 16,
+     "right": 38
     },
     "sections": [
      {
       "sel": "section.board.first",
       "tag": "section",
       "top": 64,
-      "height": 796,
-      "words": 59,
+      "height": 818,
+      "words": 52,
       "media": 1,
       "middle": 30,
       "heading": {
-       "text": "ついてくる​日陰​キャノピー",
+       "text": "ハンズ​フリー​雨よけ​装置",
        "size": 56,
        "tag": "h1"
       },
       "left": 16,
-      "right": 40,
+      "right": 58,
       "textLeft": 38,
-      "textRight": 40,
+      "textRight": 58,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -482,17 +425,17 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 980,
-      "height": 680,
-      "words": 50,
-      "media": 1,
-      "middle": 50,
+      "top": 1002,
+      "height": 523,
+      "words": 45,
+      "media": 4,
+      "middle": 8,
       "heading": {
-       "text": "しくみ",
+       "text": "実験の​記録",
        "size": 24,
        "tag": "h2"
       },
-      "left": 38,
+      "left": 16,
       "right": 16,
       "textLeft": 38,
       "textRight": 41,
@@ -503,68 +446,22 @@
       "pinned": false
      },
      {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 1780,
-      "height": 435,
-      "words": 63,
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 1884,
+      "height": 312,
+      "words": 18,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "実験の​記録",
-       "size": 24,
-       "tag": "h2"
-      },
-      "left": 38,
-      "right": 55,
-      "textLeft": 38,
-      "textRight": 55,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 2335,
-      "height": 138,
-      "words": 8,
-      "media": 0,
-      "middle": 137,
-      "heading": {
-       "text": "ほしい​人と​試した​人",
-       "size": 24,
-       "tag": "h2"
-      },
-      "left": 38,
-      "right": 104,
-      "textLeft": 38,
-      "textRight": 104,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": false,
-      "pinned": false
-     },
-     {
-      "sel": "footer.board.end-board",
-      "tag": "footer",
-      "top": 2592,
-      "height": 192,
-      "words": 11,
-      "media": 0,
-      "middle": 83,
-      "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 63,
+       "size": 136,
        "tag": "p"
       },
       "left": 38,
-      "right": 73,
+      "right": 38,
       "textLeft": 38,
-      "textRight": 73,
+      "textRight": 38,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -575,7 +472,7 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "ついてくる​日陰​キャノピー",
+      "text": "ハンズ​フリー​雨よけ​装置",
       "size": 56,
       "top": 86,
       "firstScreen": true
@@ -585,61 +482,146 @@
     "edges": [
      {
       "x": 746,
-      "n": 6
-     },
-     {
-      "x": 38,
       "n": 5
      },
      {
-      "x": 1100,
-      "n": 2
+      "x": 38,
+      "n": 3
      },
      {
       "x": 115,
       "n": 1
-     },
-     {
-      "x": 392,
-      "n": 1
-     },
-     {
-      "x": 804,
-      "n": 1
      }
     ],
-    "leftBlocks": 16,
+    "leftBlocks": 9,
     "bodySize": 16,
     "stage": false,
     "explains": true,
     "slivers": [],
-    "voidShare": 0.03,
+    "voidShare": 0.04,
     "voidBox": {
-     "x": 720,
-     "y": 420,
-     "w": 720,
-     "h": 60
+     "x": 1260,
+     "y": 300,
+     "w": 180,
+     "h": 300
     }
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 64
+    },
+    "canvas": {
+     "left": 16,
+     "right": 38
+    },
+    "hero": {
+     "text": "ハンズ​フリー​雨よけ​装置",
+     "words": 1,
+     "chars": 14,
+     "lines": 1,
+     "size": 56,
+     "vw": 3.9,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 13,
+     "firstScreen": 6,
+     "ragged": [
+      {
+       "diff": 400,
+       "top": 64
+      }
+     ],
+     "voids": [
+      {
+       "gap": 42,
+       "at": 568,
+       "panel": "30.7%"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 13,
+     "radii": [
+      [
+       0,
+       13
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      24,
+      56,
+      136
+     ]
+    },
+    "title": {
+     "text": "ハンズ​フリー​雨よけ​装置",
+     "size": 56,
+     "top": 86
+    },
+    "colourShare": 0.104
+   },
    "consoleErrors": []
   },
   {
    "width": 768,
    "height": 1024,
    "load": "load",
-   "screens": 5,
+   "screens": 3,
    "filled": [
-    0.85,
-    0.83,
-    0.89,
+    0.94,
     0.83,
     0.77
    ],
    "motion": {
-    "elements": 19,
+    "elements": 14,
     "css": 0,
-    "transitions": 19,
+    "transitions": 14,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -650,22 +632,25 @@
      "h": 1024
     },
     "page": {
-     "height": 5062,
-     "screens": 4.9,
-     "words": 191,
-     "img": 1,
+     "height": 3040,
+     "screens": 3,
+     "words": 117,
+     "img": 4,
      "video": 0,
      "canvas": 1,
      "svg": 1,
-     "sections": 4,
+     "sections": 3,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 1,
+     "realPictures": 4,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
+      "1.jpg",
+      "2.jpg",
+      "3.jpg",
       "0.jpg"
      ],
      "blendText": 0,
@@ -675,7 +660,7 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "ついてくる​日陰​キャノピー",
+     "text": "ハンズ​フリー​雨よけ​装置",
      "words": 1,
      "chars": 14,
      "lines": 1,
@@ -685,18 +670,14 @@
      "weight": 700,
      "tracking": -0.02,
      "leading": 1.05,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "center",
-     "widthRatio": 0.9,
-     "top": 133,
+     "top": 95,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
-     "text": "ついてくる​日陰​キャノピー",
+     "text": "ハンズ​フリー​雨よけ​装置",
      "words": 1,
      "lines": 1,
      "size": 44,
@@ -704,7 +685,7 @@
     },
     "headings": [
      {
-      "text": "ついてくる​日陰​キャノピー",
+      "text": "ハンズ​フリー​雨よけ​装置",
       "words": 1,
       "chars": 14,
       "lines": 1,
@@ -720,33 +701,12 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 133,
+      "top": 95,
       "tag": "h1",
       "kind": "heading"
      },
      {
-      "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
-      "words": 1,
-      "chars": 39,
-      "lines": 2,
-      "size": 28,
-      "vw": 3.6,
-      "font": "Noto Sans JP",
-      "weight": 500,
-      "tracking": 0,
-      "leading": 1.3,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.9,
-      "top": 578,
-      "tag": "blockquote",
-      "kind": "statement"
-     },
-     {
-      "text": "76.7%",
+      "text": "66.4%",
       "words": 1,
       "chars": 5,
       "lines": 1,
@@ -762,12 +722,12 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.42,
-      "top": 1315,
+      "top": 1288,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "58.2%",
+      "text": "30.7%",
       "words": 1,
       "chars": 5,
       "lines": 1,
@@ -783,7 +743,7 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.42,
-      "top": 1315,
+      "top": 1288,
       "tag": "p",
       "kind": "statement"
      },
@@ -804,12 +764,12 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.2,
-      "top": 4400,
+      "top": 2462,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "0人",
+      "text": "1件",
       "words": 1,
       "chars": 2,
       "lines": 1,
@@ -825,49 +785,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.2,
-      "top": 4400,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0人",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 28,
-      "vw": 3.6,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.2,
-      "top": 4400,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0件",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 28,
-      "vw": 3.6,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.2,
-      "top": 4400,
+      "top": 2462,
       "tag": "p",
       "kind": "statement"
      },
@@ -876,28 +794,28 @@
       "words": 2,
       "chars": 18,
       "lines": 1,
-      "size": 40,
-      "vw": 5.2,
+      "size": 69.2,
+      "vw": 9,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
       "widthRatio": 0.9,
-      "top": 4724,
+      "top": 2762,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
-     "count": 9,
-     "maxLines": 2,
+     "count": 6,
+     "maxLines": 1,
      "over2Lines": 0,
-     "statements": 8,
+     "statements": 5,
      "centered": 0,
      "medianWords": 1,
      "mixedFontHeadings": 0
@@ -906,12 +824,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.96,
+       "share": 0.93,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.04,
+       "share": 0.07,
        "mono": false
       }
      ],
@@ -921,8 +839,8 @@
       18,
       24,
       28,
-      40,
-      44
+      44,
+      69
      ],
      "sizeCount": 6,
      "notLoaded": [],
@@ -934,12 +852,12 @@
       "tracking": 0,
       "contrast": 9.2
      },
-     "measureChars": 87,
+     "measureChars": 40,
      "max": {
-      "size": 44,
-      "vw": 5.7,
-      "font": "Noto Sans JP",
-      "text": "ついてくる​日陰​キャノピー"
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -948,8 +866,8 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.05,
-     "centerShare": 0,
+     "upperShare": 0.16,
+     "centerShare": 0.02,
      "smallText": 0
     },
     "eyebrows": [],
@@ -965,7 +883,7 @@
      "sectionBgs": [
       {
        "color": "#0a0f12",
-       "top": 732,
+       "top": 705,
        "hsl": {
         "h": 203,
         "s": 0.29,
@@ -976,7 +894,7 @@
      "textColors": [
       {
        "color": "#e9fbfc",
-       "share": 0.52
+       "share": 0.49
       },
       {
        "color": "#9db8bc",
@@ -984,11 +902,11 @@
       },
       {
        "color": "#120600",
-       "share": 0.03
+       "share": 0.05
       },
       {
        "color": "#2fe3e6",
-       "share": 0.01
+       "share": 0.02
       },
       {
        "color": "#ff6a26",
@@ -996,26 +914,28 @@
       }
      ],
      "button": {
-      "bg": "#020405",
+      "bg": "#131d22",
       "hsl": {
        "h": 200,
-       "s": 0.43,
-       "l": 0.01
+       "s": 0.28,
+       "l": 0.1
       },
       "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 2,
-     "inHero": 1,
+     "count": 4,
+     "inHero": 3,
      "radius": 0,
-     "height": 48,
+     "height": 40,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
+      "ログインして​読む",
       "採用する"
      ]
     },
@@ -1034,22 +954,29 @@
      "blurred": 0,
      "roundedBoxes": 0,
      "boxRadius": 0,
-     "squareMedia": 2,
+     "squareMedia": 5,
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
-     "cardRows": []
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1544
+      }
+     ]
     },
     "heroMedia": [
      {
       "type": "canvas",
-      "ratio": 0.27
+      "ratio": 0.3
      }
     ],
     "nav": {
      "links": 5,
      "fixed": false,
-     "height": 111,
+     "height": 73,
      "floatingPill": false,
      "blur": false
     },
@@ -1063,7 +990,7 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 5062,
+    "pageH": 3040,
     "margins": {
      "left": 16,
      "right": 16
@@ -1072,20 +999,20 @@
      {
       "sel": "section.board.first",
       "tag": "section",
-      "top": 111,
-      "height": 1541,
-      "words": 59,
+      "top": 73,
+      "height": 1375,
+      "words": 52,
       "media": 1,
       "middle": 0,
       "heading": {
-       "text": "ついてくる​日陰​キャノピー",
+       "text": "ハンズ​フリー​雨よけ​装置",
        "size": 44,
        "tag": "h1"
       },
       "left": 16,
       "right": 16,
       "textLeft": 38,
-      "textRight": 54,
+      "textRight": 39,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1093,68 +1020,18 @@
       "pinned": false
      },
      {
-      "sel": "div.t.w6",
-      "tag": "div",
-      "top": 1747,
+      "sel": "section.board",
+      "tag": "section",
+      "top": 1544,
       "height": 746,
-      "words": 21,
-      "media": 0,
+      "words": 45,
+      "media": 4,
       "middle": 0,
-      "heading": {
-       "text": "しくみ",
-       "size": 24,
-       "tag": "h2"
-      },
-      "left": 38,
-      "right": 244,
-      "textLeft": 38,
-      "textRight": 244,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "div.t.w3",
-      "tag": "div",
-      "top": 2501,
-      "height": 610,
-      "words": 19,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "部品",
-       "size": 24,
-       "tag": "h2"
-      },
+      "heading": null,
       "left": 16,
       "right": 16,
       "textLeft": 38,
-      "textRight": 299,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "section.board",
-      "tag": "section",
-      "top": 3492,
-      "height": 736,
-      "words": 63,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "実験の​記録",
-       "size": 24,
-       "tag": "h2"
-      },
-      "left": 38,
-      "right": 50,
-      "textLeft": 38,
-      "textRight": 50,
+      "textRight": 59,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1164,20 +1041,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 4324,
-      "height": 282,
-      "words": 8,
+      "top": 2386,
+      "height": 258,
+      "words": 5,
       "media": 0,
-      "middle": 52,
+      "middle": 0,
       "heading": {
-       "text": "ほしい​人と​試した​人",
+       "text": "ほしいと​採用",
        "size": 24,
        "tag": "h2"
       },
       "left": 38,
-      "right": 65,
+      "right": 455,
       "textLeft": 38,
-      "textRight": 65,
+      "textRight": 455,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1187,20 +1064,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 4702,
-      "height": 344,
-      "words": 11,
+      "top": 2740,
+      "height": 284,
+      "words": 18,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 40,
+       "size": 69,
        "tag": "p"
       },
       "left": 38,
-      "right": 109,
+      "right": 48,
       "textLeft": 38,
-      "textRight": 109,
+      "textRight": 48,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1211,9 +1088,9 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "ついてくる​日陰​キャノピー",
+      "text": "ハンズ​フリー​雨よけ​装置",
       "size": 44,
-      "top": 133,
+      "top": 95,
       "firstScreen": true
      }
     ],
@@ -1221,22 +1098,14 @@
     "edges": [
      {
       "x": 38,
-      "n": 13
-     },
-     {
-      "x": 96,
-      "n": 1
+      "n": 8
      },
      {
       "x": 115,
       "n": 1
-     },
-     {
-      "x": 410,
-      "n": 1
      }
     ],
-    "leftBlocks": 16,
+    "leftBlocks": 9,
     "bodySize": 16,
     "stage": false,
     "explains": true,
@@ -1244,27 +1113,118 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 73
+    },
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "ハンズ​フリー​雨よけ​装置",
+     "words": 1,
+     "chars": 14,
+     "lines": 1,
+     "size": 44,
+     "vw": 5.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "top": 95,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 13,
+     "firstScreen": 4,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 45,
+       "at": 1332,
+       "panel": "30.7%"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 13,
+     "radii": [
+      [
+       0,
+       13
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      24,
+      44,
+      69
+     ]
+    },
+    "title": {
+     "text": "ハンズ​フリー​雨よけ​装置",
+     "size": 44,
+     "top": 95
+    },
+    "colourShare": 0.172
+   },
    "consoleErrors": []
   },
   {
    "width": 390,
    "height": 844,
    "load": "load",
-   "screens": 7,
+   "screens": 4,
    "filled": [
-    0.76,
-    0.86,
-    0.86,
-    0.92,
+    0.8,
     0.79,
-    0.76,
-    0.79
+    0.79,
+    0.73
    ],
    "motion": {
-    "elements": 19,
+    "elements": 14,
     "css": 0,
-    "transitions": 19,
+    "transitions": 14,
     "scripted": 0,
     "videos": 0,
     "playingVideos": 0
@@ -1275,22 +1235,25 @@
      "h": 844
     },
     "page": {
-     "height": 5663,
-     "screens": 6.7,
-     "words": 191,
-     "img": 1,
+     "height": 3057,
+     "screens": 3.6,
+     "words": 117,
+     "img": 4,
      "video": 0,
      "canvas": 1,
      "svg": 1,
-     "sections": 4,
+     "sections": 3,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
      "uiFragments": 0,
      "uiAbuse": false,
-     "realPictures": 1,
+     "realPictures": 4,
      "videoCount": 0,
      "uiPictures": 0,
      "pictureSamples": [
+      "1.jpg",
+      "2.jpg",
+      "3.jpg",
       "0.jpg"
      ],
      "blendText": 0,
@@ -1300,7 +1263,7 @@
      "videosNoPoster": 0
     },
     "hero": {
-     "text": "ついてくる​日陰​キャノピー",
+     "text": "ハンズ​フリー​雨よけ​装置",
      "words": 1,
      "chars": 14,
      "lines": 2,
@@ -1310,18 +1273,14 @@
      "weight": 700,
      "tracking": -0.02,
      "leading": 1.05,
-     "upper": false,
-     "italic": false,
-     "mono": false,
-     "align": "left",
-     "position": "center",
-     "widthRatio": 0.84,
-     "top": 224,
+     "top": 180,
      "tag": "h1",
-     "kind": "heading"
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
     },
     "h1": {
-     "text": "ついてくる​日陰​キャノピー",
+     "text": "ハンズ​フリー​雨よけ​装置",
      "words": 1,
      "lines": 2,
      "size": 36,
@@ -1329,7 +1288,7 @@
     },
     "headings": [
      {
-      "text": "ついてくる​日陰​キャノピー",
+      "text": "ハンズ​フリー​雨よけ​装置",
       "words": 1,
       "chars": 14,
       "lines": 2,
@@ -1345,33 +1304,12 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 224,
+      "top": 180,
       "tag": "h1",
       "kind": "heading"
      },
      {
-      "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
-      "words": 1,
-      "chars": 39,
-      "lines": 3,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Noto Sans JP",
-      "weight": 500,
-      "tracking": 0,
-      "leading": 1.3,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "center",
-      "widthRatio": 0.84,
-      "top": 775,
-      "tag": "blockquote",
-      "kind": "statement"
-     },
-     {
-      "text": "76.7%",
+      "text": "66.4%",
       "words": 1,
       "chars": 5,
       "lines": 1,
@@ -1387,12 +1325,12 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 1337,
+      "top": 1317,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "58.2%",
+      "text": "30.7%",
       "words": 1,
       "chars": 5,
       "lines": 1,
@@ -1408,7 +1346,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 1513,
+      "top": 1493,
       "tag": "p",
       "kind": "statement"
      },
@@ -1428,34 +1366,13 @@
       "mono": false,
       "align": "left",
       "position": "left",
-      "widthRatio": 0.16,
-      "top": 4906,
+      "widthRatio": 0.39,
+      "top": 2463,
       "tag": "p",
       "kind": "statement"
      },
      {
-      "text": "0人",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.16,
-      "top": 4906,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0人",
+      "text": "1件",
       "words": 1,
       "chars": 2,
       "lines": 1,
@@ -1470,29 +1387,8 @@
       "mono": false,
       "align": "left",
       "position": "right",
-      "widthRatio": 0.16,
-      "top": 4906,
-      "tag": "p",
-      "kind": "statement"
-     },
-     {
-      "text": "0件",
-      "words": 1,
-      "chars": 2,
-      "lines": 1,
-      "size": 24,
-      "vw": 6.2,
-      "font": "Oxanium",
-      "weight": 600,
-      "tracking": 0,
-      "leading": 1,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "right",
-      "widthRatio": 0.16,
-      "top": 4906,
+      "widthRatio": 0.39,
+      "top": 2463,
       "tag": "p",
       "kind": "statement"
      },
@@ -1500,29 +1396,29 @@
       "text": "IMPOSSIBLE LIBRARY",
       "words": 2,
       "chars": 18,
-      "lines": 2,
-      "size": 40,
-      "vw": 10.3,
+      "lines": 1,
+      "size": 32.6,
+      "vw": 8.4,
       "font": "Oxanium",
       "weight": 600,
       "tracking": -0.01,
-      "leading": 1,
+      "leading": 0.9,
       "upper": true,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 5265,
+      "top": 2723,
       "tag": "p",
       "kind": "statement"
      }
     ],
     "headingSummary": {
-     "count": 9,
-     "maxLines": 3,
+     "count": 6,
+     "maxLines": 2,
      "over2Lines": 0,
-     "statements": 8,
+     "statements": 5,
      "centered": 0,
      "medianWords": 1,
      "mixedFontHeadings": 0
@@ -1531,12 +1427,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.96,
+       "share": 0.93,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.04,
+       "share": 0.07,
        "mono": false
       }
      ],
@@ -1546,8 +1442,8 @@
       18,
       20,
       24,
-      36,
-      40
+      33,
+      36
      ],
      "sizeCount": 6,
      "notLoaded": [],
@@ -1561,10 +1457,10 @@
      },
      "measureChars": 41,
      "max": {
-      "size": 40,
-      "vw": 10.3,
-      "font": "Oxanium",
-      "text": "IMPOSSIBLE LIBRARY"
+      "size": 36,
+      "vw": 9.2,
+      "font": "Noto Sans JP",
+      "text": "ハンズ​フリー​雨よけ​装置"
      },
      "monoShare": 0,
      "monoProseShare": 0,
@@ -1573,8 +1469,8 @@
      "microLabels": 0,
      "microLabelShare": 0,
      "microSamples": [],
-     "upperShare": 0.05,
-     "centerShare": 0,
+     "upperShare": 0.16,
+     "centerShare": 0.02,
      "smallText": 0
     },
     "eyebrows": [],
@@ -1590,27 +1486,18 @@
      "sectionBgs": [
       {
        "color": "#0a0f12",
-       "top": 208,
+       "top": 164,
        "hsl": {
         "h": 203,
         "s": 0.29,
         "l": 0.05
-       }
-      },
-      {
-       "color": "#0e1519",
-       "top": 4452,
-       "hsl": {
-        "h": 202,
-        "s": 0.28,
-        "l": 0.08
        }
       }
      ],
      "textColors": [
       {
        "color": "#e9fbfc",
-       "share": 0.52
+       "share": 0.49
       },
       {
        "color": "#9db8bc",
@@ -1618,11 +1505,11 @@
       },
       {
        "color": "#120600",
-       "share": 0.03
+       "share": 0.05
       },
       {
        "color": "#2fe3e6",
-       "share": 0.01
+       "share": 0.02
       },
       {
        "color": "#ff6a26",
@@ -1630,26 +1517,27 @@
       }
      ],
      "button": {
-      "bg": "#020405",
+      "bg": "#131d22",
       "hsl": {
        "h": 200,
-       "s": 0.43,
-       "l": 0.01
+       "s": 0.28,
+       "l": 0.1
       },
       "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 2,
-     "inHero": 1,
+     "count": 4,
+     "inHero": 2,
      "radius": 0,
-     "height": 48,
+     "height": 40,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
      "upper": 0,
      "heroLabels": [
+      "新規登録",
       "採用する"
      ]
     },
@@ -1672,13 +1560,20 @@
      "roundedMedia": 0,
      "mediaRadius": 0,
      "textShadow": 0,
-     "cardRows": []
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 1717
+      }
+     ]
     },
     "heroMedia": [],
     "nav": {
      "links": 5,
      "fixed": false,
-     "height": 208,
+     "height": 164,
      "floatingPill": false,
      "blur": false
     },
@@ -1692,7 +1587,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 5663,
+    "pageH": 3057,
     "margins": {
      "left": 16,
      "right": 16
@@ -1702,15 +1597,15 @@
       "sel": "header.bar",
       "tag": "header",
       "top": 0,
-      "height": 208,
+      "height": 164,
       "words": 6,
       "media": 0,
-      "middle": 4,
+      "middle": 0,
       "heading": null,
       "left": 32,
-      "right": 66,
+      "right": 134,
       "textLeft": 32,
-      "textRight": 66,
+      "textRight": 134,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1720,20 +1615,20 @@
      {
       "sel": "div.t.name",
       "tag": "div",
-      "top": 208,
+      "top": 164,
       "height": 316,
-      "words": 17,
+      "words": 18,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "ついてくる​日陰​キャノピー",
+       "text": "ハンズ​フリー​雨よけ​装置",
        "size": 36,
        "tag": "h1"
       },
       "left": 32,
-      "right": 34,
+      "right": 35,
       "textLeft": 32,
-      "textRight": 34,
+      "textRight": 35,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1741,63 +1636,17 @@
       "pinned": false
      },
      {
-      "sel": "figure.t.w6",
-      "tag": "figure",
-      "top": 759,
-      "height": 187,
-      "words": 2,
+      "sel": "div.t.w6",
+      "tag": "div",
+      "top": 715,
+      "height": 211,
+      "words": 4,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "夏の​通学​路で​日差しがきついので、​頭の​上で​日陰を​作ってくれる​道具",
-       "size": 24,
-       "tag": "blockquote"
-      },
-      "left": 32,
-      "right": 47,
-      "textLeft": 32,
-      "textRight": 47,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "div.t.stage",
-      "tag": "div",
-      "top": 954,
-      "height": 359,
-      "words": 9,
-      "media": 1,
-      "middle": 0,
-      "heading": {
-       "text": "試​作品​",
+       "text": "詳しい​内容は​開発者だけが​読めます",
        "size": 20,
        "tag": "h2"
-      },
-      "left": 16,
-      "right": 16,
-      "textLeft": 32,
-      "textRight": 40,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "div.t.w3",
-      "tag": "div",
-      "top": 1321,
-      "height": 168,
-      "words": 14,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "76.7",
-       "size": 36,
-       "tag": "p"
       },
       "left": 32,
       "right": 38,
@@ -1810,22 +1659,68 @@
       "pinned": false
      },
      {
+      "sel": "div.t.stage",
+      "tag": "div",
+      "top": 934,
+      "height": 359,
+      "words": 9,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "試​作品​",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 32,
+      "textRight": 150,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
       "sel": "div.t.w3",
       "tag": "div",
-      "top": 1497,
+      "top": 1301,
+      "height": 168,
+      "words": 11,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "66.4",
+       "size": 36,
+       "tag": "p"
+      },
+      "left": 32,
+      "right": 46,
+      "textLeft": 32,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.w3",
+      "tag": "div",
+      "top": 1477,
       "height": 168,
       "words": 6,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "58.2",
+       "text": "30.7",
        "size": 36,
        "tag": "p"
       },
       "left": 32,
-      "right": 74,
+      "right": 51,
       "textLeft": 32,
-      "textRight": 74,
+      "textRight": 51,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1833,38 +1728,15 @@
       "pinned": false
      },
      {
-      "sel": "div.t.w3",
+      "sel": "div.t.w6",
       "tag": "div",
-      "top": 1673,
-      "height": 168,
-      "words": 8,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "改良の​履歴",
-       "size": 20,
-       "tag": "h2"
-      },
-      "left": 32,
-      "right": 127,
-      "textLeft": 32,
-      "textRight": 127,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "div.t.w3",
-      "tag": "div",
-      "top": 531,
+      "top": 487,
       "height": 219,
-      "words": 3,
+      "words": 4,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "研究や​製品化に​使う",
+       "text": "開発に​使う",
        "size": 20,
        "tag": "h2"
       },
@@ -1879,68 +1751,22 @@
       "pinned": false
      },
      {
-      "sel": "div.t.w6",
-      "tag": "div",
-      "top": 1913,
-      "height": 961,
-      "words": 21,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "しくみ",
-       "size": 20,
-       "tag": "h2"
-      },
-      "left": 32,
-      "right": 52,
-      "textLeft": 32,
-      "textRight": 52,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
-      "sel": "div.t.w3",
-      "tag": "div",
-      "top": 2882,
-      "height": 664,
-      "words": 19,
-      "media": 0,
-      "middle": 0,
-      "heading": {
-       "text": "部品",
-       "size": 20,
-       "tag": "h2"
-      },
-      "left": 16,
-      "right": 16,
-      "textLeft": 32,
-      "textRight": 39,
-      "fullBleed": false,
-      "footer": false,
-      "hero": false,
-      "continues": true,
-      "pinned": false
-     },
-     {
       "sel": "section.board",
       "tag": "section",
-      "top": 3875,
-      "height": 895,
-      "words": 63,
-      "media": 0,
+      "top": 1717,
+      "height": 610,
+      "words": 45,
+      "media": 4,
       "middle": 0,
       "heading": {
        "text": "実験の​記録",
        "size": 20,
        "tag": "h2"
       },
-      "left": 32,
-      "right": 33,
+      "left": 16,
+      "right": 16,
       "textLeft": 32,
-      "textRight": 33,
+      "textRight": 43,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1950,20 +1776,20 @@
      {
       "sel": "section.board",
       "tag": "section",
-      "top": 4841,
-      "height": 336,
-      "words": 8,
+      "top": 2398,
+      "height": 237,
+      "words": 5,
       "media": 0,
       "middle": 0,
       "heading": {
-       "text": "ほしい​人と​試した​人",
+       "text": "ほしいと​採用",
        "size": 20,
        "tag": "h2"
       },
       "left": 32,
-      "right": 48,
+      "right": 87,
       "textLeft": 32,
-      "textRight": 48,
+      "textRight": 87,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1973,20 +1799,20 @@
      {
       "sel": "footer.board.end-board",
       "tag": "footer",
-      "top": 5249,
-      "height": 398,
-      "words": 11,
+      "top": 2707,
+      "height": 334,
+      "words": 18,
       "media": 0,
       "middle": 0,
       "heading": {
        "text": "IMPOSSIBLE LIBRARY",
-       "size": 40,
+       "size": 33,
        "tag": "p"
       },
       "left": 32,
-      "right": 40,
+      "right": 37,
       "textLeft": 32,
-      "textRight": 40,
+      "textRight": 37,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1997,9 +1823,9 @@
     "gaps": [],
     "h1s": [
      {
-      "text": "ついてくる​日陰​キャノピー",
+      "text": "ハンズ​フリー​雨よけ​装置",
       "size": 36,
-      "top": 224,
+      "top": 180,
       "firstScreen": true
      }
     ],
@@ -2007,22 +1833,14 @@
     "edges": [
      {
       "x": 32,
-      "n": 13
-     },
-     {
-      "x": 82,
-      "n": 1
+      "n": 8
      },
      {
       "x": 97,
       "n": 1
-     },
-     {
-      "x": 215,
-      "n": 1
      }
     ],
-    "leftBlocks": 16,
+    "leftBlocks": 9,
     "bodySize": 16,
     "stage": false,
     "explains": true,
@@ -2030,24 +1848,144 @@
     "voidShare": 0,
     "voidBox": null
    },
-   "app": null,
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "ハンズ​フリー​雨よけ​装置",
+     "words": 1,
+     "chars": 14,
+     "lines": 2,
+     "size": 36,
+     "vw": 9.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 13,
+     "firstScreen": 3,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 50,
+       "at": 1529,
+       "panel": "30.7%"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 13,
+     "radii": [
+      [
+       0,
+       13
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      16,
+      18,
+      20,
+      33,
+      36
+     ]
+    },
+    "title": {
+     "text": "ハンズ​フリー​雨よけ​装置",
+     "size": 36,
+     "top": 180
+    },
+    "colourShare": 0.223
+   },
    "consoleErrors": []
   }
  ],
  "findings": [
   {
    "level": "WARN",
-   "id": "no-footage",
+   "id": "ragged-row",
    "width": 1440,
-   "message": "No video anywhere on the page.",
-   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+   "message": "1 pair(s) of cards in one row end at different heights (by 400px).",
+   "fix": "Cards that share a row share a bottom edge: balance them by their content (the same number of rows, a block of similar height beside it), or stack them. In testing, ragged rows were marked down every time."
   },
   {
    "level": "WARN",
-   "id": "measure",
+   "id": "below-fold",
    "width": 1440,
-   "message": "Longest paragraph runs about 92 characters per line.",
-   "fix": "Cap paragraphs at 45–75 characters (max-width: 60ch)."
+   "message": "Only 6 of 13 blocks start on the first 1440px screen.",
+   "fix": "Every block the brief names shows its header and first rows on the first desktop screen: size the headline block to its question, cap long lists with \"View all\", and put time-sensitive blocks before long tables."
+  },
+  {
+   "level": "WARN",
+   "id": "panel-void",
+   "width": 1440,
+   "message": "1 card(s) hold a blank band inside: 42px in \"30.7%\".",
+   "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
+  },
+  {
+   "level": "WARN",
+   "id": "app-title-size",
+   "width": 1440,
+   "message": "The h1 is 56px (\"ハンズ​フリー​雨よけ​装置\").",
+   "fix": "An app screen is not a landing page: the title is 18-32px (20-24px on a phone).",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "colour-sprawl",
+   "width": 768,
+   "message": "17% of the first screen is strongly coloured.",
+   "fix": "Keep the screen neutral and spend colour on data and status: the studied screens sit near 3%, and only tinted styles reach 10–15%, as pale tints rather than saturated fills.",
+   "alsoAt": [
+    390
+   ]
   }
  ],
  "images": [

@@ -101,8 +101,13 @@ export const Invention = z.object({
 });
 export type Invention = z.infer<typeof Invention>;
 
-/** 同意の文面の版。サイトの利用規約と VR の同意の画面で同じ版を使う。 */
-export const CONSENT_VERSION = "2026-11-25";
+/**
+ * 同意の文面の版。サイトの利用規約と VR の同意の画面で同じ版を使う。
+ * 2026-11-26：詳しい内容（依頼の原文・部品としくみ・実験の条件・改良の履歴）は、ログインした開発者だけに見せる。
+ * 前の版（2026-11-25、だれでも読めるページに載せる）で同意した公開も受け付ける（見せる範囲は狭くなっただけのため）。
+ */
+export const CONSENT_VERSION = "2026-11-26";
+export const CONSENT_VERSIONS = ["2026-11-25", CONSENT_VERSION] as const;
 
 export const Publication = z.object({
   format: z.literal(1),
@@ -112,7 +117,7 @@ export const Publication = z.object({
     anonymous: z.boolean(),
   }),
   consent: z.object({
-    version: z.literal(CONSENT_VERSION),
+    version: z.enum(CONSENT_VERSIONS),
     agreed: z.literal(true),
     agreedAt: line(32),
   }),
@@ -136,23 +141,37 @@ export const PublishBody = z.object({
   })).max(4).default([]),
 });
 
-export const Role = z.enum(["researcher", "developer"]);
-export type Role = z.infer<typeof Role>;
-
+/** 開発者の登録の内容。名前・所属・専門・紹介は、採用した発明の発案者と運営にだけ見せる。 */
 export const AccountInput = z.object({
   name: line(40).refine((s) => s.trim().length > 0, "名前が空です"),
   affiliation: line(60),
-  role: Role,
   field: line(60),
   intro: text(200),
 });
 
+/** サイトの新規登録：紹介、メールアドレスとパスワード、利用規約と個人情報の扱いへの同意。 */
+export const SignupBody = AccountInput.extend({
+  email: z.string().max(254),
+  password: z.string().max(128),
+  agreed: z.boolean(),
+});
+
+export const LoginBody = z.object({ email: z.string().max(254), password: z.string().max(128) });
+export const ProfileBody = AccountInput;
+export const PasswordBody = z.object({ current: z.string().max(128), next: z.string().max(128) });
+export const ConfirmBody = z.object({ password: z.string().max(128) });
+export const EmailBody = z.object({ email: z.string().max(254) });
+const mailToken = z.string().regex(/^[A-Za-z0-9_-]{20,100}$/, "リンクの形が正しくありません");
+export const TokenBody = z.object({ token: mailToken });
+export const ResetBody = z.object({ token: mailToken, password: z.string().max(128) });
+export const PairBody = z.object({ code: z.string().regex(/^\d{6}$/, "6 桁の数字を入れてください") });
+
 export const ReasonBody = z.object({
-  accountId: safeId,
   reason: text(200).refine((s) => s.trim().length > 0, "理由を書いてください"),
 });
 
-export const AccountBody = z.object({ accountId: safeId });
+export const ReportBody = z.object({ reason: z.enum(["rights", "personal", "danger", "other"]), detail: text(400) });
+export const ResolveBody = z.object({ action: z.enum(["dismiss", "takedown"]), note: text(200) });
 
 export const VoteBody = z.object({
   /** site：サイトのブラウザごとの ID。vr のときは使わない（端末の発案者キーで数える）。 */

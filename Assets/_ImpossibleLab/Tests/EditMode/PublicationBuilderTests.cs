@@ -48,7 +48,7 @@ namespace ImpossibleLab.Tests
         {
             var o = PublicationBuilder.Build(RainStory(), new PublishOptions { DisplayName = "あおい", Anonymous = false, AgreedAt = "2026-11-25T20:00:00" });
             Assert.AreEqual(1, (int)o["format"]);
-            Assert.AreEqual("2026-11-25", (string)o["consent"]["version"]);
+            Assert.AreEqual("2026-11-26", (string)o["consent"]["version"]);
             Assert.AreEqual(true, (bool)o["consent"]["agreed"]);
             Assert.AreEqual("あおい", (string)o["creator"]["displayName"]);
             Assert.AreEqual(false, (bool)o["creator"]["anonymous"]);

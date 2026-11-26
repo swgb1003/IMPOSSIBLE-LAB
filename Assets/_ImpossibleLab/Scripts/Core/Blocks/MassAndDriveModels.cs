@@ -24,6 +24,10 @@ namespace ImpossibleLab.Core
                 case "sphere":
                     solid = Mathf.PI / 6f * x * y * z;
                     float d = (x + y + z) / 3f; area = Mathf.PI * d * d; break;
+                case "dome":
+                case "cone":
+                case "ring":
+                    FormMesher.Measure(p.ShapeOrDefault, new Vector3(x, y, z), out solid, out area); break;
                 default: // cylinder / capsule（カプセルも円柱として数える）
                     solid = Mathf.PI / 4f * x * z * y;
                     area = 2f * Mathf.PI / 4f * x * z + Mathf.PI * 0.5f * (x + z) * y; break;

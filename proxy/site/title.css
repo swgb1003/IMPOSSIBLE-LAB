@@ -1,0 +1,207 @@
+/* IMPOSSIBLE LIBRARY の入口：黒い舞台に試作品を1つ、大きすぎるくらいに置く。
+   最初の画面の上 44% だけ一段明るい板（研究所の操作パネルと同じ地）。見出しの1行目と試作品はその境目にまたがる。
+   最初の画面・分解・実験の3場面は、試作品の 3D を画面に固定したまま、その上を文が流れる。 */
+.title-page { --h1: clamp(40px, 5.2vw, 84px); --col: calc(var(--edge) + var(--pad)); }
+
+.sep { margin-right: 1em; }
+.line { display: block; }
+.narrow-only { display: none; }
+
+/* ---------- 試作品が残る舞台 ---------- */
+.story { position: relative; isolation: isolate; }
+/* 舞台は3場面の高さいっぱいの枠の中で画面の上に止まる（枠の外へははみ出さない） */
+.story-track { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.story-stage { position: sticky; top: 0; height: 100svh; }
+.story-3d { display: block; width: 100%; height: 100%; pointer-events: auto; }
+.story.no3d .story-track { display: none; }
+
+/* 分解の場面の部品の名前：試作品の部品の横に置く */
+.tags { position: absolute; inset: 0; }
+.tag {
+  position: absolute; left: 0; top: 0; white-space: nowrap;
+  font: 500 var(--s1)/1 var(--jp); color: var(--ink); background: var(--plate-2); padding: 7px 10px;
+  opacity: 0;
+}
+
+/* ---------- 最初の画面 ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  height: calc(100svh - var(--barh, 64px)); min-height: 560px;
+}
+.seam {
+  position: absolute; left: var(--edge); right: var(--edge); top: 0; height: 44%;
+  background: var(--plate);
+}
+.hero-photo { position: absolute; z-index: 1; right: var(--col); top: 10%; width: min(52%, 720px); height: auto; }
+.js .hero-photo { display: none; }
+.js .story.no3d .hero-photo { display: block; }
+
+/* 見出しの1行目の字の下端を境目にそろえる（Noto Sans JP の字の下端は字の大きさの約 0.9 倍の位置） */
+.hero-text {
+  position: absolute; z-index: 2;
+  left: var(--col); top: calc(44% - var(--h1) * .9);
+  max-width: 44%;
+}
+.hero h1 { font: 700 var(--h1)/1.05 var(--jp); letter-spacing: -.02em; }
+.hero h1 span { display: block; white-space: nowrap; }
+.hero-lead { margin-top: 44px; font-size: 20px; line-height: 1.6; max-width: 24em; }
+.go { margin-top: 32px; background: var(--or); color: var(--on-or); }
+.go:hover { background: #ff8a52; }
+
+/* 立っている試作品の名前：明るい板の右上（展示品の札の位置） */
+.hero-cap {
+  position: absolute; z-index: 2; right: var(--col); top: 28px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right;
+  text-decoration: none; max-width: 15em; /* 狭い画面でも試作品の柱にかからない幅 */
+}
+.hero-cap b { font: 700 var(--s2)/1.4 var(--jp); }
+.hero-cap span { font-size: var(--s1); color: var(--mut); }
+.hero-cap:hover b { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- 分解と実験：文は片側に止まり、試作品は反対側で分かれたり回ったりする ---------- */
+.chapter { position: relative; min-height: 170svh; }
+.chapter-text {
+  position: sticky; top: 16svh; z-index: 2;
+  width: min(40%, 600px); margin-left: var(--col); padding-top: 8svh;
+}
+.s-test .chapter-text { margin-left: auto; margin-right: var(--col); }
+.chapter h2 { font: 700 var(--s5)/1.15 var(--jp); letter-spacing: -.01em; }
+.quote { margin-top: 36px; font: 500 30px/1.5 var(--jp); }
+.note { margin-top: 16px; font-size: var(--s1); color: var(--mut); }
+.f-title { margin-top: 36px; font-size: var(--s2); color: var(--mut); }
+.facts { margin-top: 20px; display: grid; gap: 22px; }
+.facts li { font: 500 24px/1.45 var(--jp); }
+.facts .who-said { display: block; font: 400 var(--s1)/1.5 var(--jp); color: var(--mut); margin-bottom: 2px; }
+.facts .pass { color: var(--cy); }
+.facts .num { font-size: 26px; }
+.facts .change { display: block; }
+
+
+/* ---------- 公開中の発明品：左に選んだ試作品、右に依頼の言葉の行 ---------- */
+.others {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0 var(--gap);
+  padding: 0 var(--edge); margin-top: 120px;
+}
+.others-stage {
+  grid-column: 1 / span 5; align-self: start; position: sticky; top: 10svh;
+  height: 80svh; background: var(--plate);
+}
+.shelf-3d { display: block; width: 100%; height: 100%; }
+.others-stage.photo .shelf-3d { display: none; }
+.others-stage.photo img { width: 100%; height: 100%; object-fit: cover; }
+.others-list { grid-column: 7 / span 6; padding: 0 var(--pad) 0 0; }
+.others h2 { font: 700 var(--s5)/1.15 var(--jp); letter-spacing: -.01em; }
+.others .meta { margin-top: 10px; color: var(--mut); font-size: var(--s1); }
+.shelf-rows { margin-top: 40px; display: grid; gap: 8px; }
+.shelf-row a {
+  display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 4px 20px; align-items: start;
+  padding: 12px; text-decoration: none; background: transparent; transition: background 200ms;
+}
+.shelf-row img { grid-row: span 2; width: 160px; height: 120px; object-fit: cover; }
+.shelf-row .shelf-req { font: 500 22px/1.45 var(--jp); color: var(--mut); transition: color 200ms; }
+.shelf-row .shelf-sub { font-size: var(--s1); color: var(--mut); }
+.shelf-row.nopic a { grid-template-columns: minmax(0, 1fr); }
+.shelf-row.on a { background: var(--plate); }
+.shelf-row.on .shelf-req { color: var(--ink); }
+.shelf-row a:hover .shelf-req, .shelf-row a:focus-visible .shelf-req { color: var(--ink); }
+
+/* ---------- 採用するには：試作品の写真がもう一度、左下で切れて戻ってくる ---------- */
+.adopt {
+  position: relative; overflow: hidden; margin-top: 200px; min-height: 90svh;
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0 var(--gap); padding: 0 var(--edge);
+}
+.adopt-pic { grid-column: 1 / span 7; align-self: end; position: relative; overflow: hidden; margin: 0 0 0 calc(var(--edge) * -1); }
+.adopt-pic img { width: 125%; max-width: none; height: auto; margin-left: -14%; }
+.adopt-pic figcaption { position: absolute; left: var(--col); bottom: 20px; font-size: var(--s1); color: var(--ink); background: var(--plate); padding: 6px 10px; }
+.adopt-text { grid-column: 9 / span 4; align-self: center; padding: 48px var(--pad) 48px 0; }
+.adopt h2 { font: 700 var(--s5)/1.15 var(--jp); letter-spacing: -.01em; }
+.steps { margin-top: 36px; display: grid; gap: 28px; }
+.steps a { font: 700 var(--s3)/1.4 var(--jp); text-decoration: none; color: var(--ink); }
+.steps a:hover { color: var(--or); }
+.steps p { margin-top: 4px; font-size: var(--s1); color: var(--mut); }
+.terms-line { margin-top: 40px; font-size: var(--s1); color: var(--mut); }
+.terms-line a { color: var(--ink); text-underline-offset: 4px; }
+.adopt + * { margin-top: 0; }
+.title-page .end-board { margin-top: 160px; }
+
+/* ---------- 動き ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* 登場：板が上から開き、文は下から順に上がる（試作品の組み上がりは 3D 側） */
+  .js .seam { clip-path: inset(0 0 100% 0); transition: clip-path 1100ms cubic-bezier(.7, 0, .2, 1); }
+  .js .hero.in .seam { clip-path: inset(0); }
+  .js .hero-text > *, .js .hero-cap { opacity: 0; transform: translateY(24px); transition: opacity 700ms var(--ease), transform 900ms var(--ease); }
+  .js .hero.in .hero-text > *, .js .hero.in .hero-cap { opacity: 1; transform: none; }
+  .js .hero.in .hero-text > :nth-child(1) { transition-delay: 350ms; }
+  .js .hero.in .hero-text > :nth-child(2) { transition-delay: 430ms; }
+  .js .hero.in .hero-text > :nth-child(3) { transition-delay: 510ms; }
+  .js .hero.in .hero-cap { transition-delay: 1900ms; }
+  .go { transition: background 140ms, transform 140ms, opacity 700ms var(--ease); }
+
+  /* ほかの場面：見出し、文、その下の順に上がる（一度だけ） */
+  .js [data-enter] > * { opacity: 0; transform: translateY(24px); transition: opacity 600ms var(--ease), transform 800ms var(--ease); }
+  .js [data-enter].in > * { opacity: 1; transform: none; }
+  .js [data-enter].in > :nth-child(2) { transition-delay: 80ms; }
+  .js [data-enter].in > :nth-child(3) { transition-delay: 160ms; }
+  .js [data-enter].in > :nth-child(4) { transition-delay: 240ms; }
+  .js [data-enter].in > :nth-child(n+5) { transition-delay: 320ms; }
+
+  /* 写真は下から開き、少し大きい所から落ち着く */
+  .js .adopt-pic { clip-path: inset(100% 0 0 0); transition: clip-path 1100ms cubic-bezier(.7, 0, .2, 1); }
+  .js .adopt-pic img { transform: scale(1.12); transform-origin: left bottom; transition: transform 1500ms var(--ease); }
+  .js .adopt-pic.in { clip-path: inset(0); }
+  .js .adopt-pic.in img { transform: none; }
+}
+
+/* ---------- 横幅がせまい画面 ---------- */
+@media (max-width: 1100px) {
+  .chapter-text { width: min(46%, 560px); }
+  .chapter h2, .others h2, .adopt h2 { font-size: 36px; }
+  .quote { font-size: 24px; }
+  .others-stage { grid-column: 1 / span 5; }
+  .others-list { grid-column: 6 / span 7; }
+  .shelf-row a { grid-template-columns: 96px minmax(0, 1fr); }
+  .shelf-row img { width: 96px; height: 72px; }
+  .adopt-text { grid-column: 8 / span 5; }
+}
+
+/* スマホとタブレットの縦向き：試作品は画面の上、文はその下の板に載せて流す（title.js の NARROW と同じ条件） */
+@media (max-width: 760px), (max-width: 1100px) and (orientation: portrait) {
+  .narrow-only { display: block; }
+  .title-page { --h1: clamp(32px, 9.4vw, 44px); }
+  /* 入口では名乗りの欄を出さない（一覧や1件のページで選べる）。最初の画面を試作品に使う */
+  /* 文・ボタン・試作品の名前が重ならない高さ */
+  .hero { min-height: 740px; }
+  .seam { height: 46%; }
+  .hero-text { top: calc(46% + 28px); right: var(--col); max-width: none; }
+  .hero-lead { margin-top: 16px; font-size: 18px; }
+  .go { margin-top: 24px; width: 100%; }
+  .hero-cap { top: auto; bottom: 20px; right: auto; left: var(--col); align-items: flex-start; text-align: left; }
+  .hero-cap b { font-size: var(--s1); }
+
+  .tags { display: none; }
+  .br-wide { display: none; }
+  .chapter { min-height: 150svh; }
+  .chapter-text, .s-test .chapter-text {
+    top: 50svh; width: auto; margin: 0 var(--edge); padding: 24px var(--pad) 32px; background: var(--bg);
+  }
+  .chapter h2, .others h2, .adopt h2 { font-size: 30px; }
+  .quote { margin-top: 20px; font-size: 22px; }
+  .f-title { margin-top: 20px; }
+  .facts li { font-size: 17px; }
+  .facts .num { font-size: 20px; }
+
+  .others { display: block; margin-top: 72px; }
+  .others-stage { position: sticky; top: 0; z-index: 3; height: 38svh; margin: 0 calc(var(--edge) * -1); }
+  .others-list { padding: 28px var(--pad) 0; }
+  .shelf-rows { margin-top: 24px; }
+  .shelf-row a { grid-template-columns: 80px minmax(0, 1fr); gap: 4px 14px; padding: 10px 0; }
+  .shelf-row.on a { background: transparent; }
+  .shelf-row img { width: 80px; height: 60px; }
+  .shelf-row .shelf-req { font-size: 18px; }
+
+  .adopt { display: flex; flex-direction: column-reverse; margin-top: 96px; min-height: 0; padding: 0; }
+  .adopt-text { padding: 0 var(--col) 32px; }
+  .adopt-pic { margin: 0; }
+  .adopt-pic img { width: 130%; }
+  .steps a { font-size: 20px; }
+}

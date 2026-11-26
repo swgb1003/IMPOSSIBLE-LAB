@@ -4,25 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>発案者 | IMPOSSIBLE LIBRARY</title>
-<meta name="description" content="研究所で発明して、表示名で公開した人のページ">
+<meta name="description" content="IMPOSSIBLE LAB で発明して、表示名で公開した人のページ">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css">
+<link rel="icon" href="/site/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site/site.css">
 </head>
 <body class="work">
 <header class="bar">
-  <a class="mark" href="./" aria-label="IMPOSSIBLE LIBRARY の発明品一覧へ">
+  <a class="mark" href="/" aria-label="IMPOSSIBLE LIBRARY の入口へ">
     <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
     <b>IMPOSSIBLE LIBRARY</b>
   </a>
   <div class="bar-r">
     <nav aria-label="サイト">
-      <a href="./">発明品一覧</a>
-      <a href="accounts.html">研究者と開発者</a>
-      <a href="threads.html">やりとり</a>
-      <a href="terms.html">利用規約</a>
+      <a href="/inventions">発明品一覧</a>
+      <a href="/terms">利用規約</a>
     </nav>
-    <div class="who" data-slot="who" hidden></div>
+    <div class="acct" data-slot="acct"></div>
   </div>
 </header>
 
@@ -31,7 +30,7 @@
     <div class="t head">
       <div>
         <h1 id="page-h" data-slot="name">発案者</h1>
-        <p data-slot="lead">研究所で発明して、表示名で公開した人です。匿名で公開した発明は、ここには載りません。</p>
+        <p data-slot="lead">IMPOSSIBLE LAB で発明して、表示名で公開した人です。匿名で公開した発明は、ここには載りません。</p>
       </div>
       <div class="figs" data-slot="figs"></div>
     </div>
@@ -44,6 +43,6 @@
     </div>
   </section>
 </main>
-<script type="module" src="creator.js"></script>
+<script type="module" src="/site/creator.js"></script>
 </body>
 </html>

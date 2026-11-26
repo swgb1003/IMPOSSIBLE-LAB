@@ -26,7 +26,7 @@ namespace ImpossibleLab.Core
     {
         public const int Format = 1;
         /// <summary>同意の文面の版（PC 側の CONSENT_VERSION と同じ）。</summary>
-        public const string ConsentVersion = "2026-11-25";
+        public const string ConsentVersion = "2026-11-26";
 
         static readonly CultureInfo Ci = CultureInfo.InvariantCulture;
 

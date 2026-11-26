@@ -2,26 +2,23 @@
  "id": "p-c3c626b0b8",
  "status": "open",
  "sample": true,
+ "detail": false,
  "publishedAt": "2026-11-25T11:14:25.771Z",
- "updatedAt": "2026-11-25T14:42:08.058Z",
- "consentVersion": "2026-11-25",
+ "updatedAt": "2026-11-26T14:16:30.981Z",
+ "consentVersion": "2026-11-26",
  "creator": {
   "name": "見本の発案者",
   "publicId": "c-79093c5a51eb"
  },
- "wants": {
-  "vr": 0,
-  "site": 0
- },
- "tried": 0,
- "adoptions": [],
- "considering": [],
+ "wants": 0,
+ "adoptions": 0,
+ "considering": 0,
  "images": [
   {
    "kind": "stage",
-   "caption": "研究所の発明台に置いた Rev.2",
+   "caption": "IMPOSSIBLE LAB の発明台に置いた Rev.2",
    "revision": 2,
-   "url": "sample/images/p-c3c626b0b8-0.jpg"
+   "url": "/site/sample/images/p-c3c626b0b8-0.jpg"
   }
  ],
  "invention": {
@@ -49,231 +46,15 @@
    "id": "head",
    "label": "頭"
   },
-  "request": "夏の通学路で日差しがきついので、頭の上で日陰を作ってくれる道具",
-  "designSource": "ai",
-  "needs": [
-   {
-    "need": "頭上に日陰を作る",
-    "status": "simulated",
-    "blocks": [
-     {
-      "id": "sun_shade",
-      "label": "日よけ"
-     }
-    ],
-    "how": "キャノピー（shade）が日よけを受け持つ",
-    "note": "平行光線と円柱の人型モデルで影を判定します。"
-   },
-   {
-    "need": "朝夕の低い日差しも防ぐ",
-    "status": "simulated",
-    "blocks": [
-     {
-      "id": "sun_shade",
-      "label": "日よけ"
-     }
-    ],
-    "how": "キャノピー（shade）が日よけを受け持つ",
-    "note": "太陽の高さを下げた条件で日陰率を確かめます。"
-   },
-   {
-    "need": "歩いても頭上についてくる",
-    "status": "simplified",
-    "blocks": [
-     {
-      "id": "follow_head",
-      "label": "頭上追従"
-     },
-     {
-      "id": "hover",
-      "label": "浮遊"
-     }
-    ],
-    "how": "本体（core）が頭上追従を受け持つ。浮遊の機能で実現する",
-    "note": "実験は立った状態のみで、歩行中の追従や揺れは試せません。"
-   },
-   {
-    "need": "暑さ・涼しさの体感",
-    "status": "unverifiable",
-    "blocks": [],
-    "how": "対応する機能がない",
-    "note": "体感温度や快適さはモデル化されていないため確かめられません。"
-   },
-   {
-    "need": "通学で使える安全さ・周りへの配慮",
-    "status": "unverifiable",
-    "blocks": [],
-    "how": "対応する機能がない",
-    "note": "人混みでの安全性やルール面は判定できません。"
-   }
-  ],
-  "parts": [
-   {
-    "id": "core",
-    "type": "body",
-    "label": "本体",
-    "role": "頭上追従の機能を受け持つ。部品をまとめて支える本体",
-    "shape": "円柱",
-    "material": "樹脂",
-    "sizeM": [
-     0.16,
-     0.06,
-     0.16
-    ],
-    "massKg": 0.148
-   },
-   {
-    "id": "shade",
-    "type": "canopy",
-    "label": "キャノピー（覆い）",
-    "role": "日よけの機能を受け持つ。雨や日差しをさえぎる覆い",
-    "shape": "円柱",
-    "material": "布",
-    "sizeM": [
-     1.2,
-     0.03,
-     1.2
-    ],
-    "massKg": 0.178
-   },
-   {
-    "id": "rib-frame",
-    "type": "frame",
-    "label": "骨組み",
-    "role": "形を支える骨組み",
-    "shape": "箱",
-    "material": "アルミ",
-    "sizeM": [
-     1.1,
-     0.01,
-     0.02
-    ],
-    "massKg": 0.359
-   },
-   {
-    "id": "rib-frame2",
-    "type": "frame",
-    "label": "骨組み",
-    "role": "形を支える骨組み",
-    "shape": "箱",
-    "material": "アルミ",
-    "sizeM": [
-     0.02,
-     0.01,
-     1.1
-    ],
-    "massKg": 0.359
-   },
-   {
-    "id": "fan-fl",
-    "type": "thruster",
-    "label": "推進ユニット",
-    "role": "空気を押し出して浮く力・進む力を出す",
-    "shape": "円柱",
-    "material": "樹脂",
-    "sizeM": [
-     0.1,
-     0.04,
-     0.1
-    ],
-    "massKg": 0.059
-   },
-   {
-    "id": "fan-fr",
-    "type": "thruster",
-    "label": "推進ユニット",
-    "role": "空気を押し出して浮く力・進む力を出す",
-    "shape": "円柱",
-    "material": "樹脂",
-    "sizeM": [
-     0.1,
-     0.04,
-     0.1
-    ],
-    "massKg": 0.059
-   },
-   {
-    "id": "fan-bl",
-    "type": "thruster",
-    "label": "推進ユニット",
-    "role": "空気を押し出して浮く力・進む力を出す",
-    "shape": "円柱",
-    "material": "樹脂",
-    "sizeM": [
-     0.1,
-     0.04,
-     0.1
-    ],
-    "massKg": 0.059
-   },
-   {
-    "id": "fan-br",
-    "type": "thruster",
-    "label": "推進ユニット",
-    "role": "空気を押し出して浮く力・進む力を出す",
-    "shape": "円柱",
-    "material": "樹脂",
-    "sizeM": [
-     0.1,
-     0.04,
-     0.1
-    ],
-    "massKg": 0.059
-   },
-   {
-    "id": "gyro",
-    "type": "stabilizer",
-    "label": "姿勢安定ユニット",
-    "role": "姿勢安定の機能を受け持つ。傾きや揺れを抑えて姿勢を保つ",
-    "shape": "球",
-    "material": "樹脂",
-    "sizeM": [
-     0.06,
-     0.06,
-     0.06
-    ],
-    "massKg": 0.024
-   },
-   {
-    "id": "pack",
-    "type": "battery",
-    "label": "電池",
-    "role": "電気をためて各部に送る",
-    "shape": "箱",
-    "material": "樹脂",
-    "sizeM": [
-     0.1,
-     0.03,
-     0.06
-    ],
-    "massKg": 0.36
-   },
-   {
-    "id": "head-eye",
-    "type": "sensor",
-    "label": "センサー",
-    "role": "まわりの様子や人の位置を感じ取る",
-    "shape": "球",
-    "material": "ガラス",
-    "sizeM": [
-     0.03,
-     0.03,
-     0.03
-    ],
-    "massKg": 0.014
-   }
-  ],
+  "partCount": 11,
+  "experimentCount": 2,
   "experiments": [
    {
     "revision": 1,
     "title": "その場に立つ（日差し）",
     "mode": "dream",
-    "conditions": [
-     {
-      "label": "日差し",
-      "value": "70°・900 W/m²"
-     }
-    ],
+    "passed": false,
+    "criteria": "日陰率 ≥ 70 %・体が受ける日射≤150W",
     "metrics": [
      {
       "key": "shadeRatio",
@@ -283,39 +64,15 @@
       "display": "58.2",
       "lowerIsBetter": false,
       "primary": true
-     },
-     {
-      "key": "sunExposureW",
-      "label": "体が受ける日射",
-      "value": 152.1228,
-      "unit": "W",
-      "display": "152",
-      "lowerIsBetter": true,
-      "primary": false
      }
-    ],
-    "passed": false,
-    "criteria": "日陰率 ≥ 70 %・体が受ける日射≤150W",
-    "seed": 2026,
-    "notes": [
-     "合格条件を満たさない：日陰率 0.58（日陰率≥0.70、体の大半が日陰に入ってほしい（目安））",
-     "合格条件を満たさない：体が受ける日射 152 W（体が受ける日射≤150W、日差しなしの時より大きく減らしたい（目安））",
-     "人型モデル（身長 1.75 m）がその場に立ち、装置は頭（高さ 1.75 m）に付く",
-     "日よけ：高さ 2.10 m の水平な円板（半径 0.60 m・遮光率 0.90）。太陽の高さ 70°・方位 180°の平行光線で体（円柱）の影を判定",
-     "体が受ける日射 = 日射の強さ 900 W/m² × 日の当たる面積（cos つき）× (1 − 日陰率)"
-    ],
-    "at": "2026-11-25T23:21:59"
+    ]
    },
    {
     "revision": 2,
     "title": "その場に立つ（日差し）",
     "mode": "dream",
-    "conditions": [
-     {
-      "label": "日差し",
-      "value": "70°・900 W/m²"
-     }
-    ],
+    "passed": true,
+    "criteria": "日陰率 ≥ 70 %・体が受ける日射≤150W",
     "metrics": [
      {
       "key": "shadeRatio",
@@ -325,78 +82,9 @@
       "display": "76.7",
       "lowerIsBetter": false,
       "primary": true
-     },
-     {
-      "key": "sunExposureW",
-      "label": "体が受ける日射",
-      "value": 84.714,
-      "unit": "W",
-      "display": "85",
-      "lowerIsBetter": true,
-      "primary": false
      }
-    ],
-    "passed": true,
-    "criteria": "日陰率 ≥ 70 %・体が受ける日射≤150W",
-    "seed": 2026,
-    "notes": [
-     "人型モデル（身長 1.75 m）がその場に立ち、装置は頭（高さ 1.75 m）に付く",
-     "日よけ：高さ 2.10 m の水平な円板（半径 0.80 m・遮光率 0.90）。太陽の高さ 70°・方位 180°の平行光線で体（円柱）の影を判定",
-     "体が受ける日射 = 日射の強さ 900 W/m² × 日の当たる面積（cos つき）× (1 − 日陰率)"
-    ],
-    "at": "2026-11-25T23:22:04"
+    ]
    }
-  ],
-  "revisions": [
-   {
-    "revision": 2,
-    "parent": 1,
-    "source": "offline",
-    "request": "日陰を広げて",
-    "summary": "日よけを広げる",
-    "changes": [
-     {
-      "label": "日よけ：日よけの半径",
-      "before": "0.60 m",
-      "after": "0.80 m"
-     }
-    ],
-    "resultChanged": true
-   }
-  ],
-  "research": {
-   "unverifiable": [
-    {
-     "need": "暑さ・涼しさの体感",
-     "reason": "体感温度や快適さはモデル化されていないため確かめられません。"
-    },
-    {
-     "need": "通学で使える安全さ・周りへの配慮",
-     "reason": "人混みでの安全性やルール面は判定できません。"
-    }
-   ],
-   "assumptions": [
-    "日よけ：平行光線と人型モデル（円柱）の影の判定（雨の実験と同じ方式）",
-    "人型モデル（身長 1.75 m）がその場に立ち、装置は頭（高さ 1.75 m）に付く",
-    "日よけ：高さ 2.10 m の水平な円板（半径 0.60 m・遮光率 0.90）。太陽の高さ 70°・方位 180°の平行光線で体（円柱）の影を判定",
-    "体が受ける日射 = 日射の強さ 900 W/m² × 日の当たる面積（cos つき）× (1 − 日陰率)",
-    "合格条件を満たさない：日陰率 0.58（日陰率≥0.70、体の大半が日陰に入ってほしい（目安））",
-    "合格条件を満たさない：体が受ける日射 152 W（体が受ける日射≤150W、日差しなしの時より大きく減らしたい（目安））",
-    "日よけ：高さ 2.10 m の水平な円板（半径 0.80 m・遮光率 0.90）。太陽の高さ 70°・方位 180°の平行光線で体（円柱）の影を判定"
-   ],
-   "simplified": [
-    "歩いても頭上についてくる：実験は立った状態のみで、歩行中の追従や揺れは試せません。"
-   ]
-  },
-  "developer": {
-   "totalMassKg": 1.678,
-   "tipAngleDeg": null,
-   "powerW": null,
-   "runtimeMin": null,
-   "challenges": [
-    "暑さ・涼しさの体感：体感温度や快適さはモデル化されていないため確かめられません。",
-    "通学で使える安全さ・周りへの配慮：人混みでの安全性やルール面は判定できません。"
-   ]
-  }
+  ]
  }
 }

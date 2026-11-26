@@ -24,7 +24,7 @@ namespace ImpossibleLab
             if (App.Publish == PublishStep.Sending)
             {
                 c.Dial();
-                c.BigWord("送っています", "PC の発明ライブラリへ送っています", LabTheme.ConCy);
+                c.BigWord("送っています", "PC の発明ライブラリーへ送っています", LabTheme.ConCy);
                 c.Plate(LX, 78f, PW, 468f, "公開する発明");
                 ConParasJa(48f, 130f, 414f, 540f, new[] { ($"{dna.Name} Rev.{dna.Revision}", LabTheme.ConCy), ("試作品の3D と写真を作って送ります。数秒かかります", ink) }, 18f);
                 ConFrame(new List<ConBtn>(), null);
@@ -41,11 +41,14 @@ namespace ImpossibleLab
                 c.Plate(LX, 78f, PW, 468f, "公開するもの");
                 ConParasJa(48f, 130f, 414f, 540f, new[]
                 {
-                    ("依頼の言葉（原文のまま）", mut), (request, ink),
-                    ("試作品の3D と写真1枚", ink),
-                    ($"実験 {experiments} 回の条件と結果（不合格も含む）", ink),
-                    ($"改良の履歴（Rev.1 から Rev.{dna.Revision} まで）", ink),
+                    ("だれでも見られる", mut),
+                    ($"名前・試作品の3D・写真1枚・実験 {experiments} 回の結果", ink),
                     ("発案者の表示（右で選ぶ）", ink),
+                    ("ログインした開発者だけが読める", mut),
+                    ("依頼の言葉：" + request, ink),
+                    ("部品としくみ", ink),
+                    ("実験の条件と数値（不合格も含む）", ink),
+                    ($"改良の履歴（Rev.1 から Rev.{dna.Revision} まで）", ink),
                 }, 18f);
                 c.Plate(LX, 558f, PW, 190f, "載せないもの");
                 ConParasJa(48f, 606f, 414f, 742f, new[] { ("声そのもの", ink), ("ほかの保存した発明", ink), ("この端末の情報", ink) });
@@ -63,7 +66,7 @@ namespace ImpossibleLab
                     ConParasJa(RX + 20f, 346f, 414f, 540f, new[] { ("本名でなくてかまいません。採用した人とのやりとりにも、この名前で出ます", mut) });
                 }
                 c.Plate(RX, 558f, PW, 190f, "載る場所");
-                ConParasJa(RX + 20f, 606f, 414f, 742f, new[] { ("この PC の中の発明ライブラリ（サイト）", ink), ("インターネットには出ません", mut), ("公開はあとでやめられます", mut) });
+                ConParasJa(RX + 20f, 606f, 414f, 742f, new[] { ("この PC の中の発明ライブラリー（サイト）", ink), ("インターネットには出ません", mut), ("公開はあとでやめられます", mut) });
                 ConFrame(new List<ConBtn> { new ConBtn("やめる", App.CancelPublish, ConKind.Quiet, 140f) },
                     new ConBtn("次へ　同意の確認", App.PublishToConsent, ConKind.Primary, 300f));
                 return;
@@ -73,8 +76,10 @@ namespace ImpossibleLab
             c.Plate(LX, 78f, PW, 670f, "公開の前に読んでください");
             ConParasJa(48f, 130f, 414f, 740f, new[]
             {
-                ("この発明を発明ライブラリに公開します。研究者と開発者が読み、研究や開発の検討に使えるようになります。", ink),
-                ("アイデアの権利はあなたに残ります。採用されたら知らせが届き、その先の条件は別に話し合います。", ink),
+                ("この発明を発明ライブラリーに公開します。名前と3D、実験の結果は、だれでも見られます。", ink),
+                ("依頼の言葉と設計の詳しい内容は、ログインした開発者だけが読めます。", ink),
+                ("アイデアの権利はあなたに残ります。開発者は、許諾なく製品にしないことに同意しています。", ink),
+                ("採用されたら知らせが届き、その先の条件は別に話し合います。", ink),
                 ("公開すると、特許が取りにくくなることがあります。特許を考えているなら、公開の前に専門家に相談してください。", ink),
                 ("試作品と実験は簡単な計算によるもので、安全や性能は保証しません。", ink),
                 ("設計には AI の手伝いが入っています。", ink),
@@ -103,7 +108,7 @@ namespace ImpossibleLab
             var ink = LabTheme.ConInk; var mut = LabTheme.ConMut;
             string id = inv?.Current.Id;
             var mine = App.MineFor(id);
-            c.T(RX + 20f, 296f, "発明ライブラリ", 18f, mut, bold: true);
+            c.T(RX + 20f, 296f, "発明ライブラリー", 18f, mut, bold: true);
 
             if (App.Publish == PublishStep.ConfirmWithdraw && mine != null)
             {
@@ -118,7 +123,7 @@ namespace ImpossibleLab
                 ConParasJa(RX + 20f, 316f, 414f, 470f, new[]
                 {
                     ($"{mine.StatusJa}　Rev.{mine.Revision} を公開しています", LabTheme.ConCy),
-                    ($"ほしい {wants} 人・VR で試した人 {mine.Tried} 人・採用 {mine.Adoptions.Count} 件", ink),
+                    ($"ほしい {wants} 人・採用 {mine.Adoptions.Count} 件", ink),
                     ("PC のブラウザで " + LabApp.SiteAddress + " を開くと見られます", mut),
                 }, 17f);
                 c.Button(RX + 20f, 476f, 200f, 52f, "公開を更新する", App.StartPublish, ConKind.Normal, 18f, App.PublishProblemNow == null);
@@ -128,9 +133,35 @@ namespace ImpossibleLab
             string problem = App.PublishProblemNow;
             bool publishedBefore = id != null && App.Library != null && App.Library.Published.ContainsKey(id) && !App.MineLoaded;
             string note = App.PublishError != null ? "公開できませんでした：" + App.PublishError
-                : problem ?? (publishedBefore ? "前に公開しています。PC とつながると状態を読みます" : "研究者と開発者が読むサイトに載せます");
+                : problem ?? (publishedBefore ? "前に公開しています。PC とつながると状態を読みます" : "開発者が読むサイトに載せます");
             ConParasJa(RX + 20f, 316f, 414f, 410f, new[] { (note, App.PublishError != null ? LabTheme.ConOr : problem != null ? mut : ink) }, 17f);
-            c.Button(RX + 20f, 420f, 414f, 56f, "発明ライブラリに公開する", App.StartPublish, ConKind.Normal, 20f, problem == null);
+            c.Button(RX + 20f, 420f, 414f, 56f, "発明ライブラリーに公開する", App.StartPublish, ConKind.Normal, 20f, problem == null);
+        }
+
+        /// <summary>保存の画面の右下：公開したことがある端末だけ、PC のサイトに発案者として入る番号を出す。</summary>
+        void ConPairSection()
+        {
+            if (App.Mine.Count == 0) return;
+            var c = _con;
+            const float RX = ConsoleLayer.RX, PW = ConsoleLayer.PW;
+            var ink = LabTheme.ConInk; var mut = LabTheme.ConMut;
+            c.Plate(RX, 558f, PW, 190f, "サイトに入る番号");
+            string code = App.PairCodeNow;
+            if (code != null)
+            {
+                c.T(RX + 20f, 632f, LibraryProtocol.SpacedPair(code), 40f, LabTheme.ConCy, bold: true); // y は字の中心
+                ConParasJa(RX + 20f, 664f, 414f, 742f, new[]
+                {
+                    ("PC のブラウザで " + LabApp.PairAddress + " を開いて、この番号を入れてください", ink),
+                    ($"{App.PairExpiresUtc.ToLocalTime():H:mm} まで使えます", mut),
+                }, 16f);
+                return;
+            }
+            ConParasJa(RX + 20f, 600f, 414f, 670f, new[]
+            {
+                (App.PairError != null ? "番号をもらえませんでした：" + App.PairError : "PC のサイトに、発案者として入るための番号です", App.PairError != null ? LabTheme.ConOr : ink),
+            }, 16f);
+            c.Button(RX + 20f, 680f, 414f, 52f, App.PairBusy ? "番号をもらっています" : "サイトに入る番号を出す", App.RequestPairCode, ConKind.Normal, 18f, !App.PairBusy && App.ProxyOnline == true);
         }
 
         /// <summary>最初の指示の画面に出す採用の知らせ（今日の課題の板の代わりに、一度だけ）。</summary>
@@ -142,7 +173,7 @@ namespace ImpossibleLab
             var (pub, a) = App.AdoptionNotices[0];
             int more = App.AdoptionNotices.Count - 1;
             c.Plate(LX, 354f, PW, 394f, "採用されました");
-            var who = $"{a.RoleJa}　{a.AdopterName}" + (string.IsNullOrWhiteSpace(a.AdopterAffiliation) ? "" : $"（{a.AdopterAffiliation}）");
+            var who = $"開発者　{a.AdopterName}" + (string.IsNullOrWhiteSpace(a.AdopterAffiliation) ? "" : $"（{a.AdopterAffiliation}）");
             ConParasJa(48f, 404f, 414f, 686f, new[]
             {
                 (pub.Name, LabTheme.ConCy),

@@ -115,10 +115,14 @@ namespace ImpossibleLab.Core
             new PartTypeInfo { Type = "strap", LabelJa = "ベルト・取り付け具", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "fabric" },
         };
 
-        /// <summary>部品の形。Unity の標準プリミティブのみ（円錐・輪は専用メッシュが必要なため初版では扱わない）。</summary>
+        /// <summary>
+        /// 部品の形。箱・円柱・球・カプセルは Unity の標準の形（と部品キット）、ドーム・円すい・輪は組み立てるときに作る形（Core/FormMesher）。
+        /// 大きさ：ドームは [直径, 盛り上がりの高さ, 直径]（下が開いた曲面の板）、円すいは [下の直径, 高さ, 下の直径]（上は下の 30%）、輪は [外の直径, 輪の太さ, 外の直径]（寝かせた輪）。
+        /// </summary>
         public static readonly NamedOption[] Shapes =
         {
             new NamedOption("box", "箱"), new NamedOption("cylinder", "円柱"), new NamedOption("sphere", "球"), new NamedOption("capsule", "カプセル"),
+            new NamedOption("dome", "ドーム"), new NamedOption("cone", "円すい"), new NamedOption("ring", "輪"),
         };
 
         public static readonly MaterialInfo[] Materials =

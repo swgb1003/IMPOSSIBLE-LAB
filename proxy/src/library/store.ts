@@ -5,7 +5,13 @@ import { createHash, randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
 import { HttpError } from "../http-util.ts";
-import type { Invention, Publication, Role } from "./schema.ts";
+import type { Invention, Publication } from "./schema.ts";
+import { hashPassword } from "./auth.ts";
+import {
+  accountView, Members,
+  type CreatorLoginRecord, type MailRecord, type MailTokenRecord, type NoticeRecord, type OperatorRecord, type ReportRecord,
+  type SessionRecord, type Who,
+} from "./members.ts";
 
 /** 一覧に出す実験の要約：同じ実験（DREAM を優先）の最初の版と最後の版の主な計測と合否。 */
 export interface ResultSummary {
@@ -36,6 +42,22 @@ export function resultSummary(inv: Invention): ResultSummary | null {
   return null;
 }
 
+/**
+ * だれでも見られる発明の中身：名前・何をするものか・分類と、実験の結果の要点（主な計測と合否、合格の目安）。
+ * 依頼の原文・部品としくみ・実験の条件とほかの計測・改良の履歴・計算の前提と課題は、ログインした開発者だけに見せる（detail）。
+ */
+export function publicInvention(inv: Invention) {
+  return {
+    id: inv.id, revision: inv.revision, name: inv.name, summary: inv.summary, purpose: inv.purpose,
+    tags: inv.tags, sceneTags: inv.sceneTags, mount: inv.mount,
+    partCount: inv.parts.length, experimentCount: inv.experiments.length,
+    experiments: inv.experiments.map((e) => ({
+      revision: e.revision, title: e.title, mode: e.mode, passed: e.passed, criteria: e.criteria,
+      metrics: e.metrics.filter((m) => m.primary),
+    })),
+  };
+}
+
 export const LIMITS = {
   maxPublications: 500,
   maxPerCreator: 100,
@@ -54,7 +76,7 @@ interface Adoption { id: string; accountId: string; reason: string; at: string; 
 export interface ImageInput { kind: "stage" | "experiment" | "result"; caption: string; revision: number; jpg: Buffer }
 interface ImageMeta { kind: ImageInput["kind"]; caption: string; revision: number }
 interface Considering { accountId: string; at: string }
-interface PubRecord {
+export interface PubRecord {
   id: string;
   creatorHash: string;
   inventionId: string;
@@ -74,21 +96,36 @@ interface PubRecord {
   tried: string[];
   considering: Considering[];
   adoptions: Adoption[];
+  /** 詳しい内容を見た開発者（開発者ごとに最初と最後の時刻。運営が確かめる）。 */
+  views?: { accountId: string; first: string; last: string }[];
   /** 見本（見本と明記して出す）。 */
   sample: boolean;
   /** 写真（pubs/<公開ID>.img<番号>.jpg）。 */
   images?: ImageMeta[];
 }
+/** 開発者の登録。名前・所属・専門・紹介は、採用した発明の発案者と運営にだけ見せる。 */
 export interface AccountRecord {
-  id: string; name: string; affiliation: string; role: Role; field: string; intro: string;
+  id: string; name: string; affiliation: string; field: string; intro: string;
   verified: boolean; createdAt: string; sample: boolean;
+  /** ログイン（小文字にしたメールアドレスと、元に戻せない形のパスワード）。 */
+  email?: string; passwordHash?: string; emailVerified?: boolean;
 }
 interface Message { id: string; from: "adopter" | "creator"; text: string; at: string }
-interface ThreadRecord { id: string; pubId: string; accountId: string; creatorHash: string; createdAt: string; messages: Message[] }
-interface Db { version: 1; pubs: PubRecord[]; accounts: AccountRecord[]; threads: ThreadRecord[] }
+interface ThreadRecord {
+  id: string; pubId: string; accountId: string; creatorHash: string; createdAt: string; messages: Message[];
+  /** それぞれが最後に読んだ時刻。 */
+  readAt?: { adopter?: string; creator?: string };
+  /** 採用した人が退会したら終わる。 */
+  closed?: boolean;
+}
+export interface Db {
+  version: 1; pubs: PubRecord[]; accounts: AccountRecord[]; threads: ThreadRecord[];
+  operators?: OperatorRecord[]; creatorLogins?: CreatorLoginRecord[]; sessions?: SessionRecord[]; mailTokens?: MailTokenRecord[];
+  outbox?: MailRecord[]; notices?: NoticeRecord[]; reports?: ReportRecord[];
+}
 
-/** やりとりの相手として名乗る人。Quest は端末の鍵、サイトは選んだアカウントか発案者（ログインは形だけ）。 */
-export type Identity = { kind: "creator"; hash: string } | { kind: "account"; id: string };
+/** やりとりに加わる人。Quest は端末の鍵、サイトはログインした開発者か発案者。 */
+export type Identity = Who;
 
 export interface StoreOptions {
   dir: string;
@@ -130,6 +167,8 @@ export class LibraryStore {
   private newId: (prefix: string) => string;
   private db: Db = { version: 1, pubs: [], accounts: [], threads: [] };
   private pubData = new Map<string, Publication>();
+  /** サイトの利用者（ログイン・メール・知らせ・通報）。 */
+  readonly members: Members;
 
   constructor(o: StoreOptions) {
     this.dir = o.dir;
@@ -140,7 +179,7 @@ export class LibraryStore {
     if (existsSync(dbPath)) {
       const raw = JSON.parse(readFileSync(dbPath, "utf8")) as Db;
       if (raw?.version !== 1) throw new Error("library/db.json の形式が非対応です");
-      this.db = { version: 1, pubs: raw.pubs ?? [], accounts: raw.accounts ?? [], threads: raw.threads ?? [] };
+      this.db = { ...raw, version: 1, pubs: raw.pubs ?? [], accounts: raw.accounts ?? [], threads: raw.threads ?? [] };
       for (const p of this.db.pubs) {
         const f = this.pubPath(p.id, ".json");
         if (existsSync(f)) this.pubData.set(p.id, JSON.parse(readFileSync(f, "utf8")) as Publication);
@@ -148,6 +187,7 @@ export class LibraryStore {
       // 公開データが無い記録（手で消したなど）は出さない
       this.db.pubs = this.db.pubs.filter((p) => this.pubData.has(p.id));
     }
+    this.members = new Members({ db: () => this.db, save: () => this.save(), now: this.now, newId: this.newId });
   }
 
   // ---------------- 保存 ----------------
@@ -177,7 +217,7 @@ export class LibraryStore {
     const now = this.now();
     const created = !rec;
     if (!rec) {
-      if (this.db.pubs.length >= LIMITS.maxPublications) throw new HttpError(507, "library_full", "ライブラリがいっぱいです");
+      if (this.db.pubs.length >= LIMITS.maxPublications) throw new HttpError(507, "library_full", "ライブラリーがいっぱいです");
       if (this.db.pubs.filter((p) => p.creatorHash === creatorHash).length >= LIMITS.maxPerCreator) throw new HttpError(429, "too_many", "この端末から公開できる数の上限です");
       rec = {
         id: this.newId("p"), creatorHash, inventionId: inv.id, displayName: "", anonymous: true,
@@ -213,8 +253,10 @@ export class LibraryStore {
   }
 
   /** Quest が自分の公開の状態・採用の知らせ・やりとりを取りにくる。 */
-  mine(creatorKey: string) {
-    const h = creatorHashOf(creatorKey);
+  mine(creatorKey: string) { return this.mineByHash(creatorHashOf(creatorKey)); }
+
+  /** 発案者の公開（Quest と、サイトの自分のページ）。 */
+  mineByHash(h: string) {
     return this.db.pubs.filter((p) => p.creatorHash === h).map((p) => ({
       id: p.id,
       inventionId: p.inventionId,
@@ -224,8 +266,8 @@ export class LibraryStore {
       withdrawnBy: p.withdrawnBy,
       wants: { vr: p.wantsVr.length, site: p.wantsSite.length },
       tried: p.tried.length,
-      adoptions: p.adoptions.map((a) => ({ id: a.id, at: a.at, reason: a.reason, adopter: this.accountPublic(a.accountId), threadId: a.threadId, ...this.threadCounts(a.threadId) })),
-      considering: p.considering.length,
+      adoptions: p.adoptions.map((a) => ({ id: a.id, at: a.at, reason: a.reason, adopter: this.partner(a.accountId), threadId: a.threadId, ...this.threadCounts(a.threadId) })),
+      considering: p.considering.length, publishedAt: p.publishedAt, sample: p.sample,
     }));
   }
 
@@ -251,11 +293,10 @@ export class LibraryStore {
     return {
       sort,
       items: items.map(({ rec, inv }) => ({
-        id: rec.id, name: inv.name, summary: inv.summary, request: inv.request,
-        tags: inv.tags, sceneTags: inv.sceneTags, status: this.status(rec), revision: inv.revision,
+        id: rec.id, name: inv.name, summary: inv.summary,
+        tags: inv.tags, sceneTags: inv.sceneTags, mount: inv.mount, status: this.status(rec), revision: inv.revision,
         creator: this.creatorPublic(rec), creatorAdoptions: adoptionsByCreator.get(rec.creatorHash) ?? 0,
-        wants: { vr: rec.wantsVr.length, site: rec.wantsSite.length }, tried: rec.tried.length,
-        adoptions: rec.adoptions.length, considering: rec.considering.length,
+        wants: wants(rec), adoptions: rec.adoptions.length, considering: rec.considering.length,
         publishedAt: rec.publishedAt, updatedAt: rec.updatedAt, sample: rec.sample,
         result: resultSummary(inv),
         thumb: this.imagesOf(rec).find((m) => m.kind === "stage")?.url ?? null,
@@ -263,18 +304,38 @@ export class LibraryStore {
     };
   }
 
+  /** だれでも見られる1件：名前・何をするものか・3D と写真・実験の結果の要点・ほしいと採用の数。採用した人の名前は出さない。 */
   get(id: string) {
     const rec = this.pubOrThrow(id);
     return {
-      id: rec.id, status: this.status(rec), sample: rec.sample,
+      id: rec.id, status: this.status(rec), sample: rec.sample, detail: false,
       publishedAt: rec.publishedAt, updatedAt: rec.updatedAt, consentVersion: rec.consentVersion,
       creator: this.creatorPublic(rec),
-      wants: { vr: rec.wantsVr.length, site: rec.wantsSite.length }, tried: rec.tried.length,
-      adoptions: rec.adoptions.map((a) => ({ at: a.at, reason: a.reason, adopter: this.accountPublic(a.accountId) })),
-      considering: rec.considering.map((c) => ({ at: c.at, account: this.accountPublic(c.accountId) })),
+      wants: rec.wantsVr.length + rec.wantsSite.length, adoptions: rec.adoptions.length, considering: rec.considering.length,
       images: this.imagesOf(rec),
-      invention: this.pubData.get(rec.id)!.invention,
+      invention: publicInvention(this.pubData.get(rec.id)!.invention),
     };
+  }
+
+  /**
+   * 詳しい内容つきの1件。読めるのは、ログインした開発者・公開した発案者・運営だけ。
+   * ほかの発案者には、だれでも見られる1件を返す（detail: false）。
+   * 開発者が読んだら、その記録を残す（運営が確かめる）。開発者には、自分の採用と検討中の状態も返す。
+   */
+  detail(id: string, who: Who) {
+    const rec = this.pubOrThrow(id);
+    if (who.kind === "creator" && who.hash !== rec.creatorHash) return { ...this.get(id), mine: null };
+    const inv = this.pubData.get(rec.id)!.invention;
+    const page = { ...this.get(id), detail: true, invention: { ...inv, partCount: inv.parts.length, experimentCount: inv.experiments.length } };
+    if (who.kind !== "account") return { ...page, mine: null };
+    this.accountOrThrow(who.id);
+    const now = this.now();
+    const views = (rec.views ??= []);
+    const v = views.find((x) => x.accountId === who.id);
+    if (v) v.last = now; else views.push({ accountId: who.id, first: now, last: now });
+    this.save();
+    const a = rec.adoptions.find((x) => x.accountId === who.id);
+    return { ...page, mine: { adopted: !!a, threadId: a?.threadId ?? null, considering: rec.considering.some((c) => c.accountId === who.id) } };
   }
 
   model(id: string): Buffer {
@@ -299,7 +360,7 @@ export class LibraryStore {
     const h = hash("site:" + voter);
     const added = !rec.wantsSite.includes(h);
     if (added) { rec.wantsSite.push(h); this.save(); }
-    return { added, wants: { vr: rec.wantsVr.length, site: rec.wantsSite.length } };
+    return { added, wants: rec.wantsVr.length + rec.wantsSite.length };
   }
 
   /** VR で呼び出して試した（端末ごとに1回）。 */
@@ -318,21 +379,26 @@ export class LibraryStore {
     if (!rec.tried.includes(h)) throw new HttpError(409, "not_tried", "VR で試してから、ほしいを押してください");
     const added = !rec.wantsVr.includes(h);
     if (added) { rec.wantsVr.push(h); this.save(); }
-    return { added, wants: { vr: rec.wantsVr.length, site: rec.wantsSite.length } };
+    return { added, wants: rec.wantsVr.length + rec.wantsSite.length };
   }
 
-  // ---------------- 検討中・採用（登録した研究者・開発者） ----------------
+  // ---------------- 検討中・採用（登録した開発者） ----------------
   consider(id: string, accountId: string) {
     const rec = this.pubOrThrow(id);
     this.accountOrThrow(accountId);
-    if (!rec.considering.some((c) => c.accountId === accountId)) { rec.considering.push({ accountId, at: this.now() }); this.save(); }
+    if (!rec.considering.some((c) => c.accountId === accountId)) {
+      rec.considering.push({ accountId, at: this.now() });
+      // 検討中は、だれかを伝えない（名前が伝わるのは採用したときだけ）
+      this.members.notify({ kind: "creator", hash: rec.creatorHash }, { kind: "considering", pubId: rec.id, pubName: this.nameOf(rec.id) });
+      this.save();
+    }
     return { status: this.status(rec) };
   }
 
   /** 採用する。採用した人と発案者の2人だけが読めるやりとりの場を作る（採用した人ごとに1つ）。 */
   adopt(id: string, accountId: string, reason: string) {
     const rec = this.pubOrThrow(id);
-    this.accountOrThrow(accountId);
+    const acc = this.accountOrThrow(accountId);
     if (rec.adoptions.some((a) => a.accountId === accountId)) throw new HttpError(409, "already_adopted", "すでに採用しています");
     if (this.db.threads.length >= LIMITS.maxThreads) throw new HttpError(507, "library_full", "やりとりの数の上限です");
     const now = this.now();
@@ -340,29 +406,71 @@ export class LibraryStore {
     const adoption: Adoption = { id: this.newId("a"), accountId, reason: reason.trim(), at: now, threadId: thread.id };
     rec.adoptions.push(adoption);
     this.db.threads.push(thread);
+    this.members.notify({ kind: "creator", hash: rec.creatorHash }, { kind: "adopted", pubId: rec.id, pubName: this.nameOf(rec.id), threadId: thread.id, fromName: acc.name });
     this.save();
     return { status: this.status(rec), adoptionId: adoption.id, threadId: thread.id };
   }
 
-  // ---------------- 研究者・開発者の登録 ----------------
-  createAccount(input: { name: string; affiliation: string; role: Role; field: string; intro: string }) {
+  // ---------------- 開発者の登録 ----------------
+  /** 登録を作る。メールアドレスとパスワードを付けるとログインできる（見本とテストでは付けないこともある）。 */
+  createAccount(input: { name: string; affiliation: string; field: string; intro: string; email?: string; password?: string }) {
     if (this.db.accounts.length >= LIMITS.maxAccounts) throw new HttpError(507, "library_full", "登録の数の上限です");
+    let email: string | undefined;
+    if (input.email != null) {
+      email = this.members.checkEmail(input.email);
+      if (this.members.emailTaken(email)) throw new HttpError(409, "email_taken", "このメールアドレスはすでに登録されています");
+    }
+    if (input.password != null) this.members.checkNewPassword(input.password);
     const a: AccountRecord = {
-      id: this.newId("u"), name: input.name.trim(), affiliation: input.affiliation.trim(), role: input.role,
+      id: this.newId("u"), name: input.name.trim(), affiliation: input.affiliation.trim(),
       field: input.field.trim(), intro: input.intro.trim(), verified: false, createdAt: this.now(), sample: false,
+      ...(email ? { email, emailVerified: false } : {}),
+      ...(input.password != null ? { passwordHash: hashPassword(input.password) } : {}),
     };
     this.db.accounts.push(a);
     this.save();
-    return a;
+    return accountView(a);
   }
 
-  /** 登録の一覧（採用した数つき。取り下げられた発明の採用は数えない）。 */
-  listAccounts() {
+  /** サイトの新規登録：登録してログインし、確認のメールを送る。 */
+  signup(input: { name: string; affiliation: string; field: string; intro: string; email: string; password: string }) {
+    const v = this.createAccount(input);
+    this.members.sendVerification(this.accountOrThrow(v.id));
+    return { kind: "account" as const, id: v.id };
+  }
+
+  /** 自分の登録を直す（名前・所属・専門・紹介）。 */
+  updateProfile(id: string, input: { name: string; affiliation: string; field: string; intro: string }) {
+    const a = this.accountOrThrow(id);
+    a.name = input.name.trim(); a.affiliation = input.affiliation.trim(); a.field = input.field.trim(); a.intro = input.intro.trim();
+    this.save();
+    return this.members.me({ kind: "account", id });
+  }
+
+  /** 退会：登録とログインを消す。採用の記録は「退会した人」として残し、やりとりは終える。 */
+  deleteAccount(id: string, password: string) {
+    const who: Who = { kind: "account", id };
+    this.members.confirmPassword(who, password);
+    this.db.accounts = this.db.accounts.filter((a) => a.id !== id);
+    for (const p of this.db.pubs) p.considering = p.considering.filter((c) => c.accountId !== id);
+    for (const t of this.db.threads) if (t.accountId === id) t.closed = true;
+    this.members.dropNoticesOf(who);
+    this.members.endAllSessions(who);
+    this.save();
+    return { deleted: true };
+  }
+
+  /** 運営に見せる開発者の一覧（メールアドレスと確認の状態、採用した数、詳しい内容を見た発明の数）。ほかの人には一覧を見せない。 */
+  adminAccounts() {
     const live = this.db.pubs.filter((p) => !p.withdrawn);
-    return this.db.accounts.map((a) => ({ ...a, adoptions: live.filter((p) => p.adoptions.some((x) => x.accountId === a.id)).length }));
+    return this.db.accounts.map((a) => ({
+      ...accountView(a), email: a.email ?? "", emailVerified: a.emailVerified ?? false,
+      adoptions: live.filter((p) => p.adoptions.some((x) => x.accountId === a.id)).length,
+      viewed: live.filter((p) => (p.views ?? []).some((x) => x.accountId === a.id)).length,
+    }));
   }
 
-  /** 表示名で公開している発案者の一覧（サイトの名乗りで選ぶ）。匿名の公開は出さない。 */
+  /** 表示名で公開している発案者の一覧。匿名の公開は出さない。 */
   listCreators() {
     const byId = new Map<string, { publicId: string; name: string; published: number }>();
     for (const p of this.db.pubs.filter((x) => !x.withdrawn && !x.anonymous)) {
@@ -374,11 +482,16 @@ export class LibraryStore {
     return [...byId.values()];
   }
 
-  getAccount(id: string) {
-    const a = this.accountOrThrow(id);
-    const adopted = this.db.pubs.filter((p) => !p.withdrawn && p.adoptions.some((x) => x.accountId === id))
-      .map((p) => ({ id: p.id, name: this.pubData.get(p.id)!.invention.name, at: p.adoptions.find((x) => x.accountId === id)!.at }));
-    return { ...a, adopted };
+  /** 自分のページ：採用した発明と検討中の発明。 */
+  accountActivity(id: string) {
+    this.accountOrThrow(id);
+    const live = this.db.pubs.filter((p) => !p.withdrawn);
+    return {
+      adopted: live.filter((p) => p.adoptions.some((x) => x.accountId === id))
+        .map((p) => { const a = p.adoptions.find((x) => x.accountId === id)!; return { id: p.id, name: this.nameOf(p.id), at: a.at, threadId: a.threadId }; }),
+      considering: live.filter((p) => p.considering.some((x) => x.accountId === id) && !p.adoptions.some((x) => x.accountId === id))
+        .map((p) => ({ id: p.id, name: this.nameOf(p.id), at: p.considering.find((x) => x.accountId === id)!.at })),
+    };
   }
 
   /** 発案者のページ：表示名で公開した発明だけで作る（匿名の公開は数えない・出さない）。 */
@@ -391,31 +504,39 @@ export class LibraryStore {
       published: pubs.length, adopted: pubs.filter((p) => p.adoptions.length > 0).length,
       inventions: pubs.map((p) => {
         const inv = this.pubData.get(p.id)!.invention;
-        return { id: p.id, name: inv.name, request: inv.request, status: this.status(p), publishedAt: p.publishedAt,
+        return { id: p.id, name: inv.name, summary: inv.summary, status: this.status(p), publishedAt: p.publishedAt,
           wants: p.wantsVr.length + p.wantsSite.length, adoptions: p.adoptions.length };
       }),
     };
   }
 
   // ---------------- やりとり ----------------
-  /** サイトで「発案者として見る」ときの名乗り（表示名で公開した発案者だけ選べる）。 */
-  creatorIdentityFromPublic(publicId: string): Identity {
-    const p = this.db.pubs.find((x) => !x.anonymous && publicCreatorId(x.creatorHash) === publicId);
-    if (!p) throw new HttpError(404, "not_found", "発案者が見つかりません");
-    return { kind: "creator", hash: p.creatorHash };
-  }
-
   threads(who: Identity) {
-    return this.db.threads.filter((t) => this.isMember(t, who)).map((t) => this.threadView(t));
+    return this.db.threads.filter((t) => this.isMember(t, who)).map((t) => this.threadView(t, who));
   }
 
-  thread(id: string, who: Identity) { const t = this.threadFor(id, who); return { ...this.threadView(t), messages: t.messages.map((m) => ({ ...m })) }; }
+  /** 1件を読む（読んだ時刻を残し、このやりとりの知らせを読んだことにする）。 */
+  thread(id: string, who: Identity) {
+    const t = this.threadFor(id, who);
+    const view = { ...this.threadView(t, who), messages: t.messages.map((m) => ({ ...m })) };
+    t.readAt = { ...(t.readAt ?? {}), [who.kind === "creator" ? "creator" : "adopter"]: this.now() };
+    this.members.readNotices(who, t.id);
+    this.save();
+    return view;
+  }
 
   postMessage(id: string, who: Identity, text: string) {
     const t = this.threadFor(id, who);
+    if (t.closed) throw new HttpError(410, "closed", "採用した人が退会したため、このやりとりは終わりました");
     if (t.messages.length >= LIMITS.maxMessagesPerThread) throw new HttpError(429, "too_many", "このやりとりの上限に達しました");
-    const m: Message = { id: this.newId("m"), from: who.kind === "creator" ? "creator" : "adopter", text: text.trim(), at: this.now() };
+    const from = who.kind === "creator" ? "creator" : "adopter";
+    const m: Message = { id: this.newId("m"), from, text: text.trim(), at: this.now() };
     t.messages.push(m);
+    t.readAt = { ...(t.readAt ?? {}), [from]: m.at };
+    const rec = this.db.pubs.find((p) => p.id === t.pubId);
+    const fromName = from === "creator" ? (rec ? this.creatorPublic(rec).name : "発案者") : this.partner(t.accountId).name;
+    const to: Who = from === "creator" ? { kind: "account", id: t.accountId } : { kind: "creator", hash: t.creatorHash };
+    this.members.notify(to, { kind: "message", pubId: t.pubId, pubName: this.nameOf(t.pubId), threadId: t.id, fromName });
     this.save();
     return m;
   }
@@ -423,24 +544,52 @@ export class LibraryStore {
   // ---------------- 運営 ----------------
   verifyAccount(id: string, verified: boolean) {
     const a = this.accountOrThrow(id);
+    if (verified && !a.verified) this.members.notify({ kind: "account", id }, { kind: "verified" });
     a.verified = verified;
     this.save();
     return { id, verified };
   }
 
-  /** 規約に反する公開を運営が取り下げる（発案者は公開し直せない）。 */
+  /** 規約に反する公開を運営が取り下げる（発案者は公開し直せない）。この発明の通報は片づける。 */
   takedown(id: string, reason: string) {
     const rec = this.pubOrThrow(id, true);
     rec.withdrawn = true; rec.withdrawnBy = "admin"; rec.withdrawReason = reason.trim(); rec.updatedAt = this.now();
+    for (const r of this.db.reports ?? []) if (r.pubId === id && r.status === "open") { r.status = "takedown"; r.resolvedAt = this.now(); r.note = reason.trim(); }
+    this.members.notify({ kind: "creator", hash: rec.creatorHash }, { kind: "takedown", pubId: rec.id, pubName: this.nameOf(rec.id), note: reason.trim() });
     this.save();
     return { id, withdrawn: true };
   }
 
+  /** 通報する（公開中の発明だけ）。 */
+  report(id: string, reason: Parameters<Members["report"]>[1], detail: string) {
+    const rec = this.pubOrThrow(id);
+    return this.members.report(rec.id, reason, detail);
+  }
+
+  /** 通報の一覧（新しい順。発明の名前と今の状態つき）。 */
+  reports() {
+    return [...(this.db.reports ?? [])].reverse().map((r) => {
+      const rec = this.db.pubs.find((p) => p.id === r.pubId);
+      return { ...r, pubName: this.nameOf(r.pubId), pubStatus: rec ? (rec.withdrawn ? "withdrawn" : this.status(rec)) : "withdrawn" };
+    });
+  }
+
+  /** 通報を片づける：問題なし、か取り下げ。 */
+  resolveReport(reportId: string, action: "dismiss" | "takedown", note: string) {
+    const r = this.members.reportOrThrow(reportId);
+    if (r.status !== "open") throw new HttpError(409, "resolved", "この通報はすでに片づいています");
+    if (action === "takedown") this.takedown(r.pubId, note || r.reason);
+    else { r.status = "dismissed"; r.resolvedAt = this.now(); r.note = note.trim(); this.save(); }
+    return { id: reportId, status: this.members.reportOrThrow(reportId).status };
+  }
+
   adminList() {
+    const open = (this.db.reports ?? []).filter((r) => r.status === "open");
     return this.db.pubs.map((p) => ({
-      id: p.id, name: this.pubData.get(p.id)!.invention.name, status: p.withdrawn ? "withdrawn" : this.status(p),
+      id: p.id, name: this.nameOf(p.id), status: p.withdrawn ? "withdrawn" : this.status(p),
       withdrawnBy: p.withdrawnBy, withdrawReason: p.withdrawReason, creator: this.creatorPublic(p),
-      publishedAt: p.publishedAt, adoptions: p.adoptions.length, sample: p.sample,
+      publishedAt: p.publishedAt, adoptions: p.adoptions.length, sample: p.sample, reports: open.filter((r) => r.pubId === p.id).length,
+      viewers: (p.views ?? []).map((v) => ({ ...this.partner(v.accountId), first: v.first, last: v.last })),
     }));
   }
 
@@ -466,15 +615,18 @@ export class LibraryStore {
     return p.anonymous ? { name: "発案者", publicId: null } : { name: p.displayName, publicId: publicCreatorId(p.creatorHash) };
   }
 
-  private accountPublic(id: string) {
+  /** 採用で結びついた相手（発案者）と運営に見せる開発者。退会した人は名前を出さない。 */
+  private partner(id: string) {
     const a = this.db.accounts.find((x) => x.id === id);
-    return a
-      ? { id: a.id, name: a.name, affiliation: a.affiliation, role: a.role, field: a.field, verified: a.verified }
-      : { id, name: "（登録が見つかりません）", affiliation: "", role: "researcher" as Role, field: "", verified: false };
+    if (!a) return { id, name: "退会した人", affiliation: "", field: "", intro: "", verified: false, gone: true };
+    const v = accountView(a);
+    return { id: v.id, name: v.name, affiliation: v.affiliation, field: v.field, intro: v.intro, verified: v.verified, gone: false };
   }
 
+  private nameOf(pubId: string) { return this.pubData.get(pubId)?.invention.name ?? ""; }
+
   private isMember(t: ThreadRecord, who: Identity) {
-    return who.kind === "creator" ? t.creatorHash === who.hash : t.accountId === who.id;
+    return who.kind === "creator" ? t.creatorHash === who.hash : who.kind === "account" ? t.accountId === who.id : false;
   }
 
   private threadFor(id: string, who: Identity) {
@@ -490,21 +642,41 @@ export class LibraryStore {
     return { messageCount: t?.messages.length ?? 0, lastFrom: last?.from ?? null, lastAt: last?.at ?? null };
   }
 
-  private threadView(t: ThreadRecord) {
+  private threadView(t: ThreadRecord, who?: Identity) {
     const rec = this.db.pubs.find((p) => p.id === t.pubId);
-    const inv = this.pubData.get(t.pubId)?.invention;
+    const side = who?.kind === "creator" ? "creator" : "adopter";
+    const readAt = t.readAt?.[side] ?? "";
     return {
-      id: t.id, pubId: t.pubId, pubName: inv?.name ?? "", createdAt: t.createdAt,
-      adopter: this.accountPublic(t.accountId),
+      id: t.id, pubId: t.pubId, pubName: this.nameOf(t.pubId), createdAt: t.createdAt,
+      adopter: this.partner(t.accountId),
       creator: rec ? this.creatorPublic(rec) : { name: "発案者", publicId: null },
       reason: rec?.adoptions.find((a) => a.threadId === t.id)?.reason ?? "",
+      closed: t.closed ?? false,
+      unread: who ? t.messages.filter((m) => m.from !== side && m.at > readAt).length : 0,
       ...this.threadCounts(t.id),
     };
+  }
+
+  /**
+   * 入口でしくみを紹介するための、見本の発明の詳しい内容（運営が作った見本だけ。実在の発案者の公開は出さない）。
+   */
+  showcase(id: string) {
+    const rec = this.pubOrThrow(id);
+    if (!rec.sample) throw new HttpError(403, "not_sample", "入口に出せるのは見本だけです");
+    const inv = this.pubData.get(rec.id)!.invention;
+    return { ...this.get(id), detail: true, invention: { ...inv, partCount: inv.parts.length, experimentCount: inv.experiments.length } };
   }
 
   /** テスト・見本用：公開を見本として印を付ける。 */
   markSample(id: string, sample = true) { const r = this.pubOrThrow(id, true); r.sample = sample; this.save(); }
   markSampleAccount(id: string, sample = true) { const a = this.accountOrThrow(id); a.sample = sample; this.save(); }
+  /** 見本用：見本の人にログインを付ける（パスワードはハッシュで受け取る）。 */
+  setSampleLogin(id: string, email: string, passwordHash: string) {
+    const a = this.accountOrThrow(id);
+    if (!a.sample) throw new HttpError(400, "not_sample", "見本ではありません");
+    a.email = email.toLowerCase(); a.passwordHash = passwordHash; a.emailVerified = true;
+    this.save();
+  }
 
   /** テスト用：保存先を消す。 */
   static wipe(dir: string) { rmSync(dir, { recursive: true, force: true }); }

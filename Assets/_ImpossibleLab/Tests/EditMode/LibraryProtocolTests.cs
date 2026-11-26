@@ -66,7 +66,7 @@ namespace ImpossibleLab.Tests
             var glb = new byte[] { 0x67, 0x6c, 0x54, 0x46, 2, 0, 0, 0 };
             var small = new byte[] { 0xff, 0xd8, 0xff, 0xe0, 1, 2, 3 };
             var huge = new byte[LibraryProtocol.MaxJpegBytes + 1];
-            var o = JObject.Parse(LibraryProtocol.PublishBody(pub, glb, new[] { ("stage", "研究所で組み立てた Rev.1 の試作品", 1, small), ("stage", "大きすぎる", 1, huge) }));
+            var o = JObject.Parse(LibraryProtocol.PublishBody(pub, glb, new[] { ("stage", "IMPOSSIBLE LAB で組み立てた Rev.1 の試作品", 1, small), ("stage", "大きすぎる", 1, huge) }));
             Assert.AreEqual(1, (int)o["publication"]["format"]);
             CollectionAssert.AreEqual(glb, Convert.FromBase64String((string)o["glbBase64"]));
             var images = (JArray)o["images"];
@@ -99,10 +99,22 @@ namespace ImpossibleLab.Tests
             Assert.AreEqual(7, m.WantsVr + m.WantsSite);
             Assert.AreEqual(4, m.Tried);
             Assert.AreEqual("高瀬 真央", m.Adoptions[0].AdopterName);
-            Assert.AreEqual("研究者", m.Adoptions[0].RoleJa);
+            Assert.AreEqual("北辰工科大学", m.Adoptions[0].AdopterAffiliation);
             Assert.IsTrue(m.Adoptions[0].AdopterVerified);
             Assert.IsFalse(mine[1].Live, "取り下げたものは公開中として扱わない");
             Assert.AreEqual(0, LibraryProtocol.ParseMine("壊れた").Count);
+        }
+
+        [Test] public void Pair_ReadsTheCodeAndItsLimit_OrTheReason()
+        {
+            var (code, at, err) = LibraryProtocol.ParsePair(200, "{\"code\":\"042917\",\"expiresAt\":\"2026-11-26T05:10:00.000Z\"}", null);
+            Assert.AreEqual("042917", code);
+            Assert.IsNull(err);
+            Assert.AreEqual(new DateTime(2026, 11, 26, 5, 10, 0, DateTimeKind.Utc), at.ToUniversalTime());
+            Assert.AreEqual("042 917", LibraryProtocol.SpacedPair(code));
+            Assert.AreEqual("端末の発案者キーがありません", LibraryProtocol.ParsePair(401, "{\"status\":\"error\",\"message\":\"端末の発案者キーがありません\"}", null).error);
+            Assert.AreEqual("つながりません", LibraryProtocol.ParsePair(0, null, "つながりません").error);
+            Assert.IsNull(LibraryProtocol.ParsePair(200, "{\"code\":\"12ab\"}", null).code, "6 桁の数字でなければ使わない");
         }
     }
 }

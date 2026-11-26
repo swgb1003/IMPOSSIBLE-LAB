@@ -1,0 +1,1316 @@
+{
+ "url": "http://127.0.0.1:8787/me",
+ "at": "2026-11-26T05:18:45.679Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.72,
+    0.89
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1029,
+     "screens": 1.1,
+     "words": 39,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 32,
+     "vw": 2.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "lines": 1,
+     "size": 32,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "高瀬​ ​真央",
+      "words": 2,
+      "chars": 7,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 86,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.05,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      14,
+      16,
+      18,
+      24,
+      32
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 69,
+     "max": {
+      "size": 32,
+      "vw": 2.2,
+      "font": "Noto Sans JP",
+      "text": "高瀬​ ​真央"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.05,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 212,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      },
+      {
+       "color": "#0e1519",
+       "top": 212,
+       "hsl": {
+        "h": 202,
+        "s": 0.28,
+        "l": 0.08
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#9db8bc",
+       "share": 0.48
+      },
+      {
+       "color": "#e9fbfc",
+       "share": 0.47
+      },
+      {
+       "color": "#120600",
+       "share": 0.04
+      },
+      {
+       "color": "#020405",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 2,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "ほかの​人から​見える​ページ",
+      "ハンズ​フリー​雨よけ​装置 2026年11月26日に​採用・やりとりを​開く"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 3,
+     "hairlineSamples": [
+      "div 774px",
+      "div 774px",
+      "a 538px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 8,
+     "fixed": false,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1029,
+    "margins": {
+     "left": 38,
+     "right": 54
+    },
+    "sections": [],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "高瀬​ ​真央",
+      "size": 32,
+      "top": 86,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 3
+     },
+     {
+      "x": 864,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 5,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.19,
+    "voidBox": {
+     "x": 840,
+     "y": 480,
+     "w": 600,
+     "h": 420
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": {
+     "h": 64
+    },
+    "canvas": {
+     "left": 38,
+     "right": 38
+    },
+    "hero": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 32,
+     "vw": 2.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 3,
+     "firstScreen": 3,
+     "ragged": [],
+     "voids": [
+      {
+       "gap": 555,
+       "at": 436,
+       "panel": "採用した​発明​　​1 件"
+      }
+     ]
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 4,
+     "radii": [
+      [
+       0,
+       4
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0.03,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      12,
+      14,
+      16,
+      18,
+      24,
+      32
+     ]
+    },
+    "title": {
+     "text": "高瀬​ ​真央",
+     "size": 32,
+     "top": 86
+    },
+    "colourShare": 0.013
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.47,
+    0.74
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1387,
+     "screens": 1.4,
+     "words": 39,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 32,
+     "vw": 4.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 133,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "lines": 1,
+     "size": 32,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "高瀬​ ​真央",
+      "words": 2,
+      "chars": 7,
+      "lines": 1,
+      "size": 32,
+      "vw": 4.2,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.72,
+      "top": 133,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.05,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      14,
+      16,
+      18,
+      24,
+      32
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 69,
+     "max": {
+      "size": 32,
+      "vw": 4.2,
+      "font": "Noto Sans JP",
+      "text": "高瀬​ ​真央"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.05,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 315,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#9db8bc",
+       "share": 0.48
+      },
+      {
+       "color": "#e9fbfc",
+       "share": 0.47
+      },
+      {
+       "color": "#120600",
+       "share": 0.04
+      },
+      {
+       "color": "#020405",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 1,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "ほかの​人から​見える​ページ"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 3,
+     "hairlineSamples": [
+      "div 692px",
+      "div 692px",
+      "a 692px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 7,
+     "fixed": false,
+     "height": 111,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1387,
+    "margins": {
+     "left": 38,
+     "right": 38
+    },
+    "sections": [
+     {
+      "sel": "div.t.head",
+      "tag": "div",
+      "top": 111,
+      "height": 196,
+      "words": 7,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "高瀬​ ​真央",
+       "size": 32,
+       "tag": "h1"
+      },
+      "left": 38,
+      "right": 248,
+      "textLeft": 38,
+      "textRight": 248,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span7",
+      "tag": "div",
+      "top": 315,
+      "height": 801,
+      "words": 18,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "登録の​内容",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 38,
+      "textLeft": 38,
+      "textRight": 214,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span5",
+      "tag": "div",
+      "top": 1124,
+      "height": 247,
+      "words": 9,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "採用した​発明​ ​1 件",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 472,
+      "textLeft": 38,
+      "textRight": 472,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "高瀬​ ​真央",
+      "size": 32,
+      "top": 133,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 5
+     }
+    ],
+    "leftBlocks": 5,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 38,
+     "right": 38
+    },
+    "hero": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 32,
+     "vw": 4.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 133,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 3,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 4,
+     "radii": [
+      [
+       0,
+       4
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0.03,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      12,
+      14,
+      16,
+      18,
+      24,
+      32
+     ]
+    },
+    "title": {
+     "text": "高瀬​ ​真央",
+     "size": 32,
+     "top": 133
+    },
+    "colourShare": 0.02
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.57,
+    0.73
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 1535,
+     "screens": 1.8,
+     "words": 39,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 26,
+     "vw": 6.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "lines": 1,
+     "size": 26,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "高瀬​ ​真央",
+      "words": 2,
+      "chars": 7,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 180,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.05,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      14,
+      16,
+      18,
+      20,
+      26
+     ],
+     "sizeCount": 6,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 41,
+     "max": {
+      "size": 26,
+      "vw": 6.7,
+      "font": "Noto Sans JP",
+      "text": "高瀬​ ​真央"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.05,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 373,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#9db8bc",
+       "share": 0.48
+      },
+      {
+       "color": "#e9fbfc",
+       "share": 0.47
+      },
+      {
+       "color": "#120600",
+       "share": 0.04
+      },
+      {
+       "color": "#020405",
+       "share": 0.01
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 3,
+     "inHero": 1,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "ほかの​人から​見える​ページ"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 3,
+     "hairlineSamples": [
+      "div 326px",
+      "div 326px",
+      "a 326px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 6,
+     "fixed": false,
+     "height": 164,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 1535,
+    "margins": {
+     "left": 32,
+     "right": 32
+    },
+    "sections": [
+     {
+      "sel": "header.bar",
+      "tag": "header",
+      "top": 0,
+      "height": 164,
+      "words": 9,
+      "media": 0,
+      "middle": 3,
+      "heading": null,
+      "left": 32,
+      "right": 66,
+      "textLeft": 32,
+      "textRight": 66,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "main",
+      "tag": "main",
+      "top": 164,
+      "height": 1371,
+      "words": 34,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "高瀬​ ​真央",
+       "size": 26,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "高瀬​ ​真央",
+      "size": 26,
+      "top": 180,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 5
+     }
+    ],
+    "leftBlocks": 5,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#020405",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 32,
+     "right": 22
+    },
+    "hero": {
+     "text": "高瀬​ ​真央",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 26,
+     "vw": 6.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 3,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 5,
+     "radii": [
+      [
+       0,
+       5
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0.03,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      12,
+      14,
+      16,
+      18,
+      20,
+      26
+     ]
+    },
+    "title": {
+     "text": "高瀬​ ​真央",
+     "size": 26,
+     "top": 180
+    },
+    "colourShare": 0.002
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "panel-void",
+   "width": 1440,
+   "message": "1 card(s) hold a blank band inside: 555px in \"採用した​発明​　​1 件\".",
+   "fix": "A card stretches to its neighbour only when it has content to fill. Keep a legend or a note directly under its chart (only an action or a total may sit at a stretched card's foot), let a short card keep its own height (align-items: start), and let a filtered block shrink to its rows."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-me\\desktop-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-me\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-me\\tablet-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-me\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-me\\mobile-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-me\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

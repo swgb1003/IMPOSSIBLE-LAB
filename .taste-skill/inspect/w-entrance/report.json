@@ -1,0 +1,1884 @@
+{
+ "url": "http://127.0.0.1:8787/?t=6",
+ "at": "2026-11-26T13:43:59.666Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 8,
+   "filled": [
+    0.93,
+    0.96,
+    0.9,
+    0.89,
+    0.69,
+    0.66,
+    0.56,
+    0.71
+   ],
+   "motion": {
+    "elements": 33,
+    "css": 0,
+    "transitions": 24,
+    "scripted": 9,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 6731,
+     "screens": 7.5,
+     "words": 98,
+     "img": 9,
+     "video": 0,
+     "canvas": 2,
+     "svg": 1,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 8,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "0.jpg",
+      "0.jpg",
+      "0.jpg",
+      "0.jpg",
+      "0.jpg",
+      "0.jpg",
+      "0.jpg",
+      "p-7a2e6c0086-0.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "誰もが​開発に 携われる​未来へ",
+     "words": 2,
+     "chars": 16,
+     "lines": 2,
+     "size": 74.9,
+     "vw": 5.2,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.35,
+     "top": 364,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "誰もが​開発に 携われる​未来へ",
+     "words": 2,
+     "lines": 2,
+     "size": 74.9,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "誰もが​開発に 携われる​未来へ",
+      "words": 2,
+      "chars": 16,
+      "lines": 2,
+      "size": 74.9,
+      "vw": 5.2,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 364,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "AI​ が​プロンプトを​元に​部品を​組み立てる",
+      "words": 2,
+      "chars": 25,
+      "lines": 2,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 972,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "「床に​置いた​段ボールを 棚の​上まで​持ち上げてくれる​道具」",
+      "words": 2,
+      "chars": 33,
+      "lines": 2,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Noto Sans JP",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 1137,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "実験​結果を​元に 改良を​申請",
+      "words": 2,
+      "chars": 16,
+      "lines": 2,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.4,
+      "top": 2502,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "公開中の​発明品",
+      "words": 1,
+      "chars": 8,
+      "lines": 1,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.47,
+      "top": 4080,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "採用するには",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 56,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.31,
+      "top": 5677,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 136.4,
+      "vw": 9.5,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.9,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 6481,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.98,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.02,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      20,
+      22,
+      24,
+      30,
+      56,
+      75,
+      136
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.8
+     },
+     "measureChars": 80,
+     "max": {
+      "size": 136.4,
+      "vw": 9.5,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 64,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#9db8bc",
+       "share": 0.63
+      },
+      {
+       "color": "#e9fbfc",
+       "share": 0.36
+      },
+      {
+       "color": "#120600",
+       "share": 0.01
+      },
+      {
+       "color": "#2fe3e6",
+       "share": 0
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "新規登録",
+      "発明品​一覧を​見る"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 3,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 0.93
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": false,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 6731,
+    "margins": {
+     "left": 38,
+     "right": 38
+    },
+    "sections": [
+     {
+      "sel": "div.story-track",
+      "tag": "div",
+      "top": 64,
+      "height": 3896,
+      "words": 0,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": null,
+      "right": null,
+      "textLeft": null,
+      "textRight": null,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "section.hero.in",
+      "tag": "section",
+      "top": 64,
+      "height": 836,
+      "words": 12,
+      "media": 0,
+      "middle": 606,
+      "heading": {
+       "text": "誰もが​開発に",
+       "size": 75,
+       "tag": "h1"
+      },
+      "left": 38,
+      "right": 38,
+      "textLeft": 38,
+      "textRight": 38,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.chapter.s-parts",
+      "tag": "section",
+      "top": 900,
+      "height": 1530,
+      "words": 7,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "AI​ が​プロンプトを​元に​部品を​組み立てる",
+       "size": 56,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 839,
+      "textLeft": 38,
+      "textRight": 839,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.chapter.s-test",
+      "tag": "section",
+      "top": 2430,
+      "height": 1530,
+      "words": 36,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "実験​結果を​元に",
+       "size": 56,
+       "tag": "h2"
+      },
+      "left": 826,
+      "right": 111,
+      "textLeft": 826,
+      "textRight": 111,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "section.others",
+      "tag": "section",
+      "top": 4080,
+      "height": 1209,
+      "words": 34,
+      "media": 8,
+      "middle": 126,
+      "heading": null,
+      "left": 16,
+      "right": 62,
+      "textLeft": 724,
+      "textRight": 62,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "section.adopt",
+      "tag": "section",
+      "top": 5489,
+      "height": 810,
+      "words": 14,
+      "media": 1,
+      "middle": 34,
+      "heading": {
+       "text": "採用するには",
+       "size": 56,
+       "tag": "h2"
+      },
+      "left": 0,
+      "right": 65,
+      "textLeft": 48,
+      "textRight": 65,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 6459,
+      "height": 256,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 136,
+       "tag": "p"
+      },
+      "left": 38,
+      "right": 38,
+      "textLeft": 38,
+      "textRight": 38,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [
+     {
+      "top": 5292,
+      "height": 276
+     }
+    ],
+    "h1s": [
+     {
+      "text": "誰もが​開発に 携われる​未来へ",
+      "size": 75,
+      "top": 364,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 5
+     },
+     {
+      "x": 826,
+      "n": 2
+     },
+     {
+      "x": 724,
+      "n": 1
+     },
+     {
+      "x": 960,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 9,
+    "bodySize": 22,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 7,
+   "filled": [
+    0.87,
+    0.79,
+    0.53,
+    0.68,
+    0.64,
+    0.61,
+    0.83
+   ],
+   "motion": {
+    "elements": 30,
+    "css": 0,
+    "transitions": 22,
+    "scripted": 8,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 6985,
+     "screens": 6.8,
+     "words": 90,
+     "img": 9,
+     "video": 0,
+     "canvas": 2,
+     "svg": 1,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "p-7a2e6c0086-0.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "誰もが​開発に 携われる​未来へ",
+     "words": 2,
+     "chars": 16,
+     "lines": 2,
+     "size": 44,
+     "vw": 5.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.9,
+     "top": 538,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "誰もが​開発に 携われる​未来へ",
+     "words": 2,
+     "lines": 2,
+     "size": 44,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "誰もが​開発に 携われる​未来へ",
+      "words": 2,
+      "chars": 16,
+      "lines": 2,
+      "size": 44,
+      "vw": 5.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 538,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "AI​ が​プロンプトを​元に​部品を​組み立てる",
+      "words": 2,
+      "chars": 25,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 1048,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "実験​結果を​元に 改良を​申請",
+      "words": 2,
+      "chars": 16,
+      "lines": 2,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 2584,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "公開中の​発明品",
+      "words": 1,
+      "chars": 8,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 4585,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "採用するには",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.68,
+      "top": 5529,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.9,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 6763,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 6,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 1,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.98,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.02,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      17,
+      18,
+      20,
+      22,
+      30,
+      44,
+      69
+     ],
+     "sizeCount": 8,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.8
+     },
+     "measureChars": 80,
+     "max": {
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 73,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      },
+      {
+       "color": "#020405",
+       "top": 2560,
+       "hsl": {
+        "h": 200,
+        "s": 0.43,
+        "l": 0.01
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#9db8bc",
+       "share": 0.66
+      },
+      {
+       "color": "#e9fbfc",
+       "share": 0.33
+      },
+      {
+       "color": "#120600",
+       "share": 0.01
+      },
+      {
+       "color": "#2fe3e6",
+       "share": 0
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "新規登録",
+      "発明品​一覧を​見る"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 3,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 0.93
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": false,
+     "height": 73,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 6985,
+    "margins": {
+     "left": 38,
+     "right": 60
+    },
+    "sections": [
+     {
+      "sel": "div.story-track",
+      "tag": "div",
+      "top": 73,
+      "height": 4023,
+      "words": 0,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": null,
+      "right": null,
+      "textLeft": null,
+      "textRight": null,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "section.hero.in",
+      "tag": "section",
+      "top": 73,
+      "height": 951,
+      "words": 12,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "誰もが​開発に",
+       "size": 44,
+       "tag": "h1"
+      },
+      "left": 38,
+      "right": 312,
+      "textLeft": 38,
+      "textRight": 312,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.chapter.s-parts",
+      "tag": "section",
+      "top": 1024,
+      "height": 1536,
+      "words": 9,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "AI​ が​プロンプトを​元に​部品を​組み立てる",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 77,
+      "textLeft": 38,
+      "textRight": 77,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.chapter.s-test",
+      "tag": "section",
+      "top": 2560,
+      "height": 1536,
+      "words": 36,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "実験​結果を​元に",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 227,
+      "textLeft": 38,
+      "textRight": 227,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.others",
+      "tag": "section",
+      "top": 4168,
+      "height": 1265,
+      "words": 35,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "公開中の​発明品",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 60,
+      "textLeft": 38,
+      "textRight": 60,
+      "fullBleed": true,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.adopt",
+      "tag": "section",
+      "top": 5529,
+      "height": 1052,
+      "words": 13,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": 96,
+      "right": 121,
+      "textLeft": 96,
+      "textRight": 121,
+      "fullBleed": true,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 6741,
+      "height": 229,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 69,
+       "tag": "p"
+      },
+      "left": 38,
+      "right": 48,
+      "textLeft": 38,
+      "textRight": 48,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "誰もが​開発に 携われる​未来へ",
+      "size": 44,
+      "top": 538,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 8
+     },
+     {
+      "x": 121,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 9,
+    "bodySize": 18,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 9,
+   "filled": [
+    0.78,
+    0.82,
+    0.68,
+    0.71,
+    0.61,
+    0.66,
+    0.62,
+    0.61,
+    0.76
+   ],
+   "motion": {
+    "elements": 32,
+    "css": 0,
+    "transitions": 24,
+    "scripted": 8,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 6871,
+     "screens": 8.1,
+     "words": 90,
+     "img": 9,
+     "video": 0,
+     "canvas": 2,
+     "svg": 1,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "p-7a2e6c0086-0.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "誰もが​開発に 携われる​未来へ",
+     "words": 2,
+     "chars": 16,
+     "lines": 2,
+     "size": 36.7,
+     "vw": 9.4,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1.05,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.84,
+     "top": 532,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "誰もが​開発に 携われる​未来へ",
+     "words": 2,
+     "lines": 2,
+     "size": 36.7,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "誰もが​開発に 携われる​未来へ",
+      "words": 2,
+      "chars": 16,
+      "lines": 2,
+      "size": 36.7,
+      "vw": 9.4,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 532,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "AI​ が​プロンプトを​元に​部品を​組み立てる",
+      "words": 2,
+      "chars": 25,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 928,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "「床に​置いた​段ボールを棚の​上まで​持ち上げてくれる​道具」",
+      "words": 1,
+      "chars": 32,
+      "lines": 2,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Noto Sans JP",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 1017,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "実験​結果を​元に 改良を​申請",
+      "words": 2,
+      "chars": 16,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 2194,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "公開中の​発明品",
+      "words": 1,
+      "chars": 8,
+      "lines": 1,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 3856,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "採用するには",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.01,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 5616,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 32.6,
+      "vw": 8.4,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.9,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 6618,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.98,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.02,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      17,
+      18,
+      20,
+      22,
+      30,
+      33,
+      37
+     ],
+     "sizeCount": 8,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.8
+     },
+     "measureChars": 41,
+     "max": {
+      "size": 36.7,
+      "vw": 9.4,
+      "font": "Noto Sans JP",
+      "text": "誰もが​開発に"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 164,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      },
+      {
+       "color": "#020405",
+       "top": 904,
+       "hsl": {
+        "h": 200,
+        "s": 0.43,
+        "l": 0.01
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#9db8bc",
+       "share": 0.66
+      },
+      {
+       "color": "#e9fbfc",
+       "share": 0.34
+      },
+      {
+       "color": "#120600",
+       "share": 0.01
+      },
+      {
+       "color": "#2fe3e6",
+       "share": 0
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "新規登録",
+      "発明品​一覧を​見る"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 3,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "canvas",
+      "ratio": 0.81
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": false,
+     "height": 164,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 6871,
+    "margins": {
+     "left": 32,
+     "right": 33
+    },
+    "sections": [
+     {
+      "sel": "header.bar",
+      "tag": "header",
+      "top": 0,
+      "height": 164,
+      "words": 6,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 32,
+      "right": 134,
+      "textLeft": 32,
+      "textRight": 134,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.story-track",
+      "tag": "div",
+      "top": 164,
+      "height": 3272,
+      "words": 0,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": null,
+      "right": null,
+      "textLeft": null,
+      "textRight": null,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "section.hero.in",
+      "tag": "section",
+      "top": 164,
+      "height": 740,
+      "words": 12,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "誰もが​開発に",
+       "size": 37,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 57,
+      "textLeft": 32,
+      "textRight": 57,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.chapter.s-parts",
+      "tag": "section",
+      "top": 904,
+      "height": 1266,
+      "words": 9,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "AI​ が​プロンプトを​元に​部品を​組み立てる",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 40,
+      "textLeft": 32,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.chapter.s-test",
+      "tag": "section",
+      "top": 2170,
+      "height": 1266,
+      "words": 36,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "実験​結果を​元に",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 53,
+      "textLeft": 32,
+      "textRight": 53,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "div.others-stage",
+      "tag": "div",
+      "top": 3508,
+      "height": 321,
+      "words": 0,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": null,
+      "right": null,
+      "textLeft": null,
+      "textRight": null,
+      "fullBleed": true,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": true
+     },
+     {
+      "sel": "div.others-list.in",
+      "tag": "div",
+      "top": 3828,
+      "height": 1692,
+      "words": 35,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "公開中の​発明品",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 32,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.adopt",
+      "tag": "section",
+      "top": 5616,
+      "height": 826,
+      "words": 13,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": 32,
+      "right": 39,
+      "textLeft": 32,
+      "textRight": 39,
+      "fullBleed": true,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 6602,
+      "height": 253,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 33,
+       "tag": "p"
+      },
+      "left": 32,
+      "right": 37,
+      "textLeft": 32,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "誰もが​開発に 携われる​未来へ",
+      "size": 37,
+      "top": 532,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 9
+     }
+    ],
+    "leftBlocks": 9,
+    "bodySize": 18,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "pinned-over-picture",
+   "width": 1440,
+   "message": "Pinned large text slides across pictures while the page scrolls: \"AI​ が​プロンプトを​元に​部品を​組み立てる\" (screen 3, 100% over a picture); \"実験​結果を​元に\" (screen 4, 100% over a picture); \"改良を​申請\" (screen 5, 100% over a picture)",
+   "fix": "Jurors read a pinned title crossing drawings or photographs as a collision. Keep the pictures in the column the title does not occupy, or unpin it."
+  },
+  {
+   "level": "WARN",
+   "id": "off-centre",
+   "width": 768,
+   "message": "The margins differ: 38px on the left, 60px on the right, at 768px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\desktop-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\desktop-page-01.jpg",
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\tablet-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\tablet-page-01.jpg",
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\tablet-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\mobile-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\mobile-page-01.jpg",
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-entrance\\mobile-page-02.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

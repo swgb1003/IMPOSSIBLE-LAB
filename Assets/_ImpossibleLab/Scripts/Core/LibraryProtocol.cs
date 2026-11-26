@@ -82,10 +82,9 @@ namespace ImpossibleLab.Core
 
     public sealed class MineAdoption
     {
-        public string Id, At, Reason, AdopterName, AdopterAffiliation, AdopterRole, ThreadId, LastFrom;
+        public string Id, At, Reason, AdopterName, AdopterAffiliation, ThreadId, LastFrom;
         public bool AdopterVerified;
         public int MessageCount;
-        public string RoleJa => AdopterRole == "developer" ? "開発者" : "研究者";
     }
 
     /// <summary>発明ライブラリ（PC の proxy/src/library）との約束：送る形と、返ってくる形の読み方。</summary>
@@ -164,7 +163,7 @@ namespace ImpossibleLab.Core
                         {
                             Id = aid, At = a.Value<string>("at") ?? "", Reason = a.Value<string>("reason") ?? "", ThreadId = a.Value<string>("threadId"),
                             AdopterName = who?.Value<string>("name") ?? "", AdopterAffiliation = who?.Value<string>("affiliation") ?? "",
-                            AdopterRole = who?.Value<string>("role") ?? "researcher", AdopterVerified = who?.Value<bool?>("verified") ?? false,
+                            AdopterVerified = who?.Value<bool?>("verified") ?? false,
                             MessageCount = a.Value<int?>("messageCount") ?? 0, LastFrom = a.Value<string>("lastFrom"),
                         });
                     }
@@ -173,12 +172,32 @@ namespace ImpossibleLab.Core
             return list;
         }
 
+        /// <summary>サイトに入る番号（POST /library/pair の答え）。読めなければ null と理由。</summary>
+        public static (string code, DateTime expiresUtc, string error) ParsePair(long code, string body, string transportError)
+        {
+            if (transportError != null) return (null, default, transportError);
+            var o = TryParse(body);
+            if (code != 200) return (null, default, ErrorMessage(code, o));
+            string pair = o?.Value<string>("code");
+            // JSON を読むときに日時へ変わることがあるので、日時と文字の両方を受ける
+            var t = o?["expiresAt"];
+            DateTime at = default;
+            bool ok = t?.Type == JTokenType.Date ? (at = t.Value<DateTime>().ToUniversalTime()) != default
+                : DateTime.TryParse(t?.Value<string>(), System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out at);
+            if (pair == null || !Regex.IsMatch(pair, @"^\d{6}$") || !ok) return (null, default, "PC の答えを読めませんでした");
+            return (pair, at, null);
+        }
+
+        /// <summary>番号を読みやすく 3 桁ずつに分ける（123 456）。</summary>
+        public static string SpacedPair(string code) => code != null && code.Length == 6 ? code.Substring(0, 3) + " " + code.Substring(3) : code ?? "";
+
         /// <summary>PC が返した失敗の理由（{status:"error", message}）。読めなければ状態の番号で。</summary>
         public static string ErrorMessage(long code, JObject o)
         {
             string msg = o?.Value<string>("message");
             if (!string.IsNullOrWhiteSpace(msg)) return msg;
-            if (code == 404) return "PC のプログラムが古く、発明ライブラリに対応していません";
+            if (code == 404) return "PC のプログラムが古く、発明ライブラリーに対応していません";
             return $"PC が受け付けませんでした（{code}）";
         }
 

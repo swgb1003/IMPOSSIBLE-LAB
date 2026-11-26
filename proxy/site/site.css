@@ -70,7 +70,7 @@ button { font: inherit; color: inherit; }
 .first .name { grid-column: span 6; grid-row: span 2; }
 .t { background: var(--plate); padding: var(--pad); position: relative; min-width: 0; }
 .stage, .pic { overflow: hidden; }
-.w6 { grid-column: span 6; } .w3 { grid-column: span 3; }
+.w6 { grid-column: span 6; } .w4 { grid-column: span 4; } .w3 { grid-column: span 3; }
 .h2 { grid-row: span 2; } .h4 { grid-row: span 4; }
 .t.alt { background: var(--plate-2); }
 
@@ -88,6 +88,12 @@ button { font: inherit; color: inherit; }
 .ask { background: var(--plate-2); }
 .ask blockquote { font: 500 var(--s4)/1.3 var(--jp); word-break: auto-phrase; }
 .ask figcaption { font-size: var(--s1); color: var(--mut); margin-top: 12px; }
+
+/* 詳しい内容は開発者だけ：依頼の原文の板の代わりに、読める人と入り方を書く */
+.lock { background: var(--plate-2); display: flex; flex-direction: column; gap: 12px; }
+.lock h2 { font: 500 var(--s3)/1.25 var(--jp); }
+.lock p { font-size: var(--s1); color: var(--mut); max-width: 34em; }
+.lock .acts { margin-top: auto; gap: 8px 20px; }
 
 /* 回せる試作品 */
 .stage { padding: 0; background: var(--plate); }
@@ -175,13 +181,19 @@ button { font: inherit; color: inherit; }
 .notes ul, .notes ol { display: grid; gap: 8px; font-size: var(--s1); max-width: 40em; }
 .notes li { color: var(--ink); }
 
-/* 終わり */
-.end { display: flex; flex-direction: column; justify-content: space-between; }
-.end .big { font: 600 clamp(40px, 4.4vw, 64px)/1 var(--nu); letter-spacing: -.01em; }
-.end p, .end a { font-size: var(--s1); color: var(--mut); max-width: 40em; }
-.end nav { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+/* 終わり：全幅の板1枚。名前は板の幅いっぱいに、その下の1行に説明（左）とリンク（右） */
+.end { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 40px; container-type: inline-size; }
+.end .big { font: 600 clamp(26px, 6vw, 200px)/.9 var(--nu); font-size: 10cqi; letter-spacing: -.01em; white-space: nowrap; }
+.end-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 48px; }
+.end-text p { font-size: var(--s1); color: var(--mut); max-width: 40em; }
+.end-text p + p:not(:empty) { margin-top: 6px; }
+.end nav { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: var(--s1); }
 .end nav a { color: var(--ink); text-decoration: none; padding: 6px 0; }
 .end nav a:hover { color: var(--cy); }
+/* 長い本文の横の短い板：中身の高さだけにして、本文を読み進めても画面の上に残す */
+@media (min-width: 1101px) and (min-height: 700px) {
+  .held { align-self: start; position: sticky; top: var(--edge); }
+}
 
 .page-end { height: var(--edge); }
 
@@ -214,11 +226,11 @@ button { font: inherit; color: inherit; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease); }
 .row:hover .thumb img { transform: scale(1.04); }
 .row .body { padding: var(--pad) 0; display: flex; flex-direction: column; gap: 8px; }
-.ask-line { font: 500 var(--s3)/1.35 var(--jp); }
-.row-name { font: 700 var(--s2)/1.4 var(--jp); }
+/* 名前が行の見出し（依頼の原文はログインした開発者だけが読むため、一覧には出さない） */
+.row-name { font: 700 var(--s3)/1.35 var(--jp); }
 .row-name a { text-decoration: none; }
 .row-name a:hover { color: var(--cy); }
-.row-sum { font-size: var(--s1); color: var(--mut); }
+.row-sum { font-size: var(--s2); color: var(--mut); max-width: 36em; }
 .row .meta { margin-top: auto; }
 .st.adopted { color: var(--or); }
 .st.considering, .st.open { color: var(--ink); }
@@ -253,12 +265,13 @@ button { font: inherit; color: inherit; }
 @media (max-width: 1100px) {
   .board + .board, .shelf + .board { margin-top: 96px; }
   .board { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; }
-  .w6, .first .stage, .first .name { grid-column: span 2; grid-row: auto; } .w3 { grid-column: span 1; }
+  .w6, .first .stage, .first .name { grid-column: span 2; grid-row: auto; } .w3, .w4 { grid-column: span 1; }
+  .w4:last-child { grid-column: span 2; } /* 写真が3枚：2枚を並べ、3枚目は全幅 */
   .h2, .h4 { grid-row: auto; }
   .first .name { order: -3; } .first .act { order: -2; }
   .act, .revs, .parts { grid-column: span 2; }
   .assume { order: 1; } /* 画像2枚を1列に並べ、前提はその後に */
-  .name, .ask, .fig, .act, .end, .revs, .notes, .pair { min-height: 168px; gap: 20px; }
+  .name, .ask, .lock, .fig, .act, .end, .revs, .notes, .pair { min-height: 168px; gap: 20px; }
   .stage { height: min(72vw, 640px); }
   .pic { height: 36vw; }
   .stage .pick { display: none; }
@@ -275,6 +288,7 @@ button { font: inherit; color: inherit; }
 }
 @media (max-width: 760px) {
   :root { --s5: 36px; --s4: 24px; --s3: 20px; --pad: 16px; --edge: 16px; }
+  .name h1.long { font-size: 28px; }
   .board + .board, .shelf + .board { margin-top: 72px; }
   .bar { height: auto; padding: 14px calc(var(--edge) + var(--pad)); flex-wrap: wrap; gap: 8px 20px; }
   .bar nav { gap: 0 18px; flex-wrap: wrap; }
@@ -290,15 +304,29 @@ button { font: inherit; color: inherit; }
   .row .body { padding-bottom: 8px; }
 }
 
-/* ---------- 上の帯の右：行き先と名乗り（ログインは形だけ。選んだ人として採用・やりとりをする） ---------- */
+/* ---------- 上の帯の右：行き先、ログイン、知らせ、自分のメニュー ---------- */
 .bar-r { display: flex; align-items: center; gap: 28px; min-width: 0; }
-.who { display: flex; align-items: center; gap: 10px; font-size: var(--s1); }
-.who[hidden] { display: none; }
-.who-l { color: var(--mut); }
-.who select {
-  background: var(--plate-3); color: var(--ink); border: 0; min-height: 40px; padding: 0 12px; font: inherit; font-size: var(--s1);
-  cursor: pointer; max-width: 18em;
+.acct { display: flex; align-items: center; gap: 22px; font-size: var(--s1); min-height: 40px; }
+.acct:empty { min-width: 11em; } /* 読み込むまでの場所を取っておく */
+.acct-link {
+  color: var(--mut); text-decoration: none; padding: 10px 0; background: none; border: 0; cursor: pointer; font: inherit;
+  white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; transition: color 160ms;
 }
+.acct-link:hover, .acct-link[aria-current] { color: var(--ink); }
+/* 知らせの数：橙は「見てほしいもの」 */
+.badge { background: var(--or); color: var(--on-or); font-size: 13px; font-weight: 600; min-width: 22px; height: 22px; padding: 0 6px; display: inline-grid; place-items: center; line-height: 1; }
+.menu { position: relative; }
+.menu summary {
+  list-style: none; cursor: pointer; background: var(--plate-3); min-height: 40px; padding: 0 14px; display: flex; align-items: center; gap: 10px;
+  max-width: 15em; white-space: nowrap;
+}
+.menu summary span, .menu summary { overflow: hidden; text-overflow: ellipsis; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu summary::after { content: ""; flex: none; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); }
+.menu summary:hover, .menu[open] summary { background: var(--cy-deep); }
+.menu-list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; background: var(--plate-2); outline: 1px solid var(--plate-3); min-width: 12em; display: grid; padding: 6px 0; }
+.menu-list .acct-link { padding: 11px 18px; color: var(--ink); justify-content: flex-start; width: 100%; }
+.menu-list .acct-link:hover { background: var(--plate-3); }
 
 /* ---------- 作業の画面（登録・やりとり・運営）：同じ盤と板。見出しは小さく、行の区切りだけ線にする ---------- */
 .work .board { grid-auto-rows: auto; }
@@ -326,6 +354,7 @@ button { font: inherit; color: inherit; }
 
 /* ボタン：主（白地に黒字）・次（板の色）・文字だけ。橙は採用と選んだものだけに使う */
 .btn.p { background: var(--ink); color: var(--bg); }
+.work .head a.btn.p, .alt-ways a.btn.p { color: var(--bg); } /* 見出しの欄のリンクの色より、ボタンの色を優先する */
 .btn.p:hover { background: #fff; }
 .btn.s { background: var(--plate-3); color: var(--ink); }
 .btn.s:hover { background: var(--cy-deep); }
@@ -448,6 +477,7 @@ button.th-item:hover { background: var(--plate-2); }
 .gap-b { margin-bottom: 16px; }
 
 /* 採用の画面（浮かぶ窓）。後ろを暗くするだけで、影や光は付けない */
+.dlg { word-break: keep-all; overflow-wrap: anywhere; line-break: strict; }
 .dlg { background: var(--plate); color: var(--ink); border: 0; padding: 28px; width: min(600px, calc(100vw - 32px)); max-height: calc(100vh - 32px); }
 .dlg::backdrop { background: rgba(0, 0, 0, .72); }
 .dlg h2 { font: 700 var(--s3)/1.35 var(--jp); }
@@ -467,14 +497,12 @@ button.th-item:hover { background: var(--plate-2); }
 .short ul { display: grid; gap: 8px; margin: 14px 0; }
 .short li::before { content: "・"; }
 .figs { display: flex; gap: 48px; flex-wrap: wrap; }
-.who-pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; }
-.who-pick h3 { margin-top: 0; }
 .work .head .figs .v, .figs .v { font: 600 var(--s4)/1 var(--nu); color: var(--cy); margin: 0; }
 .figs .v small { font-size: var(--s1); font-weight: 400; color: var(--mut); margin-left: 6px; }
 
 @media (max-width: 1100px) {
   .bar { height: auto; padding-top: 12px; padding-bottom: 12px; flex-wrap: wrap; gap: 10px 24px; }
-  .bar-r { flex-wrap: wrap; gap: 8px 24px; }
+  .bar-r { flex-wrap: wrap; gap: 8px 24px; flex: 1 1 auto; justify-content: space-between; } /* 折り返して1行に置くときも、左右の余白をそろえる */
   .work .head, .span7, .span5, .span8, .span4, .span12 { grid-column: span 2; }
   .rows-h { display: none; }
   .person { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; }
@@ -485,12 +513,9 @@ button.th-item:hover { background: var(--plate-2); }
   .w9, .w12 { grid-column: span 2; }
   .person .p-mark { grid-column: 2; grid-row: 2 / span 2; }
   .msg { grid-template-columns: minmax(0, 1fr); }
-  .who-pick { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 760px) {
   .work h1 { font-size: 26px; }
-  .who select { max-width: 13em; }
-  .who-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* 電話：一覧と1件は同時に出さない（選ぶと1件、戻ると一覧） */
   .work.picked .list-col { display: none; }
   .work:not(.picked) .pane-col { display: none; }
@@ -504,3 +529,66 @@ button.th-item:hover { background: var(--plate-2); }
   .want-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
 }
 @media (min-width: 761px) { .phone-only { display: none !important; } }
+
+/* ---------- ログインまわり（ログイン・登録・番号・再設定）：真ん中に1枚の板 ---------- */
+.span6c { grid-column: 4 / span 6; } .span8c { grid-column: 3 / span 8; }
+.auth main { padding-top: 24px; }
+.form-plate { padding: 36px 40px 40px; }
+.form-plate h1 { font: 700 32px/1.25 var(--jp); }
+.lead-s { font-size: var(--s1); color: var(--mut); margin-top: 10px; max-width: 40em; }
+.lead-s[hidden], .done[hidden] { display: none; }
+.form-plate .form { margin-top: 28px; gap: 20px; }
+.done { display: grid; gap: 14px; margin-top: 28px; }
+.alt-ways { display: grid; gap: 8px; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--plate-3); font-size: var(--s1); color: var(--mut); } /* taste-skill-ignore 作業の画面の行の区切り */
+.alt-ways p { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; }
+.alt-ways a { color: var(--ink); text-underline-offset: 3px; white-space: nowrap; }
+.alt-ways a:hover { color: var(--cy); }
+.check { display: flex; gap: 12px; align-items: flex-start; font-size: var(--s1); cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--or); }
+.check a { color: var(--ink); text-underline-offset: 3px; }
+.field .note { margin-top: 2px; }
+.code { font: 600 32px/1 var(--nu); letter-spacing: .32em; max-width: 9em; }
+.seg-r input[type="checkbox"]:checked + span { background: var(--or); color: var(--on-or); font-weight: 700; }
+.seg-r.col { flex-direction: column; align-items: stretch; }
+.seg-r.col span { width: 100%; }
+.gap-t { margin-top: 16px; }
+
+/* 自分のページの、メールアドレスをまだ確かめていない知らせ */
+.alert { display: grid; gap: 10px; background: var(--plate-3); }
+.alert[hidden] { display: none; }
+.alert h2 { font: 500 var(--s2)/1.4 var(--jp); }
+.alert p { font-size: var(--s1); }
+.links { display: grid; margin-top: 10px; }
+.links a { display: grid; gap: 2px; padding: 12px 0; border-top: 1px solid var(--plate-3); text-decoration: none; } /* taste-skill-ignore 作業の画面の行の区切り */
+.links a b { font-weight: 500; }
+.links a span { font-size: 14px; color: var(--mut); }
+.links a:hover b { color: var(--cy); }
+.th-link { display: block; font-size: 14px; text-underline-offset: 3px; }
+.th-link + .th-link { margin-top: 4px; }
+.row-acts { display: inline-flex; gap: 16px; }
+
+/* 知らせ・送ったメール */
+.notices { margin: 0 calc(var(--pad) * -1); }
+.threads > .note, .notices > .note { padding: 14px var(--pad); } /* 行の外へ出した一覧でも、空の文は板の内側に置く */
+.th-item.fresh b { color: var(--ink); font-weight: 700; }
+.msgs > .note.msg { display: block; }
+.tbl td.empty { text-align: left; }
+.fit { align-self: start; }
+.mail-body { margin-top: 20px; display: grid; gap: 2px; max-width: 44em; }
+.mail-body p { white-space: pre-wrap; }
+.mail-body .gap { height: .8em; }
+.mail-body a { color: var(--cy); word-break: break-all; text-underline-offset: 3px; }
+.meta-btn { padding: 0; font-size: inherit; color: var(--mut); }
+.meta-btn:hover { color: var(--cy); }
+
+@media (max-width: 1100px) {
+  .span6c, .span8c { grid-column: span 2; }
+  .form-plate { padding: 28px 24px 32px; }
+  .acct { gap: 16px; }
+}
+@media (max-width: 760px) {
+  .form-plate h1 { font-size: 26px; }
+  .acct:empty { min-width: 0; }
+  .menu summary { max-width: 10em; }
+  .menu-list { right: auto; left: 0; }
+}

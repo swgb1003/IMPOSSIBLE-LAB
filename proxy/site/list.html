@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>発明品一覧 | IMPOSSIBLE LIBRARY</title>
+<meta name="description" content="IMPOSSIBLE LAB で生まれた発明品の一覧。研究や製品化に使えるものを探して、採用できる">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Oxanium:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="/site/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/site/site.css">
+<script type="importmap">
+{ "imports": {
+  "three": "/vendor/three/build/three.module.js",
+  "three/addons/": "/vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="bar">
+  <a class="mark" href="/" aria-label="IMPOSSIBLE LIBRARY の入口へ">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11.5" fill="none" stroke="#ff6a26" stroke-width="2.5"/><path d="M14 8.5 19.5 14 14 19.5 8.5 14Z" fill="#2fe3e6"/></svg>
+    <b>IMPOSSIBLE LIBRARY</b>
+  </a>
+  <div class="bar-r">
+    <nav aria-label="サイト">
+      <a href="/inventions" aria-current="page">発明品一覧</a>
+      <a href="/terms">利用規約</a>
+    </nav>
+    <div class="acct" data-slot="acct"></div>
+  </div>
+</header>
+
+<main>
+  <section class="board index" aria-labelledby="list-h">
+    <div class="t w6 h2 name">
+      <h1 id="list-h">発明品一覧</h1>
+      <div class="intro">
+        <p class="lead">IMPOSSIBLE LAB で生まれた発明品です。研究や製品化に使えるものを探して、採用できます。</p>
+        <p class="meta" data-slot="count"></p>
+      </div>
+    </div>
+
+    <div class="t w6 h2 alt controls">
+      <div class="ctl" role="group" aria-labelledby="sort-l">
+        <p id="sort-l" class="ctl-l">並べる順</p>
+        <div class="seg" data-slot="sort"></div>
+      </div>
+      <div class="ctl" role="group" aria-labelledby="tag-l">
+        <p id="tag-l" class="ctl-l">機能</p>
+        <div class="seg" data-slot="tags"></div>
+      </div>
+      <div class="ctl" role="group" aria-labelledby="status-l">
+        <p id="status-l" class="ctl-l">状態</p>
+        <div class="seg" data-slot="status"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="shelf" aria-label="発明">
+    <ol class="rows" data-slot="rows"></ol>
+    <div class="t empty" data-slot="empty" hidden>
+      <h2>この条件の発明はまだありません</h2>
+      <p>機能か状態の絞り込みを外すと、ほかの発明が出ます。</p>
+    </div>
+  </section>
+
+  <footer class="board end-board">
+    <div class="t end">
+      <p class="big" lang="en">IMPOSSIBLE LIBRARY</p>
+      <div class="end-row">
+        <div class="end-text">
+          <p>IMPOSSIBLE LAB で試して直した発明を、研究と製品化につなぐライブラリーです。この&nbsp;PC の中だけで動いています。</p>
+          <p data-slot="sample-note"></p>
+        </div>
+        <nav aria-label="サイトの終わりのリンク">
+          <a href="/inventions">発明品一覧</a><a href="/signup">開発者の新規登録</a><a href="/terms">利用規約</a><a href="/privacy">個人情報の扱い</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+  <div class="page-end"></div>
+</main>
+<noscript><p style="padding:24px">一覧を読むには JavaScript を有効にしてください。</p></noscript>
+<script type="module" src="/site/list.js"></script>
+</body>
+</html>

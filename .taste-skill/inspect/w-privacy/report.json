@@ -1,0 +1,1227 @@
+{
+ "url": "http://127.0.0.1:8787/privacy",
+ "at": "2026-11-26T05:17:47.428Z",
+ "allow": [
+  "few-pictures",
+  "first-action",
+  "no-footage"
+ ],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.77,
+    0.7,
+    0.76
+   ],
+   "motion": {
+    "elements": 16,
+    "css": 0,
+    "transitions": 16,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1895,
+     "screens": 2.1,
+     "words": 53,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "個人​情報の​扱い",
+     "words": 1,
+     "chars": 9,
+     "lines": 1,
+     "size": 96,
+     "vw": 6.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.95,
+     "top": 86,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "個人​情報の​扱い",
+     "words": 1,
+     "lines": 1,
+     "size": 96,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "個人​情報の​扱い",
+      "words": 1,
+      "chars": 9,
+      "lines": 1,
+      "size": 96,
+      "vw": 6.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 86,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 136.4,
+      "vw": 9.5,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.9,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.95,
+      "top": 1645,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 1,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.97,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.03,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      24,
+      96,
+      136
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 18,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 18
+     },
+     "measureChars": 68,
+     "max": {
+      "size": 136.4,
+      "vw": 9.5,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.2,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 281,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9fbfc",
+       "share": 0.89
+      },
+      {
+       "color": "#9db8bc",
+       "share": 0.11
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "新規登録"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 6,
+     "fixed": false,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1895,
+    "margins": {
+     "left": 38,
+     "right": 54
+    },
+    "sections": [
+     {
+      "sel": "section.board",
+      "tag": "section",
+      "top": 64,
+      "height": 1439,
+      "words": 92,
+      "media": 0,
+      "middle": 167,
+      "heading": {
+       "text": "個人​情報の​扱い",
+       "size": 96,
+       "tag": "h1"
+      },
+      "left": 38,
+      "right": 272,
+      "textLeft": 38,
+      "textRight": 272,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 1623,
+      "height": 256,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 136,
+       "tag": "p"
+      },
+      "left": 38,
+      "right": 38,
+      "textLeft": 38,
+      "textRight": 38,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "個人​情報の​扱い",
+      "size": 96,
+      "top": 86,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 1
+     },
+     {
+      "x": 864,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 18,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.25,
+    "voidBox": {
+     "x": 660,
+     "y": 480,
+     "w": 780,
+     "h": 420
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.85,
+    0.89,
+    0.89
+   ],
+   "motion": {
+    "elements": 16,
+    "css": 0,
+    "transitions": 16,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2110,
+     "screens": 2.1,
+     "words": 53,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "個人​情報の​扱い",
+     "words": 1,
+     "chars": 9,
+     "lines": 1,
+     "size": 51.5,
+     "vw": 6.7,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.9,
+     "top": 133,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "個人​情報の​扱い",
+     "words": 1,
+     "lines": 1,
+     "size": 51.5,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "個人​情報の​扱い",
+      "words": 1,
+      "chars": 9,
+      "lines": 1,
+      "size": 51.5,
+      "vw": 6.7,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 133,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.9,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 1887,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 1,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.97,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.03,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      24,
+      52,
+      69
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 18,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 18
+     },
+     "measureChars": 68,
+     "max": {
+      "size": 69.2,
+      "vw": 9,
+      "font": "Oxanium",
+      "text": "IMPOSSIBLE LIBRARY"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.2,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 323,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9fbfc",
+       "share": 0.89
+      },
+      {
+       "color": "#9db8bc",
+       "share": 0.11
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "新規登録"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 6,
+     "fixed": false,
+     "height": 111,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2110,
+    "margins": {
+     "left": 38,
+     "right": 116
+    },
+    "sections": [
+     {
+      "sel": "div.t.span12",
+      "tag": "div",
+      "top": 111,
+      "height": 204,
+      "words": 5,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "個人​情報の​扱い",
+       "size": 51,
+       "tag": "h1"
+      },
+      "left": 38,
+      "right": 120,
+      "textLeft": 38,
+      "textRight": 120,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span7",
+      "tag": "div",
+      "top": 323,
+      "height": 1222,
+      "words": 77,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "預かる​情報",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 119,
+      "textLeft": 38,
+      "textRight": 119,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span5",
+      "tag": "div",
+      "top": 1553,
+      "height": 216,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "この​画面で​変えられること",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 38,
+      "right": 426,
+      "textLeft": 38,
+      "textRight": 426,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 1865,
+      "height": 229,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 69,
+       "tag": "p"
+      },
+      "left": 38,
+      "right": 48,
+      "textLeft": 38,
+      "textRight": 48,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "個人​情報の​扱い",
+      "size": 51,
+      "top": 133,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 38,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 18,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 4,
+   "filled": [
+    0.84,
+    0.92,
+    0.86,
+    0.86
+   ],
+   "motion": {
+    "elements": 16,
+    "css": 0,
+    "transitions": 16,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 2647,
+     "screens": 3.1,
+     "words": 53,
+     "img": 0,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "個人​情報の​扱い",
+     "words": 1,
+     "chars": 9,
+     "lines": 1,
+     "size": 44,
+     "vw": 11.3,
+     "font": "Noto Sans JP",
+     "weight": 700,
+     "tracking": -0.02,
+     "leading": 1,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.84,
+     "top": 180,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "個人​情報の​扱い",
+     "words": 1,
+     "lines": 1,
+     "size": 44,
+     "font": "Noto Sans JP"
+    },
+    "headings": [
+     {
+      "text": "個人​情報の​扱い",
+      "words": 1,
+      "chars": 9,
+      "lines": 1,
+      "size": 44,
+      "vw": 11.3,
+      "font": "Noto Sans JP",
+      "weight": 700,
+      "tracking": -0.02,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 180,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "IMPOSSIBLE LIBRARY",
+      "words": 2,
+      "chars": 18,
+      "lines": 1,
+      "size": 32.6,
+      "vw": 8.4,
+      "font": "Oxanium",
+      "weight": 600,
+      "tracking": -0.01,
+      "leading": 0.9,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.84,
+      "top": 2394,
+      "tag": "p",
+      "kind": "statement"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 1,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Noto Sans JP",
+       "share": 0.97,
+       "mono": false
+      },
+      {
+       "family": "Oxanium",
+       "share": 0.03,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      16,
+      18,
+      20,
+      33,
+      44
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Noto Sans JP",
+      "size": 18,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 18
+     },
+     "measureChars": 36,
+     "max": {
+      "size": 44,
+      "vw": 11.3,
+      "font": "Noto Sans JP",
+      "text": "個人​情報の​扱い"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.2,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#020405",
+     "bodyBgHsl": {
+      "h": 200,
+      "s": 0.43,
+      "l": 0.01
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#0a0f12",
+       "top": 409,
+       "hsl": {
+        "h": 203,
+        "s": 0.29,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#e9fbfc",
+       "share": 0.89
+      },
+      {
+       "color": "#9db8bc",
+       "share": 0.11
+      }
+     ],
+     "button": {
+      "bg": "#131d22",
+      "hsl": {
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
+      },
+      "fg": "#e9fbfc"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 0,
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "新規登録"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 6,
+     "fixed": false,
+     "height": 164,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "noto sans jp",
+     "oxanium"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 2647,
+    "margins": {
+     "left": 32,
+     "right": 36
+    },
+    "sections": [
+     {
+      "sel": "header.bar",
+      "tag": "header",
+      "top": 0,
+      "height": 164,
+      "words": 7,
+      "media": 0,
+      "middle": 4,
+      "heading": null,
+      "left": 32,
+      "right": 66,
+      "textLeft": 32,
+      "textRight": 66,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span12",
+      "tag": "div",
+      "top": 164,
+      "height": 237,
+      "words": 5,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "個人​情報の​扱い",
+       "size": 44,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 33,
+      "textLeft": 32,
+      "textRight": 33,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span7",
+      "tag": "div",
+      "top": 409,
+      "height": 1690,
+      "words": 77,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "預かる​情報",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 36,
+      "textLeft": 32,
+      "textRight": 36,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.t.span5",
+      "tag": "div",
+      "top": 2106,
+      "height": 199,
+      "words": 10,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "この​画面で​変えられること",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 54,
+      "textLeft": 32,
+      "textRight": 54,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.board.end-board",
+      "tag": "footer",
+      "top": 2378,
+      "height": 253,
+      "words": 13,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "IMPOSSIBLE LIBRARY",
+       "size": 33,
+       "tag": "p"
+      },
+      "left": 32,
+      "right": 37,
+      "textLeft": 32,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "個人​情報の​扱い",
+      "size": 44,
+      "top": 180,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 18,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "off-centre",
+   "width": 1440,
+   "message": "The margins differ: 38px on the left, 54px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+  },
+  {
+   "level": "FAIL",
+   "id": "off-centre",
+   "width": 768,
+   "message": "The page sits off-centre: its content comes to 38px from the left edge but only to 116px from the right, at 768px.",
+   "fix": "Give the page one pair of equal margins. Check the wrapper for a max-width without margin-inline: auto, a grid with an empty last column, or padding on one side only. If one side is meant to hold air, it must still be closed by something that reaches the margin (a picture, the navigation's last item, a figure)."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-privacy\\desktop-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-privacy\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-privacy\\tablet-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-privacy\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-privacy\\mobile-fold.jpg",
+   "pages": [
+    "D:\\IMPOSSIBLE_LAB\\.taste-skill\\inspect\\w-privacy\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

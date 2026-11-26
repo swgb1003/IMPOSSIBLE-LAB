@@ -24,8 +24,14 @@ export function phrases(text) {
     const prev = out[out.length - 1];
     // 日付と数（2026年11月25日・0 件）は切らない：数字のあとの単位の字と、年・月のあとの数字は前に付ける
     const unitAfterNumber = /\d$/.test(prev ?? "") && /^[年月日時分秒件人回点個]/.test(segment);
-    const numberAfterDate = (/[年月]$/.test(prev ?? "") && /^\d/.test(segment)) || /^[中化的性品]$/.test(segment);
-    if (prev != null && (ATTACH.test(segment) || unitAfterNumber || numberAfterDate || /[（「『]$/.test(prev) || /^ /.test(segment) || / $/.test(prev))) out[out.length - 1] = prev + segment;
+    const numberAfterDate = (/[年月]$/.test(prev ?? "") && /^\d/.test(segment)) || /^[中化的性品者員家用式型製]$/.test(segment);
+    // 複合動詞（持ち＋上げる、話し＋合う）は1つにする：漢字＋い段・え段の送りがなのすぐ後に、漢字で始まる語が続くとき
+    const compoundVerb = /^[一-鿿]{1,2}[いきしちひみりぎじびえけせねめれげべ]$/.test(prev ?? "") && /^[一-鿿]/.test(segment);
+    // 接頭の漢字1字（再設定・未確認・全員）は次の語に付ける
+    const prefixKanji = /^[再未非不無全各新旧超準副最]$/.test(prev ?? "") && /^[一-鿿]/.test(segment);
+    // 助詞で終わったあとの3字以上のひらがなの語（しっかり・ください・つかむ）と、読点・句点のあとのひらがなの語は、新しい文節にする
+    const afterParticle = (/[はがをにでとへや]$/.test(prev ?? "") && /^[ぁ-ゟ]{3,}$/.test(segment)) || (/[、。]$/.test(prev ?? "") && /^[ぁ-ゟ]/.test(segment));
+    if (prev != null && ((ATTACH.test(segment) && !afterParticle) || unitAfterNumber || numberAfterDate || compoundVerb || prefixKanji || /[（「『]$/.test(prev) || /^ /.test(segment) || / $/.test(prev))) out[out.length - 1] = prev + segment;
     else out.push(segment);
   }
   return out;

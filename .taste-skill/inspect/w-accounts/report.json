@@ -1,6 +1,6 @@
 {
- "url": "http://127.0.0.1:8799/site/accounts.html",
- "at": "2026-11-25T14:50:53.445Z",
+ "url": "http://127.0.0.1:8787/people",
+ "at": "2026-11-26T05:25:06.912Z",
  "allow": [],
  "viewports": [
   {
@@ -9,7 +9,7 @@
    "load": "load",
    "screens": 1,
    "filled": [
-    0.71
+    0.69
    ],
    "motion": {
     "elements": 0,
@@ -27,7 +27,7 @@
     "page": {
      "height": 900,
      "screens": 1,
-     "words": 74,
+     "words": 65,
      "img": 0,
      "video": 0,
      "canvas": 0,
@@ -107,12 +107,12 @@
      "families": [
       {
        "family": "Noto Sans JP",
-       "share": 0.95,
+       "share": 0.94,
        "mono": false
       },
       {
        "family": "Oxanium",
-       "share": 0.05,
+       "share": 0.06,
        "mono": false
       }
      ],
@@ -149,7 +149,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0.03,
-     "centerShare": 0.03,
+     "centerShare": 0,
      "smallText": 0
     },
     "eyebrows": [],
@@ -176,11 +176,11 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.6
+       "share": 0.58
       },
       {
        "color": "#e9fbfc",
-       "share": 0.34
+       "share": 0.36
       },
       {
        "color": "#020405",
@@ -196,13 +196,13 @@
       }
      ],
      "button": {
-      "bg": "#e9fbfc",
+      "bg": "#131d22",
       "hsl": {
-       "h": 183,
-       "s": 0.76,
-       "l": 0.95
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
       },
-      "fg": "#020405"
+      "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
@@ -216,9 +216,9 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "登録する",
-      "ハンズ​フリー​雨よけ​装置 2026年11月25日​ ​採用",
-      "この​人として​操作する"
+      "新規登録",
+      "研究者・​開発者として​登録する",
+      "ハンズ​フリー​雨よけ​装置 2026年11月26日​ ​採用"
      ]
     },
     "surfaces": {
@@ -250,7 +250,7 @@
     },
     "heroMedia": [],
     "nav": {
-     "links": 5,
+     "links": 6,
      "fixed": false,
      "height": 64,
      "floatingPill": false,
@@ -269,7 +269,7 @@
     "pageH": 900,
     "margins": {
      "left": 38,
-     "right": 38
+     "right": 54
     },
     "sections": [],
     "gaps": [],
@@ -297,12 +297,12 @@
     "stage": false,
     "explains": true,
     "slivers": [],
-    "voidShare": 0.13,
+    "voidShare": 0.2,
     "voidBox": {
      "x": 0,
-     "y": 780,
+     "y": 720,
      "w": 1440,
-     "h": 120
+     "h": 180
     }
    },
    "app": {
@@ -318,7 +318,7 @@
     },
     "canvas": {
      "left": 38,
-     "right": 38
+     "right": 54
     },
     "hero": {
      "text": "研究者と​開発者",
@@ -346,11 +346,11 @@
     },
     "tiles": 0,
     "panels": {
-     "count": 6,
+     "count": 7,
      "radii": [
       [
        0,
-       6
+       7
       ]
      ],
      "heavyBorders": 0,
@@ -402,7 +402,7 @@
    "load": "load",
    "screens": 2,
    "filled": [
-    0.85,
+    0.79,
     0.96
    ],
    "motion": {
@@ -419,9 +419,9 @@
      "h": 1024
     },
     "page": {
-     "height": 1400,
+     "height": 1416,
      "screens": 1.4,
-     "words": 69,
+     "words": 60,
      "img": 0,
      "video": 0,
      "canvas": 0,
@@ -543,7 +543,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0.03,
-     "centerShare": 0.03,
+     "centerShare": 0,
      "smallText": 0
     },
     "eyebrows": [],
@@ -559,7 +559,7 @@
      "sectionBgs": [
       {
        "color": "#0a0f12",
-       "top": 259,
+       "top": 315,
        "hsl": {
         "h": 203,
         "s": 0.29,
@@ -568,7 +568,7 @@
       },
       {
        "color": "#0e1519",
-       "top": 847,
+       "top": 878,
        "hsl": {
         "h": 202,
         "s": 0.28,
@@ -579,11 +579,11 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.61
+       "share": 0.59
       },
       {
        "color": "#e9fbfc",
-       "share": 0.33
+       "share": 0.35
       },
       {
        "color": "#020405",
@@ -599,19 +599,19 @@
       }
      ],
      "button": {
-      "bg": "#e9fbfc",
+      "bg": "#131d22",
       "hsl": {
-       "h": 183,
-       "s": 0.76,
-       "l": 0.95
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
       },
-      "fg": "#020405"
+      "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
      "count": 3,
-     "inHero": 1,
+     "inHero": 2,
      "radius": 0,
      "height": 40,
      "withShadow": 0,
@@ -619,7 +619,8 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "登録する"
+      "新規登録",
+      "研究者・​開発者として​登録する"
      ]
     },
     "surfaces": {
@@ -651,7 +652,7 @@
     },
     "heroMedia": [],
     "nav": {
-     "links": 5,
+     "links": 6,
      "fixed": false,
      "height": 111,
      "floatingPill": false,
@@ -667,29 +668,29 @@
      "w": 768,
      "h": 1024
     },
-    "pageH": 1400,
+    "pageH": 1416,
     "margins": {
      "left": 38,
-     "right": 38
+     "right": 47
     },
     "sections": [
      {
       "sel": "div.t.head",
       "tag": "div",
       "top": 111,
-      "height": 140,
+      "height": 196,
       "words": 10,
       "media": 0,
-      "middle": 53,
+      "middle": 0,
       "heading": {
        "text": "研究者と​開発者",
        "size": 32,
        "tag": "h1"
       },
       "left": 38,
-      "right": 38,
+      "right": 187,
       "textLeft": 38,
-      "textRight": 54,
+      "textRight": 187,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -699,11 +700,11 @@
      {
       "sel": "div.t.span7",
       "tag": "div",
-      "top": 259,
-      "height": 580,
-      "words": 29,
+      "top": 315,
+      "height": 555,
+      "words": 28,
       "media": 0,
-      "middle": 51,
+      "middle": 100,
       "heading": {
        "text": "登録している​人",
        "size": 24,
@@ -722,9 +723,9 @@
      {
       "sel": "div.t.span5",
       "tag": "div",
-      "top": 847,
-      "height": 537,
-      "words": 20,
+      "top": 878,
+      "height": 523,
+      "words": 19,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -733,9 +734,9 @@
        "tag": "h2"
       },
       "left": 38,
-      "right": 38,
+      "right": 66,
       "textLeft": 38,
-      "textRight": 38,
+      "textRight": 66,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -762,7 +763,7 @@
     "leftBlocks": 5,
     "bodySize": 16,
     "stage": false,
-    "explains": true,
+    "explains": false,
     "slivers": [],
     "voidShare": 0,
     "voidBox": null
@@ -806,11 +807,11 @@
     },
     "tiles": 0,
     "panels": {
-     "count": 6,
+     "count": 7,
      "radii": [
       [
        0,
-       6
+       7
       ]
      ],
      "heavyBorders": 0,
@@ -862,7 +863,7 @@
    "load": "load",
    "screens": 2,
    "filled": [
-    0.76,
+    0.78,
     0.92
    ],
    "motion": {
@@ -879,9 +880,9 @@
      "h": 844
     },
     "page": {
-     "height": 1049,
+     "height": 980,
      "screens": 1.2,
-     "words": 50,
+     "words": 42,
      "img": 0,
      "video": 0,
      "canvas": 0,
@@ -912,7 +913,7 @@
      "weight": 700,
      "tracking": -0.01,
      "leading": 1.2,
-     "top": 224,
+     "top": 180,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
@@ -943,7 +944,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.84,
-      "top": 224,
+      "top": 180,
       "tag": "h1",
       "kind": "heading"
      }
@@ -1003,7 +1004,7 @@
      "microLabelShare": 0,
      "microSamples": [],
      "upperShare": 0.05,
-     "centerShare": 0.01,
+     "centerShare": 0,
      "smallText": 0
     },
     "eyebrows": [],
@@ -1019,7 +1020,7 @@
      "sectionBgs": [
       {
        "color": "#0a0f12",
-       "top": 417,
+       "top": 373,
        "hsl": {
         "h": 203,
         "s": 0.29,
@@ -1030,11 +1031,15 @@
      "textColors": [
       {
        "color": "#9db8bc",
-       "share": 0.76
+       "share": 0.71
       },
       {
        "color": "#e9fbfc",
-       "share": 0.19
+       "share": 0.21
+      },
+      {
+       "color": "#020405",
+       "share": 0.05
       },
       {
        "color": "#ffc2a3",
@@ -1042,27 +1047,23 @@
       },
       {
        "color": "#2fe3e6",
-       "share": 0.01
-      },
-      {
-       "color": "#020405",
-       "share": 0.01
+       "share": 0.02
       }
      ],
      "button": {
-      "bg": "#e9fbfc",
+      "bg": "#131d22",
       "hsl": {
-       "h": 183,
-       "s": 0.76,
-       "l": 0.95
+       "h": 200,
+       "s": 0.28,
+       "l": 0.1
       },
-      "fg": "#020405"
+      "fg": "#e9fbfc"
      },
      "lowContrast": []
     },
     "buttons": {
-     "count": 1,
-     "inHero": 1,
+     "count": 2,
+     "inHero": 2,
      "radius": 0,
      "height": 40,
      "withShadow": 0,
@@ -1070,7 +1071,8 @@
      "mono": 0,
      "upper": 0,
      "heroLabels": [
-      "登録する"
+      "新規登録",
+      "研究者・​開発者として​登録する"
      ]
     },
     "surfaces": {
@@ -1100,9 +1102,9 @@
     },
     "heroMedia": [],
     "nav": {
-     "links": 5,
+     "links": 6,
      "fixed": false,
-     "height": 208,
+     "height": 164,
      "floatingPill": false,
      "blur": false
     },
@@ -1116,25 +1118,25 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 1049,
+    "pageH": 980,
     "margins": {
-     "left": 16,
-     "right": 38
+     "left": 32,
+     "right": 41
     },
     "sections": [
      {
       "sel": "header.bar",
       "tag": "header",
       "top": 0,
-      "height": 208,
+      "height": 164,
       "words": 7,
       "media": 0,
-      "middle": 0,
+      "middle": 4,
       "heading": null,
-      "left": 16,
-      "right": 82,
-      "textLeft": 16,
-      "textRight": 82,
+      "left": 32,
+      "right": 66,
+      "textLeft": 32,
+      "textRight": 66,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -1144,9 +1146,9 @@
      {
       "sel": "main",
       "tag": "main",
-      "top": 208,
-      "height": 841,
-      "words": 39,
+      "top": 164,
+      "height": 816,
+      "words": 38,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -1170,7 +1172,7 @@
      {
       "text": "研究者と​開発者",
       "size": 26,
-      "top": 224,
+      "top": 180,
       "firstScreen": true
      }
     ],
@@ -1199,7 +1201,7 @@
     "sidebar": null,
     "topbar": null,
     "canvas": {
-     "left": 16,
+     "left": 32,
      "right": 32
     },
     "hero": {
@@ -1213,7 +1215,7 @@
      "weight": 700,
      "tracking": -0.01,
      "leading": 1.2,
-     "top": 224,
+     "top": 180,
      "tag": "h1",
      "kind": "heading",
      "align": "left",
@@ -1272,9 +1274,9 @@
     "title": {
      "text": "研究者と​開発者",
      "size": 26,
-     "top": 224
+     "top": 180
     },
-    "colourShare": 0.01
+    "colourShare": 0.013
    },
    "consoleErrors": []
   }

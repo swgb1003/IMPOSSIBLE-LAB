@@ -712,6 +712,18 @@
     {
       "id": "capsule",
       "labelJa": "カプセル"
+    },
+    {
+      "id": "dome",
+      "labelJa": "ドーム"
+    },
+    {
+      "id": "cone",
+      "labelJa": "円すい"
+    },
+    {
+      "id": "ring",
+      "labelJa": "輪"
     }
   ],
   "materials": [
