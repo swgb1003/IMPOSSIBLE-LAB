@@ -369,6 +369,7 @@ namespace ImpossibleLab.Core
                 {
                     ["key"] = m.Key, ["labelJa"] = m.LabelJa, ["unit"] = (m.Unit ?? "").Trim(), ["lowerIsBetter"] = m.LowerIsBetter, ["realityOnly"] = m.RealityOnly,
                     ["scenarios"] = Strs(m.Scenarios), ["anyBlocks"] = Strs(m.AnyBlocks), ["modules"] = Strs(m.Modules), ["standModules"] = Strs(m.StandModules), ["min"] = m.Min, ["max"] = m.Max,
+                    ["needsPower"] = m.NeedsPower,
                 })),
             };
             var cats = new Newtonsoft.Json.Linq.JArray(Categories.Select(c => new Newtonsoft.Json.Linq.JObject

@@ -37,7 +37,7 @@ namespace ImpossibleLab.Core
         static readonly HashSet<string> PartFieldsV1 = new HashSet<string> { "id", "type", "position", "scale", "role" };
         static readonly HashSet<string> PartFieldsV2 = new HashSet<string> { "id", "type", "shape", "material", "position", "scale", "role" };
         static readonly HashSet<string> PartFieldsV3 = new HashSet<string>(PartFieldsV2) { "joint", "model" };
-        static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "status", "note", "how" };
+        static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "metrics", "status", "note", "how" };
         static readonly HashSet<string> BehaviorFields = new HashSet<string> { "type", "targetPart", "parameters" };
         static readonly HashSet<string> ConstraintFields = new HashSet<string> { "maxParts", "maxSpeed" };
 
@@ -188,10 +188,20 @@ namespace ImpossibleLab.Core
                         if (!n.Blocks.Contains(type)) n.Blocks.Add(type);
                     }
                 }
+                if (o.TryGetValue("metrics", out var mt) && mt.Type != JTokenType.Null)
+                {
+                    if (!(mt is JArray mets) || mets.Count > ExperimentCatalog.MaxMetrics) { r.Errors.Add($"{at}.metrics は{ExperimentCatalog.MaxMetrics}件までの配列です"); continue; }
+                    foreach (var m in mets)
+                    {
+                        string key = m.Type == JTokenType.String ? m.Value<string>() : null;
+                        if (key == null || ExperimentCatalog.Metric(key) == null) { r.Errors.Add($"{at}.metrics に未対応の計測項目があります: {Shorten(key ?? m.ToString())}"); continue; }
+                        if (!n.Metrics.Contains(key)) n.Metrics.Add(key);
+                    }
+                }
                 if (n.Status == "unverifiable" && n.Note.Length == 0) r.Errors.Add($"{at}：検証できない要望には理由（note）が必要です");
                 // 「動きを見せる」は動作プログラムの動き（関節など）で見せるので、機能ブロックがなくてもよい（仕様 28.7）。プログラムのない発明では機能が必要
                 bool shownByProgram = n.Status == "demonstrated" && root.TryGetValue("program", out var pg) && pg.Type == JTokenType.Object;
-                if ((n.Status == "simulated" || n.Status == "simplified" || n.Status == "demonstrated") && n.Blocks.Count == 0 && !shownByProgram) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）が必要です");
+                if ((n.Status == "simulated" || n.Status == "simplified" || n.Status == "demonstrated") && n.Blocks.Count == 0 && n.Metrics.Count == 0 && !shownByProgram) r.Errors.Add($"{at}：検証する要望には対応する機能（blocks）か計測項目（metrics）が必要です");
                 dna.FunctionMap.Add(n);
             }
         }
@@ -343,6 +353,7 @@ namespace ImpossibleLab.Core
             foreach (var n in dna.FunctionMap)
             {
                 var no = new JObject { ["need"] = n.Need, ["blocks"] = new JArray(n.Blocks), ["status"] = n.Status };
+                if (n.Metrics.Count > 0) no["metrics"] = new JArray(n.Metrics);
                 if (!string.IsNullOrEmpty(n.Note)) no["note"] = n.Note;
                 if (!string.IsNullOrEmpty(n.How)) no["how"] = n.How;
                 needs.Add(no);

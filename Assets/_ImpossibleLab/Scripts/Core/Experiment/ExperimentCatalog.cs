@@ -44,6 +44,8 @@ namespace ImpossibleLab.Core
         public string[] AnyBlocks = new string[0];
         /// <summary>動作プログラムが必要（仕様 28.7）。</summary>
         public bool RequiresProgram;
+        /// <summary>電気を使う部品か機能が必要（1日使う：EnergyModel.UsesPower）。</summary>
+        public bool NeedsPower;
         /// <summary>すべて必要な環境モジュール。</summary>
         public string[] Modules = new string[0];
         /// <summary>stand で測るときだけ追加で必要な環境モジュール（例：消費エネルギーは雨の実験でだけ出す）。</summary>
@@ -67,6 +69,8 @@ namespace ImpossibleLab.Core
         public const string ClimbSlope = "climb_slope";
         /// <summary>動作プログラム（仕様 28.7）：人型モデルが設置した発明に近づいて離れる。</summary>
         public const string ApproachDevice = "approach_device";
+        /// <summary>1日使う（電池の持ち。docs/blocks.md 9章）。</summary>
+        public const string DailyUse = "daily_use";
         /// <summary>関節が目標に着く前に実験が終わったときの反応時間（秒）。</summary>
         public const float ReactionTimeout = 30f;
 
@@ -90,6 +94,9 @@ namespace ImpossibleLab.Core
             // 8週目：動作プログラム
             new ScenarioInfo { Id = ApproachDevice, LabelJa = "近づいて離れる", Description = "人型モデルが、設置した発明に近づいて留まり、離れる（回数・速さを指定）",
                 AllowedModules = new[] { "approach" }, RequiredModules = new[] { "approach" }, JudgedByCriteria = true },
+            // 2026-11-27：電池の持ち
+            new ScenarioInfo { Id = DailyUse, LabelJa = "1日使う", Description = "人型モデルが発明を身に付けて（置いて）1日を過ごし、使う時間・動く割合・日なたの時間から電池の減り方を見る（24時間を早送りで再生）",
+                AllowedModules = new[] { "usage" }, RequiredModules = new[] { "usage" }, JudgedByCriteria = true },
         };
 
         public static readonly ModuleInfo[] Modules =
@@ -117,13 +124,20 @@ namespace ImpossibleLab.Core
             new ModuleInfo { Id = "slope", LabelJa = "坂", Params = new[] {
                 P("angleDeg", "坂の角度", "°", 0f, 20f, 4.76f, levels: new[] { 0f, 2f, 4.76f, 6f, 8f, 10f, 12f, 15f, 20f }),
                 P("lengthM", "坂の長さ", "m", 2f, 10f, 5f, step: 1f) } },
+            // 2026-11-27：1日使う
+            new ModuleInfo { Id = "usage", LabelJa = "使い方", Params = new[] {
+                P("hoursPerDay", "1日に使う時間", "時間", 0.5f, 24f, 4f, step: 0.5f),
+                P("activePercent", "動く時間の割合", "%", 5f, 100f, 20f, step: 5f),
+                P("sunHours", "日なたにいる時間", "時間", 0f, 12f, 2f, step: 1f) } },
         };
 
         static readonly string[] Rain = { "rain" };
 
         /// <summary>総質量を出すシナリオ（合格条件で判定する組み立て式の実験。雨の stand は RainSimulator のため出さない）。
         /// Metrics より前に宣言する（静的フィールドは書いた順に初期化される）。</summary>
-        static readonly string[] MassScenarios = { Stand, SitStill, DropTest, LiftTask, ClimbSlope };
+        static readonly string[] MassScenarios = { Stand, SitStill, DropTest, LiftTask, ClimbSlope, DailyUse };
+        static readonly string[] Daily = { DailyUse };
+        static readonly string[] Usage = { "usage" };
 
         public static readonly MetricInfo[] Metrics =
         {
@@ -173,6 +187,12 @@ namespace ImpossibleLab.Core
             new MetricInfo { Key = "jointEnergyWh", LabelJa = "関節の消費電力量", Unit = " Wh", Format = "0.0000", Primary = false, RealityOnly = true, Scenarios = new[] { ApproachDevice }, RequiresProgram = true, Min = 0, Max = 10000 },
             new MetricInfo { Key = "totalMassKg", LabelJa = "総質量（推定）", Unit = " kg", Format = "0.00", Primary = false, RealityOnly = true, Scenarios = MassScenarios, Min = 0, Max = 10000 },
             new MetricInfo { Key = "mountLoadRatio", LabelJa = "装着部位の重さの目安に対する割合", Format = "0.00", RealityOnly = true, Scenarios = MassScenarios, Min = 0, Max = 1000 },
+            // 2026-11-27：部品代（REALITY の共通層）と、1日使う（電池の持ち。モードによらず同じ計算）
+            new MetricInfo { Key = "partsCostJpy", LabelJa = "部品代（推定）", Unit = " 円", Format = "0", Primary = false, RealityOnly = true, Scenarios = MassScenarios, Min = 0, Max = 10000000 },
+            new MetricInfo { Key = "batteryHours", LabelJa = "電池で動ける時間", Unit = " 時間", Format = "0.0", LowerIsBetter = false, Scenarios = Daily, Modules = Usage, NeedsPower = true, Min = 0, Max = EnergyModel.MaxHours },
+            new MetricInfo { Key = "chargeDays", LabelJa = "充電1回で使える日数", Unit = " 日", Format = "0.0", LowerIsBetter = false, Scenarios = Daily, Modules = Usage, NeedsPower = true, Min = 0, Max = EnergyModel.MaxDays },
+            new MetricInfo { Key = "usePowerW", LabelJa = "使っている間の平均電力", Unit = " W", Format = "0.00", Primary = false, Scenarios = Daily, Modules = Usage, NeedsPower = true, Min = 0, Max = 100000 },
+            new MetricInfo { Key = "dailyEnergyWh", LabelJa = "1日に使う電力量", Unit = " Wh", Format = "0.0", Primary = false, Scenarios = Daily, Modules = Usage, NeedsPower = true, Min = 0, Max = 1000000 },
         };
 
         /// <summary>坂を上り切れなかったときの「坂を上り切る時間」の値（秒）。</summary>
@@ -198,6 +218,7 @@ namespace ImpossibleLab.Core
             new PlanCriterion { Metric = "dropCount", Op = "<=", Value = 0f, Reason = "落とさない" },
             new PlanCriterion { Metric = "liftTime", Op = "<=", Value = 10f, Reason = "10秒以内に棚へ置く（調整用）" },
             new PlanCriterion { Metric = "climbedRatio", Op = ">=", Value = 1f, Reason = "坂を上り切る" },
+            new PlanCriterion { Metric = "chargeDays", Op = ">=", Value = 1f, Reason = "毎日の充電で1日もつ" },
             new PlanCriterion { Metric = "mountLoadRatio", Op = "<=", Value = 1f, Reason = "装着部位の重さの目安以内（目安の出典は係数の表）" },
             new PlanCriterion { Metric = "expectationRate", Op = ">=", Value = 0.7f, Reason = "期待どおりに動いている時間が7割以上（調整用）" },
         };

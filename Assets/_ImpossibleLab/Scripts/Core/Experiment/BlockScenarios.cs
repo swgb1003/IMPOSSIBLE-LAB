@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ImpossibleLab.Core
@@ -414,5 +415,66 @@ namespace ImpossibleLab.Core
         {
             if (ctx.T > _done + 1f) ctx.Stop = true;
         }
+    }
+
+    // ================= 2026-11-27：1日使う（電池の持ち） =================
+
+    /// <summary>daily_use：人型モデルが発明を身に付けて（置いて）1日を過ごす。24 時間を 10 秒に早送りして再生する。</summary>
+    public sealed class DailyUseScenario : IScenario
+    {
+        public const float PlaybackSec = 10f;
+        public float MaxTime => PlaybackSec;
+        public void Begin(SimContext ctx)
+        {
+            ctx.Run.Layout = new CourseLayout();
+            ctx.Device = new Vector3(0f, BodyGeometry.MountHeight(ctx.Dna.Mount), 0f);
+            float hours = ctx.Plan.Get("usage", "hoursPerDay"), start = EnergyModel.UseStart(hours);
+            ctx.Result.Assumptions.Add($"満充電から 1 日を過ごす（24 時間を {PlaybackSec:0} 秒に早送りして再生）。使うのは {Clock(start)}〜{Clock(start + hours)} の {hours:0.#} 時間");
+        }
+        public void StepAvatar(SimContext ctx) { }
+        public static string Clock(float hour) { int m = Mathf.RoundToInt(hour * 60f); return $"{m / 60}:{m % 60:00}"; }
+    }
+
+    /// <summary>
+    /// 電池の持ち：使っている間の電力・1日の電力量・電池で動ける時間・充電1回で使える日数（EnergyModel）。
+    /// 再生では、その時刻の電池の残り（%）を Aux に入れる。
+    /// </summary>
+    public sealed class EnergyBlock : StaticBlockModel
+    {
+        EnergyModel.Result _r;
+
+        public override void Begin(SimContext ctx)
+        {
+            var dna = ctx.Dna; var plan = ctx.Plan; var res = ctx.Result;
+            _r = EnergyModel.Evaluate(dna, plan.Get("usage", "hoursPerDay"), plan.Get("usage", "activePercent"), plan.Get("usage", "sunHours"));
+            var r = _r;
+            ctx.AddMetric("usePowerW", r.UsePowerW);
+            ctx.AddMetric("dailyEnergyWh", r.DailyWh);
+            ctx.AddMetric("batteryHours", r.BatteryHours);
+            ctx.AddMetric("chargeDays", r.ChargeDays);
+            ctx.BlockPowerW += r.UsePowerW;
+
+            string Name(string id) { var p = dna.FindPart(id); return p == null ? LabCatalog.Behavior(id)?.LabelJa ?? id : (p.ModelInfo?.LabelJa ?? LabCatalog.Part(p.Type)?.LabelJa ?? p.Type); }
+            var top = r.Consumers.OrderByDescending(c => c.Watts).Take(4)
+                .Select(c => $"{Name(c.PartId.Length > 0 ? c.PartId : c.Type)} {Watts(c.Watts)}（{EnergyModel.SourceLabel(c.From)}{(c.Continuous ? "" : "・動くときだけ")}）");
+            res.Assumptions.Add($"電気を使う部品：{string.Join("、", top)}{(r.Consumers.Count > 4 ? $" ほか {r.Consumers.Count - 4} 個" : "")}");
+            res.Assumptions.Add($"使っている間の電力 = ずっと動く部品の合計 ＋ 動くときだけの部品の合計 × 動く時間の割合 {r.ActiveRatio * 100f:0}% = {Watts(r.UsePowerW)}。1日に {r.HoursPerDay:0.#} 時間使うと {r.DailyWh:0.0} Wh");
+            if (!r.NoBattery)
+                res.Assumptions.Add($"電池の容量 {r.NominalWh:0.0} Wh（{string.Join("・", r.Stores.Select(s => EnergyModel.SourceLabel(s.From)).Distinct())}）のうち、使えるのは {r.UsableWh:0.0} Wh（使用可能な割合をかける）。電池で動ける時間 = 使える容量 ÷ 使っている間の電力");
+            if (r.SolarRatedW > 0f)
+                res.Assumptions.Add($"太陽電池：定格 {r.SolarRatedW:0.#} W × 日なた {r.SunHours:0.#} 時間 × 発電の割合 {BlockCoefficients.V("solarDerate"):0.0} = 1日 {r.SolarWh:0.0} Wh をためる");
+            res.Assumptions.Add("充電1回で使える日数 = 使える容量 ÷ (1日に使う電力量 − 1日の発電量)。待機中の電力・寒さによる容量の低下・電池の劣化は扱わない");
+
+            if (r.NoBattery) res.Limits.Add("電池がない：コンセントや別の電源につなぐ必要がある");
+            else if (r.SelfSufficient) res.Limits.Add("太陽電池の発電で 1 日の電力をまかなえる計算（曇りや雨の日は足りない）");
+            if (r.RunsOutAfterHours.HasValue) res.Limits.Add($"使い始めて {r.RunsOutAfterHours.Value:0.0} 時間で電池が切れる（1日に使う時間 {r.HoursPerDay:0.#} 時間より短い）");
+            if (r.Unknown.Count > 0) res.Limits.Add($"{string.Join("・", r.Unknown.Select(Name).Distinct())}の電力は見積もれないため数えていない");
+            ctx.Aux = 100f;
+        }
+
+        public override void AfterTick(SimContext ctx) =>
+            ctx.Aux = _r.NoBattery ? 0f : _r.PercentAt(ctx.T / DailyUseScenario.PlaybackSec * 24f);
+
+        static string Watts(float w) => w < 1f ? $"{w:0.00} W" : w < 10f ? $"{w:0.0} W" : $"{w:0} W";
     }
 }

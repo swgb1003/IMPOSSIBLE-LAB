@@ -289,6 +289,7 @@ namespace ImpossibleLab.Core
                 foreach (var need in mi.StandModules) if (!p.Has(need)) errors.Add($"{mi.LabelJa}をシナリオ stand で測るには環境モジュール {need} が必要です");
             if (mi.RealityOnly && p.Mode != LabModes.Reality) errors.Add($"{mi.LabelJa}は REALITY MODE でのみ測れます");
             if (dna != null && mi.RequiresProgram && dna.Program == null) errors.Add($"{mi.LabelJa}を測るには動作プログラムが必要です");
+            if (dna != null && mi.NeedsPower && !EnergyModel.UsesPower(dna)) errors.Add($"{mi.LabelJa}を測るには電気を使う部品（照明・モーター・センサーなど）が必要です");
             if (dna != null && mi.AnyBlocks.Length > 0 && !mi.AnyBlocks.Any(b => dna.FindBehavior(b) != null))
                 errors.Add($"{mi.LabelJa}を測るには機能 {string.Join(" か ", mi.AnyBlocks)} が必要です");
         }

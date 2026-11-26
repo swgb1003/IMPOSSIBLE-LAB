@@ -119,6 +119,10 @@ namespace ImpossibleLab.Core
             if (Has("grip") || Has("lift_load"))
                 yield return C("荷物を棚へ上げる", "5 kg の荷物を落とさずに棚（0.8 m）へ上げられるか", ExperimentCatalog.LiftTask,
                     M("payload", ("kg", 5f), ("sizeM", 0.3f)), M("shelf", ("heightM", 0.8f)));
+            // 電気を使う発明は、1日の使い方で電池がもつかを見る
+            if (EnergyModel.UsesPower(dna))
+                yield return C("1日使う", "1日 4 時間使って、毎日の充電でもつか", ExperimentCatalog.DailyUse,
+                    M("usage", ("hoursPerDay", 4f), ("activePercent", 20f), ("sunHours", 2f)));
         }
 
         static PlanCandidate C(string title, string aim, string scenario, params PlanModule[] modules)
@@ -359,7 +363,7 @@ namespace ImpossibleLab.Core
                 fmt = s >= 1f ? "0" : s >= 0.1f - 1e-6f ? "0.0" : "0.00";
             }
             string unit = p.Unit;
-            return v.ToString(fmt, ci) + (unit == "°" || unit == "" ? unit : " " + unit);
+            return v.ToString(fmt, ci) + (unit == "°" || unit == "%" || unit == "" ? unit : " " + unit);
         }
 
         public static string Criterion(PlanCriterion c)

@@ -869,6 +869,15 @@ namespace ImpossibleLab
   ""behaviors"": [ { ""type"": ""drive"", ""targetPart"": ""m"", ""parameters"": { ""speedLimit"": 0.8, ""maxSlopeDeg"": 8 } },
                    { ""type"": ""carry_load"", ""targetPart"": ""body"", ""parameters"": { ""capacity"": 10 } } ], ""revision"": 1, ""parentRevision"": null }",
                 ExperimentCatalog.ClimbSlope, "climbedRatio", addModule: null, stepModule: "slope", stepKey: "angleDeg");
+            // 2026-11-27：1日使う（品番の消費電力と電池の容量から、電池の持ちを見る）
+            yield return PlanLabFlow("daily", @"{ ""schemaVersion"": 3, ""id"": ""verify-daily-lantern"", ""name"": ""背負うランタン"", ""purpose"": ""夜道で足元を照らし、1日もつ"", ""tags"": [""lighting""], ""mount"": ""back"",
+  ""parts"": [ { ""id"": ""body"", ""type"": ""body"", ""position"": [0, 0, 0], ""scale"": [0.12, 0.08, 0.05] },
+             { ""id"": ""lamp"", ""type"": ""light"", ""model"": ""led-spot1w"", ""position"": [0, 0.05, 0.02], ""scale"": [0.02, 0.016, 0.02] },
+             { ""id"": ""bat"", ""type"": ""battery"", ""model"": ""bat-18650x1"", ""position"": [0, 0, 0], ""scale"": [0.0185, 0.065, 0.0185] } ],
+  ""behaviors"": [ { ""type"": ""illuminate"", ""targetPart"": ""lamp"", ""parameters"": { ""lumens"": 100, ""beamAngleDeg"": 60, ""tiltDeg"": 50 } } ],
+  ""functionMap"": [ { ""need"": ""足元を照らす"", ""blocks"": [""illuminate""], ""status"": ""simulated"" },
+                     { ""need"": ""1日もつ"", ""blocks"": [], ""metrics"": [""batteryHours"", ""chargeDays""], ""status"": ""simulated"" } ], ""revision"": 1, ""parentRevision"": null }",
+                ExperimentCatalog.DailyUse, "chargeDays", addModule: null, stepModule: "usage", stepKey: "hoursPerDay");
 
             // 6週目の完了条件：代表6件（評価セットの AI 設計：防護・照明・温度・検知・持ち上げ・落下）で、設計 → 実験 → 改良 → 再実験 → 比較 → 保存
             int repPassed = 0;

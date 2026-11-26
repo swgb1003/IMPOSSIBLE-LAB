@@ -1,5 +1,5 @@
 {
-  "description": "AI 評価セット v1（2026-11-09）。日常の困りごと 40 件。expect.kind は design（設計してほしい）か unsupported（断ってほしい）。expect.blocks は「使ってほしい機能」の目安（自動の参考値。最終の判断は人の5段階評価）。 2026-11-18：動作プログラム（仕様 28章）の「動きの要望」10 件（m01〜m10）を追加。",
+  "description": "AI 評価セット v1（2026-11-09）。日常の困りごと 40 件。expect.kind は design（設計してほしい）か unsupported（断ってほしい）。expect.blocks は「使ってほしい機能」の目安（自動の参考値。最終の判断は人の5段階評価）。 2026-11-18：動作プログラム（仕様 28章）の「動きの要望」10 件（m01〜m10）を追加。 2026-11-27：電池の持ちと部品代の要望 4 件（e01〜e04）を追加。",
   "requests": [
     { "id": "r01", "group": "防護", "request": "傘をさすと両手がふさがるので、手を使わずに雨を防げる道具がほしい", "expect": { "kind": "design", "blocks": ["rain_shield", "follow_head"] } },
     { "id": "r02", "group": "防護", "request": "自転車に乗っているときに横から吹き込む雨で服が濡れないようにしたい", "expect": { "kind": "design", "blocks": ["rain_shield"] } },
@@ -50,6 +50,10 @@
     { "id": "m07", "group": "動き", "request": "部屋に人が入ってきたら光と音で知らせる見守りセンサーがほしい", "expect": { "kind": "design", "blocks": ["detect", "alert"] } },
     { "id": "m08", "group": "動き", "request": "手を近づけると自動で開いて、手を離すと閉まる引き出しがほしい", "expect": { "kind": "design", "blocks": ["detect"] } },
     { "id": "m09", "group": "動き", "request": "歩き出すと自動で光って、止まると消える夜道用のベストがほしい", "expect": { "kind": "design", "blocks": ["illuminate"] } },
-    { "id": "m10", "group": "動き", "request": "階段を自分で上り下りして荷物を運ぶロボットがほしい", "expect": { "kind": "design", "blocks": ["carry_load"] } }
+    { "id": "m10", "group": "動き", "request": "階段を自分で上り下りして荷物を運ぶロボットがほしい", "expect": { "kind": "design", "blocks": ["carry_load"] } },
+    { "id": "e01", "group": "電池・費用", "request": "充電を気にせず一日中使える、自転車用の前を照らすライトがほしい", "expect": { "kind": "design", "blocks": ["illuminate"] } },
+    { "id": "e02", "group": "電池・費用", "request": "電池交換が年に1回ですむ、玄関の人感センサーライト", "expect": { "kind": "design", "blocks": ["detect", "illuminate"] } },
+    { "id": "e03", "group": "電池・費用", "request": "日なたに置いておけば充電いらずで動く、庭の見回りセンサー", "expect": { "kind": "design", "blocks": ["detect"] } },
+    { "id": "e04", "group": "電池・費用", "request": "なるべく安い部品で作れる、首を冷やす扇風機", "expect": { "kind": "design", "blocks": ["cool"] } }
   ]
 }

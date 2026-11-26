@@ -57,6 +57,7 @@ export function experimentText(c: Catalog): string {
         m.modules.length ? `needs module ${m.modules.join(" + ")}` : "",
         m.standModules?.length ? `in scenario stand also needs module ${m.standModules.join(" + ")}` : "",
         m.realityOnly ? "reality mode only" : "",
+        m.needsPower ? "needs a part that uses electricity (light, display, sensor, radio, motor, speaker, heater, cooler, fan, pump and so on)" : "",
       ].filter(Boolean).join("; ");
       return `- ${m.key} (${m.labelJa}${m.unit ? ", " + m.unit : ""}, ${m.lowerIsBetter ? "lower is better" : "higher is better"}, range ${m.min}..${m.max}): ${req}`;
     })
@@ -74,10 +75,12 @@ Metrics:
 ${metrics}
 
 Plan rules:
-- A metric is measurable only if the plan uses one of its scenarios, contains its required modules, the invention has one of its required behaviors, and (for reality-only metrics) mode is "reality".
+- A metric is measurable only if the plan uses one of its scenarios, contains its required modules, the invention has one of its required behaviors (or an electric part, for metrics that need one), and (for reality-only metrics) mode is "reality".
 - Every module must be allowed in the scenario. In this version the rain module can be combined only with wind.
 - At most ${L.maxModules} modules, ${L.maxMetrics} metrics, ${L.maxCriteria} criteria. durationSec ${L.minDurationSec}..${L.maxDurationSec}. Every criterion's metric must be in the plan's metrics, and its value within the metric range. reason: short Japanese (at most ${L.maxReasonLength} characters); mark thresholds you chose yourself with "（目安）".
 - approach_device (a person-sized model walks up to the invention, stays, and walks away) is the basic experiment for "when someone comes near" programs. Give expect as JSON text (what should happen while the condition holds: {"when":{"sensor","op","value"},"joint":partId,"atLeast":value,"minRatio":0..1} or {"when":…,"behavior":type,"minRatio":…}) with metrics ruleFiredCount, reactionTime and expectationRate. Use expect "" in every other scenario.
+- daily_use (one day of use, fast-forwarded) checks battery life from the part models: the power of every electric part, the battery capacity and the solar panels. Give the usage module (hoursPerDay; activePercent, the share of that time that parts moving only when needed, such as motors and speakers, are moving; sunHours, only matters with solar parts) and metrics batteryHours and chargeDays (pass when chargeDays >= 1: one charge lasts a day). Without a battery part both are 0.
+- partsCostJpy (reality mode) is the sum of the part models' prices; parts without a model use the typical price of their type, and body, frame and similar parts are not counted.
 - Existing demo experiments: rain protection uses stand + rain + wind (metrics wetnessScore, coverageRatio); a following carrier robot uses walk_route + obstacles + payload (collisionCount, arrivalDelay, followError); flying shoes use fly_to_target + target + wind (completionTime, stabilityScore, landingError).`;
 }
 
@@ -142,7 +145,8 @@ with expect {"when":{"sensor":"target_distance","op":"<","value":1.5},"behavior"
 }
 
 const HONESTY = `## Honesty about what can be tested
-- functionMap lists each need in the user's request (a few words each) and how the app checks it: "simulated" (a block's simple model tests it), "simplified" (tested only in a heavily simplified way; say how in note), or "unverifiable" (the app cannot test it, e.g. waterproofing, comfort, durability, cost, legality, social effects; give the reason in note). blocks must list behaviors that exist in your design.
+- functionMap lists each need in the user's request (a few words each) and how the app checks it: "simulated" (a block's simple model tests it), "simplified" (tested only in a heavily simplified way; say how in note), or "unverifiable" (the app cannot test it, e.g. waterproofing, comfort, durability, legality, social effects; give the reason in note). blocks must list behaviors that exist in your design.
+- metrics lists metric keys only for needs that no behavior covers but a metric checks: a need about battery life or how long it runs ("一日もつ", "長く使える") is "simulated" with metrics ["batteryHours", "chargeDays"] and a daily_use plan; a need about a low price ("安く作れる") is "simplified" with metrics ["partsCostJpy"] (note: only parts with a known price are counted) and a reality-mode plan. Otherwise metrics is [].
 - Never pretend: if a need has no fitting block, mark it unverifiable instead of attaching an unrelated block.
 - Do not claim the device is safe or works in reality; the simulation is a simple reference model.`;
 
@@ -183,6 +187,7 @@ ${EXPLAIN}
 - Carrier (mount ground): follow_user, avoid_obstacle (the robot reacts about 0.3 s late, so detectionRange below about 0.5 m rarely helps), carry_load.capacity at least the payload.
 - Flying shoes (mount foot): hover.lift at least 0.15, move_forward thrust/speedLimit, stabilize against crosswind. In reality mode the power to lift a person is enormous, which is an intended learning point.
 - Program: use program "" unless the request needs conditions or a sequence. When you write one, every sensor needs its required behavior or part, and the first plan should be approach_device when the trigger is a person coming near.
+- Electric parts need power: a device that is worn, carried or used away from a socket needs a battery part. Pick a battery model whose capacity covers a day of use (the parts' power × hours), and solar parts only when the device stays in the sun.
 - Each experiment plan should check a different important need with metrics the design can actually produce. Prefer dream mode; add a reality plan when power or energy matters.
 
 ## When to refuse
@@ -204,7 +209,8 @@ ${catalogText(c)}
 ${experimentText(c)}
 
 ## Guidance
-- Use only metrics the invention can produce (check the required behaviors against the DNA).
+- Use only metrics the invention can produce (check the required behaviors against the DNA; metrics that need an electric part need one of those part types).
+- A need whose function map entry lists metrics is checked by a plan that produces those metrics (batteryHours and chargeDays: daily_use; partsCostJpy: a reality-mode plan).
 - If the DNA has a program that reacts to target_distance, include an approach_device plan with expect taken from that rule (the joint and 80% of its target, or the behavior it turns on). ruleFiredCount, reactionTime and expectationRate need a program.
 - If a need in the function map is unverifiable, do not invent an experiment for it.
 - If no metric fits at all, return status "unsupported" with an empty plans list and a Japanese message explaining why.

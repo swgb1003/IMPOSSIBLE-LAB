@@ -43,6 +43,7 @@ export function buildSchemas(c: Catalog) {
     need: z.string().describe("Japanese, one user need in a few words"),
     // 文法の大きさを抑えるため文字列（設計に無い機能は toDna が外す）
     blocks: z.array(z.string()).describe("behavior types (from the design) that realize and test this need; empty when unverifiable"),
+    metrics: z.array(z.string()).describe("metric keys that check this need when no behavior does (batteryHours, chargeDays, partsCostJpy); usually empty"),
     status,
     note: z.string().describe("Japanese. Required for simplified/unverifiable: what is simplified or why it cannot be tested"),
   });
@@ -188,21 +189,24 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     return out;
   });
   const present = new Set(behaviors.map((b) => b.type as string));
+  const metricKeys = new Set(c.experiments.metrics.map((m) => m.key));
   const functionMap = d.functionMap.slice(0, c.limits.maxFunctionNeeds).map((n, ni) => {
     const blocks = [...new Set(n.blocks)].filter((b) => present.has(b));
     if (blocks.length < new Set(n.blocks).size) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、設計に無い機能を外した`);
+    const metrics = [...new Set(n.metrics ?? [])].filter((m) => metricKeys.has(m)).slice(0, c.limits.maxMetrics);
+    if (metrics.length < new Set(n.metrics ?? []).size) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、無い計測項目を外した`);
     let status = n.status;
     let note = clip(n.note, c.limits.maxNoteLength);
     // 「動きを見せる」は動作プログラムがあれば機能なしでよい（アプリの検証器と同じ決まり）
     const shownByProgram = status === "demonstrated" && parseObject(d.program) != null;
-    if ((status === "simulated" || status === "simplified" || status === "demonstrated") && blocks.length === 0 && !shownByProgram) {
+    if ((status === "simulated" || status === "simplified" || status === "demonstrated") && blocks.length === 0 && metrics.length === 0 && !shownByProgram) {
       status = "unverifiable";
       note = note || "対応する機能がないため検証しない";
       fixes.push(`「${clip(n.need, 20)}」を「検証できない」に変更（対応する機能なし）`);
     }
     if (status === "unverifiable" && !note) { note = "理由の記載なし"; fixes.push(`「${clip(n.need, 20)}」に理由を補った`); }
     const how = explain(typeof howList[ni] === "string" ? (howList[ni] as string) : "", lim(c).how);
-    return { need: clip(n.need, c.limits.maxNeedLength) || "（要望）", blocks, status, ...(note ? { note } : {}), ...(how ? { how } : {}) };
+    return { need: clip(n.need, c.limits.maxNeedLength) || "（要望）", blocks, ...(metrics.length ? { metrics } : {}), status, ...(note ? { note } : {}), ...(how ? { how } : {}) };
   });
   const tags = [...new Set(d.tags)].slice(0, c.limits.maxTags);
   const prog = toProgram(d.program, idMap, c, fixes);

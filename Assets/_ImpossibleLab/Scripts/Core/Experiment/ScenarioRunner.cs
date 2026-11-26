@@ -142,6 +142,7 @@ namespace ImpossibleLab.Core
                 case ExperimentCatalog.LiftTask: return new LiftTaskScenario();
                 case ExperimentCatalog.ClimbSlope: return new ClimbSlopeScenario();
                 case ExperimentCatalog.ApproachDevice: return new ApproachDeviceScenario();
+                case ExperimentCatalog.DailyUse: return new DailyUseScenario();
                 case ExperimentCatalog.Stand:
                     if (plan.Has("rain")) throw new ArgumentException("雨のある stand は RainSimulator で実行してください");
                     return new StandScenario();
@@ -171,6 +172,7 @@ namespace ImpossibleLab.Core
                 case ExperimentCatalog.LiftTask: if (Has("lift_load") || Has("grip")) list.Add(new LiftBlock()); break;
                 case ExperimentCatalog.ClimbSlope: list.Add(new DriveBlock()); break; // 走行がなくても「上れない」と結果に出す
                 case ExperimentCatalog.ApproachDevice: if (Features.MotionProgram && dna.Program != null) list.Add(new ProgramModel()); break;
+                case ExperimentCatalog.DailyUse: if (EnergyModel.UsesPower(dna)) list.Add(new EnergyBlock()); break;
             }
             return list;
         }
@@ -183,8 +185,8 @@ namespace ImpossibleLab.Core
         {
             var r = ctx.Result;
             if (ctx.Reality && ctx.BlockPowerW > 0f) ctx.AddMetric("blockPowerW", ctx.BlockPowerW);
-            if (ctx.Reality) AddMass(ctx);
-            if (modelCount == 0) r.Limits.Add("このシナリオで働く機能がこの発明にない");
+            if (ctx.Reality) { AddMass(ctx); AddCost(ctx); }
+            if (modelCount == 0) r.Limits.Add(ctx.Plan.Scenario == ExperimentCatalog.DailyUse ? "電気を使う部品がこの発明にない" : "このシナリオで働く機能がこの発明にない");
             var criteria = ctx.Plan.Criteria.Count > 0 ? ctx.Plan.Criteria : ExperimentCatalog.DefaultCriteria.Where(c => r.Metric(c.Metric) != null).ToList();
             bool ok = criteria.Count > 0;
             var texts = new List<string>();
@@ -213,6 +215,18 @@ namespace ImpossibleLab.Core
             ctx.AddMetric("mountLoadRatio", kg / limit.Value);
             string where = LabCatalog.Mount(dna.Mount)?.LabelJa ?? dna.Mount;
             if (kg > limit.Value) r.Limits.Add($"{where}に付けるには重い：約 {kg:0.00} kg（目安 {limit.Value:0.0} kg）");
+        }
+
+        /// <summary>REALITY の共通層：部品代（推定。CostModel）。</summary>
+        static void AddCost(SimContext ctx)
+        {
+            var c = CostModel.Evaluate(ctx.Dna);
+            int before = ctx.Result.Metrics.Count;
+            ctx.AddMetric("partsCostJpy", c.Jpy);
+            if (ctx.Result.Metrics.Count == before) return;
+            string how = c.FromMedian > 0 ? $"品番 {c.FromModel} 個は品番の値段、品番のない {c.FromMedian} 個は同じ種類の品番の中央値" : $"品番 {c.FromModel} 個の値段";
+            string skip = c.Uncounted.Count > 0 ? $"。{string.Join("・", c.Uncounted.Distinct())}（{c.Uncounted.Count} 個）は値段の目安がなく数えていない" : "";
+            ctx.Result.Assumptions.Add($"部品代 約 {c.Jpy:#,0} 円：{how}{skip}。加工・組み立て・送料・税は入れない");
         }
     }
 

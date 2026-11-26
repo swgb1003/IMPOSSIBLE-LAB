@@ -47,14 +47,25 @@ namespace ImpossibleLab
             return y;
         }
 
+        static readonly System.Text.RegularExpressions.Regex ValueWithUnit = new System.Text.RegularExpressions.Regex(@"(\d+(?:\.\d+)?) ([^\s／/・]+)");
+
+        /// <summary>条件の文で、数と単位（「2 時間」など）の間で折り返さないようにする（TextMeshPro の nobr）。</summary>
+        static string NoBreakValues(string s) => string.IsNullOrEmpty(s) ? s : ValueWithUnit.Replace(s, "<nobr>$1 $2</nobr>");
+
         // ---------------- 計算の前提（S04・S05 共通） ----------------
-        List<(string, Color)> ConMethodLines(RainExperimentConfig cfg, RainExperimentResult r)
+        List<(string, Color)> ConMethodLines(RainExperimentConfig cfg, RainExperimentResult r, ExperimentPlan plan = null)
         {
             var ink = LabTheme.ConInk; var mut = LabTheme.ConMut;
             var list = new List<(string, Color)>();
             if (r != null && r.IsScenarioLab)
             {
                 foreach (var a in r.Assumptions.Take(3)) list.Add((a, ink));
+                list.Add(("計算は開始時に一括で行い、実験場では記録を再生します（シード固定で再現できます）", mut));
+            }
+            else if (plan != null && !PlanCandidates.IsLegacy(plan))
+            {
+                // 組み立て式の実験の実行中（結果ができる前）は、シナリオの説明を出す（雨の実験の説明を出さない）
+                list.Add((ExperimentCatalog.Scenario(plan.Scenario)?.Description ?? "", ink));
                 list.Add(("計算は開始時に一括で行い、実験場では記録を再生します（シード固定で再現できます）", mut));
             }
             else if (cfg.Environment == LabEnvironments.ObstacleCourse)
@@ -388,7 +399,7 @@ namespace ImpossibleLab
             // 左下：この実験の条件
             var plan = ResultCriteria.PlanOf(r);
             c.Plate(LX, 558f, PW, 190f, "この実験の条件", $"Rev.{r.Revision}・{LabModes.Label(plan?.Mode ?? cfg.Mode)}");
-            ConParas(48f, 606f, 414f, 742f, new[] { (r.DescribeConditions(), LabTheme.ConInk) }, 17f);
+            ConParas(48f, 606f, 414f, 742f, new[] { (NoBreakValues(r.DescribeConditions()), LabTheme.ConInk) }, 17f);
 
             // 右上：次の一手 ／ 要望の確認
             c.Plate(RX, 78f, PW, 468f);
@@ -408,7 +419,7 @@ namespace ImpossibleLab
                 if (items.Count == 0) items.Add(("計測値から出せる改善案はありません", LabTheme.ConMut));
                 ConParas(RX + 20f, 136f, 414f, 322f, items, 17f);
                 c.Button(RX + 20f, 330f, 414f, 56f, "同じ条件でもう一度", App.RerunSameConditions);
-                c.Button(RX + 20f, 398f, 414f, 56f, cfg.Mode == LabModes.Dream ? "REALITY で電力と重さも見る" : "DREAM で比べる", App.RerunOtherMode);
+                c.Button(RX + 20f, 398f, 414f, 56f, cfg.Mode == LabModes.Dream ? "REALITY で電力・重さ・費用も見る" : "DREAM で比べる", App.RerunOtherMode);
                 c.Button(RX + 20f, 466f, 414f, 56f, "保存して終わる", App.Save, ConKind.Quiet);
             }
 
@@ -454,12 +465,12 @@ namespace ImpossibleLab
             _liveText = c.TBox(48f, 136f, 414f, 400f, "", 22f);
             _liveText.overflowMode = TextOverflowModes.Overflow;
             c.Plate(LX, 558f, PW, 190f, "この実験の条件", LabModes.Label(cfg.Mode));
-            ConParas(48f, 606f, 414f, 742f, new[] { (lab ? PlanText.Describe(rp) : cfg.Describe(), LabTheme.ConInk) }, 17f);
+            ConParas(48f, 606f, 414f, 742f, new[] { (NoBreakValues(lab ? PlanText.Describe(rp) : cfg.Describe()), LabTheme.ConInk) }, 17f);
             c.Plate(RX, 78f, PW, 468f, "要望の確認");
             ConRequests(RX + 20f, 136f, 540f, rp ?? ExperimentPlan.FromConfig(App.TestConfig), false);
             c.Plate(RX, 558f, PW, 190f, "計算の前提");
             var res = lab && App.Course?.Run != null && App.Course.Run.Result.IsScenarioLab ? App.Course.Run.Result : null;
-            ConParas(RX + 20f, 606f, 414f, 742f, ConMethodLines(cfg, res));
+            ConParas(RX + 20f, 606f, 414f, 742f, ConMethodLines(cfg, res, rp));
             ConFrame(new List<ConBtn> { new ConBtn("停止（記録しない）", App.StopExperiment, ConKind.Normal, 260f) }, null);
             UpdateLive();
         }

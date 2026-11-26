@@ -28,6 +28,8 @@ export interface MetricInfo {
   scenarios: string[]; anyBlocks: string[]; modules: string[]; min: number; max: number;
   /** stand で測るときだけ追加で必要なモジュール（古い catalog.json には無い）。 */
   standModules?: string[];
+  /** 電気を使う部品か機能が必要（1日使う。古い catalog.json には無い）。 */
+  needsPower?: boolean;
 }
 /** 動作プログラム（仕様 28章）のセンサー・動作・上限。 */
 export interface SensorInfo { id: string; labelJa: string; unit: string; min: number; max: number; isBool: boolean; requires: string }

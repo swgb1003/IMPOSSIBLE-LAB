@@ -106,12 +106,14 @@ namespace ImpossibleLab.Core
     {
         public string Need = "";
         public List<string> Blocks = new List<string>();
+        /// <summary>機能ではなく計測項目で確かめる要望（電池の持ち・部品代など）。実験カタログの計測項目のキー。</summary>
+        public List<string> Metrics = new List<string>();
         /// <summary>simulated / simplified / unverifiable</summary>
         public string Status = "simulated";
         public string Note = "";
         /// <summary>しくみ（どの部品が何をしてこの要望をかなえるか）。説明の表示だけに使う（任意）。</summary>
         public string How = "";
-        public FunctionNeed Clone() => new FunctionNeed { Need = Need, Blocks = new List<string>(Blocks), Status = Status, Note = Note, How = How };
+        public FunctionNeed Clone() => new FunctionNeed { Need = Need, Blocks = new List<string>(Blocks), Metrics = new List<string>(Metrics), Status = Status, Note = Note, How = How };
     }
 
     public sealed class BehaviorSpec

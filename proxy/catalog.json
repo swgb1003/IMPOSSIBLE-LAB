@@ -7297,6 +7297,14 @@
         "allowedModules": [
           "approach"
         ]
+      },
+      {
+        "id": "daily_use",
+        "labelJa": "1日使う",
+        "description": "人型モデルが発明を身に付けて（置いて）1日を過ごし、使う時間・動く割合・日なたの時間から電池の減り方を見る（24時間を早送りで再生）",
+        "allowedModules": [
+          "usage"
+        ]
       }
     ],
     "modules": [
@@ -7577,6 +7585,36 @@
             "default": 5.0
           }
         ]
+      },
+      {
+        "id": "usage",
+        "labelJa": "使い方",
+        "params": [
+          {
+            "key": "hoursPerDay",
+            "labelJa": "1日に使う時間",
+            "unit": "時間",
+            "min": 0.5,
+            "max": 24.0,
+            "default": 4.0
+          },
+          {
+            "key": "activePercent",
+            "labelJa": "動く時間の割合",
+            "unit": "%",
+            "min": 5.0,
+            "max": 100.0,
+            "default": 20.0
+          },
+          {
+            "key": "sunHours",
+            "labelJa": "日なたにいる時間",
+            "unit": "時間",
+            "min": 0.0,
+            "max": 12.0,
+            "default": 2.0
+          }
+        ]
       }
     ],
     "metrics": [
@@ -7597,7 +7635,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 1000.0
+        "max": 1000.0,
+        "needsPower": false
       },
       {
         "key": "coverageRatio",
@@ -7616,7 +7655,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 1.0
+        "max": 1.0,
+        "needsPower": false
       },
       {
         "key": "collisionCount",
@@ -7633,7 +7673,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100.0
+        "max": 100.0,
+        "needsPower": false
       },
       {
         "key": "arrivalDelay",
@@ -7650,7 +7691,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 60.0
+        "max": 60.0,
+        "needsPower": false
       },
       {
         "key": "followError",
@@ -7667,7 +7709,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 20.0
+        "max": 20.0,
+        "needsPower": false
       },
       {
         "key": "averageFollowDistance",
@@ -7684,7 +7727,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 50.0
+        "max": 50.0,
+        "needsPower": false
       },
       {
         "key": "maxGap",
@@ -7701,7 +7745,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 50.0
+        "max": 50.0,
+        "needsPower": false
       },
       {
         "key": "energyWh",
@@ -7719,7 +7764,8 @@
           "rain"
         ],
         "min": 0.0,
-        "max": 10000.0
+        "max": 10000.0,
+        "needsPower": false
       },
       {
         "key": "requiredPowerKW",
@@ -7736,7 +7782,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "availableFlightSec",
@@ -7753,7 +7800,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "completionTime",
@@ -7768,7 +7816,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 60.0
+        "max": 60.0,
+        "needsPower": false
       },
       {
         "key": "stabilityScore",
@@ -7783,7 +7832,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100.0
+        "max": 100.0,
+        "needsPower": false
       },
       {
         "key": "maxDeviation",
@@ -7798,7 +7848,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 20.0
+        "max": 20.0,
+        "needsPower": false
       },
       {
         "key": "landingError",
@@ -7813,7 +7864,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 50.0
+        "max": 50.0,
+        "needsPower": false
       },
       {
         "key": "maxAltitude",
@@ -7828,7 +7880,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 10.0
+        "max": 10.0,
+        "needsPower": false
       },
       {
         "key": "footIlluminance",
@@ -7847,7 +7900,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "illuminanceMin",
@@ -7866,7 +7920,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "shadeRatio",
@@ -7885,7 +7940,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 1.0
+        "max": 1.0,
+        "needsPower": false
       },
       {
         "key": "sunExposureW",
@@ -7902,7 +7958,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 10000.0
+        "max": 10000.0,
+        "needsPower": false
       },
       {
         "key": "detectionRate",
@@ -7921,7 +7978,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 1.0
+        "max": 1.0,
+        "needsPower": false
       },
       {
         "key": "alertRange",
@@ -7938,7 +7996,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 5000.0
+        "max": 5000.0,
+        "needsPower": false
       },
       {
         "key": "temperatureGain",
@@ -7958,7 +8017,8 @@
         ],
         "standModules": [],
         "min": -50.0,
-        "max": 50.0
+        "max": 50.0,
+        "needsPower": false
       },
       {
         "key": "timeToTarget",
@@ -7978,7 +8038,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 999.0
+        "max": 999.0,
+        "needsPower": false
       },
       {
         "key": "peakImpactG",
@@ -7995,7 +8056,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "cushionCompression",
@@ -8014,7 +8076,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 10.0
+        "max": 10.0,
+        "needsPower": false
       },
       {
         "key": "dropCount",
@@ -8032,7 +8095,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100.0
+        "max": 100.0,
+        "needsPower": false
       },
       {
         "key": "liftTime",
@@ -8050,7 +8114,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 60.0
+        "max": 60.0,
+        "needsPower": false
       },
       {
         "key": "liftPowerW",
@@ -8067,7 +8132,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "blockPowerW",
@@ -8085,7 +8151,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "climbedRatio",
@@ -8104,7 +8171,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 1.0
+        "max": 1.0,
+        "needsPower": false
       },
       {
         "key": "climbTime",
@@ -8123,7 +8191,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 60.0
+        "max": 60.0,
+        "needsPower": false
       },
       {
         "key": "tipAngleDeg",
@@ -8142,7 +8211,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 90.0
+        "max": 90.0,
+        "needsPower": false
       },
       {
         "key": "drivePowerW",
@@ -8161,7 +8231,8 @@
         ],
         "standModules": [],
         "min": 0.0,
-        "max": 100000.0
+        "max": 100000.0,
+        "needsPower": false
       },
       {
         "key": "ruleFiredCount",
@@ -8176,7 +8247,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 1000.0
+        "max": 1000.0,
+        "needsPower": false
       },
       {
         "key": "reactionTime",
@@ -8191,7 +8263,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 30.0
+        "max": 30.0,
+        "needsPower": false
       },
       {
         "key": "expectationRate",
@@ -8206,7 +8279,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 1.0
+        "max": 1.0,
+        "needsPower": false
       },
       {
         "key": "jointEnergyWh",
@@ -8221,7 +8295,8 @@
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 10000.0
+        "max": 10000.0,
+        "needsPower": false
       },
       {
         "key": "totalMassKg",
@@ -8234,13 +8309,15 @@
           "sit_still",
           "drop_test",
           "lift_task",
-          "climb_slope"
+          "climb_slope",
+          "daily_use"
         ],
         "anyBlocks": [],
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 10000.0
+        "max": 10000.0,
+        "needsPower": false
       },
       {
         "key": "mountLoadRatio",
@@ -8253,13 +8330,108 @@
           "sit_still",
           "drop_test",
           "lift_task",
-          "climb_slope"
+          "climb_slope",
+          "daily_use"
         ],
         "anyBlocks": [],
         "modules": [],
         "standModules": [],
         "min": 0.0,
-        "max": 1000.0
+        "max": 1000.0,
+        "needsPower": false
+      },
+      {
+        "key": "partsCostJpy",
+        "labelJa": "部品代（推定）",
+        "unit": "円",
+        "lowerIsBetter": true,
+        "realityOnly": true,
+        "scenarios": [
+          "stand",
+          "sit_still",
+          "drop_test",
+          "lift_task",
+          "climb_slope",
+          "daily_use"
+        ],
+        "anyBlocks": [],
+        "modules": [],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1E+07,
+        "needsPower": false
+      },
+      {
+        "key": "batteryHours",
+        "labelJa": "電池で動ける時間",
+        "unit": "時間",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "daily_use"
+        ],
+        "anyBlocks": [],
+        "modules": [
+          "usage"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 10000.0,
+        "needsPower": true
+      },
+      {
+        "key": "chargeDays",
+        "labelJa": "充電1回で使える日数",
+        "unit": "日",
+        "lowerIsBetter": false,
+        "realityOnly": false,
+        "scenarios": [
+          "daily_use"
+        ],
+        "anyBlocks": [],
+        "modules": [
+          "usage"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 365.0,
+        "needsPower": true
+      },
+      {
+        "key": "usePowerW",
+        "labelJa": "使っている間の平均電力",
+        "unit": "W",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "daily_use"
+        ],
+        "anyBlocks": [],
+        "modules": [
+          "usage"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 100000.0,
+        "needsPower": true
+      },
+      {
+        "key": "dailyEnergyWh",
+        "labelJa": "1日に使う電力量",
+        "unit": "Wh",
+        "lowerIsBetter": true,
+        "realityOnly": false,
+        "scenarios": [
+          "daily_use"
+        ],
+        "anyBlocks": [],
+        "modules": [
+          "usage"
+        ],
+        "standModules": [],
+        "min": 0.0,
+        "max": 1000000.0,
+        "needsPower": true
       }
     ]
   },

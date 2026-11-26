@@ -46,6 +46,8 @@ namespace ImpossibleLab.Core
             C("rollingResistance", "車輪の転がり抵抗係数", "", 0.02f, 0.01f, 0.08f, "literature", "空気入りタイヤ（舗装路）0.01〜0.015、軟らかいゴムのキャスター 0.06〜0.08（Engineering ToolBox・キャスターの仕様表）"),
             C("driveEfficiency", "走行の駆動効率（モーター＋減速機）", "", 0.6f, 0.4f, 0.8f, "estimate", "持ち上げ機構と同じ代表値（要調査）"),
             C("rampMaxSlopeDeg", "車いす用スロープの最大勾配", "°", 4.76f, 4.76f, 4.76f, "standard", "米国 ADA 基準：1:12（8.33%、約 4.76°）。坂の実験の標準の角度に使う"),
+            // 2026-11-27：1日使う（電池の持ち）
+            C("solarDerate", "太陽電池の発電の割合（定格に対して）", "", 0.5f, 0.3f, 0.7f, "estimate", "向き・角度・熱・薄い雲で定格より下がる分の目安。体や道具に付けると真上を向き続けないため低めにする（要調査）"),
         };
 
         static readonly Dictionary<string, RealityCoefficient> _byId = All.ToDictionary(c => c.Id);

@@ -108,7 +108,7 @@ namespace ImpossibleLab
             SetMannequin(scenario != ExperimentCatalog.DropTest && scenario != ExperimentCatalog.ApproachDevice);
             if (scenario == ExperimentCatalog.ApproachDevice) _leader = Figure("Approacher", _assets != null ? _assets.Mannequin : null);
             _mountOffset = Vector3.zero;
-            if (scenario == ExperimentCatalog.Stand || scenario == ExperimentCatalog.SitStill)
+            if (scenario == ExperimentCatalog.Stand || scenario == ExperimentCatalog.SitStill || scenario == ExperimentCatalog.DailyUse)
                 _mountOffset = mount == "back" ? new Vector3(0f, 0f, -0.22f) : mount == "head" || mount == "air" ? Vector3.zero : new Vector3(0f, 0f, 0.28f);
             else if (scenario == ExperimentCatalog.LiftTask) _mountOffset = new Vector3(0.35f, 0f, 0.35f); // 荷物と一緒に動く
             var L = run.Layout;

@@ -69,6 +69,8 @@ namespace ImpossibleLab.Core
         public static Text How(InventionDna dna, FunctionNeed need)
         {
             if (!string.IsNullOrEmpty(need.How)) return new Text(need.How, false);
+            if (need.Status != "unverifiable" && need.Blocks.Count == 0 && need.Metrics.Count > 0)
+                return new Text($"部品の品番の値から{string.Join("・", need.Metrics.Select(m => ExperimentCatalog.Metric(m)?.LabelJa ?? m))}を計算して確かめる", true);
             if (need.Status == "unverifiable" || need.Blocks.Count == 0)
                 return new Text(dna.Program != null && need.Status == "demonstrated" ? "動作プログラムの手順で動きを見せる" : "対応する機能がない", true);
             var lines = new List<string>();

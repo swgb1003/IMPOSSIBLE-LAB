@@ -10,6 +10,9 @@ namespace ImpossibleLab.Core
         /// <summary>使う機能ブロック（日本語、「・」区切り）。</summary>
         public string BlocksJa = "";
         public List<string> Blocks = new List<string>();
+        /// <summary>計測項目で確かめる要望の計測項目（キー）と、その名前（「・」区切り）。</summary>
+        public List<string> Metrics = new List<string>();
+        public string MetricsJa = "";
         /// <summary>結果画面用：表示中の実験で、この要望の機能が動いたか（ForResult で入る）。</summary>
         public bool CoveredHere;
         /// <summary>この要望を確かめる実験計画の候補（なければ null）。</summary>
@@ -30,8 +33,9 @@ namespace ImpossibleLab.Core
             var rows = new List<FunctionRow>();
             derived = false;
             if (dna == null) return rows;
-            var exercised = (candidates ?? new List<PlanCandidate>()).Select(c => (c.Title, Blocks: PlanCandidates.BlocksExercised(c.Plan, dna))).ToList();
-            string PlanFor(IEnumerable<string> blocks) => exercised.FirstOrDefault(e => blocks.Any(b => e.Blocks.Contains(b))).Title;
+            var exercised = (candidates ?? new List<PlanCandidate>()).Select(c => (c.Title, Blocks: PlanCandidates.BlocksExercised(c.Plan, dna), Metrics: Measurable(c.Plan, dna))).ToList();
+            string PlanFor(IEnumerable<string> blocks, IEnumerable<string> metrics = null) =>
+                exercised.FirstOrDefault(e => blocks.Any(b => e.Blocks.Contains(b)) || (metrics ?? Enumerable.Empty<string>()).Any(m => e.Metrics.Contains(m))).Title;
 
             if (dna.FunctionMap.Count > 0)
             {
@@ -41,10 +45,12 @@ namespace ImpossibleLab.Core
                         Need = n.Need, Status = n.Status, Note = n.Note ?? "",
                         BlocksJa = string.Join("・", n.Blocks.Select(b => LabCatalog.Behavior(b)?.LabelJa ?? b)),
                         Blocks = new List<string>(n.Blocks),
+                        Metrics = new List<string>(n.Metrics),
+                        MetricsJa = string.Join("・", n.Metrics.Select(m => ExperimentCatalog.Metric(m)?.LabelJa ?? m)),
                         // 動きで見せる要望は、動作プログラムの実験（近づいて離れる）で再現する
                         PlanTitle = n.Status == "unverifiable" ? null
                             : n.Status == "demonstrated" && dna.Program != null ? exercised.FirstOrDefault(e => e.Title == "近づいて離れる").Title ?? PlanFor(n.Blocks)
-                            : PlanFor(n.Blocks),
+                            : PlanFor(n.Blocks, n.Metrics),
                     });
                 return rows;
             }
@@ -75,8 +81,22 @@ namespace ImpossibleLab.Core
         {
             var rows = Build(dna, candidates, out derived);
             var here = PlanCandidates.BlocksExercised(plan, dna);
-            foreach (var r in rows) r.CoveredHere = r.Verifiable && r.Blocks.Any(here.Contains);
+            var measured = plan == null ? new HashSet<string>() : new HashSet<string>(PlanEditor.ExpectedMetrics(plan, dna).Select(m => m.Key));
+            foreach (var r in rows) r.CoveredHere = r.Verifiable && (r.Blocks.Any(here.Contains) || r.Metrics.Any(measured.Contains));
             return rows;
+        }
+
+        /// <summary>
+        /// その計画で測れる計測項目（モードは問わない：部品代のように REALITY でだけ測るものも、REALITY に切り替えれば測れる）。
+        /// </summary>
+        static HashSet<string> Measurable(ExperimentPlan plan, InventionDna dna)
+        {
+            var set = new HashSet<string>();
+            if (plan == null || PlanCandidates.IsLegacy(plan)) return set;
+            var p = PlanEditor.Clone(plan);
+            p.Mode = LabModes.Reality;
+            foreach (var m in PlanEditor.ExpectedMetrics(p, dna)) set.Add(m.Key);
+            return set;
         }
 
         /// <summary>見出しの件数（検証する・単純化・検証できない）。</summary>

@@ -206,7 +206,7 @@ namespace ImpossibleLab.Core
             foreach (var n in dna.FunctionMap)
             {
                 if (!n.Blocks.Remove(b.Type)) continue;
-                if (n.Blocks.Count == 0 && n.Status != "unverifiable")
+                if (n.Blocks.Count == 0 && n.Metrics.Count == 0 && n.Status != "unverifiable")
                 {
                     n.Status = "unverifiable";
                     n.Note = $"改良で機能「{info?.LabelJa ?? b.Type}」を外したため検証しない";

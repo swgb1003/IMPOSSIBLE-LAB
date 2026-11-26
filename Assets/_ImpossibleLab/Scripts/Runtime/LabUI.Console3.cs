@@ -330,7 +330,7 @@ namespace ImpossibleLab
                 string detail;
                 if (!r.Verifiable) detail = "理由：" + (r.Note.Length > 0 ? r.Note : "記載なし");
                 else if (r.Status == "simplified" && r.Note.Length > 0) detail = (r.PlanTitle != null ? $"実験：{r.PlanTitle}　" : "") + "単純化：" + r.Note;
-                else detail = (r.BlocksJa.Length > 0 ? "機能：" + r.BlocksJa + "　" : "") + (r.PlanTitle != null ? $"実験：{r.PlanTitle}" : "この版の実験の候補では動きません");
+                else detail = (r.BlocksJa.Length > 0 ? "機能：" + r.BlocksJa + "　" : r.MetricsJa.Length > 0 ? "計測：" + r.MetricsJa + "　" : "") + (r.PlanTitle != null ? $"実験：{r.PlanTitle}" : "この版の実験の候補では動きません");
                 c.G.Rect(RX + 8f, y, PW - 16f, 88f, VecGraphic.Soft(LabTheme.ConCy, 0.05f));
                 c.TLine(RX + 24f, y + 28f, 406f, r.Need, 18f);
                 c.TLine(RX + 24f, y + 54f, 406f, detail, 16f, LabTheme.ConMut);
