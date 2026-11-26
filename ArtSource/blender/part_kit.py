@@ -84,6 +84,9 @@ def build_all():
     # 第2弾（雨よけ装置以外の部品）
     exec(open(r"D:/IMPOSSIBLE_LAB/ArtSource/blender/part_kit_more.py", encoding="utf-8").read(), globals())
     build_more(x)
+    # 第3弾（部品の拡充と品番の見た目、D-41）
+    exec(open(r"D:/IMPOSSIBLE_LAB/ArtSource/blender/part_kit_parts3.py", encoding="utf-8").read(), globals())
+    build_parts3(x + 1.6 * len(MORE))
     objs = list(C.objects)
     print("PartKit:", len(objs), "objects, triangles", tri_count(objs))
     for o in objs:

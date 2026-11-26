@@ -35,6 +35,9 @@ const part = z.object({
   material: line(40),
   sizeM: z.tuple([num(0, 10), num(0, 10), num(0, 10)]),
   massKg: optNum(0, 1000),
+  /** 品番（任意）：名前と価格の目安（円）。 */
+  model: line(60).optional(),
+  priceJpy: optNum(0, 10000000).optional(),
 });
 
 const experiment = z.object({

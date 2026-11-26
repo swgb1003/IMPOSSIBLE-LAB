@@ -32,6 +32,7 @@ export function buildSchemas(c: Catalog) {
     material,
     position: z.array(z.number()).describe("[x, y, z] meters, local to the body center"),
     scale: z.array(z.number()).describe("[x, y, z] meters"),
+    model: z.string().describe("part model id from the candidate list in the request, or empty string"),
   });
   const behavior = z.object({
     type: behaviorType,
@@ -175,7 +176,8 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
     used.add(pid);
     idMap.set(p.id, pid);
     const role = explain(text(ex?.roles, p.id), lim(c).role);
-    return { id: pid, type: p.type, shape: p.shape, material: p.material, position: vec3(p.position), scale: vec3(p.scale, 0.1), ...(role ? { role } : {}) } as Record<string, unknown>;
+    const model = checkModel(c, p.type, p.model, fixes);
+    return { id: pid, type: p.type, shape: model?.shape ?? p.shape, material: p.material, position: vec3(p.position), scale: vec3(p.scale, 0.1), ...(role ? { role } : {}), ...(model ? { model: model.id } : {}) } as Record<string, unknown>;
   });
   if (d.parts.length > c.limits.maxParts) fixes.push(`部品を${c.limits.maxParts}個までに切り詰め`);
   const seenBehavior = new Set<string>();
@@ -249,6 +251,15 @@ export function toPlans(plans: PlanSpec[], c: Catalog) {
       ...(p.scenario === "approach_device" && toExpect(p.expect) ? { expect: toExpect(p.expect) } : {}),
     },
   }));
+}
+
+/** AI が選んだ品番を確かめる（無い品番・種類の違う品番は外す）。 */
+function checkModel(c: Catalog, type: string, id: string | undefined, fixes: string[]) {
+  if (!id) return null;
+  const m = c.partModels?.find((x) => x.id === id);
+  if (!m) { fixes.push(`無い品番 ${clip(id, 40)} を外した`); return null; }
+  if (m.type !== type) { fixes.push(`品番 ${m.id} は種類が違うので外した`); return null; }
+  return m;
 }
 
 function vec3(v: number[], fill = 0): [number, number, number] {

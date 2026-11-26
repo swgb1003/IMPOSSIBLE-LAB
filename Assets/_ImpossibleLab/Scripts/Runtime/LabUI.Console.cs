@@ -388,7 +388,7 @@ namespace ImpossibleLab
             int n = dna.Parts.Count, selIndex = App.SelectedPartIndex;
             c.Plate(RX, 78f, PW, 468f, "部品", n > 0 ? $"{selIndex + 1} / {n} 点" : "0 点");
             var sel = App.SelectedPart;
-            const int Window = 3;
+            const int Window = 2;
             if (n > Window)
             {
                 c.Tri(RX + 232f, 86f, -1, ZoomThen(() => App.StepSelectedPart(-1)), name: "Part");
@@ -403,17 +403,41 @@ namespace ImpossibleLab
                     $"{LabCatalog.Shape(p.ShapeOrDefault)?.LabelJa ?? p.ShapeOrDefault}・{mat?.LabelJa ?? p.MaterialOrDefault}",
                     sel: i == selIndex, onClick: ZoomThen(() => App.StepSelectedPart(delta)), name: "PartRow");
             }
-            float y0 = 340f;
+            float y0 = 280f;
             if (sel != null)
             {
-                c.T(RX + 24f, 326f, $"{sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m ／ この部品 {MassModel.Part(sel).Kg:0.00} kg", 16f, LabTheme.ConMut);
+                var model = sel.ModelInfo;
+                string price = model != null ? $" ／ 約 {model.PriceJpy:#,0} 円" : "";
+                c.T(RX + 24f, 268f, $"{sel.Scale.x:0.00}×{sel.Scale.y:0.00}×{sel.Scale.z:0.00} m ／ {MassModel.Part(sel).Kg:0.00} kg{price}", 16f, LabTheme.ConMut);
                 var mat = LabCatalog.Material(sel.MaterialOrDefault);
                 ConOption(y0, "形", LabCatalog.Shape(sel.ShapeOrDefault)?.LabelJa ?? sel.ShapeOrDefault, ZoomThen(() => App.StepPartShape(-1)), ZoomThen(() => App.StepPartShape(+1)), "PartShape");
                 ConOption(y0 + 50f, "素材", $"{mat?.LabelJa ?? sel.MaterialOrDefault}<size=80%>　{mat?.DensityKgM3:0} kg/m³</size>", ZoomThen(() => App.StepPartMaterial(-1)), ZoomThen(() => App.StepPartMaterial(+1)), "PartMaterial");
+                ConOption(y0 + 100f, "品番", ModelLabel(model), ZoomThen(() => App.StepPartModel(-1)), ZoomThen(() => App.StepPartModel(+1)), "PartModel");
             }
-            ConOption(y0 + 100f, "外観", LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, () => App.StepAppearance(-1), () => App.StepAppearance(+1), "Appearance");
+            ConOption(y0 + 150f, "外観", LabCatalog.Appearance(dna.Appearance)?.LabelJa ?? dna.Appearance, () => App.StepAppearance(-1), () => App.StepAppearance(+1), "Appearance");
             // 発明台の上で回して眺める（右スティックでも回せる。角度は出さない：回すたびに画面を作り直さないため）
-            ConOption(y0 + 150f, "向き", "45°ずつ<size=80%>　右スティックでも</size>", () => App.TurnDisplay(-45f), () => App.TurnDisplay(45f), "Turn");
+            ConOption(y0 + 200f, "向き", "45°ずつ<size=80%>　右スティックでも</size>", () => App.TurnDisplay(-45f), () => App.TurnDisplay(45f), "Turn");
+        }
+
+        /// <summary>
+        /// 品番の表示：三角の間（全角 14 字ぶん）に収まるよう、長いものは字を小さくする。
+        /// 全角 22 字ぶんを超えるときだけ、かっこの中（大きさなどの補足）を省く。
+        /// </summary>
+        static string ModelLabel(PartModelInfo m)
+        {
+            if (m == null) return "標準";
+            string s = m.LabelJa;
+            if (Width(s) > 22f) s = System.Text.RegularExpressions.Regex.Replace(s, "（[^）]*）", "");
+            float w = Width(s);
+            return w > 18f ? $"<size=62%>{s}</size>" : w > 14f ? $"<size=75%>{s}</size>" : s;
+        }
+
+        /// <summary>表示の幅（全角 1、半角 0.55）。</summary>
+        static float Width(string s)
+        {
+            float w = 0f;
+            foreach (char ch in s) w += ch < 0x2000 ? 0.55f : 1f;
+            return w;
         }
 
         /// <summary>右の板の「名前 ◀ 値 ▶」の行。</summary>

@@ -36,7 +36,7 @@ namespace ImpossibleLab.Core
         // role（部品の役割の説明）はどの版でも書ける（表示だけの文。見本の設計図にも書く）
         static readonly HashSet<string> PartFieldsV1 = new HashSet<string> { "id", "type", "position", "scale", "role" };
         static readonly HashSet<string> PartFieldsV2 = new HashSet<string> { "id", "type", "shape", "material", "position", "scale", "role" };
-        static readonly HashSet<string> PartFieldsV3 = new HashSet<string>(PartFieldsV2) { "joint" };
+        static readonly HashSet<string> PartFieldsV3 = new HashSet<string>(PartFieldsV2) { "joint", "model" };
         static readonly HashSet<string> NeedFields = new HashSet<string> { "need", "blocks", "status", "note", "how" };
         static readonly HashSet<string> BehaviorFields = new HashSet<string> { "type", "targetPart", "parameters" };
         static readonly HashSet<string> ConstraintFields = new HashSet<string> { "maxParts", "maxSpeed" };
@@ -124,6 +124,7 @@ namespace ImpossibleLab.Core
 
             ParseParts(root, dna, r, version);
             ParseBehaviors(root, dna, r);
+            PartModels.ApplySpecLimits(dna, r);
             if (version == 1) dna.Mount = InferMount(dna);
             else ParseFunctionMap(root, dna, r);
             if (version >= 3)
@@ -241,8 +242,28 @@ namespace ImpossibleLab.Core
                         Clamp(v.z, info.MinScale, info.MaxScale, at + ".scale.z", r));
                 }
                 p.Role = Explain(po, "role", LabCatalog.MaxRoleLength, r, at);
+                if (version >= 3) ParseModel(po, p, r, at);
                 if (version >= 3 && po.TryGetValue("joint", out var jt) && jt.Type != JTokenType.Null) p.Joint = MotionProgramJson.ParseJoint(jt, at + ".joint", r);
                 dna.Parts.Add(p);
+            }
+        }
+
+        /// <summary>
+        /// 品番（任意）。無い品番・種類の違う品番は外して警告にする（設計は拒否しない）。
+        /// 品番の形と部品の形が違うときは、品番の形にそろえる（見た目と重さの見積もりを品番に合わせるため）。
+        /// </summary>
+        static void ParseModel(JObject po, PartSpec p, ValidationReport r, string at)
+        {
+            var id = Str(po, "model", r, false, PartModels.MaxIdLength, at);
+            if (string.IsNullOrEmpty(id)) return;
+            var m = PartModels.Find(id);
+            if (m == null) { r.Warnings.Add($"{at}.model の品番 {id} は無いので外しました"); return; }
+            if (m.Type != p.Type) { r.Warnings.Add($"{at}.model の品番 {id} は {LabCatalog.Part(m.Type)?.LabelJa ?? m.Type} 用なので外しました"); return; }
+            p.Model = m.Id;
+            if (p.ShapeOrDefault != m.Shape)
+            {
+                r.Warnings.Add($"{at} の形を品番「{m.LabelJa}」に合わせて {LabCatalog.Shape(m.Shape)?.LabelJa ?? m.Shape} にしました");
+                p.Shape = m.Shape;
             }
         }
 
@@ -315,6 +336,7 @@ namespace ImpossibleLab.Core
                 };
                 if (p.Joint != null) po["joint"] = MotionProgramJson.JointToJson(p.Joint);
                 if (!string.IsNullOrEmpty(p.Role)) po["role"] = p.Role;
+                if (!string.IsNullOrEmpty(p.Model)) po["model"] = p.Model;
                 parts.Add(po);
             }
             var needs = new JArray();

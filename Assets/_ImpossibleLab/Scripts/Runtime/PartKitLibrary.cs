@@ -24,12 +24,19 @@ namespace ImpossibleLab
         static LabAssets _for;
         static Dictionary<string, Entry> _entries;
 
-        public static Entry Find(LabAssets assets, string type, string shape)
+        /// <summary>
+        /// 部品のメッシュ：品番の見た目（KIT_&lt;type&gt;_&lt;shape&gt;-&lt;variant&gt;）→ 種類の見た目（KIT_&lt;type&gt;_&lt;shape&gt;）→ 形だけの見た目（KIT_any_&lt;shape&gt;）の順に探す。
+        /// </summary>
+        public static Entry Find(LabAssets assets, string type, string shape, string variant = null)
         {
             var all = Load(assets);
             if (all == null) return null;
+            if (!string.IsNullOrEmpty(variant) && all.TryGetValue($"KIT_{type}_{shape}-{variant}", out var v)) return v;
             return all.TryGetValue($"KIT_{type}_{shape}", out var e) ? e : all.TryGetValue($"KIT_any_{shape}", out e) ? e : null;
         }
+
+        /// <summary>キットにある見た目の名前（確かめ用）。</summary>
+        public static IEnumerable<string> Keys(LabAssets assets) => (IEnumerable<string>)Load(assets)?.Keys ?? new string[0];
 
         static Dictionary<string, Entry> Load(LabAssets assets)
         {

@@ -11,6 +11,7 @@ import { loadCatalog } from "./catalog.ts";
 import { buildSchemas, designPoints, toDna, toPlans, toProposal } from "./schemas.ts";
 import type { DesignOutput, PlanOutput, ReviseOutput } from "./schemas.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "./prompts.ts";
+import { candidatesText, modelCandidates } from "./models.ts";
 import { checkRequestText, pickExperiment, RateLimiter, readJsonBody, readWavBody, HttpError } from "./http-util.ts";
 import { estimateCostUsd, type Usage } from "./cost.ts";
 import { LibraryStore } from "./library/store.ts";
@@ -129,8 +130,10 @@ function readDna(b: Record<string, unknown>) {
 async function handleDesign(body: unknown) {
   const b = (body ?? {}) as Record<string, unknown>;
   const text = checkRequestText(b.request, catalog.limits.maxRequestLength);
+  // 品番は数百あるので、依頼に合う候補だけを依頼の文に添える（システムプロンプトは固定のままキャッシュする）
+  const models = candidatesText(modelCandidates(catalog, text));
   const r = await callClaude<DesignOutput>(
-    DESIGN_SYSTEM, `設計してほしい道具：\n<request>\n${text}\n</request>`, betaZodOutputFormat(schemas.design));
+    DESIGN_SYSTEM, `設計してほしい道具：\n<request>\n${text}\n</request>${models ? "\n\n" + models : ""}`, betaZodOutputFormat(schemas.design));
   const o = r.output;
   if (o.status !== "ok" || !o.design) {
     return { status: "unsupported", message: o.message || "この指示はこの版では設計できません", suggestions: o.suggestions.slice(0, 3), model: r.model, usage: r.usage };

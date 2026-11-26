@@ -8,6 +8,7 @@ import { buildSchemas, designPoints, sanitizeId, toDna, toPlans, toProposal } fr
 import { checkRequestText, pickExperiment, RateLimiter, HttpError, isWav } from "../src/http-util.ts";
 import { designSystemPrompt, planSystemPrompt, reviseSystemPrompt } from "../src/prompts.ts";
 import { estimateCostUsd } from "../src/cost.ts";
+import { candidatesText, modelCandidates, STAPLES } from "../src/models.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const catalog = loadCatalog(path.join(here, "..", "catalog.json"));
@@ -16,8 +17,8 @@ const schemas = buildSchemas(catalog);
 const nightLight = {
   name: "夜道ライトリュック", tags: ["lighting", "safety", "lighting"], mount: "back", appearance: "night_navy", purpose: "暗い帰り道で足元を照らす", 
   parts: [
-    { id: "Pack Body", type: "body", shape: "box", material: "fabric", position: [0, 0, 0], scale: [0.3, 0.42, 0.14] },
-    { id: "lamp", type: "light", shape: "cylinder", material: "plastic", position: [0, -0.18, 0.08], scale: [0.05, 0.03, 0.05] },
+    { id: "Pack Body", type: "body", shape: "box", material: "fabric", position: [0, 0, 0], scale: [0.3, 0.42, 0.14], model: "" },
+    { id: "lamp", type: "light", shape: "cylinder", material: "plastic", position: [0, -0.18, 0.08], scale: [0.05, 0.03, 0.05], model: "" },
   ],
   behaviors: [
     { type: "illuminate", targetPart: "lamp", parameters: [{ name: "lumens", value: 150 }, { name: "tiltDeg", value: 50 }] },
@@ -64,10 +65,10 @@ const binProgram = {
 const autoBin = {
   name: "自動で開くゴミ箱", tags: ["daily"], mount: "fixed", appearance: "lab_white", purpose: "近づくとフタが開く",
   parts: [
-    { id: "bin", type: "container", shape: "box", material: "plastic", position: [0, 0.3, 0], scale: [0.3, 0.6, 0.38] },
-    { id: "Lid", type: "panel", shape: "box", material: "plastic", position: [0, 0.61, 0], scale: [0.3, 0.02, 0.38] },
-    { id: "eye", type: "sensor", shape: "sphere", material: "plastic", position: [0, 0.5, 0.2], scale: [0.03, 0.03, 0.03] },
-    { id: "hinge-motor", type: "motor", shape: "cylinder", material: "plastic", position: [0, 0.6, -0.18], scale: [0.04, 0.06, 0.04] },
+    { id: "bin", type: "container", shape: "box", material: "plastic", position: [0, 0.3, 0], scale: [0.3, 0.6, 0.38], model: "" },
+    { id: "Lid", type: "panel", shape: "box", material: "plastic", position: [0, 0.61, 0], scale: [0.3, 0.02, 0.38], model: "" },
+    { id: "eye", type: "sensor", shape: "sphere", material: "plastic", position: [0, 0.5, 0.2], scale: [0.03, 0.03, 0.03], model: "" },
+    { id: "hinge-motor", type: "motor", shape: "cylinder", material: "plastic", position: [0, 0.6, -0.18], scale: [0.04, 0.06, 0.04], model: "" },
   ],
   behaviors: [{ type: "detect", targetPart: "eye", parameters: [{ name: "rangeM", value: 3 }] }],
   functionMap: [{ need: "近づくと開く", blocks: ["detect"], status: "simulated", note: "" }],
@@ -180,8 +181,8 @@ test("new shapes (dome, cone, ring) are in the catalog and explained to the AI",
 
 test("schema rejects values outside the catalog", () => {
   const bad = (patch: Record<string, unknown>) => () => schemas.design.parse({ status: "ok", message: "", suggestions: [], design: { ...nightLight, ...patch } });
-  assert.throws(bad({ parts: [{ id: "a", type: "laser_cannon", shape: "box", material: "steel", position: [0, 0, 0], scale: [1, 1, 1] }] }));
-  assert.throws(bad({ parts: [{ id: "a", type: "body", shape: "pyramid", material: "steel", position: [0, 0, 0], scale: [1, 1, 1] }] }));
+  assert.throws(bad({ parts: [{ id: "a", type: "laser_cannon", shape: "box", material: "steel", position: [0, 0, 0], scale: [1, 1, 1], model: "" }] }));
+  assert.throws(bad({ parts: [{ id: "a", type: "body", shape: "pyramid", material: "steel", position: [0, 0, 0], scale: [1, 1, 1], model: "" }] }));
   assert.throws(bad({ appearance: "rainbow_neon" }));
   assert.throws(bad({ mount: "tail" }));
   assert.throws(bad({ tags: ["weapon"] }));
@@ -196,7 +197,7 @@ test("revise output converts to RevisionProposal JSON, including behavior operat
   const r = schemas.revise.parse({
     status: "ok", summary: "照明を足す", notes: ["電池の減りが早くなる"],
     operations: [
-      { ...emptyOp, op: "add_part", part: { id: "Lamp 2", type: "light", shape: "sphere", material: "plastic", position: [0, 0, 0.1], scale: [0.04, 0.04, 0.04] } },
+      { ...emptyOp, op: "add_part", part: { id: "Lamp 2", type: "light", shape: "sphere", material: "plastic", position: [0, 0, 0.1], scale: [0.04, 0.04, 0.04], model: "" } },
       { ...emptyOp, op: "add_behavior", behavior: "illuminate", targetPart: "Lamp 2", parameters: [{ name: "lumens", value: 200 }] },
       { ...emptyOp, op: "remove_behavior", behavior: "alert" },
       { ...emptyOp, op: "update_parameter", behavior: "rain_shield", parameter: "skirtLength", value: 0.25 },
@@ -315,4 +316,29 @@ test("system prompts include the whole catalog, the experiment rules and the inj
   assert.ok(rv.includes("it must not float"));
   // 製品の説明（概要・部品の役割・しくみ）と、設計に無いしくみを作らない決まり
   assert.ok(d.includes("explain: JSON text") && d.includes("Each part's role") && d.includes("Do not invent hidden mechanisms") && d.includes("never by their ids"));
+});
+
+test("part models: candidates follow the request, and the AI's model is checked", () => {
+  assert.ok((catalog.partModels ?? []).length > 250, "品番は数百");
+  const night = modelCandidates(catalog, "夜のジョギング中に、手元と前方を照らすリストバンド");
+  assert.ok(night.length <= 28);
+  assert.ok(night.some((m) => m.type === "light"), "照らす依頼には発光部の品番");
+  const perType = new Map<string, number>();
+  for (const m of night) perType.set(m.type, (perType.get(m.type) ?? 0) + 1);
+  assert.ok([...perType.values()].every((n) => n <= 4), "種類ごとに 4 つまで");
+  const robot = modelCandidates(catalog, "階段を上って荷物を運ぶロボット");
+  assert.ok(robot.some((m) => m.type === "crawler"), "階段にはクローラー");
+  assert.ok(STAPLES.every((id) => catalog.partModels!.some((m) => m.id === id)), "よく使う品番は実在する");
+  const text = candidatesText(night);
+  assert.match(text, /^Part models you may use/);
+  assert.match(text, /lm/);
+
+  const lamp = { ...nightLight, parts: nightLight.parts.map((p) => (p.id === "lamp" ? { ...p, model: "led-tape30" } : p)) };
+  const ok = toDna(schemas.design.parse({ status: "ok", message: "", suggestions: [], design: lamp }).design!, catalog, "ai-test");
+  assert.equal(ok.dna.parts[1].model, "led-tape30");
+  assert.equal(ok.dna.parts[1].shape, "box", "品番の形にそろえる");
+  const wrong = { ...nightLight, parts: nightLight.parts.map((p) => (p.id === "lamp" ? { ...p, model: "bat-aa4" } : p)) };
+  const bad = toDna(schemas.design.parse({ status: "ok", message: "", suggestions: [], design: wrong }).design!, catalog, "ai-test");
+  assert.ok(!("model" in bad.dna.parts[1]));
+  assert.ok(bad.fixes.some((f) => f.includes("種類が違う")));
 });

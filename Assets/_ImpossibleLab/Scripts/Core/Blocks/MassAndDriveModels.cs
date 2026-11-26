@@ -33,7 +33,9 @@ namespace ImpossibleLab.Core
                     area = 2f * Mathf.PI / 4f * x * z + Mathf.PI * 0.5f * (x + z) * y; break;
             }
             float kg;
-            if (p.Type == "battery") kg = solid * Coef("batteryDensity", c);
+            var model = p.ModelInfo;
+            if (model != null && model.MassKg > 0f) kg = model.MassKg * PartModels.SizeRatio(p, model); // 品番の重さ（大きさの違いは体積の比）
+            else if (p.Type == "battery") kg = solid * Coef("batteryDensity", c);
             else
             {
                 string mat = p.MaterialOrDefault;

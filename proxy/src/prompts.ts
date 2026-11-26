@@ -6,7 +6,13 @@ function fmtParam(p: { key: string; labelJa: string; unit: string; min: number; 
 }
 
 export function catalogText(c: Catalog): string {
-  const parts = c.partTypes.map((p) => `- ${p.type} (${p.labelJa}): scale per axis ${p.minScale}..${p.maxScale} m`).join("\n");
+  // 部品の種類は、まとまりごとに並べる（種類が多いので、AI が探しやすいように）
+  const groups = c.partGroups?.length ? c.partGroups : [{ id: "", labelJa: "" }];
+  const parts = groups.map((g) => {
+    const list = c.partTypes.filter((p) => (g.id ? (p.group ?? "structure") === g.id : true));
+    const lines = list.map((p) => `- ${p.type} (${p.labelJa}): scale per axis ${p.minScale}..${p.maxScale} m${p.defaultShape ? `, usually ${p.defaultShape}` : ""}`);
+    return g.id ? `${g.labelJa} (${g.id}):\n${lines.join("\n")}` : lines.join("\n");
+  }).join("\n");
   const behaviors = c.behaviors
     .map((b) => {
       const target = b.requiresTargetPart ? `target part type: ${b.allowedTargetTypes.join(" or ")}` : "no target part";
@@ -30,6 +36,8 @@ Mounts (where the invention sits on the person-sized model, or how it moves): ${
 Shapes: ${named(c.shapes)}
 Materials: ${materials}
 Appearance presets (colors only, no effect on performance): ${looks || "lab_white"}
+
+Part models: a part may name a concrete model (part.model) from the candidate list that comes with the request. A model has a fixed shape, size, weight, price and specs (capacity, power, light, range, loudness and so on); the app uses them for the weight and caps the behavior values at the model's specs (for example, a 100 lm LED cannot give 800 lm). Use a model only when it fits the part, give the part the model's shape and scale, and leave model empty otherwise. Never invent model ids.
 
 Shape scale convention: cylinder and capsule scale is [diameter, height, diameter]; box is [width, height, depth]; sphere is [diameter, diameter, diameter]; dome is [diameter, how high the middle rises, diameter] (a thin curved shell, open at the bottom, like an umbrella); cone is [bottom diameter, height, bottom diameter] (the top is 30% as wide); ring is [outer diameter, ring thickness, outer diameter] (lying flat, the hole goes up and down). A wheel is turned on its side by the app, so give a wheel [diameter, tire width, diameter] (for example [0.2, 0.06, 0.2]).
 

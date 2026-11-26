@@ -776,6 +776,18 @@ namespace ImpossibleLab
             ApplyPartChange(new RevisionOperation { Op = RevisionOps.UpdatePart, PartId = part.Id, Material = list[((i < 0 ? 0 : i) + dir + list.Length) % list.Length].Id });
         }
 
+        /// <summary>品番を切り替える（標準 → この種類の品番の順）。</summary>
+        public void StepPartModel(int dir)
+        {
+            var part = SelectedPart;
+            if (part == null) return;
+            var list = new List<string> { "" };
+            list.AddRange(PartModels.OfType(part.Type).Select(m => m.Id));
+            if (list.Count <= 1) return;
+            int i = list.IndexOf(part.Model ?? "");
+            ApplyPartChange(new RevisionOperation { Op = RevisionOps.UpdatePart, PartId = part.Id, Model = list[((i < 0 ? 0 : i) + dir + list.Count) % list.Count] });
+        }
+
         void ApplyPartChange(RevisionOperation op)
         {
             if (Current == null || Sm.State != LabState.Editing || RevisionBusy) return;

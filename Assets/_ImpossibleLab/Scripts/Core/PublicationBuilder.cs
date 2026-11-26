@@ -89,7 +89,8 @@ namespace ImpossibleLab.Core
         static JObject Part(InventionDna dna, PartSpec p)
         {
             var mass = MassModel.Part(p).Kg;
-            return new JObject
+            var model = p.ModelInfo;
+            var o = new JObject
             {
                 ["id"] = p.Id,
                 ["type"] = Line(p.Type, 32),
@@ -100,6 +101,13 @@ namespace ImpossibleLab.Core
                 ["sizeM"] = new JArray(Size(p.Scale.x), Size(p.Scale.y), Size(p.Scale.z)),
                 ["massKg"] = float.IsNaN(mass) || float.IsInfinity(mass) ? null : new JValue(Math.Round(Mathf.Clamp(mass, 0f, 1000f), 3)),
             };
+            // 品番（あれば）：名前と価格の目安
+            if (model != null)
+            {
+                o["model"] = Line(model.LabelJa, 60);
+                o["priceJpy"] = Math.Round(Mathf.Clamp(model.PriceJpy * PartModels.SizeRatio(p, model), 0f, 10000000f));
+            }
+            return o;
         }
 
         static double Size(float v) => Math.Round(Mathf.Clamp(Mathf.Abs(v), 0f, 10f), 3);

@@ -1,0 +1,6321 @@
+{
+ "version": 1,
+ "models": [
+  {
+   "id": "bat-cr2032",
+   "type": "battery",
+   "labelJa": "コイン電池（3V）",
+   "shape": "cylinder",
+   "size": [
+    0.02,
+    0.0032,
+    0.02
+   ],
+   "massKg": 0.003,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "coin",
+   "tags": [
+    "小さい",
+    "腕",
+    "軽い"
+   ],
+   "specs": {
+    "capacityWh": 0.66,
+    "voltageV": 3.0
+   }
+  },
+  {
+   "id": "bat-9v",
+   "type": "battery",
+   "labelJa": "9V 角形電池",
+   "shape": "box",
+   "size": [
+    0.026,
+    0.048,
+    0.017
+   ],
+   "massKg": 0.045,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "cell9v",
+   "tags": [],
+   "specs": {
+    "capacityWh": 4.5,
+    "voltageV": 9.0
+   }
+  },
+  {
+   "id": "bat-aa2",
+   "type": "battery",
+   "labelJa": "単3 充電池 ×2 の電池ケース",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.016,
+    0.058
+   ],
+   "massKg": 0.066,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "aa",
+   "tags": [
+    "単3",
+    "乾電池",
+    "交換"
+   ],
+   "specs": {
+    "capacityWh": 4.8,
+    "voltageV": 2.4
+   }
+  },
+  {
+   "id": "bat-aa4",
+   "type": "battery",
+   "labelJa": "単3 充電池 ×4 の電池ケース",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.016,
+    0.058
+   ],
+   "massKg": 0.122,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "aa",
+   "tags": [
+    "単3",
+    "乾電池",
+    "交換"
+   ],
+   "specs": {
+    "capacityWh": 9.6,
+    "voltageV": 4.8
+   }
+  },
+  {
+   "id": "bat-aa6",
+   "type": "battery",
+   "labelJa": "単3 充電池 ×6 の電池ケース",
+   "shape": "box",
+   "size": [
+    0.09,
+    0.016,
+    0.058
+   ],
+   "massKg": 0.178,
+   "priceJpy": 700,
+   "ip": -1,
+   "variant": "aa",
+   "tags": [
+    "単3",
+    "乾電池",
+    "交換"
+   ],
+   "specs": {
+    "capacityWh": 14.4,
+    "voltageV": 7.2
+   }
+  },
+  {
+   "id": "bat-aa8",
+   "type": "battery",
+   "labelJa": "単3 充電池 ×8 の電池ケース",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.032,
+    0.058
+   ],
+   "massKg": 0.234,
+   "priceJpy": 900,
+   "ip": -1,
+   "variant": "aa",
+   "tags": [
+    "単3",
+    "乾電池",
+    "交換"
+   ],
+   "specs": {
+    "capacityWh": 19.2,
+    "voltageV": 9.6
+   }
+  },
+  {
+   "id": "bat-aaa2",
+   "type": "battery",
+   "labelJa": "単4 充電池 ×2 の電池ケース",
+   "shape": "box",
+   "size": [
+    0.024,
+    0.012,
+    0.048
+   ],
+   "massKg": 0.03,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "aa",
+   "tags": [
+    "単4",
+    "小さい"
+   ],
+   "specs": {
+    "capacityWh": 1.9,
+    "voltageV": 2.4
+   }
+  },
+  {
+   "id": "bat-aaa4",
+   "type": "battery",
+   "labelJa": "単4 充電池 ×4 の電池ケース",
+   "shape": "box",
+   "size": [
+    0.045,
+    0.012,
+    0.048
+   ],
+   "massKg": 0.055,
+   "priceJpy": 450,
+   "ip": -1,
+   "variant": "aa",
+   "tags": [
+    "単4"
+   ],
+   "specs": {
+    "capacityWh": 3.8,
+    "voltageV": 4.8
+   }
+  },
+  {
+   "id": "bat-18650x1",
+   "type": "battery",
+   "labelJa": "18650 リチウムイオンセル ×1",
+   "shape": "cylinder",
+   "size": [
+    0.0185,
+    0.065,
+    0.0185
+   ],
+   "massKg": 0.047,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "cell",
+   "tags": [
+    "リチウム",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 10.8,
+    "voltageV": 3.6
+   }
+  },
+  {
+   "id": "bat-18650x2",
+   "type": "battery",
+   "labelJa": "18650 リチウムイオンセル ×2",
+   "shape": "box",
+   "size": [
+    0.038,
+    0.066,
+    0.019
+   ],
+   "massKg": 0.109,
+   "priceJpy": 1300,
+   "ip": -1,
+   "variant": "cell",
+   "tags": [
+    "リチウム",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 21.6,
+    "voltageV": 7.2
+   }
+  },
+  {
+   "id": "bat-18650x4",
+   "type": "battery",
+   "labelJa": "18650 リチウムイオンセル ×4",
+   "shape": "box",
+   "size": [
+    0.038,
+    0.066,
+    0.038
+   ],
+   "massKg": 0.203,
+   "priceJpy": 2600,
+   "ip": -1,
+   "variant": "cell",
+   "tags": [
+    "リチウム",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 43.2,
+    "voltageV": 7.2
+   }
+  },
+  {
+   "id": "bat-18650x8",
+   "type": "battery",
+   "labelJa": "18650 リチウムイオンセル ×8",
+   "shape": "box",
+   "size": [
+    0.038,
+    0.066,
+    0.076
+   ],
+   "massKg": 0.391,
+   "priceJpy": 5200,
+   "ip": -1,
+   "variant": "cell",
+   "tags": [
+    "リチウム",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 86.4,
+    "voltageV": 7.2
+   }
+  },
+  {
+   "id": "bat-21700x1",
+   "type": "battery",
+   "labelJa": "21700 リチウムイオンセル ×1",
+   "shape": "cylinder",
+   "size": [
+    0.021,
+    0.07,
+    0.021
+   ],
+   "massKg": 0.07,
+   "priceJpy": 900,
+   "ip": -1,
+   "variant": "cell",
+   "tags": [
+    "リチウム",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 18.0,
+    "voltageV": 3.6
+   }
+  },
+  {
+   "id": "bat-21700x4",
+   "type": "battery",
+   "labelJa": "21700 リチウムイオンセル ×4",
+   "shape": "box",
+   "size": [
+    0.042,
+    0.071,
+    0.042
+   ],
+   "massKg": 0.3,
+   "priceJpy": 4200,
+   "ip": -1,
+   "variant": "cell",
+   "tags": [
+    "リチウム",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 72.0,
+    "voltageV": 7.2
+   }
+  },
+  {
+   "id": "bat-lipo300",
+   "type": "battery",
+   "labelJa": "薄型リチウムポリマー電池 300mAh",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.005,
+    0.03
+   ],
+   "massKg": 0.008,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "pouch",
+   "tags": [
+    "薄い",
+    "服",
+    "身につける"
+   ],
+   "specs": {
+    "capacityWh": 1.11,
+    "voltageV": 3.7
+   }
+  },
+  {
+   "id": "bat-lipo500",
+   "type": "battery",
+   "labelJa": "薄型リチウムポリマー電池 500mAh",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.005,
+    0.035
+   ],
+   "massKg": 0.011,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "pouch",
+   "tags": [
+    "薄い",
+    "服",
+    "身につける"
+   ],
+   "specs": {
+    "capacityWh": 1.85,
+    "voltageV": 3.7
+   }
+  },
+  {
+   "id": "bat-lipo1000",
+   "type": "battery",
+   "labelJa": "薄型リチウムポリマー電池 1000mAh",
+   "shape": "box",
+   "size": [
+    0.034,
+    0.008,
+    0.05
+   ],
+   "massKg": 0.021,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "pouch",
+   "tags": [
+    "薄い",
+    "服",
+    "身につける"
+   ],
+   "specs": {
+    "capacityWh": 3.7,
+    "voltageV": 3.7
+   }
+  },
+  {
+   "id": "bat-lipo2000",
+   "type": "battery",
+   "labelJa": "薄型リチウムポリマー電池 2000mAh",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.008,
+    0.06
+   ],
+   "massKg": 0.038,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "pouch",
+   "tags": [
+    "薄い",
+    "服",
+    "身につける"
+   ],
+   "specs": {
+    "capacityWh": 7.4,
+    "voltageV": 3.7
+   }
+  },
+  {
+   "id": "bat-lipo3000",
+   "type": "battery",
+   "labelJa": "薄型リチウムポリマー電池 3000mAh",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.009,
+    0.065
+   ],
+   "massKg": 0.055,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "pouch",
+   "tags": [
+    "薄い",
+    "服",
+    "身につける"
+   ],
+   "specs": {
+    "capacityWh": 11.1,
+    "voltageV": 3.7
+   }
+  },
+  {
+   "id": "bat-lipo5000",
+   "type": "battery",
+   "labelJa": "薄型リチウムポリマー電池 5000mAh",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.01,
+    0.09
+   ],
+   "massKg": 0.09,
+   "priceJpy": 2200,
+   "ip": -1,
+   "variant": "pouch",
+   "tags": [
+    "薄い",
+    "服",
+    "身につける"
+   ],
+   "specs": {
+    "capacityWh": 18.5,
+    "voltageV": 3.7
+   }
+  },
+  {
+   "id": "bat-drone3s2200",
+   "type": "battery",
+   "labelJa": "ドローン用リチウムポリマー 3セル 2200mAh",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.031,
+    0.1055
+   ],
+   "massKg": 0.18,
+   "priceJpy": 2800,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高出力"
+   ],
+   "specs": {
+    "capacityWh": 24.42,
+    "voltageV": 11.1
+   }
+  },
+  {
+   "id": "bat-drone4s5000",
+   "type": "battery",
+   "labelJa": "ドローン用リチウムポリマー 4セル 5000mAh",
+   "shape": "box",
+   "size": [
+    0.055,
+    0.033,
+    0.1125
+   ],
+   "massKg": 0.55,
+   "priceJpy": 7000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高出力"
+   ],
+   "specs": {
+    "capacityWh": 74.0,
+    "voltageV": 14.8
+   }
+  },
+  {
+   "id": "bat-drone6s10000",
+   "type": "battery",
+   "labelJa": "ドローン用リチウムポリマー 6セル 10000mAh",
+   "shape": "box",
+   "size": [
+    0.065,
+    0.037,
+    0.125
+   ],
+   "massKg": 1.3,
+   "priceJpy": 18000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高出力"
+   ],
+   "specs": {
+    "capacityWh": 222.0,
+    "voltageV": 22.2
+   }
+  },
+  {
+   "id": "bat-drone6s22000",
+   "type": "battery",
+   "labelJa": "ドローン用リチウムポリマー 6セル 22000mAh",
+   "shape": "box",
+   "size": [
+    0.065,
+    0.037,
+    0.155
+   ],
+   "massKg": 2.6,
+   "priceJpy": 38000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高出力"
+   ],
+   "specs": {
+    "capacityWh": 488.4,
+    "voltageV": 22.2
+   }
+  },
+  {
+   "id": "bat-bank5000",
+   "type": "battery",
+   "labelJa": "モバイルバッテリー 5000mAh（USB）",
+   "shape": "box",
+   "size": [
+    0.065,
+    0.014,
+    0.1
+   ],
+   "massKg": 0.12,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "power_bank",
+   "tags": [
+    "USB",
+    "充電",
+    "スマホ"
+   ],
+   "specs": {
+    "capacityWh": 18.5,
+    "voltageV": 5.0
+   }
+  },
+  {
+   "id": "bat-bank10000",
+   "type": "battery",
+   "labelJa": "モバイルバッテリー 10000mAh（USB）",
+   "shape": "box",
+   "size": [
+    0.07,
+    0.016,
+    0.14
+   ],
+   "massKg": 0.2,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "power_bank",
+   "tags": [
+    "USB",
+    "充電",
+    "スマホ"
+   ],
+   "specs": {
+    "capacityWh": 37.0,
+    "voltageV": 5.0
+   }
+  },
+  {
+   "id": "bat-bank20000",
+   "type": "battery",
+   "labelJa": "モバイルバッテリー 20000mAh（USB）",
+   "shape": "box",
+   "size": [
+    0.075,
+    0.026,
+    0.15
+   ],
+   "massKg": 0.36,
+   "priceJpy": 5000,
+   "ip": -1,
+   "variant": "power_bank",
+   "tags": [
+    "USB",
+    "充電",
+    "スマホ"
+   ],
+   "specs": {
+    "capacityWh": 74.0,
+    "voltageV": 5.0
+   }
+  },
+  {
+   "id": "bat-lfp12v6",
+   "type": "battery",
+   "labelJa": "リン酸鉄リチウム電池 12V 6Ah",
+   "shape": "box",
+   "size": [
+    0.15,
+    0.095,
+    0.065
+   ],
+   "massKg": 0.8,
+   "priceJpy": 6000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "ロボット",
+    "長時間",
+    "安全"
+   ],
+   "specs": {
+    "capacityWh": 76.8,
+    "voltageV": 12.8
+   }
+  },
+  {
+   "id": "bat-lfp12v12",
+   "type": "battery",
+   "labelJa": "リン酸鉄リチウム電池 12V 12Ah",
+   "shape": "box",
+   "size": [
+    0.15,
+    0.095,
+    0.1
+   ],
+   "massKg": 1.5,
+   "priceJpy": 9000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "ロボット",
+    "長時間",
+    "安全"
+   ],
+   "specs": {
+    "capacityWh": 153.6,
+    "voltageV": 12.8
+   }
+  },
+  {
+   "id": "bat-lfp12v20",
+   "type": "battery",
+   "labelJa": "リン酸鉄リチウム電池 12V 20Ah",
+   "shape": "box",
+   "size": [
+    0.18,
+    0.17,
+    0.08
+   ],
+   "massKg": 2.6,
+   "priceJpy": 15000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "ロボット",
+    "長時間",
+    "安全"
+   ],
+   "specs": {
+    "capacityWh": 256.0,
+    "voltageV": 12.8
+   }
+  },
+  {
+   "id": "bat-lfp12v50",
+   "type": "battery",
+   "labelJa": "リン酸鉄リチウム電池 12V 50Ah",
+   "shape": "box",
+   "size": [
+    0.23,
+    0.21,
+    0.14
+   ],
+   "massKg": 6.0,
+   "priceJpy": 35000,
+   "ip": -1,
+   "variant": "pack",
+   "tags": [
+    "ロボット",
+    "長時間",
+    "安全"
+   ],
+   "specs": {
+    "capacityWh": 640.0,
+    "voltageV": 12.8
+   }
+  },
+  {
+   "id": "bat-ebike36v10",
+   "type": "battery",
+   "labelJa": "電動アシスト用電池 36V 10Ah",
+   "shape": "box",
+   "size": [
+    0.09,
+    0.09,
+    0.37
+   ],
+   "massKg": 2.8,
+   "priceJpy": 30000,
+   "ip": 4,
+   "variant": "pack",
+   "tags": [
+    "自転車",
+    "移動",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 360.0,
+    "voltageV": 36.0
+   }
+  },
+  {
+   "id": "bat-ebike48v15",
+   "type": "battery",
+   "labelJa": "電動モビリティ用電池 48V 15Ah",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.1,
+    0.42
+   ],
+   "massKg": 4.2,
+   "priceJpy": 48000,
+   "ip": 4,
+   "variant": "pack",
+   "tags": [
+    "乗り物",
+    "移動",
+    "大容量"
+   ],
+   "specs": {
+    "capacityWh": 720.0,
+    "voltageV": 48.0
+   }
+  },
+  {
+   "id": "mot-dc130",
+   "type": "motor",
+   "labelJa": "小型 DC モーター（130 サイズ）",
+   "shape": "cylinder",
+   "size": [
+    0.02,
+    0.025,
+    0.02
+   ],
+   "massKg": 0.018,
+   "priceJpy": 150,
+   "ip": -1,
+   "variant": "dc",
+   "tags": [
+    "回す",
+    "安い"
+   ],
+   "specs": {
+    "powerW": 1.0,
+    "rpm": 9000.0,
+    "torqueNm": 0.0021,
+    "noiseDb": 60.0
+   }
+  },
+  {
+   "id": "mot-dc280",
+   "type": "motor",
+   "labelJa": "小型 DC モーター（280 サイズ）",
+   "shape": "cylinder",
+   "size": [
+    0.024,
+    0.03,
+    0.024
+   ],
+   "massKg": 0.03,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "dc",
+   "tags": [
+    "回す",
+    "安い"
+   ],
+   "specs": {
+    "powerW": 5.0,
+    "rpm": 8000.0,
+    "torqueNm": 0.0119,
+    "noiseDb": 63.1033
+   }
+  },
+  {
+   "id": "mot-dc380",
+   "type": "motor",
+   "labelJa": "小型 DC モーター（380 サイズ）",
+   "shape": "cylinder",
+   "size": [
+    0.028,
+    0.038,
+    0.028
+   ],
+   "massKg": 0.05,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "dc",
+   "tags": [
+    "回す",
+    "安い"
+   ],
+   "specs": {
+    "powerW": 15.0,
+    "rpm": 15000.0,
+    "torqueNm": 0.0191,
+    "noiseDb": 66.2667
+   }
+  },
+  {
+   "id": "mot-dc540",
+   "type": "motor",
+   "labelJa": "小型 DC モーター（540 サイズ）",
+   "shape": "cylinder",
+   "size": [
+    0.036,
+    0.05,
+    0.036
+   ],
+   "massKg": 0.16,
+   "priceJpy": 1000,
+   "ip": -1,
+   "variant": "dc",
+   "tags": [
+    "回す",
+    "安い"
+   ],
+   "specs": {
+    "powerW": 40.0,
+    "rpm": 20000.0,
+    "torqueNm": 0.0382,
+    "noiseDb": 70.1213
+   }
+  },
+  {
+   "id": "mot-dc775",
+   "type": "motor",
+   "labelJa": "小型 DC モーター（775 サイズ）",
+   "shape": "cylinder",
+   "size": [
+    0.042,
+    0.066,
+    0.042
+   ],
+   "massKg": 0.35,
+   "priceJpy": 1800,
+   "ip": -1,
+   "variant": "dc",
+   "tags": [
+    "回す",
+    "安い"
+   ],
+   "specs": {
+    "powerW": 150.0,
+    "rpm": 12000.0,
+    "torqueNm": 0.2387,
+    "noiseDb": 77.4801
+   }
+  },
+  {
+   "id": "mot-gear-n20",
+   "type": "motor",
+   "labelJa": "ギア付きモーター（n20）",
+   "shape": "cylinder",
+   "size": [
+    0.012,
+    0.03,
+    0.012
+   ],
+   "massKg": 0.01,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "gear",
+   "tags": [
+    "ゆっくり",
+    "力が強い",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 1.0,
+    "rpm": 100.0,
+    "torqueNm": 0.05,
+    "noiseDb": 50.0
+   }
+  },
+  {
+   "id": "mot-gear-tt",
+   "type": "motor",
+   "labelJa": "ギア付きモーター（tt）",
+   "shape": "cylinder",
+   "size": [
+    0.022,
+    0.065,
+    0.022
+   ],
+   "massKg": 0.03,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "gear",
+   "tags": [
+    "ゆっくり",
+    "力が強い",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 2.0,
+    "rpm": 200.0,
+    "torqueNm": 0.08,
+    "noiseDb": 50.0
+   }
+  },
+  {
+   "id": "mot-gear-25mm",
+   "type": "motor",
+   "labelJa": "ギア付きモーター（25mm）",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.06,
+    0.025
+   ],
+   "massKg": 0.09,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "gear",
+   "tags": [
+    "ゆっくり",
+    "力が強い",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 6.0,
+    "rpm": 150.0,
+    "torqueNm": 0.3,
+    "noiseDb": 50.0
+   }
+  },
+  {
+   "id": "mot-gear-37mm",
+   "type": "motor",
+   "labelJa": "ギア付きモーター（37mm）",
+   "shape": "cylinder",
+   "size": [
+    0.037,
+    0.08,
+    0.037
+   ],
+   "massKg": 0.25,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "gear",
+   "tags": [
+    "ゆっくり",
+    "力が強い",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 15.0,
+    "rpm": 100.0,
+    "torqueNm": 1.2,
+    "noiseDb": 50.0
+   }
+  },
+  {
+   "id": "mot-gear-worm",
+   "type": "motor",
+   "labelJa": "ギア付きモーター（worm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.09,
+    0.04
+   ],
+   "massKg": 0.45,
+   "priceJpy": 4000,
+   "ip": -1,
+   "variant": "gear",
+   "tags": [
+    "ゆっくり",
+    "力が強い",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 30.0,
+    "rpm": 50.0,
+    "torqueNm": 4.0,
+    "noiseDb": 50.0
+   }
+  },
+  {
+   "id": "mot-servo-micro",
+   "type": "motor",
+   "labelJa": "サーボモーター（小型）",
+   "shape": "box",
+   "size": [
+    0.023,
+    0.029,
+    0.012
+   ],
+   "massKg": 0.009,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "servo",
+   "tags": [
+    "角度",
+    "動かす",
+    "関節",
+    "開け閉め"
+   ],
+   "specs": {
+    "powerW": 1.9,
+    "torqueNm": 0.18,
+    "rpm": 60.0
+   }
+  },
+  {
+   "id": "mot-servo-standard",
+   "type": "motor",
+   "labelJa": "サーボモーター（標準）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.042,
+    0.02
+   ],
+   "massKg": 0.055,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "servo",
+   "tags": [
+    "角度",
+    "動かす",
+    "関節",
+    "開け閉め"
+   ],
+   "specs": {
+    "powerW": 6.0,
+    "torqueNm": 1.0,
+    "rpm": 60.0
+   }
+  },
+  {
+   "id": "mot-servo-high",
+   "type": "motor",
+   "labelJa": "サーボモーター（高トルク）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.042,
+    0.02
+   ],
+   "massKg": 0.065,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "servo",
+   "tags": [
+    "角度",
+    "動かす",
+    "関節",
+    "開け閉め"
+   ],
+   "specs": {
+    "powerW": 11.0,
+    "torqueNm": 2.0,
+    "rpm": 60.0
+   }
+  },
+  {
+   "id": "mot-servo-waterproof",
+   "type": "motor",
+   "labelJa": "サーボモーター（防水）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.042,
+    0.02
+   ],
+   "massKg": 0.07,
+   "priceJpy": 4000,
+   "ip": 6,
+   "variant": "servo",
+   "tags": [
+    "角度",
+    "動かす",
+    "関節",
+    "開け閉め"
+   ],
+   "specs": {
+    "powerW": 13.5,
+    "torqueNm": 2.5,
+    "rpm": 60.0
+   }
+  },
+  {
+   "id": "mot-servo-large",
+   "type": "motor",
+   "labelJa": "サーボモーター（大型）",
+   "shape": "box",
+   "size": [
+    0.065,
+    0.06,
+    0.03
+   ],
+   "massKg": 0.17,
+   "priceJpy": 8000,
+   "ip": -1,
+   "variant": "servo",
+   "tags": [
+    "角度",
+    "動かす",
+    "関節",
+    "開け閉め"
+   ],
+   "specs": {
+    "powerW": 31.0,
+    "torqueNm": 6.0,
+    "rpm": 60.0
+   }
+  },
+  {
+   "id": "mot-step8",
+   "type": "motor",
+   "labelJa": "ステッピングモーター（20 mm 角）",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.02,
+    0.03
+   ],
+   "massKg": 0.06,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "stepper",
+   "tags": [
+    "正確",
+    "位置",
+    "ゆっくり"
+   ],
+   "specs": {
+    "powerW": 3.3,
+    "torqueNm": 0.02,
+    "rpm": 300.0
+   }
+  },
+  {
+   "id": "mot-step14",
+   "type": "motor",
+   "labelJa": "ステッピングモーター（35 mm 角）",
+   "shape": "box",
+   "size": [
+    0.035,
+    0.035,
+    0.034
+   ],
+   "massKg": 0.13,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "stepper",
+   "tags": [
+    "正確",
+    "位置",
+    "ゆっくり"
+   ],
+   "specs": {
+    "powerW": 4.5,
+    "torqueNm": 0.1,
+    "rpm": 300.0
+   }
+  },
+  {
+   "id": "mot-step17",
+   "type": "motor",
+   "labelJa": "ステッピングモーター（42 mm 角）",
+   "shape": "box",
+   "size": [
+    0.042,
+    0.042,
+    0.048
+   ],
+   "massKg": 0.35,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "stepper",
+   "tags": [
+    "正確",
+    "位置",
+    "ゆっくり"
+   ],
+   "specs": {
+    "powerW": 9.75,
+    "torqueNm": 0.45,
+    "rpm": 300.0
+   }
+  },
+  {
+   "id": "mot-step23",
+   "type": "motor",
+   "labelJa": "ステッピングモーター（57 mm 角）",
+   "shape": "box",
+   "size": [
+    0.057,
+    0.057,
+    0.076
+   ],
+   "massKg": 1.0,
+   "priceJpy": 5000,
+   "ip": -1,
+   "variant": "stepper",
+   "tags": [
+    "正確",
+    "位置",
+    "ゆっくり"
+   ],
+   "specs": {
+    "powerW": 31.5,
+    "torqueNm": 1.9,
+    "rpm": 300.0
+   }
+  },
+  {
+   "id": "mot-linear50",
+   "type": "motor",
+   "labelJa": "電動アクチュエーター（伸び 5 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.17,
+    0.04
+   ],
+   "massKg": 0.5,
+   "priceJpy": 4000,
+   "ip": -1,
+   "variant": "linear",
+   "tags": [
+    "押す",
+    "引く",
+    "持ち上げ",
+    "伸び縮み"
+   ],
+   "specs": {
+    "powerW": 26.6667,
+    "forceN": 200.0,
+    "strokeM": 0.05
+   }
+  },
+  {
+   "id": "mot-linear100",
+   "type": "motor",
+   "labelJa": "電動アクチュエーター（伸び 10 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.22,
+    0.04
+   ],
+   "massKg": 0.9,
+   "priceJpy": 6000,
+   "ip": -1,
+   "variant": "linear",
+   "tags": [
+    "押す",
+    "引く",
+    "持ち上げ",
+    "伸び縮み"
+   ],
+   "specs": {
+    "powerW": 36.6667,
+    "forceN": 500.0,
+    "strokeM": 0.1
+   }
+  },
+  {
+   "id": "mot-linear300",
+   "type": "motor",
+   "labelJa": "電動アクチュエーター（伸び 30 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.42,
+    0.04
+   ],
+   "massKg": 1.6,
+   "priceJpy": 9000,
+   "ip": -1,
+   "variant": "linear",
+   "tags": [
+    "押す",
+    "引く",
+    "持ち上げ",
+    "伸び縮み"
+   ],
+   "specs": {
+    "powerW": 50.0,
+    "forceN": 900.0,
+    "strokeM": 0.3
+   }
+  },
+  {
+   "id": "mot-linear500",
+   "type": "motor",
+   "labelJa": "電動アクチュエーター（伸び 50 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.62,
+    0.04
+   ],
+   "massKg": 2.4,
+   "priceJpy": 14000,
+   "ip": -1,
+   "variant": "linear",
+   "tags": [
+    "押す",
+    "引く",
+    "持ち上げ",
+    "伸び縮み"
+   ],
+   "specs": {
+    "powerW": 70.0,
+    "forceN": 1500.0,
+    "strokeM": 0.5
+   }
+  },
+  {
+   "id": "mot-hub6_5",
+   "type": "motor",
+   "labelJa": "車輪一体のハブモーター（6.5 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.1651,
+    0.06,
+    0.1651
+   ],
+   "massKg": 2.6,
+   "priceJpy": 15000,
+   "ip": 4,
+   "variant": "hub",
+   "tags": [
+    "乗り物",
+    "走る",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 250.0,
+    "rpm": 600.0
+   }
+  },
+  {
+   "id": "mot-hub8",
+   "type": "motor",
+   "labelJa": "車輪一体のハブモーター（8 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.2032,
+    0.06,
+    0.2032
+   ],
+   "massKg": 3.6,
+   "priceJpy": 20000,
+   "ip": 4,
+   "variant": "hub",
+   "tags": [
+    "乗り物",
+    "走る",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 350.0,
+    "rpm": 600.0
+   }
+  },
+  {
+   "id": "mot-hub10",
+   "type": "motor",
+   "labelJa": "車輪一体のハブモーター（10 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.254,
+    0.06,
+    0.254
+   ],
+   "massKg": 5.0,
+   "priceJpy": 28000,
+   "ip": 4,
+   "variant": "hub",
+   "tags": [
+    "乗り物",
+    "走る",
+    "車輪"
+   ],
+   "specs": {
+    "powerW": 500.0,
+    "rpm": 600.0
+   }
+  },
+  {
+   "id": "mot-bl2204",
+   "type": "motor",
+   "labelJa": "ブラシレスモーター（2204）",
+   "shape": "cylinder",
+   "size": [
+    0.028,
+    0.02,
+    0.028
+   ],
+   "massKg": 0.025,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "brushless",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高回転"
+   ],
+   "specs": {
+    "powerW": 150.0,
+    "rpm": 10000.0,
+    "noiseDb": 70.0
+   }
+  },
+  {
+   "id": "mot-bl2306",
+   "type": "motor",
+   "labelJa": "ブラシレスモーター（2306）",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.024,
+    0.03
+   ],
+   "massKg": 0.033,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "brushless",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高回転"
+   ],
+   "specs": {
+    "powerW": 400.0,
+    "rpm": 10000.0,
+    "noiseDb": 70.0
+   }
+  },
+  {
+   "id": "mot-bl5010",
+   "type": "motor",
+   "labelJa": "ブラシレスモーター（5010）",
+   "shape": "cylinder",
+   "size": [
+    0.057,
+    0.025,
+    0.057
+   ],
+   "massKg": 0.1,
+   "priceJpy": 6000,
+   "ip": -1,
+   "variant": "brushless",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高回転"
+   ],
+   "specs": {
+    "powerW": 600.0,
+    "rpm": 10000.0,
+    "noiseDb": 70.0
+   }
+  },
+  {
+   "id": "mot-bl8318",
+   "type": "motor",
+   "labelJa": "ブラシレスモーター（8318）",
+   "shape": "cylinder",
+   "size": [
+    0.09,
+    0.035,
+    0.09
+   ],
+   "massKg": 0.27,
+   "priceJpy": 20000,
+   "ip": -1,
+   "variant": "brushless",
+   "tags": [
+    "飛ぶ",
+    "ドローン",
+    "高回転"
+   ],
+   "specs": {
+    "powerW": 2000.0,
+    "rpm": 10000.0,
+    "noiseDb": 70.0
+   }
+  },
+  {
+   "id": "led-spot0_5w",
+   "type": "light",
+   "labelJa": "LED スポット 0.5W",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.008,
+    0.01
+   ],
+   "massKg": 0.003,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "照らす",
+    "足元",
+    "明るい"
+   ],
+   "specs": {
+    "powerW": 0.5,
+    "lumens": 50.0
+   }
+  },
+  {
+   "id": "led-spot1w",
+   "type": "light",
+   "labelJa": "LED スポット 1W",
+   "shape": "cylinder",
+   "size": [
+    0.02,
+    0.016,
+    0.02
+   ],
+   "massKg": 0.006,
+   "priceJpy": 200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "照らす",
+    "足元",
+    "明るい"
+   ],
+   "specs": {
+    "powerW": 1.0,
+    "lumens": 100.0
+   }
+  },
+  {
+   "id": "led-spot3w",
+   "type": "light",
+   "labelJa": "LED スポット 3W",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.02,
+    0.025
+   ],
+   "massKg": 0.012,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "照らす",
+    "足元",
+    "明るい"
+   ],
+   "specs": {
+    "powerW": 3.0,
+    "lumens": 300.0
+   }
+  },
+  {
+   "id": "led-spot5w",
+   "type": "light",
+   "labelJa": "LED スポット 5W",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.024,
+    0.03
+   ],
+   "massKg": 0.02,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "照らす",
+    "足元",
+    "明るい"
+   ],
+   "specs": {
+    "powerW": 5.0,
+    "lumens": 500.0
+   }
+  },
+  {
+   "id": "led-spot10w",
+   "type": "light",
+   "labelJa": "LED スポット 10W",
+   "shape": "cylinder",
+   "size": [
+    0.045,
+    0.036,
+    0.045
+   ],
+   "massKg": 0.06,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "照らす",
+    "足元",
+    "明るい"
+   ],
+   "specs": {
+    "powerW": 10.0,
+    "lumens": 1000.0
+   }
+  },
+  {
+   "id": "led-cob20",
+   "type": "light",
+   "labelJa": "COB LED 投光 20W",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.03,
+    0.06
+   ],
+   "massKg": 0.18,
+   "priceJpy": 2500,
+   "ip": 5,
+   "variant": "panel",
+   "tags": [
+    "広く",
+    "明るい",
+    "屋外"
+   ],
+   "specs": {
+    "powerW": 20.0,
+    "lumens": 2000.0
+   }
+  },
+  {
+   "id": "led-cob30",
+   "type": "light",
+   "labelJa": "COB LED 投光 30W",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.035,
+    0.08
+   ],
+   "massKg": 0.28,
+   "priceJpy": 3500,
+   "ip": 5,
+   "variant": "panel",
+   "tags": [
+    "広く",
+    "明るい",
+    "屋外"
+   ],
+   "specs": {
+    "powerW": 30.0,
+    "lumens": 3000.0
+   }
+  },
+  {
+   "id": "led-tape10",
+   "type": "light",
+   "labelJa": "LED テープ 10 cm",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.003,
+    0.01
+   ],
+   "massKg": 0.009,
+   "priceJpy": 300,
+   "ip": 4,
+   "variant": "led_tape",
+   "tags": [
+    "線",
+    "縁",
+    "光る",
+    "服",
+    "見える"
+   ],
+   "specs": {
+    "powerW": 0.5,
+    "lumens": 30.0
+   }
+  },
+  {
+   "id": "led-tape30",
+   "type": "light",
+   "labelJa": "LED テープ 30 cm",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.003,
+    0.01
+   ],
+   "massKg": 0.017,
+   "priceJpy": 600,
+   "ip": 4,
+   "variant": "led_tape",
+   "tags": [
+    "線",
+    "縁",
+    "光る",
+    "服",
+    "見える"
+   ],
+   "specs": {
+    "powerW": 1.5,
+    "lumens": 100.0
+   }
+  },
+  {
+   "id": "led-tape100",
+   "type": "light",
+   "labelJa": "LED テープ 100 cm",
+   "shape": "box",
+   "size": [
+    1.0,
+    0.003,
+    0.01
+   ],
+   "massKg": 0.045,
+   "priceJpy": 1500,
+   "ip": 4,
+   "variant": "led_tape",
+   "tags": [
+    "線",
+    "縁",
+    "光る",
+    "服",
+    "見える"
+   ],
+   "specs": {
+    "powerW": 5.0,
+    "lumens": 300.0
+   }
+  },
+  {
+   "id": "led-panel10",
+   "type": "light",
+   "labelJa": "LED パネル 10 cm 角",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.008,
+    0.1
+   ],
+   "massKg": 0.05,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "panel",
+   "tags": [
+    "天井",
+    "面",
+    "部屋"
+   ],
+   "specs": {
+    "powerW": 2.0,
+    "lumens": 200.0
+   }
+  },
+  {
+   "id": "led-panel20",
+   "type": "light",
+   "labelJa": "LED パネル 20 cm 角",
+   "shape": "box",
+   "size": [
+    0.2,
+    0.008,
+    0.2
+   ],
+   "massKg": 0.1,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "panel",
+   "tags": [
+    "天井",
+    "面",
+    "部屋"
+   ],
+   "specs": {
+    "powerW": 8.0,
+    "lumens": 800.0
+   }
+  },
+  {
+   "id": "led-marker",
+   "type": "light",
+   "labelJa": "小型マーカーライト（点滅）",
+   "shape": "cylinder",
+   "size": [
+    0.012,
+    0.006,
+    0.012
+   ],
+   "massKg": 0.002,
+   "priceJpy": 150,
+   "ip": 6,
+   "variant": "",
+   "tags": [
+    "目印",
+    "点滅",
+    "見える"
+   ],
+   "specs": {
+    "powerW": 0.2,
+    "lumens": 10.0
+   }
+  },
+  {
+   "id": "led-headlamp",
+   "type": "light",
+   "labelJa": "ヘッドランプのライト部",
+   "shape": "cylinder",
+   "size": [
+    0.035,
+    0.03,
+    0.035
+   ],
+   "massKg": 0.04,
+   "priceJpy": 1500,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "頭",
+    "前",
+    "夜"
+   ],
+   "specs": {
+    "powerW": 3.0,
+    "lumens": 250.0
+   }
+  },
+  {
+   "id": "led-uv",
+   "type": "light",
+   "labelJa": "UV LED（365nm）",
+   "shape": "cylinder",
+   "size": [
+    0.015,
+    0.012,
+    0.015
+   ],
+   "massKg": 0.004,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "除菌"
+   ],
+   "specs": {
+    "powerW": 1.0,
+    "lumens": 5.0
+   }
+  },
+  {
+   "id": "sen-cam",
+   "type": "sensor",
+   "labelJa": "小型カメラ",
+   "shape": "box",
+   "size": [
+    0.025,
+    0.025,
+    0.02
+   ],
+   "massKg": 0.01,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "camera",
+   "tags": [
+    "見る",
+    "映像",
+    "見分ける",
+    "顔"
+   ],
+   "specs": {
+    "rangeM": 10.0,
+    "fovDeg": 70.0,
+    "powerW": 1.0
+   }
+  },
+  {
+   "id": "sen-cam-wide",
+   "type": "sensor",
+   "labelJa": "広角カメラ",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.03,
+    0.025
+   ],
+   "massKg": 0.02,
+   "priceJpy": 3500,
+   "ip": -1,
+   "variant": "camera",
+   "tags": [
+    "見る",
+    "広く",
+    "見分ける"
+   ],
+   "specs": {
+    "rangeM": 8.0,
+    "fovDeg": 120.0,
+    "powerW": 1.2
+   }
+  },
+  {
+   "id": "sen-cam-depth",
+   "type": "sensor",
+   "labelJa": "距離が分かるステレオカメラ",
+   "shape": "box",
+   "size": [
+    0.09,
+    0.025,
+    0.025
+   ],
+   "massKg": 0.07,
+   "priceJpy": 30000,
+   "ip": -1,
+   "variant": "stereo",
+   "tags": [
+    "見る",
+    "立体",
+    "距離",
+    "見分ける"
+   ],
+   "specs": {
+    "rangeM": 6.0,
+    "fovDeg": 90.0,
+    "powerW": 3.5
+   }
+  },
+  {
+   "id": "sen-cam-thermal",
+   "type": "sensor",
+   "labelJa": "熱を見るカメラ（サーモ）",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.03,
+    0.03
+   ],
+   "massKg": 0.02,
+   "priceJpy": 15000,
+   "ip": -1,
+   "variant": "camera",
+   "tags": [
+    "温度",
+    "人",
+    "暗い",
+    "見分ける"
+   ],
+   "specs": {
+    "rangeM": 15.0,
+    "fovDeg": 55.0,
+    "powerW": 0.8
+   }
+  },
+  {
+   "id": "sen-cam-ai",
+   "type": "sensor",
+   "labelJa": "物を見分けるカメラ（AI 処理つき）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.04,
+    0.03
+   ],
+   "massKg": 0.04,
+   "priceJpy": 12000,
+   "ip": -1,
+   "variant": "camera",
+   "tags": [
+    "見分ける",
+    "人",
+    "自転車",
+    "動物"
+   ],
+   "specs": {
+    "rangeM": 12.0,
+    "fovDeg": 80.0,
+    "powerW": 2.5
+   }
+  },
+  {
+   "id": "sen-ultra",
+   "type": "sensor",
+   "labelJa": "超音波距離センサー",
+   "shape": "box",
+   "size": [
+    0.045,
+    0.02,
+    0.015
+   ],
+   "massKg": 0.009,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "ultrasonic",
+   "tags": [
+    "距離",
+    "障害物",
+    "ぶつからない"
+   ],
+   "specs": {
+    "rangeM": 4.0,
+    "fovDeg": 30.0,
+    "powerW": 0.08
+   }
+  },
+  {
+   "id": "sen-ultra-wp",
+   "type": "sensor",
+   "labelJa": "防水 超音波距離センサー",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.02,
+    0.025
+   ],
+   "massKg": 0.02,
+   "priceJpy": 1500,
+   "ip": 7,
+   "variant": "ultrasonic",
+   "tags": [
+    "距離",
+    "屋外",
+    "雨",
+    "車"
+   ],
+   "specs": {
+    "rangeM": 5.0,
+    "fovDeg": 70.0,
+    "powerW": 0.15
+   }
+  },
+  {
+   "id": "sen-tof",
+   "type": "sensor",
+   "labelJa": "ToF 距離センサー（短い距離）",
+   "shape": "box",
+   "size": [
+    0.013,
+    0.004,
+    0.018
+   ],
+   "massKg": 0.002,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "tof",
+   "tags": [
+    "距離",
+    "近い",
+    "正確"
+   ],
+   "specs": {
+    "rangeM": 2.0,
+    "fovDeg": 25.0,
+    "powerW": 0.02
+   }
+  },
+  {
+   "id": "sen-tof-long",
+   "type": "sensor",
+   "labelJa": "ToF 距離センサー（4 m）",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.006,
+    0.025
+   ],
+   "massKg": 0.004,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "tof",
+   "tags": [
+    "距離",
+    "正確"
+   ],
+   "specs": {
+    "rangeM": 4.0,
+    "fovDeg": 27.0,
+    "powerW": 0.1
+   }
+  },
+  {
+   "id": "sen-lidar2d",
+   "type": "sensor",
+   "labelJa": "回転式レーザー距離計（LiDAR）",
+   "shape": "cylinder",
+   "size": [
+    0.07,
+    0.04,
+    0.07
+   ],
+   "massKg": 0.19,
+   "priceJpy": 15000,
+   "ip": -1,
+   "variant": "lidar",
+   "tags": [
+    "周り",
+    "地図",
+    "ロボット",
+    "障害物"
+   ],
+   "specs": {
+    "rangeM": 12.0,
+    "fovDeg": 360.0,
+    "powerW": 2.5
+   }
+  },
+  {
+   "id": "sen-pir",
+   "type": "sensor",
+   "labelJa": "人感センサー（赤外線）",
+   "shape": "sphere",
+   "size": [
+    0.024,
+    0.024,
+    0.024
+   ],
+   "massKg": 0.006,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "pir",
+   "tags": [
+    "人",
+    "近づく",
+    "自動",
+    "見守り"
+   ],
+   "specs": {
+    "rangeM": 5.0,
+    "fovDeg": 110.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-pir-ceiling",
+   "type": "sensor",
+   "labelJa": "天井用の人感センサー（全方向）",
+   "shape": "sphere",
+   "size": [
+    0.05,
+    0.05,
+    0.05
+   ],
+   "massKg": 0.03,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "pir",
+   "tags": [
+    "人",
+    "部屋",
+    "天井",
+    "見守り"
+   ],
+   "specs": {
+    "rangeM": 6.0,
+    "fovDeg": 360.0,
+    "powerW": 0.05
+   }
+  },
+  {
+   "id": "sen-radar",
+   "type": "sensor",
+   "labelJa": "電波式の人感センサー（ミリ波）",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.006,
+    0.03
+   ],
+   "massKg": 0.005,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "tof",
+   "tags": [
+    "人",
+    "息",
+    "寝る",
+    "見守り"
+   ],
+   "specs": {
+    "rangeM": 6.0,
+    "fovDeg": 120.0,
+    "powerW": 0.5
+   }
+  },
+  {
+   "id": "sen-climate",
+   "type": "sensor",
+   "labelJa": "温度・湿度センサー",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.008,
+    0.025
+   ],
+   "massKg": 0.004,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "climate",
+   "tags": [
+    "温度",
+    "湿度",
+    "暑い",
+    "寒い",
+    "蒸れ"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-temp-probe",
+   "type": "sensor",
+   "labelJa": "防水 温度センサー（棒）",
+   "shape": "cylinder",
+   "size": [
+    0.006,
+    0.05,
+    0.006
+   ],
+   "massKg": 0.01,
+   "priceJpy": 400,
+   "ip": 7,
+   "variant": "climate",
+   "tags": [
+    "温度",
+    "水",
+    "お風呂"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-rain",
+   "type": "sensor",
+   "labelJa": "雨滴センサー（板）",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.002,
+    0.04
+   ],
+   "massKg": 0.008,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "rain",
+   "tags": [
+    "雨",
+    "濡れる",
+    "自動"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.02
+   }
+  },
+  {
+   "id": "sen-water-level",
+   "type": "sensor",
+   "labelJa": "水位センサー",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.06,
+    0.003
+   ],
+   "massKg": 0.005,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "rain",
+   "tags": [
+    "水",
+    "タンク",
+    "量"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.02
+   }
+  },
+  {
+   "id": "sen-load5",
+   "type": "sensor",
+   "labelJa": "重さセンサー（5 kg まで）",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.013,
+    0.013
+   ],
+   "massKg": 0.03,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "load_cell",
+   "tags": [
+    "重さ",
+    "量る",
+    "荷物"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "loadKg": 5.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-load50",
+   "type": "sensor",
+   "labelJa": "重さセンサー（50 kg まで）",
+   "shape": "box",
+   "size": [
+    0.13,
+    0.022,
+    0.03
+   ],
+   "massKg": 0.18,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "load_cell",
+   "tags": [
+    "重さ",
+    "量る",
+    "人"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "loadKg": 50.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-imu6",
+   "type": "sensor",
+   "labelJa": "傾き・動きのセンサー（6 軸）",
+   "shape": "box",
+   "size": [
+    0.016,
+    0.003,
+    0.02
+   ],
+   "massKg": 0.002,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "imu",
+   "tags": [
+    "傾き",
+    "倒れる",
+    "歩く",
+    "転ぶ"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-imu9",
+   "type": "sensor",
+   "labelJa": "傾き・向きのセンサー（9 軸）",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.003,
+    0.025
+   ],
+   "massKg": 0.003,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "imu",
+   "tags": [
+    "傾き",
+    "向き",
+    "姿勢"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.02
+   }
+  },
+  {
+   "id": "sen-gps",
+   "type": "sensor",
+   "labelJa": "GPS 受信機",
+   "shape": "box",
+   "size": [
+    0.035,
+    0.009,
+    0.035
+   ],
+   "massKg": 0.02,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "gps",
+   "tags": [
+    "位置",
+    "地図",
+    "迷子",
+    "場所"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.15
+   }
+  },
+  {
+   "id": "sen-mic",
+   "type": "sensor",
+   "labelJa": "小型マイク",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.006,
+    0.01
+   ],
+   "massKg": 0.002,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "microphone",
+   "tags": [
+    "音",
+    "声",
+    "聞く"
+   ],
+   "specs": {
+    "rangeM": 5.0,
+    "fovDeg": 360.0,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "sen-mic-array",
+   "type": "sensor",
+   "labelJa": "向きが分かるマイク（4 個組）",
+   "shape": "box",
+   "size": [
+    0.065,
+    0.01,
+    0.065
+   ],
+   "massKg": 0.02,
+   "priceJpy": 5000,
+   "ip": -1,
+   "variant": "microphone",
+   "tags": [
+    "音",
+    "声",
+    "向き"
+   ],
+   "specs": {
+    "rangeM": 8.0,
+    "fovDeg": 360.0,
+    "powerW": 0.3
+   }
+  },
+  {
+   "id": "sen-lux",
+   "type": "sensor",
+   "labelJa": "明るさセンサー",
+   "shape": "box",
+   "size": [
+    0.015,
+    0.004,
+    0.015
+   ],
+   "massKg": 0.002,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "climate",
+   "tags": [
+    "暗い",
+    "明るい",
+    "自動",
+    "夜"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.005
+   }
+  },
+  {
+   "id": "sen-co2",
+   "type": "sensor",
+   "labelJa": "二酸化炭素センサー",
+   "shape": "box",
+   "size": [
+    0.035,
+    0.012,
+    0.025
+   ],
+   "massKg": 0.01,
+   "priceJpy": 4000,
+   "ip": -1,
+   "variant": "climate",
+   "tags": [
+    "空気",
+    "換気",
+    "部屋"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.2
+   }
+  },
+  {
+   "id": "sen-heart",
+   "type": "sensor",
+   "labelJa": "心拍センサー（腕・指）",
+   "shape": "box",
+   "size": [
+    0.015,
+    0.004,
+    0.015
+   ],
+   "massKg": 0.002,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "imu",
+   "tags": [
+    "体",
+    "健康",
+    "運動"
+   ],
+   "specs": {
+    "rangeM": 0.0,
+    "powerW": 0.02
+   }
+  },
+  {
+   "id": "spk-buzzer",
+   "type": "speaker",
+   "labelJa": "圧電ブザー",
+   "shape": "cylinder",
+   "size": [
+    0.012,
+    0.009,
+    0.012
+   ],
+   "massKg": 0.002,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "buzzer",
+   "tags": [
+    "鳴る",
+    "知らせる",
+    "小さい"
+   ],
+   "specs": {
+    "db": 85.0,
+    "powerW": 0.05
+   }
+  },
+  {
+   "id": "spk-buzzer-loud",
+   "type": "speaker",
+   "labelJa": "大音量ブザー",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.015,
+    0.03
+   ],
+   "massKg": 0.015,
+   "priceJpy": 600,
+   "ip": 4,
+   "variant": "buzzer",
+   "tags": [
+    "鳴る",
+    "防犯",
+    "大きい音"
+   ],
+   "specs": {
+    "db": 95.0,
+    "powerW": 0.3
+   }
+  },
+  {
+   "id": "spk-siren",
+   "type": "speaker",
+   "labelJa": "防犯サイレン",
+   "shape": "cylinder",
+   "size": [
+    0.05,
+    0.04,
+    0.05
+   ],
+   "massKg": 0.06,
+   "priceJpy": 1500,
+   "ip": 5,
+   "variant": "buzzer",
+   "tags": [
+    "防犯",
+    "大きい音",
+    "助け"
+   ],
+   "specs": {
+    "db": 105.0,
+    "powerW": 2.0
+   }
+  },
+  {
+   "id": "spk-28mm",
+   "type": "speaker",
+   "labelJa": "スピーカー（直径 28 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.028,
+    0.0126,
+    0.028
+   ],
+   "massKg": 0.01,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "声",
+    "音楽",
+    "知らせる"
+   ],
+   "specs": {
+    "db": 85.0,
+    "powerW": 1.0
+   }
+  },
+  {
+   "id": "spk-40mm",
+   "type": "speaker",
+   "labelJa": "スピーカー（直径 40 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.018,
+    0.04
+   ],
+   "massKg": 0.03,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "声",
+    "音楽",
+    "知らせる"
+   ],
+   "specs": {
+    "db": 90.0,
+    "powerW": 3.0
+   }
+  },
+  {
+   "id": "spk-60mm",
+   "type": "speaker",
+   "labelJa": "スピーカー（直径 60 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.06,
+    0.027,
+    0.06
+   ],
+   "massKg": 0.12,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "声",
+    "音楽",
+    "知らせる"
+   ],
+   "specs": {
+    "db": 95.0,
+    "powerW": 10.0
+   }
+  },
+  {
+   "id": "spk-horn",
+   "type": "speaker",
+   "labelJa": "防水ホーンスピーカー",
+   "shape": "cylinder",
+   "size": [
+    0.1,
+    0.12,
+    0.1
+   ],
+   "massKg": 0.6,
+   "priceJpy": 4000,
+   "ip": 6,
+   "variant": "",
+   "tags": [
+    "屋外",
+    "大きい音",
+    "遠く"
+   ],
+   "specs": {
+    "db": 110.0,
+    "powerW": 15.0
+   }
+  },
+  {
+   "id": "sol-0_5w",
+   "type": "solar",
+   "labelJa": "太陽電池パネル 0.5W",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.006,
+    0.06
+   ],
+   "massKg": 0.02,
+   "priceJpy": 400,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 0.5
+   }
+  },
+  {
+   "id": "sol-1w",
+   "type": "solar",
+   "labelJa": "太陽電池パネル 1W",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.006,
+    0.07
+   ],
+   "massKg": 0.03,
+   "priceJpy": 600,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 1.0
+   }
+  },
+  {
+   "id": "sol-3w",
+   "type": "solar",
+   "labelJa": "太陽電池パネル 3W",
+   "shape": "box",
+   "size": [
+    0.15,
+    0.006,
+    0.13
+   ],
+   "massKg": 0.12,
+   "priceJpy": 1500,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 3.0
+   }
+  },
+  {
+   "id": "sol-6w",
+   "type": "solar",
+   "labelJa": "太陽電池パネル 6W",
+   "shape": "box",
+   "size": [
+    0.22,
+    0.006,
+    0.18
+   ],
+   "massKg": 0.25,
+   "priceJpy": 2500,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 6.0
+   }
+  },
+  {
+   "id": "sol-10w",
+   "type": "solar",
+   "labelJa": "太陽電池パネル 10W",
+   "shape": "box",
+   "size": [
+    0.35,
+    0.006,
+    0.25
+   ],
+   "massKg": 0.5,
+   "priceJpy": 4000,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 10.0
+   }
+  },
+  {
+   "id": "sol-20w",
+   "type": "solar",
+   "labelJa": "曲げられる太陽電池パネル 20W",
+   "shape": "box",
+   "size": [
+    0.55,
+    0.003,
+    0.32
+   ],
+   "massKg": 0.6,
+   "priceJpy": 7000,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 20.0
+   }
+  },
+  {
+   "id": "sol-50w",
+   "type": "solar",
+   "labelJa": "太陽電池パネル 50W",
+   "shape": "box",
+   "size": [
+    0.65,
+    0.006,
+    0.54
+   ],
+   "massKg": 3.0,
+   "priceJpy": 12000,
+   "ip": 4,
+   "variant": "",
+   "tags": [
+    "太陽",
+    "外",
+    "充電"
+   ],
+   "specs": {
+    "powerW": 50.0
+   }
+  },
+  {
+   "id": "heat-film5",
+   "type": "heater",
+   "labelJa": "フィルムヒーター 5W",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.001,
+    0.08
+   ],
+   "massKg": 0.0125,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "film",
+   "tags": [
+    "温める",
+    "服",
+    "薄い"
+   ],
+   "specs": {
+    "powerW": 5.0
+   }
+  },
+  {
+   "id": "heat-film10",
+   "type": "heater",
+   "labelJa": "フィルムヒーター 10W",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.001,
+    0.1
+   ],
+   "massKg": 0.02,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "film",
+   "tags": [
+    "温める",
+    "服",
+    "薄い"
+   ],
+   "specs": {
+    "powerW": 10.0
+   }
+  },
+  {
+   "id": "heat-film20",
+   "type": "heater",
+   "labelJa": "フィルムヒーター 20W",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.001,
+    0.15
+   ],
+   "massKg": 0.035,
+   "priceJpy": 1800,
+   "ip": -1,
+   "variant": "film",
+   "tags": [
+    "温める",
+    "服",
+    "薄い"
+   ],
+   "specs": {
+    "powerW": 20.0
+   }
+  },
+  {
+   "id": "heat-pad-usb",
+   "type": "heater",
+   "labelJa": "USB 温熱パッド",
+   "shape": "box",
+   "size": [
+    0.15,
+    0.006,
+    0.12
+   ],
+   "massKg": 0.06,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "film",
+   "tags": [
+    "温める",
+    "背中",
+    "手"
+   ],
+   "specs": {
+    "powerW": 10.0
+   }
+  },
+  {
+   "id": "heat-ptc30",
+   "type": "heater",
+   "labelJa": "PTC ヒーター 30W",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.025,
+    0.06
+   ],
+   "massKg": 0.05,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "ptc",
+   "tags": [
+    "温める",
+    "温風"
+   ],
+   "specs": {
+    "powerW": 30.0
+   }
+  },
+  {
+   "id": "heat-ptc100",
+   "type": "heater",
+   "labelJa": "PTC ヒーター 100W",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.03,
+    0.08
+   ],
+   "massKg": 0.12,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "ptc",
+   "tags": [
+    "温める",
+    "温風",
+    "部屋"
+   ],
+   "specs": {
+    "powerW": 100.0
+   }
+  },
+  {
+   "id": "cool-peltier12",
+   "type": "cooler",
+   "labelJa": "ペルチェ素子 12W（冷やす）",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.004,
+    0.02
+   ],
+   "massKg": 0.0236,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "peltier",
+   "tags": [
+    "冷やす",
+    "首",
+    "暑い"
+   ],
+   "specs": {
+    "powerW": 12.0
+   }
+  },
+  {
+   "id": "cool-peltier36",
+   "type": "cooler",
+   "labelJa": "ペルチェ素子 36W（冷やす）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.004,
+    0.04
+   ],
+   "massKg": 0.0308,
+   "priceJpy": 900,
+   "ip": -1,
+   "variant": "peltier",
+   "tags": [
+    "冷やす",
+    "首",
+    "暑い"
+   ],
+   "specs": {
+    "powerW": 36.0
+   }
+  },
+  {
+   "id": "cool-peltier60",
+   "type": "cooler",
+   "labelJa": "ペルチェ素子 60W（冷やす）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.004,
+    0.04
+   ],
+   "massKg": 0.038,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "peltier",
+   "tags": [
+    "冷やす",
+    "首",
+    "暑い"
+   ],
+   "specs": {
+    "powerW": 60.0
+   }
+  },
+  {
+   "id": "cool-neck",
+   "type": "cooler",
+   "labelJa": "首用の冷却プレート（ペルチェと放熱つき）",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.02,
+    0.04
+   ],
+   "massKg": 0.09,
+   "priceJpy": 4000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "冷やす",
+    "首",
+    "夏"
+   ],
+   "specs": {
+    "powerW": 8.0
+   }
+  },
+  {
+   "id": "whl-50",
+   "type": "wheel",
+   "labelJa": "ゴム車輪（直径 5 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.05,
+    0.02,
+    0.05
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "走る",
+    "床"
+   ],
+   "specs": {
+    "loadKg": 10.0
+   }
+  },
+  {
+   "id": "whl-100",
+   "type": "wheel",
+   "labelJa": "ゴム車輪（直径 10 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.1,
+    0.03,
+    0.1
+   ],
+   "massKg": 0.08,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "走る",
+    "床"
+   ],
+   "specs": {
+    "loadKg": 20.0
+   }
+  },
+  {
+   "id": "whl-150",
+   "type": "wheel",
+   "labelJa": "ゴム車輪（直径 15 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.15,
+    0.04,
+    0.15
+   ],
+   "massKg": 0.2,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "走る",
+    "床"
+   ],
+   "specs": {
+    "loadKg": 30.0
+   }
+  },
+  {
+   "id": "whl-200",
+   "type": "wheel",
+   "labelJa": "ゴム車輪（直径 20 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.2,
+    0.05,
+    0.2
+   ],
+   "massKg": 0.45,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "走る",
+    "床"
+   ],
+   "specs": {
+    "loadKg": 40.0
+   }
+  },
+  {
+   "id": "whl-air8",
+   "type": "wheel",
+   "labelJa": "空気入りタイヤ（8 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.2,
+    0.05,
+    0.2
+   ],
+   "massKg": 0.9,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "でこぼこ",
+    "外",
+    "乗り物"
+   ],
+   "specs": {
+    "loadKg": 100.0
+   }
+  },
+  {
+   "id": "whl-omni",
+   "type": "wheel",
+   "labelJa": "オムニホイール（横にも転がる）",
+   "shape": "cylinder",
+   "size": [
+    0.1,
+    0.03,
+    0.1
+   ],
+   "massKg": 0.15,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "横",
+    "ロボット",
+    "その場で回る"
+   ],
+   "specs": {
+    "loadKg": 15.0
+   }
+  },
+  {
+   "id": "thr-prop5",
+   "type": "thruster",
+   "labelJa": "プロペラ推進ユニット（5 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.1397,
+    0.03,
+    0.1397
+   ],
+   "massKg": 0.0625,
+   "priceJpy": 2800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "ドローン"
+   ],
+   "specs": {
+    "thrustN": 9.0,
+    "powerW": 150.0
+   }
+  },
+  {
+   "id": "thr-prop7",
+   "type": "thruster",
+   "labelJa": "プロペラ推進ユニット（7 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.1956,
+    0.03,
+    0.1956
+   ],
+   "massKg": 0.075,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "ドローン"
+   ],
+   "specs": {
+    "thrustN": 15.0,
+    "powerW": 300.0
+   }
+  },
+  {
+   "id": "thr-prop10",
+   "type": "thruster",
+   "labelJa": "プロペラ推進ユニット（10 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.2794,
+    0.03,
+    0.2794
+   ],
+   "massKg": 0.095,
+   "priceJpy": 3400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "ドローン"
+   ],
+   "specs": {
+    "thrustN": 30.0,
+    "powerW": 500.0
+   }
+  },
+  {
+   "id": "thr-prop15",
+   "type": "thruster",
+   "labelJa": "プロペラ推進ユニット（15 インチ）",
+   "shape": "cylinder",
+   "size": [
+    0.4191,
+    0.03,
+    0.4191
+   ],
+   "massKg": 0.135,
+   "priceJpy": 4500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "ドローン"
+   ],
+   "specs": {
+    "thrustN": 60.0,
+    "powerW": 900.0
+   }
+  },
+  {
+   "id": "thr-edf50",
+   "type": "thruster",
+   "labelJa": "ダクトファン（50 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.06,
+    0.05,
+    0.06
+   ],
+   "massKg": 0.1,
+   "priceJpy": 4000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "風",
+    "高出力"
+   ],
+   "specs": {
+    "thrustN": 5.0,
+    "powerW": 300.0
+   }
+  },
+  {
+   "id": "thr-edf70",
+   "type": "thruster",
+   "labelJa": "ダクトファン（70 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.08,
+    0.07,
+    0.08
+   ],
+   "massKg": 0.12,
+   "priceJpy": 7000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "風",
+    "高出力"
+   ],
+   "specs": {
+    "thrustN": 12.0,
+    "powerW": 800.0
+   }
+  },
+  {
+   "id": "thr-edf90",
+   "type": "thruster",
+   "labelJa": "ダクトファン（90 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.1,
+    0.09,
+    0.1
+   ],
+   "massKg": 0.14,
+   "priceJpy": 12000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "飛ぶ",
+    "風",
+    "高出力"
+   ],
+   "specs": {
+    "thrustN": 25.0,
+    "powerW": 1800.0
+   }
+  },
+  {
+   "id": "hng-25",
+   "type": "hinge",
+   "labelJa": "小型ちょうつがい（25 mm）",
+   "shape": "box",
+   "size": [
+    0.025,
+    0.003,
+    0.025
+   ],
+   "massKg": 0.01,
+   "priceJpy": 150,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "開け閉め",
+    "ふた",
+    "折る"
+   ],
+   "specs": {
+    "loadKg": 2.0
+   }
+  },
+  {
+   "id": "hng-50",
+   "type": "hinge",
+   "labelJa": "ちょうつがい（50 mm）",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.004,
+    0.04
+   ],
+   "massKg": 0.035,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "開け閉め",
+    "扉",
+    "折る"
+   ],
+   "specs": {
+    "loadKg": 8.0
+   }
+  },
+  {
+   "id": "hng-piano",
+   "type": "hinge",
+   "labelJa": "長いちょうつがい（30 cm）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.003,
+    0.03
+   ],
+   "massKg": 0.12,
+   "priceJpy": 900,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "ふた",
+    "長い"
+   ],
+   "specs": {
+    "loadKg": 15.0
+   }
+  },
+  {
+   "id": "hng-torque",
+   "type": "hinge",
+   "labelJa": "止まるちょうつがい（好きな角度で止まる）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.008,
+    0.035
+   ],
+   "massKg": 0.05,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "角度",
+    "ふた",
+    "画面"
+   ],
+   "specs": {
+    "loadKg": 3.0,
+    "torqueNm": 0.5
+   }
+  },
+  {
+   "id": "hng-wp",
+   "type": "hinge",
+   "labelJa": "ステンレス防水ちょうつがい",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.004,
+    0.04
+   ],
+   "massKg": 0.05,
+   "priceJpy": 700,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "屋外",
+    "水",
+    "錆びない"
+   ],
+   "specs": {
+    "loadKg": 10.0
+   }
+  },
+  {
+   "id": "rail-150",
+   "type": "slide_rail",
+   "labelJa": "スライドレール（15 cm）",
+   "shape": "box",
+   "size": [
+    0.012,
+    0.035,
+    0.15
+   ],
+   "massKg": 0.15,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "引き出し",
+    "伸ばす",
+    "滑らせる"
+   ],
+   "specs": {
+    "loadKg": 15.0,
+    "strokeM": 0.135
+   }
+  },
+  {
+   "id": "rail-300",
+   "type": "slide_rail",
+   "labelJa": "スライドレール（30 cm）",
+   "shape": "box",
+   "size": [
+    0.012,
+    0.035,
+    0.3
+   ],
+   "massKg": 0.3,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "引き出し",
+    "伸ばす",
+    "滑らせる"
+   ],
+   "specs": {
+    "loadKg": 25.0,
+    "strokeM": 0.27
+   }
+  },
+  {
+   "id": "rail-500",
+   "type": "slide_rail",
+   "labelJa": "スライドレール（50 cm）",
+   "shape": "box",
+   "size": [
+    0.012,
+    0.035,
+    0.5
+   ],
+   "massKg": 0.55,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "引き出し",
+    "伸ばす",
+    "滑らせる"
+   ],
+   "specs": {
+    "loadKg": 35.0,
+    "strokeM": 0.45
+   }
+  },
+  {
+   "id": "rail-linear",
+   "type": "slide_rail",
+   "labelJa": "直動ガイド（ミニ 10 cm）",
+   "shape": "box",
+   "size": [
+    0.012,
+    0.01,
+    0.1
+   ],
+   "massKg": 0.06,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "正確",
+    "まっすぐ",
+    "動かす"
+   ],
+   "specs": {
+    "loadKg": 5.0,
+    "strokeM": 0.07
+   }
+  },
+  {
+   "id": "pole-1m",
+   "type": "telescopic",
+   "labelJa": "伸縮ポール（30〜100 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.3,
+    0.025
+   ],
+   "massKg": 0.15,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "伸ばす",
+    "高く",
+    "棒"
+   ],
+   "specs": {
+    "strokeM": 0.7,
+    "loadKg": 3.0
+   }
+  },
+  {
+   "id": "pole-2m",
+   "type": "telescopic",
+   "labelJa": "伸縮ポール（50〜200 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.5,
+    0.03
+   ],
+   "massKg": 0.35,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "伸ばす",
+    "高く",
+    "棒"
+   ],
+   "specs": {
+    "strokeM": 1.5,
+    "loadKg": 3.0
+   }
+  },
+  {
+   "id": "pole-carbon",
+   "type": "telescopic",
+   "labelJa": "カーボン伸縮ポール（軽い）",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.4,
+    0.025
+   ],
+   "massKg": 0.12,
+   "priceJpy": 5000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "軽い",
+    "伸ばす",
+    "傘"
+   ],
+   "specs": {
+    "strokeM": 1.0,
+    "loadKg": 2.0
+   }
+  },
+  {
+   "id": "spr-small",
+   "type": "spring",
+   "labelJa": "小さな押しばね",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.03,
+    0.01
+   ],
+   "massKg": 0.002,
+   "priceJpy": 50,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "戻る",
+    "押す",
+    "ボタン"
+   ],
+   "specs": {
+    "forceN": 10.0
+   }
+  },
+  {
+   "id": "spr-large",
+   "type": "spring",
+   "labelJa": "大きな押しばね",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.1,
+    0.04
+   ],
+   "massKg": 0.05,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "戻る",
+    "衝撃",
+    "やわらげる"
+   ],
+   "specs": {
+    "forceN": 200.0
+   }
+  },
+  {
+   "id": "spr-gas100",
+   "type": "spring",
+   "labelJa": "ガススプリング（100 N）",
+   "shape": "cylinder",
+   "size": [
+    0.018,
+    0.25,
+    0.018
+   ],
+   "massKg": 0.15,
+   "priceJpy": 1000,
+   "ip": -1,
+   "variant": "gas",
+   "tags": [
+    "ゆっくり開く",
+    "ふた",
+    "支える"
+   ],
+   "specs": {
+    "forceN": 100.0,
+    "strokeM": 0.08
+   }
+  },
+  {
+   "id": "spr-gas300",
+   "type": "spring",
+   "labelJa": "ガススプリング（300 N）",
+   "shape": "cylinder",
+   "size": [
+    0.022,
+    0.35,
+    0.022
+   ],
+   "massKg": 0.3,
+   "priceJpy": 1800,
+   "ip": -1,
+   "variant": "gas",
+   "tags": [
+    "ゆっくり開く",
+    "ふた",
+    "支える",
+    "重い"
+   ],
+   "specs": {
+    "forceN": 300.0,
+    "strokeM": 0.12
+   }
+  },
+  {
+   "id": "spr-torsion",
+   "type": "spring",
+   "labelJa": "ねじりばね",
+   "shape": "cylinder",
+   "size": [
+    0.015,
+    0.01,
+    0.015
+   ],
+   "massKg": 0.003,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "戻る",
+    "ちょうつがい",
+    "クリップ"
+   ],
+   "specs": {
+    "torqueNm": 0.1
+   }
+  },
+  {
+   "id": "gear-spur",
+   "type": "gear",
+   "labelJa": "歯車の組（平歯車）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.008,
+    0.04
+   ],
+   "massKg": 0.02,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "回す",
+    "速さを変える"
+   ],
+   "specs": {
+    "torqueNm": 2.0
+   }
+  },
+  {
+   "id": "gear-belt",
+   "type": "gear",
+   "labelJa": "タイミングベルトとプーリー",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.012,
+    0.2
+   ],
+   "massKg": 0.06,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "belt",
+   "tags": [
+    "回す",
+    "離れた所",
+    "ベルト"
+   ],
+   "specs": {
+    "torqueNm": 1.5
+   }
+  },
+  {
+   "id": "gear-worm",
+   "type": "gear",
+   "labelJa": "ウォームギア（逆に回らない）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.03,
+    0.04
+   ],
+   "massKg": 0.08,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "止める",
+    "持ち上げ",
+    "回す"
+   ],
+   "specs": {
+    "torqueNm": 5.0
+   }
+  },
+  {
+   "id": "gear-pulley",
+   "type": "gear",
+   "labelJa": "滑車",
+   "shape": "cylinder",
+   "size": [
+    0.05,
+    0.015,
+    0.05
+   ],
+   "massKg": 0.04,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "持ち上げ",
+    "ひも",
+    "ロープ"
+   ],
+   "specs": {
+    "loadKg": 20.0
+   }
+  },
+  {
+   "id": "lock-magnet",
+   "type": "latch",
+   "labelJa": "マグネットキャッチ",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.012,
+    0.012
+   ],
+   "massKg": 0.015,
+   "priceJpy": 200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "閉める",
+    "ふた",
+    "扉"
+   ],
+   "specs": {
+    "forceN": 30.0
+   }
+  },
+  {
+   "id": "lock-solenoid",
+   "type": "latch",
+   "labelJa": "電気で開く錠（ソレノイド）",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.02,
+    0.03
+   ],
+   "massKg": 0.12,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "鍵",
+    "自動",
+    "開ける"
+   ],
+   "specs": {
+    "forceN": 300.0,
+    "powerW": 6.0
+   }
+  },
+  {
+   "id": "lock-push",
+   "type": "latch",
+   "labelJa": "押して開くプッシュラッチ",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.015,
+    0.02
+   ],
+   "massKg": 0.01,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "閉める",
+    "引き出し"
+   ],
+   "specs": {
+    "forceN": 20.0
+   }
+  },
+  {
+   "id": "lock-hasp",
+   "type": "latch",
+   "labelJa": "掛け金",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.008,
+    0.03
+   ],
+   "massKg": 0.05,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "鍵",
+    "閉める",
+    "箱"
+   ],
+   "specs": {
+    "forceN": 500.0
+   }
+  },
+  {
+   "id": "crawl-30",
+   "type": "crawler",
+   "labelJa": "クローラー（長さ 30 cm）",
+   "shape": "box",
+   "size": [
+    0.065,
+    0.09,
+    0.3
+   ],
+   "massKg": 0.8,
+   "priceJpy": 8000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "階段",
+    "段差",
+    "でこぼこ",
+    "雪"
+   ],
+   "specs": {
+    "loadKg": 20.0
+   }
+  },
+  {
+   "id": "crawl-60",
+   "type": "crawler",
+   "labelJa": "クローラー（長さ 60 cm）",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.14,
+    0.6
+   ],
+   "massKg": 2.5,
+   "priceJpy": 18000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "階段",
+    "段差",
+    "でこぼこ",
+    "雪"
+   ],
+   "specs": {
+    "loadKg": 60.0
+   }
+  },
+  {
+   "id": "crawl-100",
+   "type": "crawler",
+   "labelJa": "クローラー（長さ 100 cm）",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.2067,
+    1.0
+   ],
+   "massKg": 6.0,
+   "priceJpy": 40000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "階段",
+    "段差",
+    "でこぼこ",
+    "雪"
+   ],
+   "specs": {
+    "loadKg": 150.0
+   }
+  },
+  {
+   "id": "cast-ball25",
+   "type": "caster",
+   "labelJa": "ボールキャスター（25 mm）",
+   "shape": "sphere",
+   "size": [
+    0.025,
+    0.025,
+    0.025
+   ],
+   "massKg": 0.03,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "ball",
+   "tags": [
+    "転がる",
+    "支える",
+    "ロボット"
+   ],
+   "specs": {
+    "loadKg": 10.0
+   }
+  },
+  {
+   "id": "cast-40",
+   "type": "caster",
+   "labelJa": "自在キャスター（40 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.055,
+    0.04
+   ],
+   "massKg": 0.05,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "転がる",
+    "台車",
+    "向きが変わる"
+   ],
+   "specs": {
+    "loadKg": 20.0
+   }
+  },
+  {
+   "id": "cast-75b",
+   "type": "caster",
+   "labelJa": "ストッパー付き自在キャスター（75 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.075,
+    0.1,
+    0.075
+   ],
+   "massKg": 0.2,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "転がる",
+    "止める",
+    "台車"
+   ],
+   "specs": {
+    "loadKg": 60.0
+   }
+  },
+  {
+   "id": "cast-100",
+   "type": "caster",
+   "labelJa": "自在キャスター（100 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.1,
+    0.13,
+    0.1
+   ],
+   "massKg": 0.35,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "台車",
+    "重い荷物"
+   ],
+   "specs": {
+    "loadKg": 100.0
+   }
+  },
+  {
+   "id": "leg-adj",
+   "type": "leg",
+   "labelJa": "高さを変えられる脚",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.08,
+    0.03
+   ],
+   "massKg": 0.05,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "立てる",
+    "床",
+    "水平"
+   ],
+   "specs": {
+    "loadKg": 50.0
+   }
+  },
+  {
+   "id": "leg-fold",
+   "type": "leg",
+   "labelJa": "折りたたみ脚",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.6,
+    0.025
+   ],
+   "massKg": 0.4,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "立てる",
+    "たたむ",
+    "台"
+   ],
+   "specs": {
+    "loadKg": 30.0
+   }
+  },
+  {
+   "id": "leg-robot",
+   "type": "leg",
+   "labelJa": "歩くロボットの脚（関節つき）",
+   "shape": "cylinder",
+   "size": [
+    0.05,
+    0.3,
+    0.05
+   ],
+   "massKg": 0.5,
+   "priceJpy": 12000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "歩く",
+    "階段",
+    "ロボット"
+   ],
+   "specs": {
+    "loadKg": 5.0,
+    "powerW": 20.0
+   }
+  },
+  {
+   "id": "pump-mini",
+   "type": "pump",
+   "labelJa": "小型水ポンプ（3V）",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.045,
+    0.025
+   ],
+   "massKg": 0.03,
+   "priceJpy": 400,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "水",
+    "吸う",
+    "流す"
+   ],
+   "specs": {
+    "flowLpm": 1.5,
+    "powerW": 1.0
+   }
+  },
+  {
+   "id": "pump-dia",
+   "type": "pump",
+   "labelJa": "ダイヤフラムポンプ（12V）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.035,
+    0.09
+   ],
+   "massKg": 0.2,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "水",
+    "霧",
+    "高圧"
+   ],
+   "specs": {
+    "flowLpm": 3.0,
+    "powerW": 24.0
+   }
+  },
+  {
+   "id": "pump-peri",
+   "type": "pump",
+   "labelJa": "チューブポンプ（少しずつ送る）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.04,
+    0.05
+   ],
+   "massKg": 0.1,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "正確",
+    "薬",
+    "えさ"
+   ],
+   "specs": {
+    "flowLpm": 0.1,
+    "powerW": 4.0
+   }
+  },
+  {
+   "id": "pump-air",
+   "type": "pump",
+   "labelJa": "エアーポンプ（空気を送る）",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.025,
+    0.05
+   ],
+   "massKg": 0.05,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "空気",
+    "膨らむ",
+    "クッション"
+   ],
+   "specs": {
+    "flowLpm": 2.0,
+    "powerW": 2.0
+   }
+  },
+  {
+   "id": "pump-sub",
+   "type": "pump",
+   "labelJa": "水中ポンプ（12V）",
+   "shape": "cylinder",
+   "size": [
+    0.05,
+    0.09,
+    0.05
+   ],
+   "massKg": 0.25,
+   "priceJpy": 2500,
+   "ip": 8,
+   "variant": "",
+   "tags": [
+    "水",
+    "くみ上げ"
+   ],
+   "specs": {
+    "flowLpm": 8.0,
+    "powerW": 20.0
+   }
+  },
+  {
+   "id": "tank-0_1l",
+   "type": "tank",
+   "labelJa": "タンク（0.1 L）",
+   "shape": "cylinder",
+   "size": [
+    0.045,
+    0.08,
+    0.045
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "水",
+    "ためる",
+    "入れる"
+   ],
+   "specs": {
+    "volumeL": 0.1
+   }
+  },
+  {
+   "id": "tank-0_5l",
+   "type": "tank",
+   "labelJa": "タンク（0.5 L）",
+   "shape": "cylinder",
+   "size": [
+    0.075,
+    0.14,
+    0.075
+   ],
+   "massKg": 0.08,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "水",
+    "ためる",
+    "入れる"
+   ],
+   "specs": {
+    "volumeL": 0.5
+   }
+  },
+  {
+   "id": "tank-2l",
+   "type": "tank",
+   "labelJa": "タンク（2 L）",
+   "shape": "cylinder",
+   "size": [
+    0.12,
+    0.22,
+    0.12
+   ],
+   "massKg": 0.25,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "水",
+    "ためる",
+    "入れる"
+   ],
+   "specs": {
+    "volumeL": 2.0
+   }
+  },
+  {
+   "id": "tank-5l",
+   "type": "tank",
+   "labelJa": "タンク（5 L）",
+   "shape": "cylinder",
+   "size": [
+    0.17,
+    0.27,
+    0.17
+   ],
+   "massKg": 0.5,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "水",
+    "ためる",
+    "入れる"
+   ],
+   "specs": {
+    "volumeL": 5.0
+   }
+  },
+  {
+   "id": "tank-10l",
+   "type": "tank",
+   "labelJa": "タンク（10 L）",
+   "shape": "cylinder",
+   "size": [
+    0.22,
+    0.32,
+    0.22
+   ],
+   "massKg": 0.9,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "水",
+    "ためる",
+    "入れる"
+   ],
+   "specs": {
+    "volumeL": 10.0
+   }
+  },
+  {
+   "id": "noz-mist",
+   "type": "nozzle",
+   "labelJa": "霧のノズル",
+   "shape": "cone",
+   "size": [
+    0.012,
+    0.015,
+    0.012
+   ],
+   "massKg": 0.005,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "霧",
+    "冷やす",
+    "まく"
+   ],
+   "specs": {
+    "flowLpm": 0.1
+   }
+  },
+  {
+   "id": "noz-spray",
+   "type": "nozzle",
+   "labelJa": "スプレーノズル",
+   "shape": "cone",
+   "size": [
+    0.02,
+    0.025,
+    0.02
+   ],
+   "massKg": 0.01,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "まく",
+    "水",
+    "洗う"
+   ],
+   "specs": {
+    "flowLpm": 1.0
+   }
+  },
+  {
+   "id": "noz-jet",
+   "type": "nozzle",
+   "labelJa": "噴射ノズル",
+   "shape": "cone",
+   "size": [
+    0.03,
+    0.05,
+    0.03
+   ],
+   "massKg": 0.03,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "噴く",
+    "勢い",
+    "空気"
+   ],
+   "specs": {
+    "flowLpm": 5.0
+   }
+  },
+  {
+   "id": "valve-sol",
+   "type": "valve",
+   "labelJa": "電磁弁（水・空気）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.05,
+    0.03
+   ],
+   "massKg": 0.12,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "止める",
+    "流す",
+    "自動"
+   ],
+   "specs": {
+    "powerW": 5.0
+   }
+  },
+  {
+   "id": "valve-check",
+   "type": "valve",
+   "labelJa": "逆止弁（逆に流れない）",
+   "shape": "cylinder",
+   "size": [
+    0.015,
+    0.03,
+    0.015
+   ],
+   "massKg": 0.01,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "止める",
+    "空気",
+    "水"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "valve-ball",
+   "type": "valve",
+   "labelJa": "ボールバルブ（手で開け閉め）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.04,
+    0.05
+   ],
+   "massKg": 0.15,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "止める",
+    "手で"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hose-4",
+   "type": "hose",
+   "labelJa": "シリコンチューブ（太さ 4 mm、1 m）",
+   "shape": "cylinder",
+   "size": [
+    0.004,
+    1.0,
+    0.004
+   ],
+   "massKg": 0.016,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "流す",
+    "つなぐ",
+    "水",
+    "空気"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hose-8",
+   "type": "hose",
+   "labelJa": "シリコンチューブ（太さ 8 mm、1 m）",
+   "shape": "cylinder",
+   "size": [
+    0.008,
+    1.0,
+    0.008
+   ],
+   "massKg": 0.032,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "流す",
+    "つなぐ",
+    "水",
+    "空気"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hose-12",
+   "type": "hose",
+   "labelJa": "シリコンチューブ（太さ 12 mm、1 m）",
+   "shape": "cylinder",
+   "size": [
+    0.012,
+    1.0,
+    0.012
+   ],
+   "massKg": 0.048,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "流す",
+    "つなぐ",
+    "水",
+    "空気"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "fan-30",
+   "type": "fan",
+   "labelJa": "ファン（30 mm）",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.0175,
+    0.03
+   ],
+   "massKg": 0.046,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "風",
+    "冷やす",
+    "換気"
+   ],
+   "specs": {
+    "airflowM3h": 5.0,
+    "powerW": 0.5,
+    "noiseDb": 25.0
+   }
+  },
+  {
+   "id": "fan-40",
+   "type": "fan",
+   "labelJa": "ファン（40 mm）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.02,
+    0.04
+   ],
+   "massKg": 0.058,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "風",
+    "冷やす",
+    "換気"
+   ],
+   "specs": {
+    "airflowM3h": 9.0,
+    "powerW": 0.8,
+    "noiseDb": 26.0
+   }
+  },
+  {
+   "id": "fan-60",
+   "type": "fan",
+   "labelJa": "ファン（60 mm）",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.025,
+    0.06
+   ],
+   "massKg": 0.082,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "風",
+    "冷やす",
+    "換気"
+   ],
+   "specs": {
+    "airflowM3h": 30.0,
+    "powerW": 1.5,
+    "noiseDb": 28.0
+   }
+  },
+  {
+   "id": "fan-80",
+   "type": "fan",
+   "labelJa": "ファン（80 mm）",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.03,
+    0.08
+   ],
+   "massKg": 0.106,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "風",
+    "冷やす",
+    "換気"
+   ],
+   "specs": {
+    "airflowM3h": 55.0,
+    "powerW": 2.0,
+    "noiseDb": 30.0
+   }
+  },
+  {
+   "id": "fan-120",
+   "type": "fan",
+   "labelJa": "ファン（120 mm）",
+   "shape": "box",
+   "size": [
+    0.12,
+    0.04,
+    0.12
+   ],
+   "massKg": 0.154,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "風",
+    "冷やす",
+    "換気"
+   ],
+   "specs": {
+    "airflowM3h": 110.0,
+    "powerW": 3.0,
+    "noiseDb": 32.0
+   }
+  },
+  {
+   "id": "fan-blower",
+   "type": "fan",
+   "labelJa": "ブロワー（50 mm、強い風）",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.015,
+    0.05
+   ],
+   "massKg": 0.03,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "blower",
+   "tags": [
+    "風",
+    "送る",
+    "強い"
+   ],
+   "specs": {
+    "airflowM3h": 10.0,
+    "powerW": 2.0,
+    "noiseDb": 40.0
+   }
+  },
+  {
+   "id": "fan-wp",
+   "type": "fan",
+   "labelJa": "防水ファン（80 mm）",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.025,
+    0.08
+   ],
+   "massKg": 0.1,
+   "priceJpy": 2500,
+   "ip": 5,
+   "variant": "",
+   "tags": [
+    "風",
+    "屋外",
+    "雨"
+   ],
+   "specs": {
+    "airflowM3h": 50.0,
+    "powerW": 2.5,
+    "noiseDb": 32.0
+   }
+  },
+  {
+   "id": "fan-neck",
+   "type": "fan",
+   "labelJa": "首かけ扇風機用の小型ファン",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.02,
+    0.04
+   ],
+   "massKg": 0.02,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "風",
+    "首",
+    "夏"
+   ],
+   "specs": {
+    "airflowM3h": 6.0,
+    "powerW": 1.5,
+    "noiseDb": 35.0
+   }
+  },
+  {
+   "id": "disp-0_96",
+   "type": "display",
+   "labelJa": "画面（0.96 インチ）",
+   "shape": "box",
+   "size": [
+    0.027,
+    0.006,
+    0.027
+   ],
+   "massKg": 0.004,
+   "priceJpy": 600,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "表示",
+    "数字",
+    "見せる"
+   ],
+   "specs": {
+    "inch": 0.96,
+    "powerW": 0.08
+   }
+  },
+  {
+   "id": "disp-1_3",
+   "type": "display",
+   "labelJa": "画面（1.3 インチ）",
+   "shape": "box",
+   "size": [
+    0.035,
+    0.006,
+    0.035
+   ],
+   "massKg": 0.006,
+   "priceJpy": 900,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "表示",
+    "数字",
+    "見せる"
+   ],
+   "specs": {
+    "inch": 1.3,
+    "powerW": 0.1
+   }
+  },
+  {
+   "id": "disp-2_4",
+   "type": "display",
+   "labelJa": "画面（2.4 インチ）",
+   "shape": "box",
+   "size": [
+    0.06,
+    0.006,
+    0.045
+   ],
+   "massKg": 0.02,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "表示",
+    "数字",
+    "見せる"
+   ],
+   "specs": {
+    "inch": 2.4,
+    "powerW": 0.4
+   }
+  },
+  {
+   "id": "disp-3_5",
+   "type": "display",
+   "labelJa": "画面（3.5 インチ）",
+   "shape": "box",
+   "size": [
+    0.085,
+    0.006,
+    0.06
+   ],
+   "massKg": 0.04,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "表示",
+    "数字",
+    "見せる"
+   ],
+   "specs": {
+    "inch": 3.5,
+    "powerW": 0.8
+   }
+  },
+  {
+   "id": "disp-7",
+   "type": "display",
+   "labelJa": "画面（7 インチ）",
+   "shape": "box",
+   "size": [
+    0.17,
+    0.006,
+    0.11
+   ],
+   "massKg": 0.25,
+   "priceJpy": 7000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "表示",
+    "数字",
+    "見せる"
+   ],
+   "specs": {
+    "inch": 7.0,
+    "powerW": 3.0
+   }
+  },
+  {
+   "id": "disp-epaper",
+   "type": "display",
+   "labelJa": "電子ペーパー（2.9 インチ・省電力）",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.004,
+    0.04
+   ],
+   "massKg": 0.015,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "表示",
+    "長持ち",
+    "札"
+   ],
+   "specs": {
+    "inch": 2.9,
+    "powerW": 0.01
+   }
+  },
+  {
+   "id": "disp-matrix",
+   "type": "display",
+   "labelJa": "LED ドット表示（8×8）",
+   "shape": "box",
+   "size": [
+    0.032,
+    0.008,
+    0.032
+   ],
+   "massKg": 0.01,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "matrix",
+   "tags": [
+    "表示",
+    "顔",
+    "光る",
+    "かわいい"
+   ],
+   "specs": {
+    "inch": 1.3,
+    "powerW": 0.5,
+    "lumens": 20.0
+   }
+  },
+  {
+   "id": "vib-coin",
+   "type": "vibrator",
+   "labelJa": "コイン形振動モーター",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.003,
+    0.01
+   ],
+   "massKg": 0.001,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "震える",
+    "知らせる",
+    "腕"
+   ],
+   "specs": {
+    "powerW": 0.2
+   }
+  },
+  {
+   "id": "vib-erm",
+   "type": "vibrator",
+   "labelJa": "振動モーター（10 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.02,
+    0.01
+   ],
+   "massKg": 0.004,
+   "priceJpy": 150,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "震える",
+    "知らせる",
+    "手"
+   ],
+   "specs": {
+    "powerW": 0.3
+   }
+  },
+  {
+   "id": "vib-lra",
+   "type": "vibrator",
+   "labelJa": "リニア振動子（くっきりした振動）",
+   "shape": "box",
+   "size": [
+    0.01,
+    0.004,
+    0.01
+   ],
+   "massKg": 0.002,
+   "priceJpy": 400,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "震える",
+    "合図",
+    "腕"
+   ],
+   "specs": {
+    "powerW": 0.2
+   }
+  },
+  {
+   "id": "ref-tape",
+   "type": "reflector",
+   "labelJa": "反射テープ（2 cm × 30 cm）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.001,
+    0.02
+   ],
+   "massKg": 0.005,
+   "priceJpy": 300,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "夜",
+    "見える",
+    "車",
+    "反射"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "ref-disk",
+   "type": "reflector",
+   "labelJa": "丸い反射板（直径 7 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.07,
+    0.005,
+    0.07
+   ],
+   "massKg": 0.015,
+   "priceJpy": 200,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "夜",
+    "見える",
+    "自転車"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "ref-panel",
+   "type": "reflector",
+   "labelJa": "反射パネル（A5）",
+   "shape": "box",
+   "size": [
+    0.21,
+    0.002,
+    0.15
+   ],
+   "massKg": 0.04,
+   "priceJpy": 600,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "夜",
+    "見える",
+    "背中",
+    "ベスト"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "sw-tact",
+   "type": "switch",
+   "labelJa": "押しボタン（小）",
+   "shape": "box",
+   "size": [
+    0.012,
+    0.008,
+    0.012
+   ],
+   "massKg": 0.002,
+   "priceJpy": 30,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "押す",
+    "操作"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "sw-big",
+   "type": "switch",
+   "labelJa": "大きな押しボタン",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.02,
+    0.03
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "button",
+   "tags": [
+    "押す",
+    "すぐ",
+    "非常"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "sw-toggle",
+   "type": "switch",
+   "labelJa": "トグルスイッチ",
+   "shape": "box",
+   "size": [
+    0.015,
+    0.03,
+    0.015
+   ],
+   "massKg": 0.01,
+   "priceJpy": 200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "入れる",
+    "切る",
+    "電源"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "sw-wp",
+   "type": "switch",
+   "labelJa": "防水押しボタン",
+   "shape": "cylinder",
+   "size": [
+    0.022,
+    0.03,
+    0.022
+   ],
+   "massKg": 0.015,
+   "priceJpy": 600,
+   "ip": 7,
+   "variant": "button",
+   "tags": [
+    "押す",
+    "屋外",
+    "雨"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "sw-dial",
+   "type": "switch",
+   "labelJa": "回すつまみ（ダイヤル）",
+   "shape": "cylinder",
+   "size": [
+    0.025,
+    0.02,
+    0.025
+   ],
+   "massKg": 0.015,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "dial",
+   "tags": [
+    "強さ",
+    "調整",
+    "回す"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "sw-slide",
+   "type": "switch",
+   "labelJa": "スライドスイッチ",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.008,
+    0.01
+   ],
+   "massKg": 0.003,
+   "priceJpy": 50,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "入れる",
+    "切る"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "rf-ble",
+   "type": "radio",
+   "labelJa": "Bluetooth モジュール",
+   "shape": "box",
+   "size": [
+    0.018,
+    0.003,
+    0.025
+   ],
+   "massKg": 0.002,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "スマホ",
+    "つなぐ",
+    "近く"
+   ],
+   "specs": {
+    "rangeM": 10.0,
+    "powerW": 0.05
+   }
+  },
+  {
+   "id": "rf-wifi",
+   "type": "radio",
+   "labelJa": "Wi-Fi モジュール",
+   "shape": "box",
+   "size": [
+    0.025,
+    0.004,
+    0.05
+   ],
+   "massKg": 0.005,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "インターネット",
+    "家",
+    "つなぐ"
+   ],
+   "specs": {
+    "rangeM": 30.0,
+    "powerW": 0.5
+   }
+  },
+  {
+   "id": "rf-lora",
+   "type": "radio",
+   "labelJa": "LoRa 無線（遠くまで届く）",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.006,
+    0.04
+   ],
+   "massKg": 0.008,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "遠く",
+    "山",
+    "見守り"
+   ],
+   "specs": {
+    "rangeM": 2000.0,
+    "powerW": 0.4
+   }
+  },
+  {
+   "id": "rf-lte",
+   "type": "radio",
+   "labelJa": "携帯回線モジュール（LTE）",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.005,
+    0.04
+   ],
+   "massKg": 0.01,
+   "priceJpy": 6000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "どこでも",
+    "位置",
+    "知らせる"
+   ],
+   "specs": {
+    "rangeM": 10000.0,
+    "powerW": 1.5
+   }
+  },
+  {
+   "id": "rf-ir",
+   "type": "radio",
+   "labelJa": "赤外線リモコン受信部",
+   "shape": "box",
+   "size": [
+    0.01,
+    0.007,
+    0.006
+   ],
+   "massKg": 0.001,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "リモコン",
+    "家電"
+   ],
+   "specs": {
+    "rangeM": 8.0,
+    "powerW": 0.005
+   }
+  },
+  {
+   "id": "chg-qi5",
+   "type": "charger",
+   "labelJa": "ワイヤレス充電コイル（5W）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.003,
+    0.04
+   ],
+   "massKg": 0.01,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "充電",
+    "置くだけ"
+   ],
+   "specs": {
+    "powerW": 5.0
+   }
+  },
+  {
+   "id": "chg-qi15",
+   "type": "charger",
+   "labelJa": "ワイヤレス充電コイル（15W）",
+   "shape": "cylinder",
+   "size": [
+    0.05,
+    0.004,
+    0.05
+   ],
+   "massKg": 0.02,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "充電",
+    "置くだけ",
+    "速い"
+   ],
+   "specs": {
+    "powerW": 15.0
+   }
+  },
+  {
+   "id": "chg-mag",
+   "type": "charger",
+   "labelJa": "マグネット充電端子",
+   "shape": "box",
+   "size": [
+    0.015,
+    0.006,
+    0.008
+   ],
+   "massKg": 0.003,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "充電",
+    "防水",
+    "くっつく"
+   ],
+   "specs": {
+    "powerW": 10.0
+   }
+  },
+  {
+   "id": "cap-10f",
+   "type": "capacitor",
+   "labelJa": "電気二重層キャパシタ（10F）",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.03,
+    0.01
+   ],
+   "massKg": 0.006,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "すぐ充電",
+    "瞬間",
+    "長持ち"
+   ],
+   "specs": {
+    "capacityWh": 0.0101,
+    "voltageV": 2.7
+   }
+  },
+  {
+   "id": "cap-100f",
+   "type": "capacitor",
+   "labelJa": "電気二重層キャパシタ（100F）",
+   "shape": "cylinder",
+   "size": [
+    0.022,
+    0.045,
+    0.022
+   ],
+   "massKg": 0.02,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "すぐ充電",
+    "瞬間",
+    "長持ち"
+   ],
+   "specs": {
+    "capacityWh": 0.1013,
+    "voltageV": 2.7
+   }
+  },
+  {
+   "id": "cap-500f",
+   "type": "capacitor",
+   "labelJa": "電気二重層キャパシタ（500F）",
+   "shape": "cylinder",
+   "size": [
+    0.035,
+    0.06,
+    0.035
+   ],
+   "massKg": 0.1,
+   "priceJpy": 2000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "すぐ充電",
+    "瞬間",
+    "長持ち"
+   ],
+   "specs": {
+    "capacityWh": 0.5063,
+    "voltageV": 2.7
+   }
+  },
+  {
+   "id": "hs-20",
+   "type": "heat_sink",
+   "labelJa": "放熱板（20 mm 角）",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.008,
+    0.02
+   ],
+   "massKg": 0.01,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "冷やす",
+    "熱を逃がす"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hs-40",
+   "type": "heat_sink",
+   "labelJa": "放熱板（40 mm 角）",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.008,
+    0.04
+   ],
+   "massKg": 0.03,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "冷やす",
+    "熱を逃がす"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hs-100",
+   "type": "heat_sink",
+   "labelJa": "放熱板（100 mm 角）",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.02,
+    0.1
+   ],
+   "massKg": 0.2,
+   "priceJpy": 1200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "冷やす",
+    "熱を逃がす"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hs-pipe",
+   "type": "heat_sink",
+   "labelJa": "ヒートパイプつき放熱器",
+   "shape": "box",
+   "size": [
+    0.05,
+    0.06,
+    0.03
+   ],
+   "massKg": 0.15,
+   "priceJpy": 2500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "冷やす",
+    "強力"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "ins-foam5",
+   "type": "insulation",
+   "labelJa": "断熱シート（発泡、5 mm）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.005,
+    0.3
+   ],
+   "massKg": 0.01,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "保温",
+    "保冷",
+    "冷めない"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "ins-foam10",
+   "type": "insulation",
+   "labelJa": "断熱ボード（発泡、10 mm）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.01,
+    0.3
+   ],
+   "massKg": 0.03,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "保温",
+    "保冷",
+    "箱"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "ins-aerogel",
+   "type": "insulation",
+   "labelJa": "エアロゲル断熱シート（3 mm）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.003,
+    0.3
+   ],
+   "massKg": 0.015,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "保温",
+    "薄い",
+    "服"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "ins-vacuum",
+   "type": "insulation",
+   "labelJa": "真空断熱パネル（10 mm）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.01,
+    0.3
+   ],
+   "massKg": 0.18,
+   "priceJpy": 4000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "保冷",
+    "強力",
+    "箱"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "clip-binder",
+   "type": "clip",
+   "labelJa": "ダブルクリップ",
+   "shape": "box",
+   "size": [
+    0.032,
+    0.02,
+    0.012
+   ],
+   "massKg": 0.01,
+   "priceJpy": 50,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "はさむ",
+    "留める"
+   ],
+   "specs": {
+    "forceN": 15.0
+   }
+  },
+  {
+   "id": "clip-belt",
+   "type": "clip",
+   "labelJa": "ベルトクリップ",
+   "shape": "box",
+   "size": [
+    0.03,
+    0.06,
+    0.012
+   ],
+   "massKg": 0.015,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "腰",
+    "ベルト",
+    "付ける"
+   ],
+   "specs": {
+    "forceN": 20.0
+   }
+  },
+  {
+   "id": "clip-cable",
+   "type": "clip",
+   "labelJa": "コードクリップ",
+   "shape": "box",
+   "size": [
+    0.015,
+    0.012,
+    0.015
+   ],
+   "massKg": 0.002,
+   "priceJpy": 30,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "まとめる",
+    "留める"
+   ],
+   "specs": {
+    "forceN": 5.0
+   }
+  },
+  {
+   "id": "suc-30",
+   "type": "suction_cup",
+   "labelJa": "吸盤（直径 3 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.03,
+    0.0125,
+    0.03
+   ],
+   "massKg": 0.005,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "窓",
+    "壁",
+    "くっつく",
+    "車"
+   ],
+   "specs": {
+    "forceN": 20.0
+   }
+  },
+  {
+   "id": "suc-60",
+   "type": "suction_cup",
+   "labelJa": "吸盤（直径 6 cm）",
+   "shape": "cylinder",
+   "size": [
+    0.06,
+    0.02,
+    0.06
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "窓",
+    "壁",
+    "くっつく",
+    "車"
+   ],
+   "specs": {
+    "forceN": 80.0
+   }
+  },
+  {
+   "id": "suc-120",
+   "type": "suction_cup",
+   "labelJa": "吸盤（直径 12 cm、レバー式）",
+   "shape": "cylinder",
+   "size": [
+    0.12,
+    0.035,
+    0.12
+   ],
+   "massKg": 0.15,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "窓",
+    "壁",
+    "くっつく",
+    "車"
+   ],
+   "specs": {
+    "forceN": 400.0
+   }
+  },
+  {
+   "id": "mag-10",
+   "type": "magnet",
+   "labelJa": "ネオジム磁石（直径 10 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.01,
+    0.004,
+    0.01
+   ],
+   "massKg": 0.004,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "くっつく",
+    "鉄",
+    "外せる"
+   ],
+   "specs": {
+    "forceN": 20.0
+   }
+  },
+  {
+   "id": "mag-20",
+   "type": "magnet",
+   "labelJa": "ネオジム磁石（直径 20 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.02,
+    0.004,
+    0.02
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "くっつく",
+    "鉄",
+    "外せる"
+   ],
+   "specs": {
+    "forceN": 80.0
+   }
+  },
+  {
+   "id": "mag-pot40",
+   "type": "magnet",
+   "labelJa": "フック付き強力磁石（直径 40 mm）",
+   "shape": "cylinder",
+   "size": [
+    0.04,
+    0.01,
+    0.04
+   ],
+   "massKg": 0.08,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "くっつく",
+    "鉄",
+    "吊るす"
+   ],
+   "specs": {
+    "forceN": 250.0
+   }
+  },
+  {
+   "id": "hook-s",
+   "type": "hook",
+   "labelJa": "S 字フック",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.08,
+    0.006
+   ],
+   "massKg": 0.02,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "掛ける",
+    "吊るす"
+   ],
+   "specs": {
+    "loadKg": 5.0
+   }
+  },
+  {
+   "id": "hook-wall",
+   "type": "hook",
+   "labelJa": "壁掛けフック",
+   "shape": "box",
+   "size": [
+    0.02,
+    0.04,
+    0.03
+   ],
+   "massKg": 0.02,
+   "priceJpy": 200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "掛ける",
+    "壁"
+   ],
+   "specs": {
+    "loadKg": 3.0
+   }
+  },
+  {
+   "id": "hook-carabiner",
+   "type": "hook",
+   "labelJa": "カラビナ",
+   "shape": "box",
+   "size": [
+    0.04,
+    0.08,
+    0.008
+   ],
+   "massKg": 0.03,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "つなぐ",
+    "外せる",
+    "リュック"
+   ],
+   "specs": {
+    "loadKg": 20.0
+   }
+  },
+  {
+   "id": "vel-small",
+   "type": "velcro",
+   "labelJa": "面ファスナー（2 cm × 10 cm）",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.004,
+    0.02
+   ],
+   "massKg": 0.003,
+   "priceJpy": 100,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "付け外し",
+    "服",
+    "腕"
+   ],
+   "specs": {
+    "forceN": 15.0
+   }
+  },
+  {
+   "id": "vel-large",
+   "type": "velcro",
+   "labelJa": "面ファスナー（5 cm × 50 cm）",
+   "shape": "box",
+   "size": [
+    0.5,
+    0.004,
+    0.05
+   ],
+   "massKg": 0.03,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "付け外し",
+    "体",
+    "固定"
+   ],
+   "specs": {
+    "forceN": 60.0
+   }
+  },
+  {
+   "id": "hdl-pull",
+   "type": "handle",
+   "labelJa": "小さな取っ手",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.025,
+    0.02
+   ],
+   "massKg": 0.03,
+   "priceJpy": 200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "持つ",
+    "引く",
+    "ふた"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hdl-carry",
+   "type": "handle",
+   "labelJa": "持ち手（グリップ）",
+   "shape": "box",
+   "size": [
+    0.12,
+    0.04,
+    0.03
+   ],
+   "massKg": 0.08,
+   "priceJpy": 500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "持つ",
+    "運ぶ",
+    "握る"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "hdl-trolley",
+   "type": "handle",
+   "labelJa": "伸びる引き手（キャリー用）",
+   "shape": "box",
+   "size": [
+    0.25,
+    0.5,
+    0.03
+   ],
+   "massKg": 0.8,
+   "priceJpy": 3000,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "引く",
+    "運ぶ",
+    "キャリー"
+   ],
+   "specs": {
+    "strokeM": 0.4
+   }
+  },
+  {
+   "id": "gsk-o20",
+   "type": "gasket",
+   "labelJa": "O リング（直径 20 mm）",
+   "shape": "ring",
+   "size": [
+    0.02,
+    0.002,
+    0.02
+   ],
+   "massKg": 0.001,
+   "priceJpy": 30,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "防水",
+    "ふた",
+    "すき間"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "gsk-o50",
+   "type": "gasket",
+   "labelJa": "O リング（直径 50 mm）",
+   "shape": "ring",
+   "size": [
+    0.05,
+    0.003,
+    0.05
+   ],
+   "massKg": 0.003,
+   "priceJpy": 80,
+   "ip": 7,
+   "variant": "",
+   "tags": [
+    "防水",
+    "ふた",
+    "すき間"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "gsk-strip",
+   "type": "gasket",
+   "labelJa": "すき間テープ（ゴム、1 m）",
+   "shape": "box",
+   "size": [
+    1.0,
+    0.005,
+    0.01
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": 5,
+   "variant": "",
+   "tags": [
+    "防水",
+    "すき間",
+    "におい",
+    "閉じ込める"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "mesh-fine",
+   "type": "mesh_cover",
+   "labelJa": "細かいメッシュ（防虫・防じん）",
+   "shape": "box",
+   "size": [
+    0.2,
+    0.002,
+    0.2
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "通気",
+    "虫",
+    "ほこり"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "mesh-grille",
+   "type": "mesh_cover",
+   "labelJa": "金属グリル（ファン・スピーカー用）",
+   "shape": "box",
+   "size": [
+    0.08,
+    0.003,
+    0.08
+   ],
+   "massKg": 0.02,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "守る",
+    "指",
+    "ファン"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "mesh-net",
+   "type": "mesh_cover",
+   "labelJa": "通気ネット（布）",
+   "shape": "box",
+   "size": [
+    0.3,
+    0.002,
+    0.3
+   ],
+   "massKg": 0.01,
+   "priceJpy": 200,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "通気",
+    "蒸れない",
+    "服"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "win-acrylic",
+   "type": "window",
+   "labelJa": "アクリル窓（2 mm）",
+   "shape": "box",
+   "size": [
+    0.1,
+    0.002,
+    0.1
+   ],
+   "massKg": 0.024,
+   "priceJpy": 300,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "見える",
+    "のぞく",
+    "ふた"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "win-pc",
+   "type": "window",
+   "labelJa": "ポリカーボネート窓（割れにくい、3 mm）",
+   "shape": "box",
+   "size": [
+    0.2,
+    0.003,
+    0.15
+   ],
+   "massKg": 0.11,
+   "priceJpy": 800,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "見える",
+    "割れない",
+    "盾"
+   ],
+   "specs": {}
+  },
+  {
+   "id": "win-visor",
+   "type": "window",
+   "labelJa": "くもり止めバイザー",
+   "shape": "dome",
+   "size": [
+    0.22,
+    0.06,
+    0.22
+   ],
+   "massKg": 0.06,
+   "priceJpy": 1500,
+   "ip": -1,
+   "variant": "",
+   "tags": [
+    "顔",
+    "見える",
+    "雨",
+    "守る"
+   ],
+   "specs": {}
+  }
+ ]
+}

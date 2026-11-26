@@ -13,6 +13,8 @@ namespace ImpossibleLab.Core
         /// <summary>形の指定がないときの形（DNA v1 の見た目と同じになるよう決めてある）。</summary>
         public string DefaultShape = "cylinder";
         public string DefaultMaterial = "plastic";
+        /// <summary>まとまり（LabCatalog.PartGroups）。AI への部品の説明と画面の並びに使う。</summary>
+        public string Group = "structure";
     }
 
     /// <summary>名前つきの選択肢（タグ・取り付け位置・形）。</summary>
@@ -92,9 +94,9 @@ namespace ImpossibleLab.Core
         public static readonly PartTypeInfo[] PartTypes =
         {
             new PartTypeInfo { Type = "body", LabelJa = "本体", MinScale = 0.03f, MaxScale = 1.0f },
-            new PartTypeInfo { Type = "wheel", LabelJa = "車輪", MinScale = 0.03f, MaxScale = 0.6f, DefaultMaterial = "rubber" },
+            new PartTypeInfo { Type = "wheel", LabelJa = "車輪", MinScale = 0.015f, MaxScale = 0.6f, DefaultMaterial = "rubber" },
             new PartTypeInfo { Type = "container", LabelJa = "格納部", MinScale = 0.05f, MaxScale = 1.0f, DefaultShape = "box" },
-            new PartTypeInfo { Type = "sensor", LabelJa = "センサー", MinScale = 0.005f, MaxScale = 0.3f, DefaultShape = "sphere" },
+            new PartTypeInfo { Type = "sensor", LabelJa = "センサー", MinScale = 0.001f, MaxScale = 0.3f, DefaultShape = "sphere" },
             new PartTypeInfo { Type = "arm", LabelJa = "アーム", MinScale = 0.02f, MaxScale = 1.0f, DefaultShape = "capsule", DefaultMaterial = "aluminum" },
             new PartTypeInfo { Type = "canopy", LabelJa = "キャノピー（覆い）", MinScale = 0.02f, MaxScale = 3.0f, DefaultMaterial = "fabric" },
             new PartTypeInfo { Type = "thruster", LabelJa = "推進ユニット", MinScale = 0.03f, MaxScale = 0.5f, DefaultMaterial = "aluminum" },
@@ -103,17 +105,80 @@ namespace ImpossibleLab.Core
             // DNA v2 で追加（docs/GENERAL_INVENTION_DESIGN.md 3章）。薄い部品・背の高い骨組みの範囲は AI 評価1回目（2026-11-09）の結果で広げた
             new PartTypeInfo { Type = "frame", LabelJa = "骨組み", MinScale = 0.005f, MaxScale = 2.2f, DefaultShape = "box", DefaultMaterial = "aluminum" },
             new PartTypeInfo { Type = "panel", LabelJa = "板", MinScale = 0.003f, MaxScale = 2.0f, DefaultShape = "box" },
-            new PartTypeInfo { Type = "light", LabelJa = "発光部", MinScale = 0.01f, MaxScale = 0.3f },
-            new PartTypeInfo { Type = "heater", LabelJa = "加熱部", MinScale = 0.003f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
-            new PartTypeInfo { Type = "cooler", LabelJa = "冷却部", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
-            new PartTypeInfo { Type = "motor", LabelJa = "駆動部（モーター）", MinScale = 0.02f, MaxScale = 0.3f, DefaultMaterial = "steel" },
+            new PartTypeInfo { Type = "light", LabelJa = "発光部", MinScale = 0.002f, MaxScale = 1.0f },
+            new PartTypeInfo { Type = "heater", LabelJa = "加熱部", MinScale = 0.001f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "cooler", LabelJa = "冷却部", MinScale = 0.003f, MaxScale = 0.5f, DefaultShape = "box", DefaultMaterial = "aluminum" },
+            new PartTypeInfo { Type = "motor", LabelJa = "駆動部（モーター）", MinScale = 0.008f, MaxScale = 0.8f, DefaultMaterial = "steel" },
             new PartTypeInfo { Type = "gripper", LabelJa = "つかみ具", MinScale = 0.02f, MaxScale = 0.4f, DefaultShape = "box" },
             new PartTypeInfo { Type = "cushion", LabelJa = "緩衝材", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "foam" },
-            new PartTypeInfo { Type = "battery", LabelJa = "電池", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box" },
-            new PartTypeInfo { Type = "solar", LabelJa = "太陽電池", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "glass" },
+            new PartTypeInfo { Type = "battery", LabelJa = "電池", MinScale = 0.002f, MaxScale = 0.5f, DefaultShape = "box" },
+            new PartTypeInfo { Type = "solar", LabelJa = "太陽電池", MinScale = 0.002f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "glass" },
             new PartTypeInfo { Type = "speaker", LabelJa = "音を出す部品", MinScale = 0.005f, MaxScale = 0.3f },
             new PartTypeInfo { Type = "strap", LabelJa = "ベルト・取り付け具", MinScale = 0.005f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "fabric" },
+
+            // 部品の拡充（2026-11-27、docs/DECISIONS.md D-41）。品番は Data/Catalog/Resources/ImpossibleLabCatalog/part_models.json（PartModels）
+            // 動き
+            new PartTypeInfo { Type = "hinge", LabelJa = "ちょうつがい", MinScale = 0.002f, MaxScale = 0.6f, DefaultShape = "box", DefaultMaterial = "steel", Group = "motion" },
+            new PartTypeInfo { Type = "slide_rail", LabelJa = "スライドレール", MinScale = 0.005f, MaxScale = 1.5f, DefaultShape = "box", DefaultMaterial = "steel", Group = "motion" },
+            new PartTypeInfo { Type = "telescopic", LabelJa = "伸縮ポール", MinScale = 0.01f, MaxScale = 2.0f, DefaultShape = "cylinder", DefaultMaterial = "aluminum", Group = "motion" },
+            new PartTypeInfo { Type = "spring", LabelJa = "ばね", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "cylinder", DefaultMaterial = "steel", Group = "motion" },
+            new PartTypeInfo { Type = "gear", LabelJa = "歯車・ベルト", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "cylinder", DefaultMaterial = "steel", Group = "motion" },
+            new PartTypeInfo { Type = "latch", LabelJa = "ロック・留め金", MinScale = 0.005f, MaxScale = 0.2f, DefaultShape = "box", DefaultMaterial = "steel", Group = "motion" },
+            new PartTypeInfo { Type = "crawler", LabelJa = "クローラー", MinScale = 0.03f, MaxScale = 1.2f, DefaultShape = "box", DefaultMaterial = "rubber", Group = "motion" },
+            new PartTypeInfo { Type = "caster", LabelJa = "キャスター", MinScale = 0.015f, MaxScale = 0.2f, DefaultShape = "cylinder", DefaultMaterial = "rubber", Group = "motion" },
+            new PartTypeInfo { Type = "leg", LabelJa = "脚", MinScale = 0.01f, MaxScale = 1.2f, DefaultShape = "cylinder", DefaultMaterial = "aluminum", Group = "motion" },
+            // 流体・風
+            new PartTypeInfo { Type = "pump", LabelJa = "ポンプ", MinScale = 0.01f, MaxScale = 0.4f, DefaultShape = "cylinder", Group = "fluid" },
+            new PartTypeInfo { Type = "tank", LabelJa = "タンク", MinScale = 0.02f, MaxScale = 1.0f, DefaultShape = "cylinder", Group = "fluid" },
+            new PartTypeInfo { Type = "nozzle", LabelJa = "ノズル", MinScale = 0.005f, MaxScale = 0.2f, DefaultShape = "cone", Group = "fluid" },
+            new PartTypeInfo { Type = "valve", LabelJa = "弁", MinScale = 0.008f, MaxScale = 0.2f, DefaultShape = "box", DefaultMaterial = "steel", Group = "fluid" },
+            new PartTypeInfo { Type = "hose", LabelJa = "ホース・チューブ", MinScale = 0.002f, MaxScale = 2.0f, DefaultShape = "cylinder", DefaultMaterial = "rubber", Group = "fluid" },
+            new PartTypeInfo { Type = "fan", LabelJa = "ファン", MinScale = 0.005f, MaxScale = 0.5f, DefaultShape = "box", Group = "fluid" },
+            // 光・音・知らせる
+            new PartTypeInfo { Type = "display", LabelJa = "画面", MinScale = 0.002f, MaxScale = 0.6f, DefaultShape = "box", Group = "output" },
+            new PartTypeInfo { Type = "vibrator", LabelJa = "振動モーター", MinScale = 0.002f, MaxScale = 0.06f, DefaultShape = "cylinder", DefaultMaterial = "steel", Group = "output" },
+            new PartTypeInfo { Type = "reflector", LabelJa = "反射材", MinScale = 0.001f, MaxScale = 1.0f, DefaultShape = "box", Group = "output" },
+            // 電気
+            new PartTypeInfo { Type = "switch", LabelJa = "スイッチ・ボタン", MinScale = 0.003f, MaxScale = 0.1f, DefaultShape = "box", Group = "power" },
+            new PartTypeInfo { Type = "radio", LabelJa = "無線モジュール", MinScale = 0.002f, MaxScale = 0.15f, DefaultShape = "box", Group = "power" },
+            new PartTypeInfo { Type = "charger", LabelJa = "ワイヤレス充電", MinScale = 0.002f, MaxScale = 0.3f, DefaultShape = "cylinder", Group = "power" },
+            new PartTypeInfo { Type = "capacitor", LabelJa = "コンデンサ（キャパシタ）", MinScale = 0.005f, MaxScale = 0.15f, DefaultShape = "cylinder", DefaultMaterial = "aluminum", Group = "power" },
+            // 熱
+            new PartTypeInfo { Type = "heat_sink", LabelJa = "放熱板", MinScale = 0.005f, MaxScale = 0.4f, DefaultShape = "box", DefaultMaterial = "aluminum", Group = "thermal" },
+            new PartTypeInfo { Type = "insulation", LabelJa = "断熱材", MinScale = 0.002f, MaxScale = 1.5f, DefaultShape = "box", DefaultMaterial = "foam", Group = "thermal" },
+            // 取り付け
+            new PartTypeInfo { Type = "clip", LabelJa = "クリップ", MinScale = 0.005f, MaxScale = 0.15f, DefaultShape = "box", Group = "mounting" },
+            new PartTypeInfo { Type = "suction_cup", LabelJa = "吸盤", MinScale = 0.003f, MaxScale = 0.15f, DefaultShape = "cylinder", DefaultMaterial = "rubber", Group = "mounting" },
+            new PartTypeInfo { Type = "magnet", LabelJa = "磁石", MinScale = 0.003f, MaxScale = 0.1f, DefaultShape = "cylinder", DefaultMaterial = "steel", Group = "mounting" },
+            new PartTypeInfo { Type = "hook", LabelJa = "フック", MinScale = 0.005f, MaxScale = 0.2f, DefaultShape = "box", DefaultMaterial = "steel", Group = "mounting" },
+            new PartTypeInfo { Type = "velcro", LabelJa = "面ファスナー", MinScale = 0.003f, MaxScale = 0.6f, DefaultShape = "box", DefaultMaterial = "fabric", Group = "mounting" },
+            new PartTypeInfo { Type = "handle", LabelJa = "取っ手", MinScale = 0.01f, MaxScale = 0.6f, DefaultShape = "box", Group = "mounting" },
+            // 守る
+            new PartTypeInfo { Type = "gasket", LabelJa = "防水パッキン", MinScale = 0.001f, MaxScale = 1.0f, DefaultShape = "ring", DefaultMaterial = "rubber", Group = "protection" },
+            new PartTypeInfo { Type = "mesh_cover", LabelJa = "メッシュの覆い", MinScale = 0.001f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "steel", Group = "protection" },
+            new PartTypeInfo { Type = "window", LabelJa = "透明な窓", MinScale = 0.001f, MaxScale = 1.0f, DefaultShape = "box", DefaultMaterial = "glass", Group = "protection" },
         };
+
+        /// <summary>部品のまとまり（AI への説明と画面の並び）。</summary>
+        public static readonly NamedOption[] PartGroups =
+        {
+            new NamedOption("structure", "本体・骨組み"), new NamedOption("motion", "動き"), new NamedOption("power", "電気"),
+            new NamedOption("sensing", "センサー"), new NamedOption("output", "光・音・知らせる"), new NamedOption("thermal", "熱"),
+            new NamedOption("fluid", "流体・風"), new NamedOption("mounting", "取り付け"), new NamedOption("protection", "守る"),
+        };
+
+        /// <summary>前からある部品のまとまり（表に Group を書かずに済むよう、ここでまとめて決める）。</summary>
+        static readonly Dictionary<string, string> LegacyGroups = new Dictionary<string, string>
+        {
+            ["wheel"] = "motion", ["arm"] = "motion", ["thruster"] = "motion", ["motor"] = "motion", ["gripper"] = "motion", ["stabilizer"] = "motion",
+            ["sensor"] = "sensing", ["light"] = "output", ["speaker"] = "output", ["heater"] = "thermal", ["cooler"] = "thermal",
+            ["battery"] = "power", ["solar"] = "power", ["strap"] = "mounting", ["cushion"] = "protection",
+        };
+
+        static LabCatalog()
+        {
+            foreach (var p in PartTypes) if (LegacyGroups.TryGetValue(p.Type, out var g)) p.Group = g;
+        }
 
         /// <summary>
         /// 部品の形。箱・円柱・球・カプセルは Unity の標準の形（と部品キット）、ドーム・円すい・輪は組み立てるときに作る形（Core/FormMesher）。
@@ -201,7 +266,7 @@ namespace ImpossibleLab.Core
                 AllowedTargetTypes = new[] { "heater" }, ModelJa = "集中定数の熱モデル C dT/dt = 電力×効率 − G(T − 外気温)", Parameters = new[] {
                 P("powerW", "加熱の電力", "W", 1f, 100f, 10f, "0") } },
             new BehaviorInfo { Type = "cool", LabelJa = "冷却", RequiresTargetPart = true,
-                AllowedTargetTypes = new[] { "cooler" }, ModelJa = "集中定数の熱モデル C dT/dt = −電力×成績係数 − G(T − 外気温)", Parameters = new[] {
+                AllowedTargetTypes = new[] { "cooler", "fan" }, ModelJa = "集中定数の熱モデル C dT/dt = −電力×成績係数 − G(T − 外気温)", Parameters = new[] {
                 P("powerW", "冷却の電力", "W", 1f, 100f, 10f, "0") } },
             new BehaviorInfo { Type = "sun_shade", LabelJa = "日よけ", RequiresTargetPart = true,
                 AllowedTargetTypes = new[] { "canopy", "panel" }, ModelJa = "平行光線と人型モデル（円柱）の影の判定（雨の実験と同じ方式）", Parameters = new[] {
@@ -216,13 +281,13 @@ namespace ImpossibleLab.Core
                 P("gripForceN", "つかむ力", "N", 1f, 200f, 30f, "0"),
                 P("openingM", "開き幅", "m", 0.02f, 0.6f, 0.2f) } },
             new BehaviorInfo { Type = "lift_load", LabelJa = "持ち上げ", RequiresTargetPart = true,
-                AllowedTargetTypes = new[] { "arm", "motor" }, ModelJa = "一定の速さで持ち上げる：電力 = m g v ÷ 効率", Parameters = new[] {
+                AllowedTargetTypes = new[] { "arm", "motor", "telescopic", "slide_rail" }, ModelJa = "一定の速さで持ち上げる：電力 = m g v ÷ 効率", Parameters = new[] {
                 P("maxLoadKg", "持ち上げられる重さ", "kg", 0.5f, 30f, 5f, "0.0"),
                 P("liftHeightM", "持ち上げられる高さ", "m", 0.1f, 2f, 0.8f),
                 P("speed", "持ち上げる速さ", "m/s", 0.05f, 1f, 0.2f) } },
             // ---- 機能ブロック 第2弾（6週目）。計算式は Core/Blocks/MassAndDriveModels.cs・docs/blocks.md 8章 ----
             new BehaviorInfo { Type = "drive", LabelJa = "走行", RequiresTargetPart = true,
-                AllowedTargetTypes = new[] { "wheel", "motor", "body" }, ModelJa = "坂の角度 ≤ 上れる角度なら制限速度で上る。電力 P = m g (sinθ + 転がり抵抗係数 cosθ) v ÷ 駆動効率", Parameters = new[] {
+                AllowedTargetTypes = new[] { "wheel", "motor", "body", "crawler" }, ModelJa = "坂の角度 ≤ 上れる角度なら制限速度で上る。電力 P = m g (sinθ + 転がり抵抗係数 cosθ) v ÷ 駆動効率", Parameters = new[] {
                 P("speedLimit", "走る速さ", "m/s", 0.1f, 3f, 1f, "0.0"),
                 P("maxSlopeDeg", "上れる坂の角度", "°", 0f, 30f, 10f, "0") } },
             new BehaviorInfo { Type = "detect", LabelJa = "検知", RequiresTargetPart = true,
@@ -230,7 +295,7 @@ namespace ImpossibleLab.Core
                 P("rangeM", "検知距離", "m", 0.5f, 30f, 5f, "0.0"),
                 P("fovDeg", "視野角", "°", 10f, 360f, 90f, "0") } },
             new BehaviorInfo { Type = "alert", LabelJa = "通知", RequiresTargetPart = true,
-                AllowedTargetTypes = new[] { "light", "speaker" }, ModelJa = "音：距離の逆二乗で弱まる、光：点の光が気づく照度に届く距離", Parameters = new[] {
+                AllowedTargetTypes = new[] { "light", "speaker", "display", "vibrator" }, ModelJa = "音：距離の逆二乗で弱まる、光：点の光が気づく照度に届く距離", Parameters = new[] {
                 P("loudnessDb", "音の大きさ（1 m）", "dB", 0f, 110f, 80f, "0"),
                 P("lightLumens", "光の明るさ", "lm", 0f, 500f, 50f, "0"),
                 P("flashHz", "点滅の速さ", "Hz", 0f, 10f, 2f, "0.0") } },
@@ -273,7 +338,8 @@ namespace ImpossibleLab.Core
         {
             var parts = new Newtonsoft.Json.Linq.JArray(PartTypes.Select(p => new Newtonsoft.Json.Linq.JObject
             {
-                ["type"] = p.Type, ["labelJa"] = p.LabelJa, ["minScale"] = p.MinScale, ["maxScale"] = p.MaxScale,
+                ["type"] = p.Type, ["labelJa"] = p.LabelJa, ["minScale"] = p.MinScale, ["maxScale"] = p.MaxScale, ["group"] = p.Group,
+                ["defaultShape"] = p.DefaultShape, ["defaultMaterial"] = p.DefaultMaterial,
             }));
             var behaviors = new Newtonsoft.Json.Linq.JArray(AiBehaviors.Select(b => new Newtonsoft.Json.Linq.JObject
             {
@@ -332,7 +398,8 @@ namespace ImpossibleLab.Core
                 ["generatedBy"] = "ImpossibleLab.Core.LabCatalog.ToProxyJson (Unity で再生成すること。手で編集しない)",
                 ["schemaVersion"] = InventionDna.CurrentSchemaVersion,
                 ["partTypes"] = parts, ["behaviors"] = behaviors, ["categories"] = cats,
-                ["tags"] = Named(Tags), ["mounts"] = Named(Mounts), ["shapes"] = Named(Shapes),
+                ["tags"] = Named(Tags), ["mounts"] = Named(Mounts), ["shapes"] = Named(Shapes), ["partGroups"] = Named(PartGroups),
+                ["partModels"] = PartModels.ToProxyJson(),
                 ["materials"] = new Newtonsoft.Json.Linq.JArray(Materials.Select(m => new Newtonsoft.Json.Linq.JObject { ["id"] = m.Id, ["labelJa"] = m.LabelJa, ["densityKgM3"] = m.DensityKgM3 })),
                 ["functionStatuses"] = Strs(FunctionStatuses),
                 ["experiments"] = experiments,

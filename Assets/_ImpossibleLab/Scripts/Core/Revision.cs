@@ -45,6 +45,8 @@ namespace ImpossibleLab.Core
         /// <summary>update_part：新しい形・素材（null なら変えない）。</summary>
         public string Shape;
         public string Material;
+        /// <summary>品番（update_part）。"" は品番を外す、null は変えない。</summary>
+        public string Model;
         /// <summary>update_rule：ルール id・変える項目（enabled / when / target / seconds）・条件や動作の番号。値は Value（enabled は 0/1）。</summary>
         public string RuleId;
         public string RuleField;
@@ -416,6 +418,25 @@ namespace ImpossibleLab.Core
             {
                 r.Changes.Add(new ChangeLine { Label = name + "：素材", Before = LabCatalog.Material(part.MaterialOrDefault)?.LabelJa ?? part.MaterialOrDefault, After = LabCatalog.Material(op.Material).LabelJa });
                 part.Material = op.Material;
+            }
+            // 形を変えて品番の形と合わなくなったら、品番を外す
+            var had = part.ModelInfo;
+            if (op.Model == null && had != null && had.Shape != part.ShapeOrDefault)
+            {
+                r.Changes.Add(new ChangeLine { Label = name + "：品番", Before = had.LabelJa, After = "標準" });
+                part.Model = "";
+            }
+            if (op.Model != null && op.Model != part.Model)
+            {
+                var m = PartModels.Find(op.Model);
+                if (op.Model.Length > 0 && (m == null || m.Type != part.Type)) { r.Errors.Add($"この部品に使えない品番: {op.Model}"); return; }
+                r.Changes.Add(new ChangeLine { Label = name + "：品番", Before = part.ModelInfo?.LabelJa ?? "標準", After = m?.LabelJa ?? "標準" });
+                part.Model = m?.Id ?? "";
+                if (m != null && m.Shape != part.ShapeOrDefault)
+                {
+                    r.Changes.Add(new ChangeLine { Label = name + "：形", Before = LabCatalog.Shape(part.ShapeOrDefault)?.LabelJa ?? part.ShapeOrDefault, After = LabCatalog.Shape(m.Shape)?.LabelJa ?? m.Shape });
+                    part.Shape = m.Shape;
+                }
             }
         }
 

@@ -110,8 +110,10 @@ function details(page, inv) {
   partGroups = [];
   for (const p of inv.parts) {
     const role = p.role || `${p.shape}・${p.material}`;
-    let g = partGroups.find((x) => x.label === p.label && x.role === role);
-    if (!g) { g = { label: p.label, role, ids: [] }; partGroups.push(g); }
+    // 品番があれば品番の名前で見せる（同じ品番どうしをまとめる）
+    const label = p.model || p.label;
+    let g = partGroups.find((x) => x.label === label && x.role === role);
+    if (!g) { g = { label, role, ids: [] }; partGroups.push(g); }
     g.ids.push(p.id);
   }
   for (const g of partGroups) {

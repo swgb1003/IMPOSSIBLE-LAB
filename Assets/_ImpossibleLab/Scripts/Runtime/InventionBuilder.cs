@@ -162,7 +162,7 @@ namespace ImpossibleLab
         {
             if (IsThinFrame(part)) return CreateThinFrame(part, dna);
             if (FormMesher.IsMadeShape(part.ShapeOrDefault)) return CreateMadeShape(part, dna);
-            var kit = PartKitLibrary.Find(_assets, part.Type, part.ShapeOrDefault);
+            var kit = PartKitLibrary.Find(_assets, part.Type, part.ShapeOrDefault, part.ModelInfo?.Variant);
             if (kit != null) return CreateFromKit(part, dna, kit);
             // 見た目は DNA の素材（機能部品は機能の色）、形は DNA の shape（未指定なら部品タイプの既定）で決める（PartLook）
             Material mat = _assets.For(PartLook.Surface(part));
@@ -214,8 +214,9 @@ namespace ImpossibleLab
             var go = new GameObject($"Part_{part.Id}_{part.Type}");
             go.transform.localRotation = part.Type == "wheel" && shape == "cylinder" ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
             go.transform.localScale = scale;
-            // 機能の色を飾りが持つキットでは、筐体は素材の色にする
-            var surface = kit.HasAccent ? PartLook.Housing(part) : PartLook.Surface(part);
+            // 機能の色を飾りが持つキットと、品番の見た目のキットでは、筐体は素材の色にする（機能の色は飾りだけ）
+            bool variant = kit.Key.IndexOf('-') >= 0;
+            var surface = kit.HasAccent || variant ? PartLook.Housing(part) : PartLook.Surface(part);
             // 角の丸みを実寸で一定にする（飾りも同じ変形で筐体の面に沿わせる）。センサーのレンズは真円にする
             bool fit = ProductLook.Enabled && ProductLook.Fits(kit.Key, shape);
             bool cylinder = shape == "cylinder";
@@ -223,7 +224,9 @@ namespace ImpossibleLab
             if (tint.HasValue && part.Id == _lowerShell) tint = ProductLook.Darker(tint.Value);
             AddMesh(go, fit ? ProductLook.Fit(kit.Mesh, scale, cylinder) : kit.Mesh, _assets.For(surface), tint);
             var fn = PartLook.Surface(part);
-            bool roundLens = ProductLook.Enabled && part.Type == "sensor" && shape == "sphere";
+            // センサーの丸いレンズと光のにじみは、標準のセンサー（球）の見た目だけ（人感センサーのドームなどには付けない）
+            bool baseSensor = part.Type == "sensor" && shape == "sphere" && !variant;
+            bool roundLens = ProductLook.Enabled && baseSensor;
             foreach (var x in kit.Extras)
             {
                 var child = new GameObject(x.Name);
@@ -232,7 +235,7 @@ namespace ImpossibleLab
                 var mesh = fit ? ProductLook.Fit(x.Mesh, scale, cylinder) : roundLens && x.IsAccent ? ProductLook.Lens(x.Mesh, scale) : x.Mesh;
                 AddMesh(child, mesh, functionColor ? _assets.For(fn) : x.Material, functionColor ? PartLook.Tint(fn, part, dna.Appearance) : null);
             }
-            if (part.Type == "sensor" && shape == "sphere" && kit.HasAccent && _assets.LensGlow != null) AddLensGlow(go.transform, scale);
+            if (baseSensor && kit.HasAccent && _assets.LensGlow != null) AddLensGlow(go.transform, scale);
             return go;
         }
 

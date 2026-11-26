@@ -1,7 +1,16 @@
 // Unity の LabCatalog から書き出した catalog.json を読む（部品・機能・パラメータ範囲・実験カタログの唯一の出典は C# 側）。
 import { readFileSync } from "node:fs";
 
-export interface PartTypeInfo { type: string; labelJa: string; minScale: number; maxScale: number }
+export interface PartTypeInfo {
+  type: string; labelJa: string; minScale: number; maxScale: number;
+  /** まとまり（partGroups）と既定の形・素材。古い catalog.json には無い。 */
+  group?: string; defaultShape?: string; defaultMaterial?: string;
+}
+/** 部品の品番（同じ種類の中の仕様違い。値は汎用部品の目安）。 */
+export interface PartModelInfo {
+  id: string; type: string; labelJa: string; shape: string; size: number[]; massKg: number; priceJpy: number; ip: number;
+  tags: string[]; specs: Record<string, number>;
+}
 export interface ParameterInfo { key: string; labelJa: string; unit: string; min: number; max: number; default: number }
 export interface BehaviorInfo {
   type: string; labelJa: string; requiresTargetPart: boolean; allowedTargetTypes: string[]; parameters: ParameterInfo[];
@@ -42,6 +51,9 @@ export interface Catalog {
   tags: NamedOption[];
   mounts: NamedOption[];
   shapes: NamedOption[];
+  /** 部品のまとまり・品番。古い catalog.json には無い。 */
+  partGroups?: NamedOption[];
+  partModels?: PartModelInfo[];
   materials: MaterialInfo[];
   functionStatuses: string[];
   experiments: { scenarios: ScenarioInfo[]; modules: ModuleInfo[]; metrics: MetricInfo[] };

@@ -86,6 +86,10 @@ namespace ImpossibleLab.Core
         public JointSpec Joint;
         /// <summary>この製品の中での役割（何のために付いているか）。説明の表示だけに使う（任意）。</summary>
         public string Role = "";
+        /// <summary>品番（PartModels。任意）。あれば重さ・仕様・見た目をその品番にする（大きさの違いは体積の比で見積もる）。</summary>
+        public string Model = "";
+        /// <summary>品番の情報（無ければ null）。</summary>
+        public PartModelInfo ModelInfo => PartModels.Find(Model);
 
         public PartSpec Clone()
         {
