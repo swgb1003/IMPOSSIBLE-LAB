@@ -8,6 +8,7 @@ namespace ImpossibleLab.Core
     /// 電池の持ち（1日使う：daily_use）。式は docs/blocks.md 9章、決めたことは docs/DECISIONS.md D-45。
     /// 部品の消費電力・電池の容量・太陽電池の発電は品番の値を使い、品番のない部品は機能の値か、同じ種類の品番の中央値で見積もる。
     /// 使っている間ずっと動く部品（照明・センサーなど）と、必要なときだけ動く部品（モーターなど）に分け、後者は「動いている割合」だけ電力を使う。
+    /// 動作プログラムで入り切りする機能の部品は、照明でも必要なときだけ動く部品として数える。動かす機能のないモーター・脚などは数えない。
     /// ゲーム・教育向けの簡易モデルで、実際の電池の持ちの予測ではない。
     /// </summary>
     public static class EnergyModel
@@ -23,6 +24,9 @@ namespace ImpossibleLab.Core
         public const string Solar = "solar";
         /// <summary>電気を使う機能（部品の種類によらず、機能の値から電力が分かる）。</summary>
         static readonly string[] PoweredBehaviors = { "heat", "cool", "illuminate", "detect" };
+        /// <summary>部品を動かす機能（対象の部品を決めなくても、モーター・脚・推進ユニットを使う）。</summary>
+        static readonly HashSet<string> MovingBehaviors = new HashSet<string> { "follow_user", "avoid_obstacle", "carry_load", "hover", "move_forward", "stabilize", "follow_head", "grip", "lift_load", "drive" };
+        static readonly HashSet<string> Movers = new HashSet<string> { "motor", "leg", "thruster" };
         /// <summary>1日の流れ（再生用）：使い始める時刻と、日なたに出る時刻。</summary>
         public const float UseStartHour = 8f, SunStartHour = 10f;
         /// <summary>充電1回で使える日数の上限（発電で足りるときもこの値）。</summary>
@@ -31,7 +35,8 @@ namespace ImpossibleLab.Core
 
         public enum Source { Model, Behavior, TypeMedian, Mass }
 
-        public struct Consumer { public string PartId, Type; public float Watts; public bool Continuous; public Source From; }
+        /// <summary>Switched：動作プログラムで入り切りするので、ずっと動く種類でも必要なときだけ動く部品として数えた。</summary>
+        public struct Consumer { public string PartId, Type; public float Watts; public bool Continuous, Switched; public Source From; }
         public struct Store { public string PartId; public float Wh; public Source From; }
 
         public sealed class Result
@@ -56,6 +61,8 @@ namespace ImpossibleLab.Core
             public readonly List<Store> Stores = new List<Store>();
             /// <summary>電気を使うのに電力を見積もれなかった部品の id。</summary>
             public readonly List<string> Unknown = new List<string>();
+            /// <summary>動かす機能がないので電力を数えなかった部品の id（モーター・脚など）。</summary>
+            public readonly List<string> Idle = new List<string>();
             /// <summary>再生用：0〜24 時の電池の残り（%、0.1 時間ごと）。</summary>
             public float[] PercentByTenthHour = new float[0];
 
@@ -88,13 +95,36 @@ namespace ImpossibleLab.Core
             return med > 0f ? med : (float?)null;
         }
 
+        /// <summary>動作プログラムで入り切りする機能（set_behavior の対象）。</summary>
+        public static bool Switched(InventionDna dna, string behaviorType) =>
+            dna?.Program != null && dna.Program.Rules.Any(r => r.Enabled && r.Do.Any(a => a.Action == ProgramAction.SetBehavior && a.Behavior == behaviorType));
+
+        /// <summary>
+        /// 必要なときだけ動く部品に、動かすものがあるか：対象にする機能・その部品の関節、
+        /// モーター・脚・推進ユニットは部品を動かす機能（走行・浮遊など）、モーターはほかの部品の関節も。
+        /// </summary>
+        public static bool IsMoved(InventionDna dna, PartSpec p) =>
+            dna.Behaviors.Any(b => b.TargetPart == p.Id) || p.Joint != null
+            || (Movers.Contains(p.Type) && dna.Behaviors.Any(b => MovingBehaviors.Contains(b.Type)))
+            || (p.Type == "motor" && dna.Parts.Any(x => x.Joint != null));
+
         /// <summary>
         /// 部品の消費電力：加温・冷却の機能の電力 → 品番の消費電力 → 照明・検知の機能の値 → 同じ種類の品番の中央値 の順。
-        /// 電気を使わない部品は null。
+        /// 電気を使わない部品と、動かす機能のない「必要なときだけ動く部品」は null。対象にする機能を動作プログラムで入り切りする部品は Switched。
         /// </summary>
         public static Consumer? PartPower(InventionDna dna, PartSpec p)
         {
+            var c = PartPowerRaw(dna, p);
+            if (!c.HasValue) return null;
+            var v = c.Value;
+            if (v.Continuous && dna.Behaviors.Any(b => b.TargetPart == p.Id && Switched(dna, b.Type))) { v.Continuous = false; v.Switched = true; }
+            return v;
+        }
+
+        static Consumer? PartPowerRaw(InventionDna dna, PartSpec p)
+        {
             bool cont = Continuous.Contains(p.Type), inter = Intermittent.Contains(p.Type);
+            if (inter && !IsMoved(dna, p)) return null;
             var targeting = dna.Behaviors.Where(b => b.TargetPart == p.Id).ToList();
             var thermal = targeting.FirstOrDefault(b => b.Type == "heat" || b.Type == "cool");
             if (thermal != null && thermal.Parameters.TryGetValue("powerW", out float tw))
@@ -132,7 +162,7 @@ namespace ImpossibleLab.Core
         }
 
         /// <param name="hoursPerDay">1日に使う時間（時間）。</param>
-        /// <param name="activePercent">必要なときだけ動く部品が、使う時間のうち動いている割合（%）。</param>
+        /// <param name="activePercent">必要なときだけ動く部品（動作プログラムで入り切りする部品を含む）が、使う時間のうち動いている割合（%）。</param>
         /// <param name="sunHours">太陽電池が日なたにある時間（時間）。</param>
         public static Result Evaluate(InventionDna dna, float hoursPerDay, float activePercent, float sunHours)
         {
@@ -143,6 +173,7 @@ namespace ImpossibleLab.Core
                 var c = PartPower(dna, p);
                 if (c.HasValue) { r.Consumers.Add(c.Value); counted.Add(p.Id); }
                 else if (Unmodeled.Contains(p.Type)) r.Unknown.Add(p.Id);
+                else if (Intermittent.Contains(p.Type)) r.Idle.Add(p.Id);
                 var s = PartStore(p);
                 if (s.HasValue) r.Stores.Add(s.Value);
                 if (p.Type == Solar)
@@ -159,7 +190,8 @@ namespace ImpossibleLab.Core
                         : b.Type == "detect" ? BlockCoefficients.V("detectPowerW")
                         : b.Parameters.TryGetValue("powerW", out var pw) ? Mathf.Max(0f, pw) : 0f;
                 if (w <= 0f) continue;
-                r.Consumers.Add(new Consumer { PartId = b.TargetPart ?? "", Type = b.Type, Watts = w, Continuous = true, From = Source.Behavior });
+                bool sw = Switched(dna, b.Type);
+                r.Consumers.Add(new Consumer { PartId = b.TargetPart ?? "", Type = b.Type, Watts = w, Continuous = !sw, Switched = sw, From = Source.Behavior });
                 if (b.TargetPart != null) counted.Add(b.TargetPart);
             }
             float cont = r.Consumers.Where(x => x.Continuous).Sum(x => x.Watts), inter = r.Consumers.Where(x => !x.Continuous).Sum(x => x.Watts);
@@ -172,7 +204,7 @@ namespace ImpossibleLab.Core
             r.BatteryHours = r.UsePowerW > 0f ? Mathf.Min(MaxHours, r.UsableWh / r.UsePowerW) : (r.NoBattery ? 0f : MaxHours);
             float net = r.DailyWh - r.SolarWh;
             if (r.NoBattery) r.ChargeDays = 0f;
-            else if (net <= 1e-6f) { r.ChargeDays = MaxDays; r.SelfSufficient = true; }
+            else if (net <= 1e-6f) { r.ChargeDays = MaxDays; r.SelfSufficient = r.SolarWh > 0f; }
             else r.ChargeDays = Mathf.Min(MaxDays, r.UsableWh / net);
             r.PercentByTenthHour = Timeline(r);
             float start = UseStart(r.HoursPerDay);

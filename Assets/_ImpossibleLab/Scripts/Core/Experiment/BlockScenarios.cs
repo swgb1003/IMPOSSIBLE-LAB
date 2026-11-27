@@ -456,15 +456,18 @@ namespace ImpossibleLab.Core
 
             string Name(string id) { var p = dna.FindPart(id); return p == null ? LabCatalog.Behavior(id)?.LabelJa ?? id : (p.ModelInfo?.LabelJa ?? LabCatalog.Part(p.Type)?.LabelJa ?? p.Type); }
             var top = r.Consumers.OrderByDescending(c => c.Watts).Take(4)
-                .Select(c => $"{Name(c.PartId.Length > 0 ? c.PartId : c.Type)} {Watts(c.Watts)}（{EnergyModel.SourceLabel(c.From)}{(c.Continuous ? "" : "・動くときだけ")}）");
+                .Select(c => $"{Name(c.PartId.Length > 0 ? c.PartId : c.Type)} {Watts(c.Watts)}（{EnergyModel.SourceLabel(c.From)}{(c.Continuous ? "" : c.Switched ? "・プログラムで入り切り" : "・動くときだけ")}）");
             res.Assumptions.Add($"電気を使う部品：{string.Join("、", top)}{(r.Consumers.Count > 4 ? $" ほか {r.Consumers.Count - 4} 個" : "")}");
-            res.Assumptions.Add($"使っている間の電力 = ずっと動く部品の合計 ＋ 動くときだけの部品の合計 × 動く時間の割合 {r.ActiveRatio * 100f:0}% = {Watts(r.UsePowerW)}。1日に {r.HoursPerDay:0.#} 時間使うと {r.DailyWh:0.0} Wh");
+            if (r.Idle.Count > 0) res.Assumptions.Add($"{string.Join("・", r.Idle.Select(Name).Distinct())}は、動かす機能がないので電力を数えていない");
+            string inter = r.Consumers.Any(c => c.Switched) ? "動くときだけの部品（プログラムで入り切りする部品を含む）" : "動くときだけの部品";
+            res.Assumptions.Add($"使っている間の電力 = ずっと動く部品の合計 ＋ {inter}の合計 × 動く時間の割合 {r.ActiveRatio * 100f:0}% = {Watts(r.UsePowerW)}。1日に {r.HoursPerDay:0.#} 時間使うと {r.DailyWh:0.0} Wh");
             if (!r.NoBattery)
                 res.Assumptions.Add($"電池の容量 {r.NominalWh:0.0} Wh（{string.Join("・", r.Stores.Select(s => EnergyModel.SourceLabel(s.From)).Distinct())}）のうち、使えるのは {r.UsableWh:0.0} Wh（使用可能な割合をかける）。電池で動ける時間 = 使える容量 ÷ 使っている間の電力");
             if (r.SolarRatedW > 0f)
                 res.Assumptions.Add($"太陽電池：定格 {r.SolarRatedW:0.#} W × 日なた {r.SunHours:0.#} 時間 × 発電の割合 {BlockCoefficients.V("solarDerate"):0.0} = 1日 {r.SolarWh:0.0} Wh をためる");
             res.Assumptions.Add("充電1回で使える日数 = 使える容量 ÷ (1日に使う電力量 − 1日の発電量)。待機中の電力・寒さによる容量の低下・電池の劣化は扱わない");
 
+            if (r.UsePowerW <= 0f) res.Limits.Add("使っている間に電力を使う部品がない計算");
             if (r.NoBattery) res.Limits.Add("電池がない：コンセントや別の電源につなぐ必要がある");
             else if (r.SelfSufficient) res.Limits.Add("太陽電池の発電で 1 日の電力をまかなえる計算（曇りや雨の日は足りない）");
             if (r.RunsOutAfterHours.HasValue) res.Limits.Add($"使い始めて {r.RunsOutAfterHours.Value:0.0} 時間で電池が切れる（1日に使う時間 {r.HoursPerDay:0.#} 時間より短い）");

@@ -15,6 +15,8 @@ namespace ImpossibleLab.Tests
             return new PartSpec { Id = id, Type = type, Model = model, Shape = m?.Shape ?? "", Scale = scale ?? m?.Size ?? Vector3.one * 0.05f };
         }
 
+        static PartSpec Hinged(PartSpec p) { p.Joint = new JointSpec { Parent = "body", Max = 90f, Speed = 90f }; return p; }
+
         static BehaviorSpec B(string type, string target, params (string k, float v)[] ps)
         {
             var b = new BehaviorSpec { Type = type, TargetPart = target };
@@ -22,14 +24,14 @@ namespace ImpossibleLab.Tests
             return b;
         }
 
-        /// <summary>灯り 1 W・人感センサー 0.01 W・ギヤモーター 2 W（動くときだけ）・18650 電池 1 本（10.8 Wh）。</summary>
+        /// <summary>灯り 1 W・人感センサー 0.01 W・ギヤモーター 2 W（関節を動かす、動くときだけ）・18650 電池 1 本（10.8 Wh）。</summary>
         static InventionDna Lantern(string battery = "bat-18650x1", string solar = null)
         {
             var dna = new InventionDna { Id = "t-lantern", Name = "テスト", Purpose = "テスト", Mount = "back" };
             dna.Parts.Add(P("body", "body", scale: new Vector3(0.12f, 0.08f, 0.05f)));
             dna.Parts.Add(P("lamp", "light", "led-spot1w"));
             dna.Parts.Add(P("eye", "sensor", "sen-pir"));
-            dna.Parts.Add(P("m", "motor", "mot-gear-tt"));
+            dna.Parts.Add(Hinged(P("m", "motor", "mot-gear-tt")));
             if (battery != null) dna.Parts.Add(P("bat", "battery", battery));
             if (solar != null) dna.Parts.Add(P("sun", "solar", solar));
             dna.Behaviors.Add(B("illuminate", "lamp", ("lumens", 100f), ("beamAngleDeg", 60f), ("tiltDeg", 45f)));
@@ -62,7 +64,7 @@ namespace ImpossibleLab.Tests
         {
             var dna = new InventionDna { Id = "t", Mount = "hand" };
             dna.Parts.Add(P("lamp", "light"));
-            dna.Parts.Add(P("m", "motor"));
+            dna.Parts.Add(Hinged(P("m", "motor")));
             dna.Parts.Add(P("pad", "heater", "heat-pad-usb"));
             dna.Parts.Add(P("bat", "battery", scale: new Vector3(0.04f, 0.02f, 0.06f)));
             dna.Behaviors.Add(B("illuminate", "lamp", ("lumens", 150f)));
@@ -77,6 +79,47 @@ namespace ImpossibleLab.Tests
             var store = r.Stores.Single();
             Assert.AreEqual(EnergyModel.Source.Mass, store.From, "品番のない電池は重さ × エネルギー密度");
             Assert.AreEqual(MassModel.Part(dna.FindPart("bat")).Kg * RealityModel.Default.Get("batteryEnergyDensity").Value, store.Wh, 1e-3f);
+        }
+
+        [Test] public void Evaluate_ProgramSwitchedParts_AreIntermittent_AndUnmovedPartsAreNotCounted()
+        {
+            var dna = Lantern();
+            dna.Parts.Add(P("spike", "leg"));
+            dna.Program = new MotionProgram
+            {
+                Rules = { new ProgramRule { Id = "on", When = { new ProgramCondition { Sensor = "target_distance", Op = "<", Value = 2f } },
+                                            Do = { new ProgramAction { Action = ProgramAction.SetBehavior, Behavior = "illuminate", On = true } } } },
+            };
+            var r = EnergyModel.Evaluate(dna, 4f, 20f, 0f);
+            var lamp = r.Consumers.Single(c => c.PartId == "lamp");
+            Assert.IsTrue(lamp.Switched);
+            Assert.IsFalse(lamp.Continuous);
+            Assert.AreEqual(0.01f + (1f + 2f) * 0.2f, r.UsePowerW, 1e-4f, "プログラムで入り切りする灯りは、動く時間の割合だけ電力を使う");
+            CollectionAssert.AreEqual(new[] { "spike" }, r.Idle, "動かす機能も関節もない脚は数えない");
+            Assert.IsFalse(r.Consumers.Any(c => c.PartId == "spike"));
+            var res = ScenarioRunner.RunPlan(dna, Daily()).Result;
+            Assert.IsTrue(res.Assumptions.Any(a => a.Contains("プログラムで入り切り")), string.Join(" / ", res.Assumptions));
+            Assert.IsTrue(res.Assumptions.Any(a => a.StartsWith("脚は、動かす機能がないので")), string.Join(" / ", res.Assumptions));
+
+            dna.Program.Rules[0].Enabled = false;
+            Assert.IsTrue(EnergyModel.Evaluate(dna, 4f, 20f, 0f).Consumers.Single(c => c.PartId == "lamp").Continuous, "止めたルールは数えない");
+            dna.Behaviors.Add(B("drive", "body"));
+            Assert.IsEmpty(EnergyModel.Evaluate(dna, 4f, 20f, 0f).Idle, "走行の機能があれば脚も動かす");
+        }
+
+        [Test] public void Evaluate_NothingDrawsPower_IsNotSolarSelfSufficient()
+        {
+            var dna = new InventionDna { Id = "t-idle", Mount = "hand" };
+            dna.Parts.Add(P("body", "body"));
+            dna.Parts.Add(P("m", "motor", "mot-gear-tt"));
+            dna.Parts.Add(P("bat", "battery", "bat-18650x1"));
+            Assert.IsTrue(EnergyModel.UsesPower(dna));
+            var r = EnergyModel.Evaluate(dna, 4f, 20f, 0f);
+            Assert.AreEqual(0f, r.UsePowerW);
+            Assert.IsFalse(r.SelfSufficient, "発電がないのに、発電で足りるとは言わない");
+            var res = ScenarioRunner.RunPlan(dna, Daily()).Result;
+            Assert.IsTrue(res.Limits.Any(l => l.Contains("電力を使う部品がない")), string.Join(" / ", res.Limits));
+            Assert.IsFalse(res.Limits.Any(l => l.Contains("太陽電池")));
         }
 
         [Test] public void Evaluate_SolarCanCoverTheDay_AndNoBatteryGivesZero()

@@ -41,9 +41,10 @@ export function buildSchemas(c: Catalog) {
   });
   const need = z.object({
     need: z.string().describe("Japanese, one user need in a few words"),
-    // 文法の大きさを抑えるため文字列（設計に無い機能は toDna が外す）
-    blocks: z.array(z.string()).describe("behavior types (from the design) that realize and test this need; empty when unverifiable"),
-    metrics: z.array(z.string()).describe("metric keys that check this need when no behavior does (batteryHours, chargeDays, partsCostJpy); usually empty"),
+    // 文法の大きさを抑えるため文字列（設計に無い機能は toDna が外す）。
+    // 計測項目（電池の持ち・部品代）も同じ配列で受け取り、toDna がアプリの形の metrics に分ける。
+    // 別の配列にすると構造化出力の文法が API の上限を超える（2026-11-27 に確認）
+    blocks: z.array(z.string()).describe("behavior types (from the design) that realize and test this need, or metric keys (batteryHours, chargeDays, partsCostJpy) when no behavior does; empty when unverifiable"),
     status,
     note: z.string().describe("Japanese. Required for simplified/unverifiable: what is simplified or why it cannot be tested"),
   });
@@ -191,10 +192,10 @@ export function toDna(d: NonNullable<DesignOutput["design"]>, c: Catalog, id = n
   const present = new Set(behaviors.map((b) => b.type as string));
   const metricKeys = new Set(c.experiments.metrics.map((m) => m.key));
   const functionMap = d.functionMap.slice(0, c.limits.maxFunctionNeeds).map((n, ni) => {
-    const blocks = [...new Set(n.blocks)].filter((b) => present.has(b));
-    if (blocks.length < new Set(n.blocks).size) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、設計に無い機能を外した`);
-    const metrics = [...new Set(n.metrics ?? [])].filter((m) => metricKeys.has(m)).slice(0, c.limits.maxMetrics);
-    if (metrics.length < new Set(n.metrics ?? []).size) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、無い計測項目を外した`);
+    const given = [...new Set(n.blocks)];
+    const blocks = given.filter((b) => present.has(b));
+    const metrics = given.filter((m) => metricKeys.has(m) && !present.has(m)).slice(0, c.limits.maxMetrics);
+    if (blocks.length + metrics.length < given.length) fixes.push(`「${clip(n.need, 20)}」の機能対応表から、設計に無い機能・計測項目を外した`);
     let status = n.status;
     let note = clip(n.note, c.limits.maxNoteLength);
     // 「動きを見せる」は動作プログラムがあれば機能なしでよい（アプリの検証器と同じ決まり）

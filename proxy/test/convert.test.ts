@@ -25,11 +25,11 @@ const nightLight = {
     { type: "alert", targetPart: "lamp", parameters: [{ name: "lightLumens", value: 30 }] },
   ],
   functionMap: [
-    { need: "足元を照らす", blocks: ["illuminate"], metrics: [], status: "simulated", note: "" },
-    { need: "車に気づいてもらう", blocks: ["alert", "detect"], metrics: [], status: "simplified", note: "見える距離を概算" },
-    { need: "雨でも使える", blocks: [], metrics: [], status: "unverifiable", note: "防水は検証できない" },
-    { need: "軽い", blocks: ["stabilize"], metrics: [], status: "simulated", note: "" },
-    { need: "かっこいい", blocks: [], metrics: [], status: "unverifiable", note: "" },
+    { need: "足元を照らす", blocks: ["illuminate"], status: "simulated", note: "" },
+    { need: "車に気づいてもらう", blocks: ["alert", "detect"], status: "simplified", note: "見える距離を概算" },
+    { need: "雨でも使える", blocks: [], status: "unverifiable", note: "防水は検証できない" },
+    { need: "軽い", blocks: ["stabilize"], status: "simulated", note: "" },
+    { need: "かっこいい", blocks: [], status: "unverifiable", note: "" },
   ],
   program: "",
   explain: JSON.stringify({
@@ -71,7 +71,7 @@ const autoBin = {
     { id: "hinge-motor", type: "motor", shape: "cylinder", material: "plastic", position: [0, 0.6, -0.18], scale: [0.04, 0.06, 0.04], model: "" },
   ],
   behaviors: [{ type: "detect", targetPart: "eye", parameters: [{ name: "rangeM", value: 3 }] }],
-  functionMap: [{ need: "近づくと開く", blocks: ["detect"], metrics: [], status: "simulated", note: "" }],
+  functionMap: [{ need: "近づくと開く", blocks: ["detect"], status: "simulated", note: "" }],
   program: JSON.stringify(binProgram),
   explain: JSON.stringify({ points: ["フタは後ろの辺で回る"] }),
   plans: [{
@@ -157,16 +157,18 @@ test("a design with a motion program converts to the app's program format", () =
   const stand = toPlans([{ ...nightLight.plans[0], expect: autoBin.plans[0].expect }] as never, catalog)[0];
   assert.ok(!("expect" in stand.plan), "期待は approach_device だけ");
   // 「動きを見せる」要望は、動作プログラムがあれば機能（blocks）なしでよい。プログラムがなければ「検証できない」に直す
-  const shown = { need: "雨で閉じる", blocks: [], metrics: [], status: "demonstrated", note: "" };
+  const shown = { need: "雨で閉じる", blocks: [], status: "demonstrated", note: "" };
   assert.equal(toDna({ ...out.design!, functionMap: [shown] }, catalog).dna.functionMap[0].status, "demonstrated");
   assert.equal(toDna({ ...out.design!, functionMap: [shown], program: "" }, catalog).dna.functionMap[0].status, "unverifiable");
-  // 電池の持ち・部品代の要望は、機能がなくても計測項目（metrics）で確かめる。無い計測項目は外す
-  const battery = { need: "一日もつ", blocks: [], metrics: ["batteryHours", "chargeDays", "nope"], status: "simulated", note: "" };
+  // 電池の持ち・部品代の要望は、機能がなくても計測項目で確かめる。AI は blocks に計測項目のキーを入れ（構造化出力の文法の上限のため）、
+  // toDna がアプリの形の blocks と metrics に分ける。無い機能・計測項目は外す
+  const battery = { need: "一日もつ", blocks: ["detect", "batteryHours", "chargeDays", "nope"], status: "simulated", note: "" };
   const bd = toDna({ ...out.design!, functionMap: [battery] }, catalog);
   assert.equal(bd.dna.functionMap[0].status, "simulated");
+  assert.deepEqual(bd.dna.functionMap[0].blocks, ["detect"]);
   assert.deepEqual((bd.dna.functionMap[0] as { metrics?: string[] }).metrics, ["batteryHours", "chargeDays"]);
-  assert.ok(bd.fixes.some((f) => f.includes("無い計測項目")));
-  const none = toDna({ ...out.design!, functionMap: [{ ...battery, metrics: ["nope"] }] }, catalog);
+  assert.ok(bd.fixes.some((f) => f.includes("無い機能・計測項目")));
+  const none = toDna({ ...out.design!, functionMap: [{ ...battery, blocks: ["nope"] }] }, catalog);
   assert.equal(none.dna.functionMap[0].status, "unverifiable");
   assert.ok(!("metrics" in none.dna.functionMap[0]), "空の metrics は出さない");
   // 読めない JSON（途中で切れた・配列）は program なしにして記録する。JSON として読むだけで、実行はしない
@@ -197,7 +199,7 @@ test("schema rejects values outside the catalog", () => {
   assert.throws(bad({ tags: ["weapon"] }));
   assert.throws(bad({ plans: [{ ...nightLight.plans[0], scenario: "moonwalk" }] }));
   assert.throws(bad({ plans: [{ ...nightLight.plans[0], metrics: ["teleportTime"] }] }));
-  assert.throws(bad({ functionMap: [{ need: "x", blocks: [], metrics: [], status: "maybe", note: "" }] }));
+  assert.throws(bad({ functionMap: [{ need: "x", blocks: [], status: "maybe", note: "" }] }));
 });
 
 const emptyOp = { behavior: "", parameter: "", value: 0, partId: "", part: null, targetPart: "", parameters: [], ruleId: "", field: "", index: 0, rule: "", joint: "" };
@@ -326,7 +328,7 @@ test("system prompts include the whole catalog, the experiment rules and the inj
   // 製品の説明（概要・部品の役割・しくみ）と、設計に無いしくみを作らない決まり
   assert.ok(d.includes("explain: JSON text") && d.includes("Each part's role") && d.includes("Do not invent hidden mechanisms") && d.includes("never by their ids"));
   // 電池の持ち（1日使う）と部品代：電気の部品が要る計測項目・要望の metrics・電池の部品
-  assert.ok(d.includes("needs a part that uses electricity") && d.includes('metrics ["batteryHours", "chargeDays"]') && d.includes("needs a battery part"));
+  assert.ok(d.includes("needs a part that uses electricity") && d.includes('blocks ["batteryHours", "chargeDays"]') && d.includes("needs a battery part"));
   assert.ok(!/unverifiable" \(the app cannot test it, e\.g\.[^)]*cost/.test(d), "部品代は確かめられない例から外す");
 });
 
